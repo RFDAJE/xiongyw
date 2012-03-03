@@ -1,0 +1,108 @@
+//////////////////////////////////////////////////////////////
+import fontsize;
+import "../node/node.asy" as node;
+
+settings.tex = "xelatex";
+texpreamble("\usepackage{xeCJK}");
+texpreamble("\setCJKmainfont{SimHei}");
+texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
+
+import fontsize;
+import "../node/node.asy" as node;
+
+settings.tex = "xelatex";
+texpreamble("\usepackage{xeCJK}");
+texpreamble("\setCJKmainfont{SimHei}");
+texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
+
+
+node N0065ab64 = node("AG_Object", "d");
+node N0065a97c = node("AG_Config", "d");
+N0065ab64.attach(N0065a97c);
+node N0065b554 = node("AG_Driver", "d");
+node N0065ba54 = node("AG_DriverSw", "d");
+node N0065b754 = node("AG_DriverOSDLinklist", "d");
+N0065ba54.attach(N0065b754);
+N0065b554.attach(N0065ba54);
+N0065ab64.attach(N0065b554);
+node N0065c500 = node("AG_InputDevice", "d");
+node N0065c6e8 = node("AG_Keyboard", "d");
+N0065c500.attach(N0065c6e8);
+N0065ab64.attach(N0065c500);
+node N0065f890 = node("AG_Widget", "d");
+node N0065fa88 = node("AG_Window", "d");
+N0065f890.attach(N0065fa88);
+node N0065ad64 = node("AG_Box", "d");
+node N0065d488 = node("AG_NotebookTab", "d");
+N0065ad64.attach(N0065d488);
+node N0065e42c = node("AG_Statusbar", "d");
+N0065ad64.attach(N0065e42c);
+node N0065ecd4 = node("AG_Titlebar", "d");
+N0065ad64.attach(N0065ecd4);
+node N0065f0bc = node("AG_Toolbar", "d");
+N0065ad64.attach(N0065f0bc);
+N0065f890.attach(N0065ad64);
+node N0065af58 = node("AG_Button", "d");
+N0065f890.attach(N0065af58);
+node N0065b14c = node("AG_Checkbox", "d");
+N0065f890.attach(N0065b14c);
+node N0065b358 = node("AG_Console", "d");
+N0065f890.attach(N0065b358);
+node N0065bc3c = node("AG_Editable", "d");
+N0065f890.attach(N0065bc3c);
+node N0065be30 = node("AG_Fixed", "d");
+N0065f890.attach(N0065be30);
+node N0065c024 = node("AG_FSpinbutton", "d");
+N0065f890.attach(N0065c024);
+node N0065c30c = node("AG_Icon", "d");
+N0065f890.attach(N0065c30c);
+node N0065c8d0 = node("AG_Label", "d");
+N0065f890.attach(N0065c8d0);
+node N0065cac4 = node("AG_Menu", "d");
+N0065f890.attach(N0065cac4);
+node N0065ccb8 = node("AG_MenuView", "d");
+N0065f890.attach(N0065ccb8);
+node N0065ceac = node("AG_MFSpinbutton", "d");
+N0065f890.attach(N0065ceac);
+node N0065d0a0 = node("AG_MSpinbutton", "d");
+N0065f890.attach(N0065d0a0);
+node N0065d294 = node("AG_Notebook", "d");
+N0065f890.attach(N0065d294);
+node N0065d67c = node("AG_Numerical", "d");
+N0065f890.attach(N0065d67c);
+node N0065d870 = node("AG_Pixmap", "d");
+N0065f890.attach(N0065d870);
+node N0065da64 = node("AG_ProgressBar", "d");
+N0065f890.attach(N0065da64);
+node N0065dc58 = node("AG_Radio", "d");
+N0065f890.attach(N0065dc58);
+node N0065de50 = node("AG_Scrollbar", "d");
+N0065f890.attach(N0065de50);
+node N0065e044 = node("AG_Separator", "d");
+N0065f890.attach(N0065e044);
+node N0065e238 = node("AG_Spinbutton", "d");
+N0065f890.attach(N0065e238);
+node N0065e6cc = node("AG_Table", "d");
+N0065f890.attach(N0065e6cc);
+node N0065f2b0 = node("AG_Treetbl", "d");
+N0065f890.attach(N0065f2b0);
+node N0065e8c0 = node("AG_Textbox", "d");
+N0065f890.attach(N0065e8c0);
+node N0065eec8 = node("AG_Tlist", "d");
+N0065f890.attach(N0065eec8);
+node N0065f4a4 = node("AG_UCombo", "d");
+N0065f890.attach(N0065f4a4);
+node N0065fe78 = node("GIFView", "d");
+N0065f890.attach(N0065fe78);
+node N0065fc84 = node("VideoView", "d");
+N0065f890.attach(N0065fc84);
+node N0065f69c = node("AG_Viewbox", "d");
+N0065f890.attach(N0065f69c);
+N0065ab64.attach(N0065f890);
+node N0065eaec = node("AG_Font", "d");
+N0065ab64.attach(N0065eaec);
+picture root = draw_dir_tree(N0065ab64);
+
+attach(bbox(root, 2, 2, white), (0,0), SE);
+
+//////////////////////////////////////////////////////////////

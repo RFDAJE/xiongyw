@@ -1,0 +1,826 @@
+/* 
+ * created(bruin, 2008-07-04): generic node/tree struct
+ *
+ * $Id$
+ */
+import fontsize;
+import "node.asy" as node;
+
+texpreamble("\usepackage{amssymb,amsmath,mathrsfs}
+             %\usepackage{CJK}
+             %\newcommand{\myfrac}[2]{\,$\mathrm{{^{#1}}\!\!\diagup\!\!{_{#2}}}$\,}
+             %\newcommand{\myfrac}[2]{#1\!/\!#2}
+             %\newcommand{\cwave}{бл}
+             %\newcommand{\song}{\CJKfamily{song}}
+             %\newcommand{\fs}{\CJKfamily{fs}}
+             %\newcommand{\hei}{\CJKfamily{hei}}
+             %\newcommand{\kai}{\CJKfamily{kai}}
+             %\AtBeginDocument{\begin{CJK*}{GBK}{hei}}
+             %\AtEndDocument{\clearpage\end{CJK*}}"
+            );
+
+/* we use PostScript unit in both picture and frame */
+size(0, 0);
+unitsize(0, 0);
+
+
+
+/* ################ data struct ################ */
+node root   = node("root");
+node kid1 = node("kid1");
+node kid2 = node("kiiid2");
+node kid3 = node("kiddd3");
+node kid4 = node("kkid4");
+root.attach(kid1, kid2);
+root.attach(kid3, kid4);
+
+node kid11 = node("kkid11");
+node kid12 = node("kiiid12");
+node kid13 = node("kidddd13");
+
+node kid21 = node("kid21");
+node kid22 = node("kid22");
+
+node kid31 = node("kidddd31");
+
+kid1.attach(kid11, kid12, kid13);
+kid2.attach(kid21, kid22);
+kid3.attach(kid31);
+
+node kid311 = node("kid311");
+node kid312 = node("kid312");
+kid31.attach(kid311, kid312);
+
+/* ################ draw the pictures ################ */
+
+picture pic_flat_left = draw_tree(root, style=TREE_STYLE_FLAT, orient=TREE_ORIENT_LEFT);
+picture pic_flat_right = draw_tree(root, style=TREE_STYLE_FLAT, orient=TREE_ORIENT_RIGHT);
+picture pic_step_left = draw_tree(root, style=TREE_STYLE_STEP, orient=TREE_ORIENT_LEFT, show_collapse_icon=true, level=3, gene_gap=30);
+picture pic_step_right = draw_tree(root, style=TREE_STYLE_STEP, orient=TREE_ORIENT_RIGHT, show_collapse_icon=true, level=2);
+
+
+picture pic_case_left = draw_tree(root, style=TREE_STYLE_CASE, orient=TREE_ORIENT_LEFT, gene_gap=6);
+picture pic_case_right = draw_tree(root, style=TREE_STYLE_CASE, orient=TREE_ORIENT_RIGHT, gene_gap=6);
+
+attach(pic_flat_left.fit(), (0,0), SE);
+attach(pic_flat_right.fit(), (280, 0), SE);
+attach(pic_step_left.fit(), (0, 250), SE);
+attach(pic_step_right.fit(), (280, 250), SE);
+attach(pic_case_left.fit(), (0,420), SE);
+attach(pic_case_right.fit(), (280,420), SE);
+
+shipout("node.eps");
+erase(currentpicture);
+
+
+/* ################ call sequence ################ */
+
+real   font_size = 10;      /* font size */
+
+/* st/s3/otv/tmm */
+string st = "st";
+string s3 = "s3";
+string otv = "otv";
+string tmm = "tmm";
+
+/* match the color with the diagram in original SRS document by martin */
+pen fill_pen_st  = rgb(153, 204, 255);
+pen fill_pen_s3  = rgb(204, 153, 255);
+pen fill_pen_otv = rgb(204, 255, 204);
+pen fill_pen_tmm = white;
+
+
+picture node_draw_func(node p)
+{
+	picture pic;
+	filltype fill;
+
+	defaultpen(fontsize(font_size));
+	pen line_pen = linewidth(0.8) + black + linecap(0); /* square cap */
+	pen name_pen = linewidth(0.1) + black + fontsize(font_size);
+	
+
+	if(p.priv == st){
+		fill = FillDraw(fill_pen_st);
+	}else if(p.priv == s3){
+		fill = FillDraw(fill_pen_s3);
+	}else if(p.priv == otv){
+		fill = FillDraw(fill_pen_otv);
+	}else if(p.priv == tmm){
+		//fill = Fill(ymargin=1, fill_pen_tmm);
+		fill=FillDraw(fill_pen_tmm);
+	}else{
+		fill = NoFill;
+	}
+	
+	draw(pic, "\texttt{"+p.text+"}", box,(0,0),1,black,fill);
+
+	return pic;
+}
+
+
+node misc                     = node("......", "unknown");
+
+node main                     = node("main()", "tmm");
+node board_init               = node("board_init()", "tmm");
+node task_priority_set        = node("task_priority_set()", "st");
+node control_task_main        = node("control_task_main(!)", "otv");
+node STAL_KPI_KernelMonitor   = node("STAL_KPI_KernelMonitor()", "s3");
+main.attach(board_init, 
+            task_priority_set, 
+            control_task_main, 
+            STAL_KPI_KernelMonitor);
+
+
+node STAL_Init                = node("STAL_Init()", "s3");
+node STAL_KPI_Register        = node("STAL_KPI_Register()", "s3");
+board_init.attach(STAL_Init, 
+                  STAL_KPI_Register);
+
+node HAL_INIT_GetConfig       = node("HAL_INIT_GetConfig()", "tmm");
+node STAL_SYS_Register        = node("STAL_SYS_Register()", "s3");
+node HAL_INIT_Init            = node("HAL_INIT_Init()", "tmm");
+STAL_Init.attach(HAL_INIT_GetConfig, 
+                 STAL_SYS_Register, 
+                 HAL_INIT_Init);
+
+node InitStBoot                = node("InitStBoot()", "tmm");
+node InitStPio                 = node("InitStPio()", "tmm");
+node InitStUART                = node("InitStUART(*)", "tmm");
+node InitStEvt                 = node("InitStEvt()", "tmm");
+node InitStMerge               = node("InitStMerge(*)", "tmm");
+node InitStFdma                = node("InitStFdma()", "tmm");
+node InitStAvmem               = node("InitStAvmem()", "tmm");
+node InitStAvmem2              = node("InitStAvmem2()", "tmm");
+node InitStI2c                 = node("InitStI2c(*)", "tmm");
+node InitStClkrv               = node("InitStClkrv()", "tmm");
+node InitStDenc                = node("InitStDenc(*)", "tmm");
+node InitStVtg                 = node("InitStVtg(*)", "tmm");
+node InitStVout                = node("InitStVout(*)", "tmm");
+node InitStAud                 = node("InitStAud()", "tmm");
+node InitStBlit                = node("InitStBlit()", "tmm");
+HAL_INIT_Init.attach(InitStBoot, 
+                     InitStPio, 
+                     InitStUART, 
+                     InitStEvt, 
+                     InitStMerge, 
+                     InitStFdma, 
+                     InitStAvmem, 
+                     InitStAvmem2,
+                     InitStI2c,
+                     InitStClkrv,
+                     InitStDenc,
+                     InitStVtg,
+                     InitStVout,
+                     InitStAud,
+                     InitStBlit);
+
+node STBOOT_Init               = node("STBOOT_Init()", "s3");
+InitStBoot.attach(STBOOT_Init);
+
+node kernel_initialize         = node("kernel_initialize()", "st");
+node kernel_start              = node("kernel_start()", "st");
+STBOOT_Init.attach(kernel_initialize,
+                   kernel_start);
+
+node STPIO_InitNoReset         = node("STPIO_InitNoReset()", "st");
+InitStPio.attach(STPIO_InitNoReset);
+
+node STUART_Init               = node("STUART_Init()", "st");
+node STTBX_Init                = node("STTBX_Init()", "st");
+InitStUART.attach(STUART_Init,
+                  STTBX_Init);
+
+node STEVT_Init                = node("STEVT_Init()", "st");
+node STEVT_Open                = node("STEVT_Open()", "st");
+InitStEvt.attach(STEVT_Init,
+                 STEVT_Open);
+
+node ST_GetClockInfo           = node("ST_GetClockInfo()", "st");
+node STMERGE_Init              = node("STMERGE_Init()", "st");
+node STMERGE_SetParams         = node("STMERGE_SetParams(*)", "st");
+node STMERGE_Connect           = node("STMERGE_Connect(?)", "st");
+InitStMerge.attach(ST_GetClockInfo,
+                   STMERGE_Init,
+                   STMERGE_SetParams,
+                   STMERGE_Connect);
+
+node ST_GetClocksPerSecond      = node("ST_GetClocksPerSecond()", "st");
+node STFDMA_Init                = node("STFDMA_Init()", "st");
+InitStFdma.attach(ST_GetClocksPerSecond,
+                  STFDMA_Init);
+
+node STAVMEM_Init               = node("STAVMEM_Init()", "st");
+node STAVMEM_CreatePartition    = node("STAVMEM_CreatePartition()", "st");
+InitStAvmem.attach(STAVMEM_Init,
+                   STAVMEM_CreatePartition);
+InitStAvmem2.attach(STAVMEM_Init,
+                    STAVMEM_CreatePartition);
+
+node STI2C_Init_0                 = node("STI2C_Init(0)", "st");
+node STI2C_Init_1                 = node("STI2C_Init(1)", "st");
+node STI2C_Init_2                 = node("STI2C_Init(*)", "st");
+InitStI2c.attach(ST_GetClockInfo,
+                 STI2C_Init_0,
+                 STI2C_Init_1,
+                 STI2C_Init_2);
+
+node STVTG_Init                   = node("STVTG_Init(hd)", "st");
+node STVTG_Open                   = node("STVTG_Open(hd)", "st");
+node STVTG_SetMode                = node("STVTG_SetMode(hd)", "st");
+node STVTG_SetOptionalConfiguration = node("STVTG_SetOptionalConfiguration(hd)", "st");
+node STVTG_Init_sd                = node("STVTG_Init(sd)", "st");
+node STVTG_Open_sd                = node("STVTG_Open(sd)", "st");
+node STVTG_SetMode_sd             = node("STVTG_SetMode(sd)", "st");
+InitStVtg.attach(STVTG_Init,
+                 STVTG_Open,
+                 STVTG_SetMode,
+                 STVTG_SetOptionalConfiguration,
+                 STVTG_Init_sd,
+                 STVTG_Open_sd,
+                 STVTG_SetMode_sd);
+
+node STCLKRV_Init                 = node("STCLKRV_Init()", "st");
+node STCLKRV_Open                 = node("STCLKRV_Open()", "st");
+node STCLKRV_SetSTCSource         = node("STCLKRV_SetSTCSource()", "st");
+node STCLKRV_SetSTCOffset         = node("STCLKRV_SetSTCOffset()", "st");
+node STCLKRV_InvDecodeClk         = node("STCLKRV_InvDecodeClk()", "st");
+node STCLKRV_SetApplicationMode   = node("STCLKRV_SetApplicationMode()", "st");
+node STCLKRV_Enable               = node("STCLKRV_Enable()", "st");
+InitStClkrv.attach(STCLKRV_Init,
+                   STCLKRV_Open,
+                   STCLKRV_SetSTCSource,
+                   STCLKRV_SetSTCOffset,
+                   STCLKRV_InvDecodeClk,
+                   STCLKRV_SetApplicationMode,
+                   STCLKRV_Enable);
+
+node STDENC_Init                  = node("STDENC_Init()", "st");
+node STDENC_Open                  = node("STDENC_Open()", "st");
+node STDENC_SetEncodingMode       = node("STDENC_SetEncodingMode(*)", "st");
+InitStDenc.attach(STDENC_Init,
+                  STDENC_Open,
+                  STDENC_SetEncodingMode);
+
+node STVOUT_Init                  = node("STVOUT_Init()", "st");
+node STVOUT_Open                  = node("STVOUT_Open()", "st");
+node STVOUT_GetCapability         = node("STVOUT_GetCapability()", "st");
+node STVOUT_SetInputSource        = node("STVOUT_SetInputSource()", "st");
+node STVOUT_SetOutputParams       = node("STVOUT_SetOutputParams()", "st");
+node STVOUT_Enable                = node("STVOUT_Enable()", "st");
+InitStVout.attach(STVOUT_Init,
+                  STVOUT_Open,
+                  STVOUT_GetCapability,
+                  STVOUT_SetInputSource,
+                  STVOUT_SetOutputParams,
+                  STVOUT_Enable);
+
+node STBLIT_GetInitAllocParams    = node("STBLIT_GetInitAllocParams()", "st");
+node STBLIT_Init                  = node("STBLIT_Init()", "st");
+InitStBlit.attach(STBLIT_GetInitAllocParams,
+                  STBLIT_Init);
+
+node STAUD_Init                   = node("STAUD_Init()", "st");
+node STAUD_Open                   = node("STAUD_Open()", "st");
+node STAUD_OPGetParams            = node("STAUD_OPGetParams()", "st");
+node STAUD_OPEnableHDMIOutput     = node("STAUD_OPEnableHDMIOutput", "st");
+node STAUD_Close                  = node("STAUD_Close", "st");
+InitStAud.attach(STAUD_Init,
+                 STAUD_Open,
+                 STAUD_OPGetParams,
+                 STAUD_OPEnableHDMIOutput,
+                 STAUD_Close);
+
+
+
+
+node ctl_first_init            = node("ctl_first_init()", "otv");
+node init_ctltask_attb         = node("init_ctltask_attb()", "otv");
+node ctl_synchronize           = node("ctl_synchronize()", "otv");
+node appman_timer_new          = node("kb_get_sys_focus()", "otv");
+node kb_get_user_focus         = node("kb_get_sys_focus()", "otv");
+node kb_get_sys_focus          = node("kb_get_sys_focus()", "otv");
+node user_queue_wait_message   = node("user_queue_wait_message(;;)", "otv");
+control_task_main.attach(ctl_first_init,
+                         init_ctltask_attb,
+                         ctl_synchronize,
+                         appman_timer_new,
+                         kb_get_user_focus,
+                         kb_get_sys_focus,
+                         user_queue_wait_message);
+
+node ctl_decoder_init_1        = node("ctl_decoder_init_1()", "otv");
+node direct_segment_init       = node("direct_segment_init()", "otv");
+node o_printf_init             = node("o_printf_init()", "otv");
+node handle_init               = node("handle_init()", "otv");
+node system_timer_init         = node("system_timer_init()", "otv");
+node node_table_init           = node("node_table_init()", "otv");
+node time_init                 = node("time_init()", "otv");
+node o_actmon_init             = node("o_actmon_init()", "otv");
+node kb_init                   = node("kb_init()", "otv");
+node rsb_init                  = node("rsb_init()", "otv");
+node UI_scratchpad_new         = node("UI_scratchpad_new()", "otv");
+node sockets_init              = node("sockets_init()", "otv");
+node init_hash_table           = node("init_hash_table()", "otv");
+node o_file_sys_init           = node("o_file_sys_init()", "otv");
+node wk_mgr_init               = node("wk_mgr_init()", "otv");
+node o_locale_init             = node("o_locale_init()", "otv");
+node o_network_registration_pipe_init = node("o_network_registration_pipe_init()", "otv");
+ctl_first_init.attach(ctl_decoder_init_1,
+                      direct_segment_init,
+                      o_printf_init,
+                      handle_init,
+                      system_timer_init,
+                      node_table_init,
+                      time_init,
+                      o_actmon_init,
+                      kb_init,
+                      rsb_init,
+                      UI_scratchpad_new,
+                      sockets_init,
+                      init_hash_table,
+                      o_file_sys_init,
+                      wk_mgr_init,
+                      o_locale_init,
+                      o_network_registration_pipe_init);
+
+node xmsg_init                 = node("xmsg_init()", "otv");
+node o_genhandle_init          = node("o_genhandle_init()", "otv");
+node o_genclient_init          = node("o_genclient_init()", "otv");
+node o_station_control_init    = node("o_station_control_init()", "otv");
+node o_stream_handle_init      = node("o_stream_handle_init()", "otv");
+node o_app_heap_system_init    = node("o_app_heap_system_init()", "otv");
+node o_pipe_init               = node("o_pipe_init()", "otv");
+node o_container_init          = node("o_container_init()", "otv");
+node o_plist_init              = node("o_plist_init()", "otv");
+node aee_init                  = node("aee_init()", "otv");
+node o_avserv_init             = node("o_avserv_init()", "otv");
+node init_current_pipe_db      = node("init_current_pipe_db()", "otv");
+node o_pipe_register_null_src_class  = node("o_pipe_register_null_src_class()", "otv");
+node o_pipe_register_null_dest_class = node("o_pipe_register_null_dest_class()", "otv");
+node service_task_init         = node("service_task_init()", "otv");
+node GP_initialization         = node("GP_initialization()", "otv");
+node display_dest_register     = node("display_dest_register()", "otv");
+node program_info_init         = node("program_info_init()", "otv");
+node o_attribute_init          = node("o_attribute_init()", "otv");
+node ctl_decoder_init_2        = node("ctl_decoder_init_2()", "otv");
+node postload                  = node("postload(!)", "otv");
+node module_service_init       = node("module_service_init()", "otv");
+node service_task_run          = node("service_task_run()", "otv");
+node o_fs_register_client      = node("o_fs_register_client()", "otv");
+node init_batch_processing     = node("init_batch_processing()", "otv");
+node gdbo_init                 = node("gdbo_init()", "otv");
+node authentication_init       = node("authentication_init()", "otv");
+node crypto_init               = node("crypto_init()", "otv");
+node who_init                  = node("who_init()", "otv");
+node rm_first_init             = node("rm_first_init()", "otv");
+node osd_init                  = node("osd_init()", "otv");
+node ui_graphic_init           = node("ui_graphic_init()", "otv");
+node efemgr_init               = node("efemgr_init()", "otv");
+node fep_init                  = node("fep_init()", "otv");
+node intp_task_main            = node("intp_task_main(!)", "otv");
+node set_exn_stack_owner       = node("set_exn_stack_owner()", "otv");
+node user_queue_wait_message2  = node("user_queue_wait_message(;)", "otv");
+node system_queue_put_message_abort = node("system_queue_put_message_abort(intp)", "otv");
+node o_natapp_init             = node("o_natapp_init()", "otv");
+node o_pipe_register_notify    = node("o_pipe_register_notify()", "otv");
+node bc_src_class_register     = node("bc_src_class_register(0)", "otv");
+node bc_cat_src_class_register = node("bc_cat_src_class_register(0)", "otv");
+node o_ss_pes_handler_init     = node("o_ss_pes_handler_init()", "otv");
+node pipe_control_init         = node("pipe_control_init()", "tmm");
+node ctl_decoder_init_3        = node("ctl_decoder_init_3()", "otv");
+node o_app_set_current_pipe    = node("o_app_set_current_pipe()", "otv");
+node o_file_sys_init2          = node("o_file_sys_init2()", "otv");
+node o_file_start_expiration_date_checking = node("o_file_start_expiration_date_checking()", "otv");
+ctl_synchronize.attach(xmsg_init,
+                       o_genhandle_init, 
+                       o_genclient_init, 
+                       o_station_control_init,
+                       o_stream_handle_init, 
+                       o_app_heap_system_init,
+                       o_pipe_init, 
+                       o_container_init,
+                       o_plist_init,
+                       aee_init, 
+                       o_avserv_init, 
+                       init_current_pipe_db, 
+                       o_pipe_register_null_src_class, 
+                       o_pipe_register_null_dest_class,
+                       service_task_init, 
+                       GP_initialization, 
+                       display_dest_register,
+                       program_info_init,
+                       o_attribute_init, 
+                       ctl_decoder_init_2,
+                       postload, 
+                       module_service_init,
+                       service_task_run, 
+                       o_fs_register_client, 
+                       init_batch_processing,
+                       gdbo_init, 
+                       authentication_init,
+                       crypto_init,
+                       who_init, 
+                       rm_first_init, 
+                       osd_init, 
+                       ui_graphic_init, 
+                       efemgr_init, 
+                       fep_init, 
+                       intp_task_main, 
+                       set_exn_stack_owner, 
+                       user_queue_wait_message2, 
+                       system_queue_put_message_abort,
+                       o_natapp_init, 
+                       o_pipe_register_notify,
+                       bc_src_class_register, 
+                       bc_cat_src_class_register,
+                       o_ss_pes_handler_init,
+                       pipe_control_init, 
+                       ctl_decoder_init_3,
+                       o_app_set_current_pipe,
+                       o_file_sys_init2,
+                       o_file_start_expiration_date_checking);
+
+node service_task_main         = node("service_task_main(!)", "otv");
+service_task_run.attach(service_task_main);
+node o_fs_register_client2     = node("o_fs_register_client()", "otv");
+node user_queue_wait_data      = node("user_queue_wait_data(;;)", "otv");
+service_task_main.attach(o_fs_register_client2,
+                         user_queue_wait_data);
+
+node decoder_hard_init_1       = node("decoder_hard_init_1()", "tmm");
+node decoder_hard_init_2       = node("decoder_hard_init_2()", "tmm");
+node decoder_hard_init_3       = node("decoder_hard_init_3()", "tmm");
+ctl_decoder_init_1.attach(decoder_hard_init_1);
+ctl_decoder_init_2.attach(decoder_hard_init_2);
+ctl_decoder_init_3.attach(decoder_hard_init_3);
+
+node STAL_DecoderHardInit1     = node("STAL_DecoderHardInit1()", "s3");
+node STAL_DecoderHardInit2     = node("STAL_DecoderHardInit2()", "s3");
+node STAL_DecoderHardInit3     = node("STAL_DecoderHardInit3()", "s3");
+
+decoder_hard_init_1.attach(STAL_DecoderHardInit1);
+
+//node BoardFormatAndMountHdd    = node("BoardFormatAndMountHdd()", "tmm");
+//node STAL_FLASH_EmergencyErase = node("STAL_FLASH_EmergencyErase()", "s3");
+decoder_hard_init_2.attach(STAL_DecoderHardInit2);
+//decoder_hard_init_2.attach(BoardFormatAndMountHdd);
+//decoder_hard_init_2.attach(STAL_FLASH_EmergencyErase);
+decoder_hard_init_3.attach(STAL_DecoderHardInit3);
+
+node STAL_PLD_Register         = node("STAL_PLD_Register()", "s3");
+node STAL_SDBG_Register        = node("STAL_SDBG_Register()", "s3");
+node HAL_INIT_DecoderHardInit1 = node("HAL_INIT_DecoderHardInit1()", "tmm");
+STAL_DecoderHardInit1.attach(STAL_PLD_Register,
+                             STAL_SDBG_Register,
+                             HAL_INIT_DecoderHardInit1);
+
+node o_pipe_register_pld_ftable = node("o_pipe_register_pld_ftable()", "otv");
+STAL_PLD_Register.attach(o_pipe_register_pld_ftable);
+
+node STUART_Open               = node("STUART_Open()", "st");
+STAL_SDBG_Register.attach(STUART_Open);
+
+node STAL_CLK_INIT             = node("STAL_CLK_INIT()", "s3");
+node STAL_KBD_Register         = node("STAL_KBD_Register()", "s3");
+node STAL_RTC_Register         = node("STAL_RTC_Register()", "s3");
+node STAL_GMIX_Register        = node("STAL_GMIX_Register()", "s3");
+node STAL_VMAN_Register        = node("STAL_VMAN_Register()", "s3");
+node STAL_DMX_Register         = node("STAL_DMX_Register()", "s3");
+node STAL_DMD_Register         = node("STAL_DMD_Register()", "s3");
+node STAL_CA_Register          = node("STAL_CA_Register()", "s3");
+node STAL_TVOUT_Register       = node("STAL_TVOUT_Register()", "s3");
+node STAL_VID_Register         = node("STAL_VID_Register()", "s3");
+node STAL_VIDPFM_Register      = node("STAL_VIDPFM_Register()", "s3");
+node STAL_AUD_Register         = node("STAL_AUD_Register()", "s3");
+node STAL_AUDPFM_Register      = node("STAL_AUDPFM_Register()", "s3");
+node STAL_OSD_Register         = node("STAL_OSD_Register()", "s3");
+node STAL_RAMFS_Register       = node("STAL_RAMFS_Register()", "s3");
+node STAL_FLASH_Register       = node("STAL_FLASH_Register()", "s3");
+node STAL_SVSCALE_Register     = node("STAL_SVSCALE_Register()", "s3");
+node STAL_SQC_Register         = node("STAL_SQC_Register()", "s3");
+node STAL_MPLANE_Register      = node("STAL_MPLANE_Register()", "s3");
+node HAL_INIT_DecoderHardInit2 = node("HAL_INIT_DecoderHardInit2(*)", "tmm");
+STAL_DecoderHardInit2.attach(STAL_CLK_INIT,
+                             STAL_KBD_Register,
+                             STAL_RTC_Register,
+                             STAL_GMIX_Register,
+                             STAL_VMAN_Register,
+                             STAL_DMX_Register,
+                             STAL_DMD_Register,
+                             STAL_CA_Register,
+                             STAL_TVOUT_Register,
+                             STAL_VID_Register,
+                             STAL_VIDPFM_Register,
+                             STAL_AUD_Register,
+                             STAL_AUDPFM_Register,
+                             STAL_OSD_Register,
+                             STAL_RAMFS_Register,
+                             STAL_FLASH_Register,
+                             STAL_SVSCALE_Register,
+                             STAL_SQC_Register,
+                             STAL_MPLANE_Register,
+                             HAL_INIT_DecoderHardInit2);
+
+node HAL_KBD_GetConfig         = node("HAL_KBD_GetConfig()", "tmm");
+node sys_info_register         = node("sys_info_register()", "otv");
+node kb_device_register        = node("kb_device_register()", "otv");
+node kb_device_set_repeat      = node("kb_device_set_repeat()", "otv");
+STAL_KBD_Register.attach(HAL_KBD_GetConfig,
+                         sys_info_register, 
+                         kb_device_register,
+                         kb_device_set_repeat);
+
+node ram_fsys_init             = node("ram_fsys_init()", "otv");
+STAL_RAMFS_Register.attach(ram_fsys_init);
+
+node HAL_FLASH_GetConfig       = node("HAL_FLASH_GetConfig()", "tmm");
+node STAL_FLASH_P_pBlockLayout = node("STAL_FLASH_P_pBlockLayout()", "s3");
+node fm_file_sys_init          = node("fm_file_sys_init()", "otv");
+STAL_FLASH_Register.attach(HAL_FLASH_GetConfig,
+                           STAL_FLASH_P_pBlockLayout,
+                           fm_file_sys_init);
+
+node InitStHdmi                = node("InitStHdmi(*)", "tmm");
+node STHDMI_Init               = node("STHDMI_Init()", "st");
+node STHDMI_Open               = node("STHDMI_Open()", "st");
+node STAL_HDMI_Init            = node("STAL_HDMI_Init()", "s3");
+node STVOUT_Start              = node("STVOUT_Start()", "st");
+HAL_INIT_DecoderHardInit2.attach(InitStHdmi);
+
+InitStHdmi.attach(STHDMI_Init,
+                  STHDMI_Open,
+                  STAL_HDMI_Init,
+                  STVOUT_Start);
+
+node HAL_DMD_GetConfig         = node("HAL_DMD_GetConfig()", "tmm");
+STAL_DMD_Register.attach(HAL_DMD_GetConfig);
+
+node STAL_SCART_Register       = node("STAL_SCART_Register()", "s3");
+node HAL_INIT_DecoderHardInit3 = node("HAL_INIT_DecoderHardInit3()", "tmm");
+STAL_DecoderHardInit3.attach(STAL_SCART_Register,
+                             HAL_INIT_DecoderHardInit3);
+
+
+
+/* legend in the lower left corner of the picture */
+void add_legend(picture pic)
+{
+	real y = min(pic).y  - 30;
+        label(pic, "Legend:\quad", (0,y+2), 0.001SE, NoFill);
+
+	draw(pic, "\texttt{\quad THOMSON\quad}",        box, (8font_size,y),  2, black, FillDraw(fill_pen_tmm));
+	draw(pic, "\texttt{\quad ST: STAPI/OS21\quad}", box, (18font_size,y), 2, black, FillDraw(fill_pen_st));
+	draw(pic, "\texttt{\quad S3: CLTV\quad}",       box, (28font_size,y), 2, black, FillDraw(fill_pen_s3));
+	draw(pic, "\texttt{\quad OTV: CORE/NP\quad}",   box, (38font_size,y), 2, black, FillDraw(fill_pen_otv));
+
+	label(pic, "\texttt{func(*)}: to be customized or needs customized parameter(s).", (4font_size,y-20), 0.001SE, NoFill);
+	label(pic, "\texttt{func(?)}: the call is optional or customizable.", (4font_size,y-30), 0.001SE, NoFill);
+	label(pic, "\texttt{func(!)}: a separate task been forked to execute this function", (4font_size,y-40), 0.001SE, NoFill);
+	label(pic, "\texttt{func(;)}: the func been called in a loop", (4font_size,y-50), 0.001SE, NoFill);
+	label(pic, "\texttt{func(;;)}: the func been called in an infinite loop", (4font_size,y-60), 0.001SE, NoFill);
+	//label(pic, "\texttt{func()=>}: the function forks other task(s)", (4font_size,y-50), 0.001SE, NoFill);
+}
+
+/********* draw the call sequence tree *******/                             
+picture call = draw_tree(main, node_draw_func, style=TREE_STYLE_STEP, level=6, gene_gap=40);
+add_legend(call);
+attach(call.fit(), (0,0), SE);
+shipout("call.eps");
+erase(currentpicture);
+                             
+
+
+
+
+/* ################ directory tree ################ */
+
+real   font_size = 10;      /* font size */
+
+string dir = "d";
+string file = "f";
+
+/* 
+ * sample node draw function to draw folder 
+ * icon around directory names, as shown below:
+ *
+ *          _______
+ *         /       \
+ *        +------------------+
+ *        |                  |
+ *        | mydirectoryname  |
+ *        |                  |
+ *        +------------------+
+ */
+picture dir_draw_func(node p)
+{
+	picture pic;
+	real mini_h = font_size; 
+	real margin = 2 ; /* h & v margins */
+  pair min, max;
+
+  label(pic, "\texttt{"+p.text+"}");
+  
+  
+   /* get the text dimension */
+   min = min(pic);
+   max = max(pic);
+   
+   /* make sure the height is at least min_h */
+   if((max.y - min.y) < mini_h){
+       real delta = (mini_h - (max.y - min.y)) / 2;
+       max = (max.x, max.y + delta);
+       min = (min.x, min.y - delta);
+   }
+   
+   /* take margin into account */
+   min -= (margin, margin);
+   max += (margin, margin);
+   
+   /* draw the box */
+   draw(pic, min--(min.x, max.y)--max--(max.x, min.y)--cycle,  p.priv == dir? defaultpen : invisible);
+
+   /* draw the folder part */
+   draw(pic, (min.x, max.y)--(min.x+2, max.y+2)--(min.x+8, max.y+2)--(min.x+10, max.y), p.priv == dir? defaultpen : invisible);
+
+   return pic;
+}
+
+
+node dir_etc                     = node("$\cdots$", "d");
+node file_etc                    = node("$\cdots$", "f");
+
+/* buildroot */
+node buildroot   = node("buildroot", "d");
+
+node atmos       = node("atmos", "d");
+node trinity     = node("trinity", "d");
+node jmfb_tv     = node("jmfb-tv", "d");
+
+buildroot.attach(atmos,
+                 trinity,
+                 jmfb_tv);
+
+/* buildroot/atmos */
+node products    = node("products", "d");
+node system      = node("system", "d");
+node source      = node("source", "d");
+node build       = node("build", "d");
+
+atmos.attach(products,
+             system,
+             source,
+             build);
+
+/* buildroot/atmos/products */
+node PROD          = node ("\$\{PROD\}", "d");
+node products_inc  = node("include", "d");
+node products_hw   = node("hardware", "d");
+node products_etc  = dir_etc;
+
+products.attach(PROD,
+                products_hw,
+                products_inc,
+                products_etc);
+
+/* buildroot/atmos/products/hardware */
+node HW            = node ("\$\{HW\}", "d");
+node HW_flashfs    = node("flashfs", "d");
+products_hw.attach(HW);
+HW.attach(HW_flashfs);
+
+/* buildroot/atmos/products/include */
+node inc_flashfs    = node("flashfs", "d"); 
+node common_pst     = node("common.pst", "f");
+node flashfs_conf   = node("flashfs.conf", "f");
+node mkproduct_func = node("mkproduct.functions", "f");
+node webserver_cfg  = node("webserver.cfg", "f");
+node inc_etc        = file_etc;
+
+products_inc.attach(inc_flashfs,
+                    common_pst, 
+                    flashfs_conf,
+                    mkproduct_func,
+                    webserver_cfg, 
+                    inc_etc);
+
+/* buildroot/atmos/products/${PROD} */
+node flashfs       = node ("flashfs", "d");
+node mkproduct_pst = node ("mkproduct.pst", "f");
+node mkproduct_cfg = node ("mkproduct.cfg", "f");
+
+PROD.attach(flashfs,
+            mkproduct_cfg,
+            mkproduct_pst);
+
+/* buildroot/atmos/products/${PROD}/flashfs */
+node im_conf_factory = node("im.conf.factory", "f");
+node initbun         = node("initbun", "f");
+node initquantum     = node("initquantum", "f");
+
+flashfs.attach(im_conf_factory,
+               initbun, 
+               initquantum); 
+
+/* buildroot/atmos/system */
+node PROD2          = node("\$\{PROD\}", "f");
+node gateway        = node("gateway", "f");
+node system_etc     = file_etc;
+
+system.attach(PROD2,
+              gateway,
+              system_etc);
+
+/* buildroot/atmos/source */
+node hardware       = node("hardware", "d");
+node software       = node("software", "d");
+node include_       = node("include", "d");
+node cx241xx_boot   = node("cx241xx_boot", "d"); 
+node quantum        = node("quantum", "d");
+node webserver      = node("webserver", "d");
+node solfs          = node("solfs", "d");
+node source_etc     = dir_etc;
+node zappa          = node("zappa", "d");
+node voddler        = node("voddler", "d");
+
+source.attach(hardware,
+              software,
+              include_,
+              cx241xx_boot,
+              quantum, 
+              webserver,
+              solfs, 
+              zappa, 
+              source_etc,
+              voddler);
+
+/* buildroot/atmos/source/hardware */
+node HW              = node("\$\{HW\}.hw", "f");
+node hardware_etc    = file_etc;
+node flashfs_config  = node("flashfs_config", "d");
+
+hardware.attach(flashfs_config, HW, hardware_etc);
+
+/* buildroot/atmos/source/hardware/flashfs_config */
+node flashfs_config_16M = node("flashfs_config_16MB_128k_sectors.hw", "f");
+node flashfs_config_etc = file_etc;
+flashfs_config.attach(flashfs_config_16M, flashfs_config_etc);
+
+/* buildroot/atmos/source/software/ */
+
+node package_voddler       = node("voddler.pkg", "f");
+node package_etc           = node("*.pkg", "f");
+
+software.attach(package_voddler, package_etc);
+
+/* buildroot/atmos/source/voddler */
+node voddler_main    = node("main.c", "f");
+node voddler_mod     = node("voddler.module", "f");
+node voddler_src     = node("src->jfmb-tv", "d");
+
+voddler.attach(voddler_main,
+               voddler_mod, 
+               voddler_src); 
+
+
+/* buildroot/atmos/build */
+
+node HW_PROD         = node("\$\{HW\}-\$\{PROD\}", "d");
+node build_prod      = node("products", "d");
+
+build.attach(HW_PROD, build_prod);
+
+/* buildroot/atmos/build/${HW}-${PROD} */
+
+node init            = node("init", "d");
+node temp_dirs       = dir_etc;
+node top_makefile    = node("makefile", "f");
+node syslink_input   = node("syslink.input", "f");
+node temp_files      = file_etc;
+
+HW_PROD.attach(init, dir_etc, top_makefile, syslink_input, temp_files);
+
+/* buildroot/atmos/build/products */
+node prod_HW_PROD         = node("\$\{HW\}-\$\{PROD\}", "d");
+
+build_prod.attach(prod_HW_PROD);
+
+/* buildroot/atmos/build/products/${HW}-${PROD} */
+node zflashfs       = node("zflashfs", "d");
+node zflashfs_hw    = node("zflashfs_hardware", "d");
+node zflashfs_comm  = node("zflashfs_common", "d");
+node bin_files    = node("*.bin", "f");
+node image_files    = node("*.img", "f");
+
+prod_HW_PROD.attach(zflashfs,
+                    zflashfs_hw,
+                    zflashfs_comm,
+                    bin_files,
+                    image_files);
+
+/********* draw the dir tree *******/                             
+picture buildroot = draw_tree(buildroot, dir_draw_func, style=TREE_STYLE_STEP, level=6, gene_gap=40, show_collapse_icon=true);
+//picture buildroot = draw_tree(buildroot, dir_draw_func, style=TREE_STYLE_FLAT, gene_gap=40, show_collapse_icon=true);
+attach(buildroot.fit(), (0,0), SE);
+shipout("dir.eps");
+erase(currentpicture);

@@ -1,0 +1,61 @@
+import fontsize;
+import "../node/node.asy" as node;
+
+settings.tex = "xelatex";
+texpreamble("\usepackage{xeCJK}");
+texpreamble("\setCJKmainfont{SimHei}");
+texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
+
+node N090aa008 = node(".git", "d");
+node N090b2050 = node("branches", "d");
+N090aa008.attach(N090b2050);
+node N090b2078 = node("HEAD", "f");
+N090aa008.attach(N090b2078);
+node N090b20a0 = node("description", "f");
+N090aa008.attach(N090b20a0);
+node N090b20c8 = node("info", "d");
+node N090ba110 = node("exclude", "f");
+N090b20c8.attach(N090ba110);
+N090aa008.attach(N090b20c8);
+node N090b20f0 = node("config", "f");
+N090aa008.attach(N090b20f0);
+node N090b2118 = node("hooks", "d");
+node N090b2140 = node("pre-applypatch.sample", "f");
+N090b2118.attach(N090b2140);
+node N090b2178 = node("commit-msg.sample", "f");
+N090b2118.attach(N090b2178);
+node N090b21a8 = node("pre-rebase.sample", "f");
+N090b2118.attach(N090b21a8);
+node N090b21d8 = node("post-update.sample", "f");
+N090b2118.attach(N090b21d8);
+node N090b2208 = node("applypatch-msg.sample", "f");
+N090b2118.attach(N090b2208);
+node N090b2240 = node("post-receive.sample", "f");
+N090b2118.attach(N090b2240);
+node N090b2270 = node("update.sample", "f");
+N090b2118.attach(N090b2270);
+node N090b22a0 = node("pre-commit.sample", "f");
+N090b2118.attach(N090b22a0);
+node N090b22d0 = node("prepare-commit-msg.sample", "f");
+N090b2118.attach(N090b22d0);
+node N090b2308 = node("post-commit.sample", "f");
+N090b2118.attach(N090b2308);
+N090aa008.attach(N090b2118);
+node N090b2338 = node("objects", "d");
+node N090b2360 = node("info", "d");
+N090b2338.attach(N090b2360);
+node N090b2388 = node("pack", "d");
+N090b2338.attach(N090b2388);
+N090aa008.attach(N090b2338);
+node N090b23b0 = node("refs", "d");
+node N090b23d8 = node("heads", "d");
+N090b23b0.attach(N090b23d8);
+node N090b2400 = node("tags", "d");
+N090b23b0.attach(N090b2400);
+N090aa008.attach(N090b23b0);
+
+
+//change the following to draw_call_sequence() to produce call sequence.
+picture root = draw_dir_tree(N090aa008);
+//attach(root.fit(), (0,0), SE);
+attach(bbox(root, 2, 2, white), (0,0), SE);

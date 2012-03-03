@@ -75,7 +75,9 @@ int main(int argc, char *argv[])
 	get_node_name(root, rootname);
 	printf("\n\n//change the following to draw_call_sequence() to produce call sequence.\n");
 	printf("picture root = draw_dir_tree(%s);\n", rootname);
-	printf("attach(root.fit(), (0,0), SE);\n");
+	//printf("attach(root.fit(), (0,0), SE);\n");
+	printf("attach(bbox(root, 2, 2, white), (0,0), SE);\n");
+	
 	
 	
 	return 0;
