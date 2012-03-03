@@ -1,0 +1,12 @@
+% run: pdflatex a4grid2.tex
+
+
+\documentclass[a4paper]{book}
+\usepackage[paper=a4paper]{geometry}
+\usepackage[final]{pdfpages}
+\usepackage{verbatim}
+\begin{document}
+\includepdf[nup=1x1,landscape=false, pages={1}, offset=0mm 0mm, turn=false,frame=false]{a4grid.pdf}
+\includepdf[nup=1x1,landscape=false, angle=180,pages={1}, offset=0mm 0mm, turn=false,frame=false]{a4grid.pdf}
+\end{document} 
+
