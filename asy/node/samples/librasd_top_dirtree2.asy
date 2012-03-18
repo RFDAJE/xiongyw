@@ -26,6 +26,7 @@ N09ca50e8.attach(N09ca5138);
 node src = node("src", "d");
 node app = node("app", "d");
 node N09ca5208 = node("bootloader", "d");
+/*
 node N09ca5230 = node("common", "d");
 node N09ca5258 = node("main.c", "f");
 N09ca5230.attach(N09ca5258);
@@ -43,6 +44,7 @@ node N09ca5350 = node("shell.h", "f");
 N09ca5230.attach(N09ca5350);
 node N09ca5378 = node("map.h", "f");
 N09ca5230.attach(N09ca5378);
+*/
 node N09ca53a0 = node("demo", "d");
 node mware = node("mware", "d");
 node N09ca53f0 = node("bsp", "d");
@@ -53,13 +55,17 @@ node N09ca5470 = node("yyyy-mm-dd", "d");
 node N09ca5498 = node("include", "d");
 N09ca5470.attach(N09ca5498);
 node N09ca54c0 = node("lib", "d");
+node lib1 = node("lib_librasd_bsp.a", "f");
+node lib2 = node("lib_librasd_bsp-boot.a", "f");
+N09ca54c0.attach(lib1, lib2);
 N09ca5470.attach(N09ca54c0);
 N09ca5448.attach(N09ca5470);
 N09ca53f0.attach(N09ca5448);
 
 librasd.attach(src, make);
 src.attach(app, mware, N09ca53f0);
-app.attach(N09ca5230, N09ca53a0, N09ca5208);
+//app.attach(N09ca5230, N09ca53a0, N09ca5208);
+app.attach(N09ca53a0, N09ca5208);
 make.attach(N09ca50e8, bootloader, Makefile);
 
 
