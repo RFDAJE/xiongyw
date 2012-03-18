@@ -66,11 +66,11 @@ node J_Link_003e2a18                  = node("J-Link", "d");
 node H_Link_003e29e8                  = node("H-Link", "d");
 node U_Link_003e4400                  = node("U-Link", "d");
 Emulator_003e2920.attach(BDI1000_003e2958);
-Emulator_003e2920.attach(H_Link_003e29e8);
-Emulator_003e2920.attach(J_Link_003e2a18);
 Emulator_003e2920.attach(RealView_003e43e0);
-Emulator_003e2920.attach(U_Link_003e4400);
 Emulator_003e2920.attach(Wiggler_003e4430);
+Emulator_003e2920.attach(J_Link_003e2a18);
+Emulator_003e2920.attach(H_Link_003e29e8);
+Emulator_003e2920.attach(U_Link_003e4400);
 
 
 
@@ -95,5 +95,6 @@ Target_003e4f90.attach(PPC_003e4f60);
 
 
 //change the following to draw_call_sequence() to produce call sequence.
-picture root = draw_dir_tree(Embedded_Debugging_Setup_003e3e80);
+//picture root = draw_dir_tree(Embedded_Debugging_Setup_003e3e80);
+picture root = draw_call_sequence(Embedded_Debugging_Setup_003e3e80);
 attach(bbox(root, 2, 2, white), (0,0), SE);
