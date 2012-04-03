@@ -1,4 +1,4 @@
-Install:
+1. Windows Install:
  
 -          Suppose TexLive 2010 or 2011 is already installed.
 -          Download Asymptote Windows binary ¡°asymptote-2.13-setup.exe¡± from http://asymptote.sf.net, and install it;
@@ -38,8 +38,18 @@ cygwin warning:
     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
  
 
- 
-- A grid drawing sample:
+2. Install on FC12:
+
+- download "texlive2011-20110705.iso"
+- mount -o loop texlive2011-20110705.iso /mnt
+- cd /mnt
+- ./install-tl
+- update PATH in "~/.bash_profile" as instructed.
+
+#yum install asymptote
+
+
+3. A grid drawing sample:
  
  
  

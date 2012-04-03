@@ -192,12 +192,12 @@ get_node_name(TNODE * node, char name[])
     sprintf(name, "%s_%08x", node->txt, (unsigned int) node);
 
     /*
-     * 1. replace '-' & '.' with '_' 
+     * 1. replace [-.+] with '_' 
      * 2. if starting with digit, replace it with '_'
      */
     len = strlen(name);
     for (i = 0; i < len; i++) {
-        if (name[i] == '-' || name[i] == '.')
+        if (name[i] == '-' || name[i] == '.' || name[i] == '+')
             name[i] = '_';
     }
 
