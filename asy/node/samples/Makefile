@@ -28,7 +28,8 @@ endef
 $(eval $(call compile-rules,$(src_list)))
 
 .PHONY: all clean 
-all: $(pdf_list) $(png_list)
+#all: $(pdf_list) $(png_list)
+all: $(pdf_list)
 	echo $(src_list)
 
 clean:
