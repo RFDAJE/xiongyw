@@ -8,14 +8,11 @@ wget http://intgat.tigress.co.uk/rmy/uml/zerofree-1.0.1.tgz
 tar xzvf zerofree-1.0.1.tgz
 [bruin@f12 zerofree-1.0.1]$ make
 sudo cp zerofree /usr/bin
+
 init 1 
 umount /dev/sdc1
-umount /dev/sdb1
-mount -o ro /dev/sdb1 /home
 mount -o ro /dev/sdc1 /home/lfs
 zerofree /dev/sdc1
-zerofree /dev/sdb1
-fsck -f /dev/sdb1
 fsck -f /dev/sdc1
 poweroff
 
