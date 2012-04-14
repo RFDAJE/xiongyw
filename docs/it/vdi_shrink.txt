@@ -1,0 +1,22 @@
+﻿http://blog.chinaunix.net/uid-15059847-id-3048882.html
+ref: http://clip.artchiu.org/2009/07/14/to-reduce-the-size-of-a-virtualbox-dynamic-vdi/
+
+=> on linux guest:
+
+yum install e2fsprogs-devel.i686
+wget http://intgat.tigress.co.uk/rmy/uml/zerofree-1.0.1.tgz
+tar xzvf zerofree-1.0.1.tgz
+[bruin@f12 zerofree-1.0.1]$ make
+sudo cp zerofree /usr/bin
+
+init 1 
+umount /dev/sdc1
+mount -o ro /dev/sdc1 /home/lfs
+zerofree /dev/sdc1
+fsck -f /dev/sdc1
+poweroff
+
+
+=> on windows host:
+
+VBoxManage.exe modifyhd --compact mydisk.vdi
