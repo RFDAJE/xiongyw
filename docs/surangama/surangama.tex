@@ -1,0 +1,472 @@
+%--------------------------------------------------------------+
+% 楞嚴經白文
+%
+% 参考：
+%
+% - 宣化上人：大佛頂如來密因修證了義諸菩薩萬行首楞嚴經科判
+% - 宣化上人：大佛頂首楞嚴經浅释，上海佛学书局，2007
+% - 中华书局：佛教十三经，2010
+% - 金陵刻经处：楞严经（上下册）
+% - slyj.org：2008年校对版
+% - 释成观：大佛顶首楞严经义贯（全文09校）.pdf
+%
+% 创建：2011-07-01
+% 最近一次修改：2011-08-08
+%
+% $Id: surangama.tex,v 1.4 2011/08/09 07:14:14 xiongyw Exp $
+%--------------------------------------------------------------+
+
+\documentclass[UTF8,a4paper,twoside,nospace,nopunct,nofonts]{ctexbook}
+
+\usepackage{xifthen}
+\newboolean{fulu}  % 附录
+\setboolean{fulu}{false}
+
+
+%\usepackage{fontspec}
+%\usepackage{xunicode}
+%\usepackage{xltxtra}
+%\usepackage{xeCJK}
+
+%\punctstyle{quanjiao}  % 全角
+%\punctstyle{banjiao}  % 半角
+\punctstyle{kaiming}  % 开明标点：句末用全角，其他用半角。xeCJK包提供,ctex自动包括xeCJK。
+
+
+%--------------------------------------------------------------+
+% 自定义字体：
+% - 上面ctexbook选用 nofonts 取消预定义字体；
+% - 字体文件放在"./fonts/"子目录下，不使用系统字体（c:/windows/fonts）。
+% - 参照 ctex-xecjk-winfonts.def, xeCJK 和 fontspec文档 定义字体如下。
+% 
+%
+% 本文只使用三个字体：
+%
+% 1. 宋体：正文，基于华文宋体 STSONG.TTF，添加几个正文中的生僻字
+% 2. 仿宋：偈诵和咒语，采用华文仿宋 STFANGSO.TTF，添加几个咒语中的生僻字
+% 3. 姚体：标题，采用方正姚体 (fzytk.ttf)
+%
+% 4. 黑体：基于微软黑体并添加几个生僻字，备用。
+% 5. calibri：英文字体，备用
+%
+% 华文字体为常州华文印刷有限公司推出的字体。
+%--------------------------------------------------------------+
+%\setCJKmainfont[BoldFont={SimHei},ItalicFont={[STFANGSO.TTF]}]{[STSONG.TTF]} 
+\setCJKmainfont[Path=./fonts/]{stsong-lyj.ttf} 
+\setCJKsansfont[Path=./fonts/]{simhei-lyj.ttf}
+\setCJKmonofont[Path=./fonts/]{simhei-lyj.ttf}  % \texttt
+
+\setCJKfamilyfont{zhsong}[Path=./fonts/]{stsong-lyj.ttf}
+\setCJKfamilyfont{zhfs}[Path=./fonts/]{stfangso-lyj.ttf}
+\setCJKfamilyfont{zhyao}[Path=./fonts/]{fzytk.ttf}
+\setCJKfamilyfont{zhhei}[Path=./fonts/]{simhei-lyj.ttf}
+
+\newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
+\newcommand*{\fangsong}{\CJKfamily{zhfs}} % 仿宋
+\newcommand*{\yaoti}{\CJKfamily{zhyao}}    % 姚体
+\newcommand*{\heiti}{\CJKfamily{zhhei}}    % 黑体
+
+%\newfontfamily\calibri[Path=./fonts/]{calibri.ttf}  % 英文字体
+
+%--------------------------------------------------------------+
+% 生僻字列表（若在编辑器中不能显示，则需选用大字符集字体）：
+% 注：可用 http://zdic.net 查找某字的 unicode 编码。并用该网站论坛上的“CJK统一汉字笔画检索(09版）.doc”来查找 unicode 中已定义的汉字。
+% http://www.cojak.org/
+%http://www.byscrj.cn/jmm/indexComputing.htm
+%
+% 1. “𡋯”，【土+孛】，U+212EF，bo2，在第二卷出现2次（“鬱𡋯”）。从方正宋体超大字符集中拷贝。
+% 2. “𧹞”，【赤+皮】，同赧，U+27E5E，nan3，在第七卷楞严咒第一会中出现两次（“瑟𧹞”）。用“赧皳”两个字拼造。
+% 3. “𤙖”，【口+牛】，U+24656，在第七卷楞严咒第二、四、五会中共出现11次（2次“烏𤙖”，9次“虎𤙖”）。用“颌牪”两个字拼造。
+% 4. “㘕”，【口+蓝】，U+3615，在第七卷楞严咒第一会中出现1次（“薩怛多般怛㘕”）。用“嚂藍”两个字拼造。
+% 5. “𠼐”，【口+犁】，U+20F10，在第七卷楞严咒第四会中出现3次（1次“澀比𠼐”，2次“𠼐弊泮”）。用“嚂犁”两个字拼造。
+% 6. “鬬”，【同斗、鬥、鬪、鬭】，U+9B2C，在第七、九卷各出现1次（“賊難鬬諍”，“鬬心不交”）。
+% 7. “㲲”，【曡+毛】，同氎（U+6C0E），U+3CB2，die2，在第七、九卷各出现1次（“紙素白㲲”，“或是㲲華”）。用“曡氎”两个字拼造。
+% 8. “𠯗”，【口+币】，U+20BD7，同咂，za1，在第八卷出现1次（“無量𠯗食”）。
+% 9. “㳷”，【水+勿+日】，U+3CF7，wen3，同吻，“吻合”义。在第9、10卷中各出现2次（卷9“心精通㳷”，
+%     “心愛緜㳷”；卷10“覺知通㳷”，“圓覺㳷心”）。从方正宋体超大字符集中拷贝。
+% 10. “㘑”，【口+隷】，U+3611，li4，在第七卷楞严咒中第二、五会中各出现一次（“帝㘑”，“閉㘑”）。用“嚂隷”两个字拼造。
+%
+%--------------------------------------------------------------+
+
+
+
+
+%--------------------------------------------------------------+
+% A4 (210x297mm) page metrics                                  |
+%---- horizontal (210mm) ----
+\setlength{\hoffset}{0mm}
+\setlength{\oddsidemargin}{9.6mm}
+\setlength{\evensidemargin}{9.6mm}
+\setlength{\textwidth}{140mm} % 左右空白一样多：210-(25.4+9.6)*2=140
+\setlength{\marginparwidth}{0mm}
+\setlength{\marginparsep}{0mm}
+%---- vertical (297mm) ----
+\setlength{\voffset}{0mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headheight}{12mm}
+\setlength{\headsep}{5mm}
+\setlength{\footskip}{0mm}
+\setlength{\textheight}{230mm} % 297-(25.4*2)-12-5=230
+%--------------------------------------------------------------+
+
+
+
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+
+
+%------------------------------------------------------------
+% 定义新命令 JUAN (卷)
+% - 第一个参数#1是该卷文件名(juan<#1>.tex)中的阿拉伯数字序号;
+% - 第二个参数#2是对应的中文，要打印在页眉上。
+% - 第三个参数#3是正文字号
+% - 第四个参数#4是页眉字号
+%------------------------------------------------------------
+\newcommand{\JUAN}[4]{% 
+
+ % 确保每卷从奇数页开始；加的空白页无页眉页脚
+\clearpage{\pagestyle{empty}\cleardoublepage}  
+
+\songti
+\zihao{#3}
+\setlength{\parskip}{0mm}
+
+\pagestyle{fancy}
+\fancyfoot{}  % 没有页脚
+
+\renewcommand{\headrulewidth}{1pt}  % 重设页眉线宽度
+
+
+% 页眉内容，奇偶页不同
+\fancyhead[C]{\zihao{#4}楞嚴經}
+%\fancyhead[LE]{\zihao{#4}\thepage\hspace{1cm}卷#2}
+\fancyhead[LE]{\zihao{#4}\thepage}
+\fancyhead[RO]{\zihao{#4}卷#2\hspace{1cm}\thepage}
+
+
+%在每卷的首页，页眉画两条线，上粗下细。第一段前面空两行。
+~\vskip-8.5mm
+\hrule height2pt width\headwidth\vskip2pt
+\hrule height1pt width\headwidth
+
+~
+
+~
+
+%\centerline{\heiti\zihao{#3}卷\quad#2}
+
+~
+
+\input{./text.utf8/juan#1.tex}
+\pagebreak
+}
+
+%------------------------------------------------------------
+% 定义新环境 JISONG (偈颂)
+% - 居中
+% - 仿宋
+%------------------------------------------------------------
+\newenvironment{JISONG}{\fangsong\centering}{\raggedright\songti}
+
+
+
+
+%------------------------------------------------------------
+% 定义新环境 ZHOUYU (咒语)，用在正文中
+% - 仿宋字体
+% - 使用引用环境 quotation
+%------------------------------------------------------------
+\newenvironment{ZHOUYU}{\fangsong\begin{quotation}}{\end{quotation}\songti}
+%\newcommand{\zhouyu}[2]{#2\hspace{-0mm}$^{#1}$} % 每句咒语的命令：第一个参数是序号，第二个参数是文字
+\newcommand{\zy}[3]{#2.} % 每句咒语的命令：第一个参数是序号，第二个参数是音译，第三个是汉语大意
+
+
+
+
+
+%----------------------------------------------
+% 咒语“下注”格式，用在附录中：
+%
+%     南无
+%     -----
+%     Namah    
+%----------------------------------------------
+
+\usepackage{amsmath}
+\usepackage{ifthen}
+
+% 定义分子分母都左对齐的分式
+\newcommand{\myfrac}[2]{%
+{\displaystyle\frac{#1\hfill}{#2\hfill}}
+%\genfrac{}{}{}{0}{#1\hfill}{#2\hfill}
+}
+
+% 下注格式
+\newcommand{\xiazhu}[2]{%
+$\myfrac{\zihao{2}\texttt{#1}}{\calibri\fontsize{20pt}{20pt}\selectfont\text{#2}}$
+}
+
+% 咒语，第一个参数是序号；由于Latex参数最多只能为10个，所以这后面最多
+% 8个参数，可以输入 4段原文+注解。如果不够四段，加空括号（不能缺）。
+%
+% 例子： \zhouyu{(1)}{好好学习}{Good good study}{}{}{}{}{}{} 
+%             \zhouyu{}{天天向上}{day day up}{}{}{}{}{}{} 
+\newcommand{\zhouyuxiazhu}[9]{%
+\setlength{\lineskip}{0mm}
+\noindent
+\hspace{0mm}
+\calibri\huge\makebox[0mm][r]{#1} 
+\ifthenelse{\equal{#2}{}}{}{\xiazhu{#2}{#3}}
+\ifthenelse{\equal{#4}{}}{}{\xiazhu{#4}{#5}}
+\ifthenelse{\equal{#6}{}}{}{\xiazhu{#6}{#7}}
+\ifthenelse{\equal{#8}{}}{}{\xiazhu{#8}{#9}}\\
+}
+
+
+
+
+\newcommand{\ZHOUYUZHUJIE}[2]{%
+\songti
+\zihao{#1}
+\setlength{\parskip}{0mm}
+
+\pagestyle{fancy}
+\fancyfoot{}  % 没有页脚
+
+\renewcommand{\headrulewidth}{1pt}  % 重设页眉线宽度
+
+% 页眉内容，奇偶页不同
+\fancyhead[C]{\zihao{#2}楞嚴呪註解}
+\fancyhead[LE]{\zihao{#2}\thepage}
+\fancyhead[RO]{\zihao{#2}\thepage}
+
+%在首页，页眉画两条线，上粗下细。第一段前面空两行。
+~\vskip-8.5mm
+\hrule height2pt width\headwidth\vskip1pt
+\hrule height1pt width\headwidth
+
+~
+
+~
+
+\input{./text.utf8/mantra.tex}
+\pagebreak
+}
+
+
+%----------------------------
+% 咒语大意
+%----------------------------
+\newcommand{\zydy}[3]{\noindent\makebox[0mm][r]{\zihao{4}(#1)~}\heiti #2\quad{\fangsong #3}\\} % 第一个参数是序号，第二个参数是音译，第三个参数是汉语大意
+
+
+\newcommand{\ZHOUYUDAYI}[2]{%
+\songti
+\zihao{#1}
+\setlength{\parskip}{0mm}
+
+\pagestyle{fancy}
+\fancyfoot{}  % 没有页脚
+
+\renewcommand{\headrulewidth}{1pt}  % 重设页眉线宽度
+
+% 页眉内容，奇偶页不同
+\fancyhead[C]{\zihao{#2}附錄：楞嚴呪大意}
+\fancyhead[LE]{\zihao{#2}\thepage}
+\fancyhead[RO]{\zihao{#2}\thepage}
+
+%在首页，页眉画两条线，上粗下细。第一段前面空两行。
+~\vskip-8.5mm
+\hrule height2pt width\headwidth\vskip1pt
+\hrule height1pt width\headwidth
+
+
+~
+
+\input{./text.utf8/mantra.tex}
+\pagebreak
+}
+
+
+
+
+
+
+\begin{document}
+
+%--------------------------------
+% 衬页 （2页空白）
+%--------------------------------
+\thispagestyle{empty}
+\hspace{0mm}
+\pagebreak
+
+\thispagestyle{empty}
+\hspace{0mm}
+\pagebreak
+
+%--------------------------------
+% 金陵刻经处藏板释迦摩尼佛像
+%--------------------------------
+\thispagestyle{empty}
+\begin{center}
+\zihao{-0}
+\hspace{0mm}\\[-25mm]
+\yaoti{南無本師釋迦牟尼佛}\\[10mm]
+\includegraphics[width=.8\textwidth]{pictures/budda.png}
+\end{center}
+\pagebreak
+
+%--------------------------------
+% 开经偈
+%--------------------------------
+\thispagestyle{empty}
+\begin{center}
+\fangsong
+\zihao{1}南無本師釋迦牟尼佛\\[-9mm]
+\zihao{3}{\raggedleft 三稱~~~~~\\}
+\zihao{1}
+~\\[20mm]
+開經偈\\[20mm]
+無上甚深微妙法，\\[3mm]
+百千萬劫難遭遇。\\[3mm]
+我今見聞得受持，\\[3mm]
+願解如來真實義。\\
+\end{center}
+
+\pagebreak
+
+%--------------------------------
+% 经名、译者
+%--------------------------------
+\thispagestyle{empty}
+\begin{center}
+\zihao{-0}
+\yaoti
+大佛頂如來密因修證了\\
+義諸菩薩萬行首楞嚴經\\[30mm]
+\end{center}
+\zihao{2}
+\fangsong
+唐中天竺沙門般剌密諦譯\\
+烏萇國沙門彌伽釋迦譯語\\
+羅浮山南樓寺沙門懷迪證譯\\
+菩薩戒弟子前正議大夫同中書門下平章事清河房融筆受
+\pagebreak
+
+%--------------------------------
+% 空白页
+%--------------------------------
+\thispagestyle{empty}
+\hspace{0mm}
+\pagebreak
+
+
+%================================
+%
+% 正文开始
+%
+% 字数统计（不包括标点）初步结果：TextNum.exe
+%
+%  1.    5215
+%  2.    6764
+%  3.    6906
+%  4.    6973
+%  5.    5673
+%  6.    6257
+%  7.    7362
+%  8.    6481
+%  9.    4599
+% 10.    8356
+%-----------------------
+%  +    64585
+%================================
+
+\setcounter{page}{1}
+
+\JUAN{01}{一}{-1}{-2}
+
+\JUAN{02}{二}{-1}{-2}
+
+%\JUAN{03}{三}{-1}{-2}
+
+%\JUAN{04}{四}{-1}{-2}
+
+%\JUAN{05}{五}{-1}{-2}
+
+%\JUAN{06}{六}{-1}{-2}
+
+%\JUAN{07}{七}{-1}{-2}
+
+%\JUAN{08}{八}{-1}{-2}
+
+%\JUAN{09}{九}{-1}{-2}
+
+%\JUAN{10}{十}{-1}{-2}
+
+\pagebreak
+\pagestyle{empty}
+\begin{center}
+\includegraphics[width=\textwidth]{pictures/tx.png}
+\end{center}
+
+
+\pagebreak
+\pagestyle{empty}
+\begin{center}
+\includegraphics[width=\textwidth]{pictures/yz.png}
+\end{center}
+
+
+\pagebreak
+\pagestyle{empty}
+\begin{center}
+\setlength{\fboxsep}{1mm} \fbox{%
+\includegraphics[width=\textwidth]{pictures/ntw.png}
+}
+\end{center}
+
+
+% 附录咒语注解
+%\ZHOUYUZHUJIE{-1}{-2}
+
+% 附录：咒语大意
+%\setboolean{fulu}{true}
+%\ZHOUYUDAYI{2}{-2}
+
+%--------------------------------
+% 迴向偈
+% 願以此功德。莊嚴佛淨土。
+% 上報四重恩。下濟三途苦。
+% 若有見聞者。悉發菩提心。
+% 盡此一報身。同生極樂國。
+%--------------------------------
+\pagebreak
+\thispagestyle{empty}
+\begin{center}
+\fangsong
+\zihao{1}
+
+~
+
+迴向偈\\[20mm]
+世界和平，人民安樂。\\[3mm]
+正法久住，法錀常轉。\\[3mm]
+災障消滅，禍患不生。\\[3mm]
+法界有情，同生極樂。\\
+\end{center}
+
+%--------------------------------
+% 衬页 （2页空白）
+%--------------------------------
+\pagebreak
+\thispagestyle{empty}
+\hspace{0mm}
+
+\pagebreak
+\thispagestyle{empty}
+\hspace{0mm}
+
+
+\end{document}

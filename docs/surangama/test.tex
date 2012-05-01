@@ -1,0 +1,101 @@
+
+\documentclass[a4paper,twoside,nopunct,nofonts]{ctexbook}
+
+\usepackage{amsmath}
+\usepackage{ifthen}
+\usepackage{enumerate}
+
+
+\setCJKmainfont[Path=./fonts/]{stsong-lyj.ttf} 
+\setCJKsansfont[Path=./fonts/]{simhei.ttf}
+\setCJKmonofont[Path=./fonts/]{simhei.ttf}
+
+\setCJKfamilyfont{zhsong}[Path=./fonts/]{stsong-lyj.ttf}
+\setCJKfamilyfont{zhfs}[Path=./fonts/]{stfangso-lyj.ttf}
+%\setCJKfamilyfont{zhhei}[Path=./fonts/]{fzytk.ttf}
+\setCJKfamilyfont{zhhei}{SimHei}
+
+\newfontfamily\calibri[Path=./fonts/]{calibri.ttf}
+\newfontfamily\kartika[Path=./fonts/]{kartika.ttf}
+
+\newcommand*{\songti}{\CJKfamily{zhsong}} % 宋体
+\newcommand*{\fangsong}{\CJKfamily{zhfs}} % 仿宋
+\newcommand*{\heiti}{\CJKfamily{zhhei}}   % 黑体
+
+%----------------------------------------------
+% 咒语“下注”格式：
+%
+%     南无
+%     -----
+%     Namah    
+%----------------------------------------------
+
+\usepackage{amsmath}
+
+% 定义分子分母都左对齐的分式
+\newcommand{\myfrac}[2]{%
+{\displaystyle\frac{#1\hfill}{#2\hfill}}
+%\genfrac{}{}{}{0}{#1\hfill}{#2\hfill}
+}
+
+% 下注格式
+\newcommand{\xiazhu}[2]{%
+$\myfrac{\zihao{2}\texttt{#1}}{\calibri\fontsize{20pt}{20pt}\selectfont\text{#2}}$
+}
+
+% 咒语，第一个参数是序号；由于Latex参数最多只能为10个，所以这后面最多
+% 8个参数，可以输入 4段原文+注解。如果不够四段，加空括号（不能缺）。
+%
+% 例子： \zhouyu{(1)}{好好学习}{Good good study}{}{}{}{}{}{} 
+%             \zhouyu{}{天天向上}{day day up}{}{}{}{}{}{} 
+\newcommand{\zhouyu}[9]{%
+\setlength{\lineskip}{5mm}
+\noindent
+\hspace{0mm}
+\calibri\huge\makebox[0mm][r]{#1~} 
+\ifthenelse{\equal{#2}{}}{}{\xiazhu{#2}{#3}}
+\ifthenelse{\equal{#4}{}}{}{\xiazhu{#4}{#5}}
+\ifthenelse{\equal{#6}{}}{}{\xiazhu{#6}{#7}}
+\ifthenelse{\equal{#8}{}}{}{\xiazhu{#8}{#9}}\\
+}
+
+
+
+%\newcommand{\xiazhu}[2]{%
+%$\dfrac{\fangsong\zihao{2}\text{#1}}{\kartika\fontsize{30pt}{30pt}\selectfont\text{#2}}$
+%}
+
+\newcommand{\xiazhuu}[2]{%
+$\dfrac{\zihao{2}\texttt{#1}}{\calibri\fontsize{20pt}{20pt}\selectfont\text{#2}}$
+}
+
+%\newcommand{\zhouyu}[3]{%
+%\noindent #1 \xiazhuu{\ifthenelse{\equal{#2}{}}{}{#2}}{\ifthenelse{\equal{#3}{}}{}{#3}}
+%}
+
+
+
+\begin{document}
+\fangsong
+\zihao{2}
+
+
+
+%\noindent 2.\xiazhuu{南无}{Namah}\xiazhuu{萨怛他}{stathagata}\xiazhuu{苏伽多耶苏伽多耶苏伽多耶苏伽多耶}{sugatayabcedfghijklmnopqrstuvwxyz}\xiazhuu{萨怛他}{stathagata}\xiazhuu{苏伽多耶}{sugataya}\xiazhuu{萨怛他}{stathagata}\xiazhuu{苏伽多耶}{sugataya}
+
+
+%\noindent 3.\xiazhuu{好好学习，}{Good good study,}\xiazhuu{天天向上！}{day day up!}\xiazhuu{人山人海！}{People mountain people sea!}\xiazhuu{很久不见！}{Long time no see!}
+
+
+\zhouyu{(427)}{好好学习，}{ttxs}{}{}{}{}{}{}
+
+\zhouyu{(1)}{好好学习，}{haohaoxuexi}{萨怛他}{stathagata}{菩萨}{bodhisattvas}{段汉语哦段汉语哦}{a long verse}
+
+
+\begin{enumerate}
+\item \zhouyu{}{好好学习，}{ttxs}{}{}{}{}{}{}
+\item \zhouyu{}{好好学习，}{haohaoxuexi}{萨怛他}{stathagata}{菩萨}{bodhisattvas}{段汉语哦段汉语哦}{a long verse}
+\end{enumerate}
+
+
+\end{document}
