@@ -89,13 +89,13 @@ Server = http://repo.archlinux.fr/$arch
 then :
 pacman -Sy yaourt
 
-8. linux-uksm
+- linux-uksm
 
 yaourt -S linux-uksm 
 
 ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 
-9. samba
+- samba
 
 pacman -Sy samba
 edit /etc/samba/smb.conf:
@@ -110,4 +110,8 @@ testparm
 smbpasswd -a bruin
 add "samba" in "/etc/rc.conf":
 DAEMONS=(...samba...)
+
+- texlive/asymptote
+
+pacman -S texlive-most texlive-lang ghostscript asymptote
 
