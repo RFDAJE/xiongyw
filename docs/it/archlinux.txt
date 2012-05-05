@@ -77,7 +77,7 @@ ln ¨Cs /usr/bin/vim /usr/bin/vi
 cat > /etc/vimrc: set nu, syntax on, set tabstop=4
 
 - misc utilities:
-pacman ¨CS htop ntfs-3g
+pacman ¨CS htop ntfs-3 git
 
 - Yaourt: 
 
@@ -96,4 +96,18 @@ yaourt -S linux-uksm
 ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 
 9. samba
+
+pacman -Sy samba
+edit /etc/samba/smb.conf:
+
+          [homes]
+ 	        comment = Home Directories
+ 	        browseable = yes
+	        writable = yes
+ 	        valid users = bruin
+
+testparm
+smbpasswd -a bruin
+add "samba" in "/etc/rc.conf":
+DAEMONS=(...samba...)
 
