@@ -1,0 +1,99 @@
+References:
+http://blog.csdn.net/leo_wanta/article/details/6885821
+http://hi.baidu.com/creative_in_the_sky/blog/item/8f4c0851919353120df3e3e8.html
+http://hi.baidu.com/nuthead/blog/item/742c94ee2ec3f3202cf5343b.html
+http://zengrong.net/post/1564.htm
+
+
+- pacman常用命令有：
+
+pacman -Sy abc                    和源同步后安装名为abc的包
+pacman -S abc                     从本地数据库中得到abc的信息，下载安装abc包
+pacman -Sf abc                    强制安装包abc
+pacman -Ss abc                   搜索有关abc信息的包
+pacman -Si abc                    从数据库中搜索包abc的信息
+pacman -Syu                        同步源，并更新系统
+pacman -Sy                          仅同步源
+pacman -R abc                     删除abc包
+pacman -Rc abc                   删除abc包和依赖abc的包
+pacman -Rsn abc                 移除包所有不需要的依赖包并删除其配置文件
+pacman -Sc                          清理/var/cache/pacman/pkg目录下的旧包
+pacman -Scc                        清除所有下载的包和数据库
+pacman -U   abc                   安装下载的abs包，或新编译的abc包
+pacman -Sd abc                   忽略依赖性问题，安装包abc
+pacman -Su --ignore foo        升级时不升级包foo
+pacman -Sg abc                   查询abc这个包组包含的软件包
+pacman -Q                           列出系统中所有的包
+pacman -Q package             在本地包数据库搜索(查询)指定软件包
+pacman -Qi package            在本地包数据库搜索(查询)指定软件包并列出相关信息
+pacman-optimize                  To defragment pacman的数据库缓存和速度优化选项
+pacman -Q | wc -l                  统计当前系统中的包数量
+pacman -U packagename.pkg.tar.gz        使用ABS和makeokg从源代码编译安装包
+
+
+- First install x86_64 version: archlinux-2011.08.19-core-x86_64.iso
+
+
+- Add user
+useradd bruin
+passwd bruin
+mkdir –p /home/bruin
+chown –R bruin:bruin /home/bruin
+visudo, and add “bruin ALL=(ALL) NOPASSWD:SETENV:ALL”
+
+- get network up
+
+/etc/rc.conf
+
+interface=eth0
+address=
+netmask=
+broadcast=
+gateway=
+
+DAEMONS=(... sshd ...)
+
+- Enable local mirrors:
+   Editing “/etc/pacmain.d/mirrorlist”
+
+- Enable multilib
+   Editing “/etc/pacman.conf”
+
+- Upgrade: 
+pacman -Syy
+mv /usr/bin/tzselect /usr/bin/tzselect.orig
+mv -v /usr/sbin/zdump{,.orig}
+mv -v /usr/sbin/zic{,.orig}  
+nohup find / -exec ls -la {} >/dev/null 2>&1 \; &
+pacman-key --init
+pacman -S filesystem --force
+mv -v /etc/profile.d/locale.sh{,.old}
+pacman –Syu
+
+- vim
+pacman –S vim
+pacman –R vi
+ln –s /usr/bin/vim /usr/bin/vi
+cat > /etc/vimrc: set nu, syntax on, set tabstop=4
+
+- misc utilities:
+pacman –S htop ntfs-3g
+
+- Yaourt: 
+
+edit /etc/pacman.conf:
+
+[archlinuxfr] 
+Server = http://repo.archlinux.fr/$arch
+
+then :
+pacman -Sy yaourt
+
+8. linux-uksm
+
+yaourt -S linux-uksm 
+
+ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
+
+9. samba
+
