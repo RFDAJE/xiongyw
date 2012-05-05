@@ -115,3 +115,18 @@ DAEMONS=(...samba...)
 
 pacman -S texlive-most texlive-lang ghostscript asymptote
 
+- X
+
+base: pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
+3d: pacman -S mesa mesa-demos
+video drv: pacman -S xf86-video-ati
+X test: pacman -S xorg-twm xorg-xclock xterm
+dbus: pacman -S dbus; rc.d start dbus;  /etc/rc.conf: DAEMONs=(...dbus...)
+make sure: rm ~/.xinitrc
+test it: startx
+fonts: yaourt -S ttf-dejavu wqy-zenhei wqy-microhei 
+input: pacman -S ibus ibus-pinyin
+gnome: pacman -S gnome gnome-extra
+/etc/inittab: run level 5; x:5:respawn:/usr/sbin/gdm -nodaemon;
+echo 'exec gnome-session'>>~/.xinitrc
+reboot
