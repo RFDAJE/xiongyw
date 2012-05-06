@@ -35,6 +35,7 @@ pacman -Rsn abc               移除包所有不需要的依赖包并删除其配置文件
 pacman -U abc                 安装下载的abs包，或新编译的abc包
 pacman -U foo.pkg.tar.gz      使用ABS和makeokg从源代码编译安装foo包
 pacman -Q                     列出系统中所有的包
+pacman -Qo file               the owner pkg of the file
 pacman -Q package             在本地包数据库搜索(查询)指定软件包
 pacman -Qi package            在本地包数据库搜索(查询)指定软件包并列出相关信息
 pacman -Q | wc -l             统计当前系统中的包数量
@@ -159,11 +160,12 @@ ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 - 3d: pacman -S mesa mesa-demos
 - video drv: pacman -S xf86-video-ati
 - X test: pacman -S xorg-twm xorg-xclock xterm
-- dbus: pacman -S dbus; rc.d start dbus;  /etc/rc.conf: DAEMONs=(...dbus...)
-- make sure: rm ~/.xinitrc
 - test it: startx
-- fonts: yaourt -S ttf-dejavu wqy-zenhei wqy-microhei 
-- input: pacman -S ibus ibus-pinyin
+- exit X: pkill X
+
+- dbus: pacman -S dbus; rc.d start dbus;  /etc/rc.conf: DAEMONs=(...dbus...)
+- fonts: yaourt -S ttf-dejavu wqy-zenhei wqy-bitmapfont 
+- input: pacman -S ibus ibus-pinyin: note: it requires removing of sqlite3
 - gnome: pacman -S gnome gnome-extra
 - /etc/inittab: run level 5; x:5:respawn:/usr/sbin/gdm -nodaemon;
 - echo 'exec gnome-session'>>~/.xinitrc
