@@ -12,23 +12,23 @@ http://zengrong.net/post/1564.htm
 
 + pacman cmd:
 
-pacman -Sy                    仅同步源
-pacman -Syy                   force 同步源
-pacman -Syu                   同步源，并更新系统
+pacman -Sy                    sync pkg db from servers defined in pacman.conf
+pacman -Syy                   force a pkg db sync, even they are up to date
+pacman -Syu                   sync pkg db, and upgrade the system
 
-pacman -S abc                 从本地数据库中得到abc的信息，下载安装abc包
-pacman -Sy abc                和源同步后安装名为abc的包
-pacman -Sf abc                强制安装包abc
-pacman -Sd abc                忽略依赖性问题，安装包abc
-pacman -Ss abc                搜索有关abc信息的包
-pacman -Si abc                从数据库中搜索包abc的信息
-pacman -Sg abc                查询abc这个包组包含的软件包
-pacman -Su --ignore foo       升级时不升级包foo
+pacman -S abc                 download and install pkg abc
+pacman -Sy abc                sync pkg db, and download/install pkg abc
+pacman -Sf abc                force download/install of pkg abc
+pacman -Sd abc                download/install pkg abc, ignore dependency requirement.
+pacman -Ss abc                search info of pkg abc from locally installed pkgs
+pacman -Si abc                display info of pkg abc
+pacman -Sg abc                display the list of pkgs belong to pkg group abc
+pacman -Su --ignore foo       ignore pkg foo when upgrading
 
-pacman -Sc                    清理/var/cache/pacman/pkg目录下的旧包
-pacman -Scc                   清除所有下载的包和数据库
+pacman -Sc                    clean pkg cache at /var/cache/pacman/pkg
+pacman -Scc                   clean all from pacman cache
 
-pacman -R abc                 删除abc包
+pacman -R abc                 remove pkg abc
 pacman -Rc abc                删除abc包和依赖abc的包
 pacman -Rsn abc               移除包所有不需要的依赖包并删除其配置文件
 
@@ -103,7 +103,7 @@ ln -s /usr/bin/vim /usr/bin/vi
 cat > /etc/vimrc: set nu, syntax on, set tabstop=4
 
 + misc utilities:
-pacman -S htop ntfs-3 git dos2unix
+pacman -S htop ntfs-3g git dos2unix samba vsftpd
 
 + samba
 
@@ -148,13 +148,28 @@ ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 
 
 
-----------------------------------------------------------------
+################################################################
+
++ X concepts:
+
+- X server: Xorg X window system (X server, etc)
+- Window Manager: WMs are X clients that provide the border around a window.
+- Display Manager: A display manager, or login manager, is a graphical interface screen that is displayed at the end of the boot process in place of the default shell.
+- Desktop Environment: Desktop environments provide a complete graphical user interface (GUI) for a system by bundling together a variety of X clients written using a common widget toolkit and set of libraries.
 
 
++ X for virtual box
+
+ref: https://wiki.archlinux.org/index.php/Arch_Linux_VirtualBox_Guest#Arch_Linux_guests
+
+pacman -S virtualbox-archlinux-additions
+modprobe -a vboxguest vboxsf vboxvideo
+Edit /etc/rc.conf: MODULES=(... vboxguest vboxsf vboxvideo)
 
 
++ X for i7/dell
 
-+ X
+http://www.douban.com/group/topic/2259557/
 
 - base: pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
 - 3d: pacman -S mesa mesa-demos
@@ -164,9 +179,20 @@ ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 - exit X: pkill X
 
 - dbus: pacman -S dbus; rc.d start dbus;  /etc/rc.conf: DAEMONs=(...dbus...)
-- fonts: yaourt -S ttf-dejavu wqy-zenhei wqy-bitmapfont 
+- fonts: yaourt -S ttf-dejavu wqy-zenhei
+  /etc/fonts/conf.d/65-wqy-zenhei.conf: <edit name="embeddedbitmap"><bool>true</bool></edit> 
 - input: pacman -S ibus ibus-pinyin: note: it requires removing of sqlite3
 - gnome: pacman -S gnome gnome-extra
 - /etc/inittab: run level 5; x:5:respawn:/usr/sbin/gdm -nodaemon;
 - echo 'exec gnome-session'>>~/.xinitrc
 - reboot
+
+
+kde:
+ref: https://wiki.archlinux.org/index.php/KDE
+
+pacman -S kde
+/etc/inittab: kdm
+/etc/rc.conf: DEAMONS={...kdm...}
+pacman -S kdebase-workspace
+~/.xinitrc: exec ck-launch-session startkde
