@@ -156,6 +156,8 @@ ref: http://kerneldedup.org/forum/forum.php?mod=viewthread&tid=24&page=1&extra=
 
 + X
 
+http://www.douban.com/group/topic/2259557/
+
 - base: pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
 - 3d: pacman -S mesa mesa-demos
 - video drv: pacman -S xf86-video-ati
