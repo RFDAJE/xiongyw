@@ -1,3 +1,3 @@
 pr -t -e4 xxx.c
 sed -e "s/\t/    /g" xxx.c
-
+find . -name "*.[ch]" -exec sed -i "s/\t/    /g" {} \;
