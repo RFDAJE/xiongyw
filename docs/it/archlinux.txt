@@ -169,6 +169,8 @@ Edit /etc/rc.conf: MODULES=(... vboxguest vboxsf vboxvideo)
 
 + X for i7/dell
 
+http://www.douban.com/group/topic/2259557/
+
 - base: pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils
 - 3d: pacman -S mesa mesa-demos
 - video drv: pacman -S xf86-video-ati
