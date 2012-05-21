@@ -197,7 +197,11 @@ get_node_name(TNODE * node, char name[])
      */
     len = strlen(name);
     for (i = 0; i < len; i++) {
-        if (name[i] == '-' || name[i] == '.' || name[i] == '+')
+        if (name[i] == '-' || 
+            name[i] == '.' || 
+            name[i] == '+' || 
+            name[i] == ' ' ||
+            name[i] == '&')
             name[i] = '_';
     }
 
