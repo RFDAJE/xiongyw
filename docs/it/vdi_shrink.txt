@@ -11,7 +11,6 @@ sudo cp zerofree /usr/bin
 
 init 1 
 umount /dev/sdc1
-mount -o ro /dev/sdc1 /home/lfs
 zerofree /dev/sdc1
 fsck -f /dev/sdc1
 poweroff
