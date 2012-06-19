@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------------------
-# non-recursive make project for libra_sd
+# non-recursive make project 
 #
 # created(bruin, 2011-11-28)
-# last updated: 2012-02-22
+# last updated: 2012-06-19
 #
 # reference: 
 #   1. http://oreilly.com/catalog/make3/book/index.csp "Managing Projects with GNU Make", 3rd, Robert Mecklenburg
@@ -14,7 +14,8 @@
 # assumptions and goals
 # --------------------------------------
 # assumptions:
-#   1. only use GNU Make under Linux environment (added support for Windows also)
+#   1. only use GNU Make under Linux environment (can support Windows if toolchain and gmake.exe
+#      are available for Windows)
 #   2. source files may have the same name (in different directories)
 #   3. source tree is clean, i.e., no extra sources, no local makefiles.
 #   4. source are either C or C++ with the following suffix: .h, .c, .cpp
@@ -25,7 +26,8 @@
 #   2. separating output from source tree
 #   3. dependency generation
 #   4. override built-in rules
-#   5. misc: support jobs, help, silent/verbose, etc
+#   5. using 'local.mk' in subdirectories to override root Makefile
+#   6. misc: support jobs, help, silent/verbose, etc
 # --------------------------------------
 
 
@@ -80,18 +82,37 @@ endif
 # --------------------------------------
 
 
-# modules.mak and options.mak are put in the app specific sub directories
 # by default we build the demo application
 
 ifdef BOOT
-app := bootloader
-else
-app := demo
+APP_NAME := bootloader
+else 
+	ifdef LOADER
+		APP_NAME := loader
+	else
+		APP_NAME := demo
+	endif
 endif
 
+SYS_ROOT := ../../..
 
-srcroot := ../src
-outroot := ../out/$(app)
+APP_ROOT := $(SYS_ROOT)/app
+SDK_ROOT := $(SYS_ROOT)/sdk.mtos
+TGT_ROOT := $(SYS_ROOT)/tgt
+TGT_NAME := librasd_evk
+
+
+# bsp library path
+TGT_BSP_ROOT := $(TGT_ROOT)/$(TGT_NAME)/bsp
+TGT_BSP_SOC_LIB_ROOT := $(TGT_BSP_ROOT)/platform/2012_06_05/lib
+TGT_BSP_SOC_INC_ROOT := $(TGT_BSP_ROOT)/platform/2012_06_05/include
+TGT_BSP_PERIPHERAL_ROOT := $(TGT_BSP_ROOT)/peripherals
+TGT_DRV_COMMON_ROOT := $(TGT_ROOT)/drv_common
+
+#OUT_ROOT := $(SYS_ROOT)/$(TGT_NAME).$(APP_NAME).out
+OUT_ROOT := /tmp/out/$(TGT_NAME)/$(APP_NAME)
+
+
 
 
 program   := image
@@ -100,28 +121,27 @@ sources    :=
 libraries  := 
 
 
-# CAK library PATH
-CAK_LIB_PATH := $(srcroot)/mware/3rd/cas/kvca4.0/lib
+# CAK library PATH: 
+CAK_LIB_PATH := $(TGT_ROOT)/$(TGT_NAME)/cas/kvca4.0/lib
 
-# bsp library path
-#BSP_LIB_PATH := /home/liyb/2012_03_09/verification/test_librasd_bsp/lib
-BSP_LIB_PATH := $(srcroot)/bsp/platform/2012-03-16/lib
-#BSP_LIB_PATH := Z:\librasd_bsp_release\2012_03_01\verification\test_librasd_bsp\lib
 
-#bsp include root path
-BSP_INCLUDE_ROOT := $(srcroot)/bsp/platform/2012-03-16/include
 
+
+
+# 
+# modules.mak and options.mak are put in the app specific sub directories
+#
 
 # --------------------------------------
 # all sources and include directories
 # --------------------------------------
-include $(app)/modules.mak  
+include $(APP_NAME)/modules.mak  
 
 
 # --------------------------------------
 # compiling & linking options
 # --------------------------------------
-include $(app)/options.mak
+include $(APP_NAME)/options.mak
 
 
 
@@ -129,9 +149,9 @@ include $(app)/options.mak
 # output directories
 # --------------------------------------
 ifdef WINDOWS
-	out_dirs := $(subst /,\,$(addprefix $(outroot)/,$(modules)))
+	out_dirs := $(subst /,\,$(addprefix $(OUT_ROOT)/,$(patsubst $(SYS_ROOT)/%,%,$(modules))))
 else
-	out_dirs := $(addprefix $(outroot)/,$(modules))
+	out_dirs := $(addprefix $(OUT_ROOT)/,$(patsubst $(SYS_ROOT)/%,%,$(modules)))
 endif
 
 
@@ -141,7 +161,7 @@ endif
 # these are recursive variables
 # --------------------------------------
 objects = $(call srcs-to-objs, $(sources))
-depends = $(subst .o,.d,$(objects))
+depends = $(patsubst %.o,%.d,$(objects))
 
 
 
@@ -152,39 +172,48 @@ depends = $(subst .o,.d,$(objects))
 # get objects path from sources path
 # $(call srcs-to-objs,srcs)
 define srcs-to-objs 
-	$(addprefix $(outroot)/, \
-        $(patsubst $(srcroot)/%,%,\
-	$(subst .cpp,.o,$(filter %.cpp,$1)) \
-        $(subst .c,.o,$(filter %.c,$1))     \
-        $(subst .S,.o,$(filter %.S,$1)))) 
+	$(addprefix $(OUT_ROOT)/, \
+	$(patsubst $(SYS_ROOT)/%,%,\
+	$(patsubst %.cpp,%.o,$(filter %.cpp,$1)) \
+	$(patsubst %.c,%.o,$(filter %.c,$1))     \
+	$(patsubst %.S,%.o,$(filter %.S,$1)))) 
 endef
 
 # --------------------------------------
 # $(call module-to-lib module-path)
 define module-to-lib
-	$(addprefix $(outroot)/,$(patsubst $(srcroot)/%,%/$(notdir $1).a,$1))
+	$(addprefix $(OUT_ROOT)/,$(patsubst $(SYS_ROOT)/%,%/$(notdir $1).a,$1))
 endef
 	
 # --------------------------------------
 # generate rules for each module in the module list
 # $(call all-module-rules,module-dir-list)
 define all-module-rules
-	$(foreach module,$1,$(call one-module-rules,$(addprefix $(srcroot)/,$(module))))
+	$(foreach module,$1,$(call one-module-rules,$(module)))
 endef
 
 # auto insert (by eval) rules for each module, also updating 
-# global 'sources' & 'libraries' variables
+# global 'sources' & 'libraries' variables;
+#
+# if there is a 'local.mk' under the module directory, also
+# read that (-include), and the 'local.mk' can define 'local_exclude"
+# to list names of source files to be excluded in the compilation.
 # $(call one-module-rules,module-root-path)
 define one-module-rules
-	$(eval local_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
-	$(eval local_obj := $(call srcs-to-objs,$(local_src)))
-	$(eval local_lib := $(call module-to-lib,$1))
+	$(eval -include $1/local.mk)
+	$(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
+
+	$(eval local_exclude := $(addprefix $1/,$(local_exclude)))
+	$(eval module_src := $(filter-out $(local_exclude),$(module_src)))
+
+	$(eval module_obj := $(call srcs-to-objs,$(module_src)))
+	$(eval module_lib := $(call module-to-lib,$1))
 	
-	sources += $(local_src)
+	sources += $(module_src)
 
-	libraries += $(local_lib)
+	libraries += $(module_lib)
 
-	$(eval $(local_lib): $(local_obj)
+	$(eval $(module_lib): $(module_obj)
 	  $(AR) rv $$@ $$^
          )
 endef
@@ -206,7 +235,7 @@ endef
 define one-compile-rule
 	$(eval tmp_obj := $1)
 	$(eval tmp_src := $2)
-	$(eval tmp_dep := $(subst .o,.d,$(tmp_obj)))
+	$(eval tmp_dep := $(patsubst %.o,%.d,$(tmp_obj)))
 
 	$(eval $(tmp_obj): $(tmp_src)
 	  $(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $(CFLAGS) $(CPPFLAGS) $$<
@@ -240,9 +269,9 @@ $(eval $(call compile-rules,$(sources)))
 .PHONY: all clean help chkdir
 	
 all: chkdir $(objects)
-	$(CC) $(LD_OPTIONS) -Wl,--start-group $(objects) $(LD_LIBS) -Wl,--end-group -o $(outroot)/$(program).elf
-	$(OBJDUMP) -dx $(outroot)/$(program).elf > $(outroot)/$(program).dump
-	$(OBJCOPY) -S  -O binary $(outroot)/$(program).elf  $(outroot)/$(program).bin
+	$(CC) $(LD_OPTIONS) -Wl,--start-group $(objects) $(LD_LIBS) -Wl,--end-group -o $(OUT_ROOT)/$(program).elf
+	$(OBJDUMP) -dx $(OUT_ROOT)/$(program).elf > $(OUT_ROOT)/$(program).dump
+	$(OBJCOPY) -S  -O binary $(OUT_ROOT)/$(program).elf  $(OUT_ROOT)/$(program).bin
 
 	
 chkdir: $(out_dirs)
@@ -251,9 +280,9 @@ $(out_dirs):
 
 clean:
 ifdef WINDOWS
-	$(RM) $(subst /,\,$(outroot))
+	$(RM) $(subst /,\,$(OUT_ROOT))
 else
-	$(RM) $(outroot)
+	$(RM) $(OUT_ROOT)
 endif	
 
 help:

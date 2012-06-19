@@ -54,11 +54,11 @@ CFLAGS += -Winline
 CFLAGS += -Wundef 
 
 # [-g]: produce debug info, should be turn off for release build
-CFLAGS += -g  
+#CFLAGS += -g  
 # [-ggdb]: produce debugging information for use by GDB. is it applicable here?
 #CFLAGS += -ggdb
 # [-O2]: Optimize even more than [-O] or [-O1]. better turn it off for debug build.
-#CFLAGS += -O2
+CFLAGS += -O2
 
 # ARM specific options
 # [-marm]:
@@ -113,24 +113,27 @@ CFLAGS += -D_AGAR_CORE_INTERNAL
 #CFLAGS += -D__AVL_IR_RC5__
 CFLAGS += -D__AVL_IR_NEC__
 CFLAGS += -D_AGAR_UPDATE_REGION
+CFLAGS += -D_AGAR_FRAME_BUFFER_
 
 #
 # controlling which msg queue to be used
 #
-CFLAGS += -DKVCA_USE_MW_QUEUE
+#CFLAGS += -DKVCA_USE_MW_QUEUE
 #CFLAGS += -DSEARCH_USE_MW_QUEUE
+
 CFLAGS += -DPLAYER_USE_MW_QUEUE
+
 #CFLAGS += -DMONITOR_USE_MW_QUEUE
 
 #
 # enable CA or not
 #
-#CFLAGS += -DENABLE_CA
+CFLAGS += -DENABLE_CA
 
 #
 # string transcoding at database API
 #
-#CFLAGS += -DDB_TRANSCODING
+CFLAGS += -DDB_TRANSCODING
 
 
 
@@ -182,21 +185,11 @@ LD_OPTIONS += -Wl,--no-undefined
 LD_OPTIONS += -Wl,--gc-sections 
 LD_OPTIONS += -Wl,-static 
 LD_OPTIONS += -Wl,-L $(TOOLCHAIN_LIB_ROOT) 
-LD_OPTIONS += -Wl,-L $(BSP_LIB_PATH)
+LD_OPTIONS += -Wl,-L $(TGT_BSP_SOC_LIB_ROOT)
 LD_OPTIONS += -Wl,-L $(CAK_LIB_PATH)
-LD_OPTIONS += -Wl,-Map -Wl,$(outroot)/$(system_map)
+LD_OPTIONS += -Wl,-Map -Wl,$(OUT_ROOT)/$(system_map)
 # libs/objs used for linking:
-#LD_OPTIONS += -Wl,--start-group
 LD_LIBS := -lgcc
 LD_LIBS += -lm
 LD_LIBS += -l_librasd_bsp
 LD_LIBS += -lkvca40_AVL_20120117
-#LD_LIBS += $(srcroot)/bsp/platform/libs/Vector_gnu.o
-#LD_LIBS += $(srcroot)/bsp/platform/libs/main.o
-#LD_LIBS += $(srcroot)/bsp/platform/libs/avl_util.o
-#LD_LIBS += $(srcroot)/bsp/platform/libs/misc.o 
-#LD_LIBS += $(srcroot)/bsp/platform/libs/shell.o
-#LD_LIBS += $(srcroot)/bsp/platform/libs/dsputil_init_arm.o
-#LD_OPTIONS += -Wl,--end-group 
-
-
