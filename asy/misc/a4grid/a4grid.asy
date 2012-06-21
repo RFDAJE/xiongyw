@@ -19,7 +19,10 @@ real v_margin = 13.5;
 /* square grid size */
 real space = 5;
 
-pen grid_pen = grey + linewidth(0.25);
+//pen grid_pen = grey + linewidth(0.25);
+real grid_pen_width = 0.01mm;
+/* dash line */
+pen grid_pen = linetype(new real[] {4, 6}) + linewidth(grid_pen_width);
  
 int i;
 
