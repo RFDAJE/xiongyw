@@ -1,3 +1,6 @@
+/*
+ * asy -noV -f pdf a4grid.asy
+ */
 
 settings.tex = "xelatex";
  
@@ -6,36 +9,49 @@ texpreamble("\setCJKmainfont{SimSun}");
  
 unitsize(1mm);
  
-/* A4 size: 210x297mm
-     left/right margin: 10mm*2
-  top/bottom margin: 13.5mm*2
- */
+/* A4 size (portrait layout): 210x297mm  */
 real width = 210;
 real height = 297;
-real margin10 = 10;
-real margin8 = 13.5;
+/* left/right margin size */
+real h_margin = 10; 
+/* top/bottom margin size */
+real v_margin = 13.5;
+/* square grid size */
 real space = 5;
+
+pen grid_pen = grey + linewidth(0.1);
  
 int i;
- 
+
+/* 
+ * 1. use a white line to stretch the picture to A4 size 
+ */
 draw((0,0)--(width, height), white+linewidth(0.01mm));
+
+
+/*
+ * 2. draw the grid 
+ */
  
-/* rows */
-for(i = 0; i <= 270/5; ++i){
-    draw((margin10,i*space+margin8)--(width-margin10, i*space+margin8), grey+linewidth(0.1mm));
+/* rows: horizontal lines */
+for(i = 0; i <= (height-2*v_margin)/space; ++i){
+    draw((h_margin,i*space+v_margin)--(width-h_margin, i*space+v_margin), grid_pen);
 }
  
-/* columns */
-for(i = 0; i <= 190/5; ++i){
-    draw((i*space+margin10, margin8)--(i*space+margin10, height-margin8), grey+linewidth(0.1mm));
+/* columns: vertical lines */
+for(i = 0; i <= (width-2*h_margin)/space; ++i){
+    draw((i*space+h_margin, v_margin)--(i*space+h_margin, height-v_margin), grid_pen);
 }
- 
  
 
-pair lowleft2 = (155, 3.5);
+/*
+ * 3. label in a black rectangle
+ */ 
+/* rectangle size */
 real rect_width=20;
-real rect_height=10;
+real rect_height=8;
+/* upleft point of the rect */
+pair upleft = (155, 13.42);
  
- 
-filldraw(lowleft2--(lowleft2.x,lowleft2.y+rect_height)--(lowleft2.x+rect_width,lowleft2.y+rect_height)--(lowleft2.x+rect_width, lowleft2.y)--cycle,black);
-label(Label("\texttt{bruin}"), (165,11), white);
+filldraw(upleft--(upleft.x,upleft.y-rect_height)--(upleft.x+rect_width,upleft.y-rect_height)--(upleft.x+rect_width, upleft.y)--cycle,black);
+label(Label("\texttt{bruin}"), (upleft.x + 10, upleft.y - 4), white);
