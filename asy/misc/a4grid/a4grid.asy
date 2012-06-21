@@ -19,7 +19,7 @@ real v_margin = 13.5;
 /* square grid size */
 real space = 5;
 
-pen grid_pen = grey + linewidth(0.1);
+pen grid_pen = grey + linewidth(0.25);
  
 int i;
 
