@@ -1,0 +1,66 @@
+http://www.rcgroups.com/forums/showthread.php?t=1083442
+
+Aug 03, 2009, 01:54 PM
+
+There is no need to use Mach3 if you use CNC USB controller.
+
+Mach3 and EMC are GCode interpreters and software pulsing engines. They send step/dir commands through parallel port.
+
+In CNC USB controller solution GCode and DXF are interpteted with software, but then commands are send to controller. Controller is used as a pulsing engine and generates step/dir commands. 
+
+Stepper motor drivers use those step/dir commands to drive motors and are same in all cases.
+
+In all cases GCode is needed as an input. GCode represents toolpath. Toolpath can be generated in CAM programs like SolidCAM, MasterCAM, ArtCAM, CooperCAM and others. All those sofwares can export GCode which is compatible with CNC USB controller. Controller software also supports DXF import as toolpath which simplifies some easy jobs (see examples on webpage). 
+
+This controller is perfect solution for hot wire cnc cutter in combination with Profili2. Wing design and GCode generation in done in Profili2. See video I made which shows such wing cutting job from begining (design) to end (cut cores).
+Profili2 can also generate GCode for cutting balsa ribs and it works great. I attached screenshot showing Profili2 generated ribs. Some of the features like lightning holes, spar, d-box and leading edge are visible on this image. Bridges that hold balsa ribs are also visible. And it is all done with just a few clicks. 
+
+I'm building 3-axis machine (I have a build thread on CNCZone). When it will be finished I plan to make some tutorial videos. I have some ideas for them. But it is a slow build so it can take some time.
+
+It looks like some professionaly build, ready to use boards will be available. Becouse of professional manufacturing they will be smaller and will have different connectors. If someone is interested...
+
+I'm ready to answer all questions you have. If you have any ideas for useful features please write to me. If possible I'll try to implement them.
+
+Andrej
+
+
+http://www.cnczone.com/forums/diy-cnc_router_table_machines/85228-3-axis_machine_build.html
+
+ 07-09-2009, 06:00 PM
+
+3-axis machine build
+Hello
+
+My name is Andrej. I'm computer programmer and my hobbies include building rc model aircrafts, geocaching, electronics,...
+
+I love flying wings and three years ago I created my first CNC foam cutting machine. At that time I was learning how to program microprocessors. I created controller for my machine which was using RS232 to communicate with computer. Controller accepted dxf for wing root and another for wing tip and send step/dir pulses to stepper drivers. 
+
+I used that machine for some time. Main disadvantige was, that creating those dxf files took quite some time and a small change meant that everything has to be done again.
+
+Some months ago, I needed to cut some wings. I found out, that Profili2 supports 4-axis GCode generation. Time to create new controller has come.
+
+GCode parsers, linear, circular and helical interpolators were programmed, USB support was added and CNC USB motion controller was born. Cutting wings with my foam cutter was now easy thanks to great Profili2 / CNC USB motion controller compatibility. Check out video on my foam cutter page.
+
+But why stop here. I had everything ready for true 3+1 axis machine. Except machine itself. A friend of mine Ultralajt created his machine and I decided I'll create mine.
+
+Main design goals were, that everything must be build with simple tools becouse I don't have any special equipment. Machine must be cheap but parts must be upgredable to better quality ones. 
+
+I don't have any plans and all my sketches are not publishable. I doubt anybody but me understands them. I'll try to photograph everthing. Feel free to ask any questions. 
+
+I can't wait no see full power of my CNC USB motion controller
+__________________
+CNC USB controller - http://www.planet-cnc.com
+
+
+
+07-31-2009, 07:23 AM
+
+There is a lot of clipart available on internet in EPS or PDF format.
+You can convert those to DXF with GhostFriend and import it as DXF.
+
+Here are examples:
+Original EPS file
+Converted to DXF with GhostFriend
+Exported to DXF from CNC USB Controller software
+Exported to GCode from CNC USB Controller software
+
