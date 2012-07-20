@@ -1,0 +1,16 @@
+/*
+ * simple rules for recording a song in ascii format
+ * adopted from 
+ * song     = [note]+
+ * note     = pitch duration
+ * pitch    = [-+b#]*[1-7], where
+     '-' means one negative octave distance from "normal" octave. multiple '-' means multiple of octave distances; 
+     '+' means the opposite to '-';
+     'b' means half negative note distance; multiple 'b' is allowed.
+     '#' means the opposite to 'b';
+     1-7 means do, re, mi, fa, so, la, ti respectively.
+ * duration = [.>=]*
+ */
+
+
+1.2=3=5=5=6=
