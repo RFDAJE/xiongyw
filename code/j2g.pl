@@ -28,6 +28,21 @@
 #
 #####################################################################
 
+# freq (in Hz) of notes in C1 octave
+@g_freq = (
+261.626, # do
+293.665, # re
+329.628, # mi
+349.228, # fa
+391.995, # so
+440.000, # la
+493.883, # ti
+);
+
+# freq ratio of 100 cent: 2^(1/12).
+$g_cent100=1.059463;
+
+
 
 # all lines from the input file are joined into a single string, CR/LF removed
 $song = '';
@@ -81,6 +96,15 @@ sub open_file
 	}
 }
 
+#####################################################################
+### print_header
+#####################################################################
+sub print_header
+{
+	print "G91X0Y0Z0\n";
+	print "#1=1. (k; feed-rate=freq*k)\n";
+	print "#2=1. (duration of a beat in seconds)\n";
+}
 
 #####################################################################
 ### convert_to_gcode
@@ -93,24 +117,64 @@ sub convert_to_gcode
 
 	#removing all white spaces, if any
 	$song =~ s/\s+//g;
-	print "$song\n";
+	#print "$song\n";
 
 	# build the note array
 	@notes = $song =~ /([\+\-b#]*\d[\.>=]*)/g;
 
+	& print_header;
+
 	# convert each note into g-code
 	foreach $note (@notes) {
-		print "($note)\n";
-		$_ = $note;
-		/([1-7])/;
-		my $p = $1;
+		#print "($note)\n";
+		
+		#################################
+		### pitch: freq in Hz
+		#################################
 
-		# pitch: only support +/- for now
-		# how many '+', '=':
+		# get the digit and the base freq
+		$_ = $note;
+		/([1-7])/;  # now $1 is the digit, used as index below
+		my $freq = $g_freq[$1 - 1];
+
+		# get the octave shift, how many '+' and '-':
 		my $plus = ($note =~ tr/\+//);
 		my $minus = ($note =~ tr/\-//);
+		$freq = $freq * (2 ** ($plus - $minus));
 
-		print "$p, $plus, $minus^\n";
+		# get the b/#
+		my $below = ($note =~ tr/b//);
+		my $sharp = ($note =~ tr/#//);
+		$freq = $freq * ($g_cent100 ** ($sharp - $below));
+
+		#print "$1, $freq, $plus, $minus, $sharp, $below^\n";
+
+		#################################
+		### duration: nr of beat. 
+		###    '=' and '.' are processed first, followed by '>'
+		#################################
+		
+		my $duration = 1.0;
+		my $equal = ($note =~ tr/=//);
+		$duration = 1.0 / (2 ** $equal);
+		my $dot =  ($note =~ tr/\.//);
+		if ($dot > 0) {
+			$duration = $duration *1.5;
+		}
+		my $great = ($note =~ tr/>//);
+		$duration = $duration + $great;
+		#print "$note: $equal, $dot, $great, $duration^\n";
+
+		#################################
+		### output g-code:
+		### #1: k, feedrate = freq * k;
+		### #2: seconds per beat
+		#################################
+		my $feedrate = $freq;   # mm/min
+		my $distance = $feedrate * $duration / 60.;
+		printf("X[%7.3f*#2*#1] F[%$5.3f*#1]\n", $distance, $feedrate);
 	}
-	
+
+	# end the g-code
+	print "M2 (stop)\n";	
 }
