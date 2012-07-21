@@ -103,8 +103,8 @@ sub open_file
 sub print_header
 {
 	print "G91X0Y0Z0\n";
-	print "#1=1. (k; feed-rate=freq*k)\n";
-	print "#2=1. (duration of a beat in seconds)\n";
+	print "#1=1. (k; feed-rate=freq*k. increasing this raises pitches)\n";
+	print "#2=1. (duration of a beat in seconds. increasing this slow down tempo)\n";
 }
 
 #####################################################################
@@ -126,6 +126,9 @@ sub convert_to_gcode
 	& print_header;
 
 	# convert each note into g-code
+	my $axis_idx=0;
+	#my @axis = ('X', 'Y', 'Z');
+	my @axis = ('X', 'X', 'X');
 	foreach $note (@notes) {
 		#print "($note)\n";
 		
@@ -175,7 +178,10 @@ sub convert_to_gcode
 		#################################
 		my $feedrate = $freq;   # mm/min
 		my $distance = $feedrate * $duration / 60.;
-		printf("X[%7.3f*#2*#1] F[%$5.3f*#1]\n", $distance, $feedrate);
+
+		printf("%s[%7.3f*#2*#1] F[%$5.3f*#1]\n", $axis[$axis_idx % 3], $distance, $feedrate);
+
+		$axis_idx = $axis_idx + 1;
 	}
 
 	# end the g-code
