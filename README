@@ -1,1 +1,3 @@
-https://xiongyw@github.com/xiongyw/xiongyw.git
+- "yum install git" or "pacman -S git" on Linux
+- install "Git-1.7.11-preview20120620.exe" on windows
+- git clone https://xiongyw@github.com/xiongyw/xiongyw.git
