@@ -4,10 +4,41 @@ use File::Basename;
 use strict;
 
 
+################################################################
 # ref: "Perl 5 Complete", $7.5 example 3.
+#
+# notes on the data structure:
 
-
-
+# here is a sample tree on file system:
+#
+# test
+#  |
+#  |- dir1
+#  |   |
+#  |   |- file1
+#  |   \- file2
+#  |- dir2
+#  |   |
+#  |   |- file3
+#  |   \- file4
+#  |- file5
+#  \- file6
+#
+# it should be represented in perl as hash tables illustrated below:
+#
+#
+#  {"test" => {"dir1" => {"file1"=>"FILE", 
+#                         "file2"=>"FILE"
+#                        },
+#              "dir2" => {"file3"=>"FILE",
+#	                  "file4"=>"FILE"
+#			 },
+#               "file5"=>"FILE",
+#               "file6"=>"FILE"
+#              }
+#  }
+#
+################################################################
 
 my $head = 
     "import fontsize;\n".
@@ -29,11 +60,14 @@ my $FILE = "__FILE__";
 # flag is either zero or non-zero:
 #   - 0 means dir only
 #   - otherwise, means dir and files
+#
+# it returns a ref to a hash contains the entries under path, the
+# basename of the path itself is not included.
 ################################################################
 sub build_tree
 {
 	my ($path, $level, $flag) = @_;
-	my ($file, $dad, $kids) = ('', {}, {});
+	my ($file, $kids) = ('', {});
 	
 	# sanity checks
 	if(!(-e $path)){
@@ -43,7 +77,6 @@ sub build_tree
 	if(!(-d $path)){
 		die "$path is not a directory\n";
 	}
-
 		
 	opendir(FD, $path);
 	my @files = readdir(FD);
@@ -71,8 +104,9 @@ sub build_tree
 
 	chdir("..");
 	
-	$dad->{basename($path)} = $kids;
-	return $dad;
+	#$dad->{basename($path)} = $kids;
+	#return $dad;
+	return $kids;
 }
 
 ###############################################################
@@ -126,22 +160,34 @@ sub attach_asy_node
 }
 
 ################################################################
-# it takes 1 argument: REF to a hash representing the tree
+# it takes 2 argument: REF to the root key, and
+# REF to the value of the root key:
+#  - $rootkey: its assumed that the asy node of the rootkey is already created,
+#    it's provided here for its kids to attach to it.
+#  - $rootvalue: hashref to the content of the root. cann't be $FILE, as the
+#    sanity test excludes this case
+#
 ################################################################
 sub output_tree
 {
-	my ($hashref) = @_;
-	my ($dad, $kids) = ('', {});
+	my ($dad, $kids) = @_;
+	my $dad_node;
+	my $key;
 
-	foreach $dad (keys %$hashref){
-		print "$dad\n";
-		if(ref $hashref->{$dad}){
-			output_tree($hashref->{$dad});
+	$dad_node = get_node_asy_name(\$dad);
+
+	foreach $key (keys %$kids){
+		define_asy_node(\$key);
+
+		if(ref $kids->{$key}){
+			output_tree(\$key, $kids->{$key});
+		}
+		else{
+			attach_asy_node(\$dad, \$key);
 		}
 	}
-
 }
-
-my $tree = build_tree("/home/bruin/work/github/xiongyw/asy/node/dirtree/test", 10, 1);
+my $tree = {};
+$tree->{"test"} = build_tree("test", 10, 1);
 output_tree($tree);
 
