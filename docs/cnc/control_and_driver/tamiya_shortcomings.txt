@@ -1,0 +1,365 @@
+http://www.rcgroups.com/forums/showthread.php?t=61346
+
+
+Directions to replace Standard Tamiya Connector
+I just bought some batteries and need to replace my connectors...I have Standard Tamiya Connector..is there a website that shows me how to do this ...thanks!!!
+  	
+	Sign up now
+	to remove ads between posts
+
+	 Sep 13, 2002, 08:30 AM	
+	 #2
+	 U2Steve
+	 Now with more COWBELL!
+
+	 Lexington, KY, USA
+	 Joined Mar 2001
+	 803 Posts
+	 The E-Zone should be the website to go to for such info! 
+	 What connectors will you be using to replace your Tamiyas? I use Sermos/PowerPole connectors to replace Tamiya; if you are, too, I'll give you a quick how-to here...
+	   	
+		 Sep 13, 2002, 08:32 AM	
+		 #3
+		 thor4944
+		 Registered User
+
+		 Ohio Wapak
+		 Joined Feb 2002
+		 3,678 Posts
+		 htey are the
+		 They are the same connectors..I bought a Pegasus 35 esc and I need to put the connectors on the esc........HELP!!!!
+		   	
+			 Sep 13, 2002, 08:35 AM	
+			 #4
+			 thor4944
+			 Registered User
+
+			 Ohio Wapak
+			 Joined Feb 2002
+			 3,678 Posts
+			 forgot
+			 Forgot to tell you I have to take the connector off of the old esc first..and it is on tight!!!!
+			   	
+				 Sep 13, 2002, 09:09 AM	
+				 #5
+				 DBCherry
+				 Registered User
+				 Worcester, MA.
+				 Joined Nov 2001
+				 1,408 Posts
+				 thor,
+				 First, if you're saying that you need to PUT Tamiya connectors on the new pack, or the ESC, I'd recommend against it!
+				 Those connectors aren't good enough to risk a plane in the air.   
+				 Get yourself some Dean's or Sermos connectors.
+				 The rest isn't too hard once you get use to it. Just cut off the old connectors, strip the wires back a bit, then solder on new connectors. (Some folks "crimp" the Sermos connectors to the end of the wires, but I feel safer soldering.)
+				 You can also solder the ESC wires directly to the motor to save some weight.
+				 Dennis-
+				   	
+					 Sep 13, 2002, 09:25 AM	
+					 #6
+					 U2Steve
+					 Now with more COWBELL!
+
+					 Lexington, KY, USA
+					 Joined Mar 2001
+					 803 Posts
+					 The best way I've found to remove a Tamiya is to grip the plastic housing, and ram a screwdriver through the front opening to push the wire&contact out the backside, then cut the contact off the wire w/side cutters. I mean, you weren't gonna recycle them were you? 
+					 To put the Sermos on, you can either crimp or solder. Based on wisdom gleaned here, crimping is best, and what the connector was designed for, but the crimper made for the job is the only one that does a decent job (no substitutes! ) and it's very expensive! So...
+					 To solder:
+					 Start by gathering stuff- 15 to 25-watt iron, a thin-diameter electronic-grade solder, flux, wet sponge/rag, and the connectors. A "third hand" -type clamping rig would be, well, handy.
+					 Cut and trim the wire, and strip the insulation back 3/8" from the end.
+					 Dip the wire end in electronic (not plumbing, not acid, not corrosive) flux. 
+					 Put a contact (the metal part of the connector) on the end of the wire. Push the end in all the way.
+					 Clamp the wire upright, with the contact at the top. Use a metal clamp, or at least put a metal alligator clip on the wire as a heat sink.
+					 Make sure the iron is hot, that thou may strike  Wipe the tip with the wet sponge/rag to clean. Apply the iron to the side of the contact. Touch the solder to the top end of the contact. After a few seconds, the flux inside should sizzle; shortly thereafter the solder should begin to melt and flow into the top of the contact. As it does, feed in an inch or so of solder to fill the contact. Pull the iron and solder back, count to five to let the joint harden, then gently wipe with wet rag.
+					 Push the contact into a housing (pay attention to polarity and housing color!) until it snaps. A small flatblade screwdriver pushing on the bottom of the contact may help.
+
+					 You're done! Repeat as necessary...
+
+					 Steve
+					   	
+						 Sep 13, 2002, 09:26 AM	
+						 #7
+						 thor4944
+						 Registered User
+
+						 Ohio Wapak
+						 Joined Feb 2002
+						 3,678 Posts
+						 thanks...sounds easy
+						 THanks..sounds easy..but my question is why are those connectors not good..what could happen in the air?
+						   	
+							 Sep 13, 2002, 09:38 AM	
+							 #8
+							 thor4944
+							 Registered User
+
+							 Ohio Wapak
+							 Joined Feb 2002
+							 3,678 Posts
+							 thanks so much for you time
+							 Thanks so much for y our time and instructions!!! great!!
+							   	
+								 Sep 13, 2002, 09:45 AM	
+								 #9
+								 mkirsch1
+								 Registered User
+								 Joined Oct 2001
+								 2,799 Posts
+								 Tamiya connectors stretch out and get loose after you unplug them a few times. The pins are very small compared to Dean's Ultra or Sermos connectors. Larger pins transmit current more efficiently.
+								   	
+									 Sep 13, 2002, 09:45 AM	
+									 #10
+									 U2Steve
+									 Now with more COWBELL!
+
+									 Lexington, KY, USA
+									 Joined Mar 2001
+									 803 Posts
+									 The main problem with Tamiya is that they weren't designed to be mated/demated repeatedly. The contacts loosen, resistance goes up, heat goes up with resistance, and eventually you get melted connections, or open connections, and airplane death .
+									 I think personally the things must be basically free in bulk quantities, so that's what the manufacturers use...
+									   	
+										 Sep 13, 2002, 10:12 AM	
+										 #11
+										 DBCherry
+										 Registered User
+										 Worcester, MA.
+										 Joined Nov 2001
+										 1,408 Posts
+										 Nice instructions Steve. Basic, easy to understand. Absolutely right on the money about the Tamiyas too.   
+										 Good info here Thor.
+										 Dennis-
+										   	
+											 Sep 13, 2002, 10:15 AM	
+											 #12
+											 thor4944
+											 Registered User
+
+											 Ohio Wapak
+											 Joined Feb 2002
+											 3,678 Posts
+											 great info
+											 Thanks so much again.!!!!!!
+											   	
+												 Sep 13, 2002, 10:24 AM	
+												 #13
+												 U2Steve
+												 Now with more COWBELL!
+
+												 Lexington, KY, USA
+												 Joined Mar 2001
+												 803 Posts
+												 What this place is for...
+												 Like I said: E-flight info should be available here- anything, anytime. If we ain't got it, we'll get it!  
+												   	
+													 Sep 13, 2002, 12:30 PM	
+													 #14
+													 Smash McCrash
+													 89" Kool Aid drinker.
+
+													 Ventura, California
+													 Joined Dec 2001
+													 3,098 Posts
+													 A word of caution that is very important and should be common sense: Do not let the leads from the battery short together. When I am doing battery packs, I usually do 1 lead at a time, shrink wrap it then move on to the other. Shorting them is about the quickest way to ruin a good set of batteries or worse.
+
+													 Mike
+													   	
+														 Sep 13, 2002, 04:01 PM	
+														 #15
+														 James Frolik
+														 Long-Time Member
+
+														 Cologne, Germany
+														 Joined Dec 1996
+														 2,256 Posts
+														 In addition, the cheap Tamiya connectors also don't carry the higher amp loads very well that many eflight models experience.
+
+														 My first foray into eflight was with a Graupner JU-52 followed by a robbe Dash 7. Both models used Tamiya connectors because...well, because they were the least expensive and I didn't know better. Flight times were dismal, particularly with the Dash 7 and it's four Speed 400/7.2v motors and 6x4 props -- like, about 1.5 minutes with a new, 8-cell RC2000 pack!
+
+														 After repeated testing of God knows what [I was suppose to be looking for,] I read about the inefficiency of the Tamyia connectors. So I changed to 4mm gold connectors. Suddenly the Dash 7's flight times increased four fold! This is no joke.
+
+														 Now I use 2mm or 4mm gold connectors on all my models, depending on the maximum amps expected. (Anything above roughly 15 amps I use the 4mm connectors.)
+														   	
+															Last edited by James Frolik; Sep 13, 2002 at 04:04 PM. 
+															Directions to replace Standard Tamiya Connector
+															I just bought some batteries and need to replace my connectors...I have Standard Tamiya Connector..is there a website that shows me how to do this ...thanks!!!
+															  	
+																Sign up now
+																to remove ads between posts
+
+																 Sep 13, 2002, 08:30 AM	
+																 #2
+																 U2Steve
+																 Now with more COWBELL!
+
+																 Lexington, KY, USA
+																 Joined Mar 2001
+																 803 Posts
+																 The E-Zone should be the website to go to for such info! 
+																 What connectors will you be using to replace your Tamiyas? I use Sermos/PowerPole connectors to replace Tamiya; if you are, too, I'll give you a quick how-to here...
+																   	
+																	 Sep 13, 2002, 08:32 AM	
+																	 #3
+																	 thor4944
+																	 Registered User
+
+																	 Ohio Wapak
+																	 Joined Feb 2002
+																	 3,678 Posts
+																	 htey are the
+																	 They are the same connectors..I bought a Pegasus 35 esc and I need to put the connectors on the esc........HELP!!!!
+																	   	
+																		 Sep 13, 2002, 08:35 AM	
+																		 #4
+																		 thor4944
+																		 Registered User
+
+																		 Ohio Wapak
+																		 Joined Feb 2002
+																		 3,678 Posts
+																		 forgot
+																		 Forgot to tell you I have to take the connector off of the old esc first..and it is on tight!!!!
+																		   	
+																			 Sep 13, 2002, 09:09 AM	
+																			 #5
+																			 DBCherry
+																			 Registered User
+																			 Worcester, MA.
+																			 Joined Nov 2001
+																			 1,408 Posts
+																			 thor,
+																			 First, if you're saying that you need to PUT Tamiya connectors on the new pack, or the ESC, I'd recommend against it!
+																			 Those connectors aren't good enough to risk a plane in the air.   
+																			 Get yourself some Dean's or Sermos connectors.
+																			 The rest isn't too hard once you get use to it. Just cut off the old connectors, strip the wires back a bit, then solder on new connectors. (Some folks "crimp" the Sermos connectors to the end of the wires, but I feel safer soldering.)
+																			 You can also solder the ESC wires directly to the motor to save some weight.
+																			 Dennis-
+																			   	
+																				 Sep 13, 2002, 09:25 AM	
+																				 #6
+																				 U2Steve
+																				 Now with more COWBELL!
+
+																				 Lexington, KY, USA
+																				 Joined Mar 2001
+																				 803 Posts
+																				 The best way I've found to remove a Tamiya is to grip the plastic housing, and ram a screwdriver through the front opening to push the wire&contact out the backside, then cut the contact off the wire w/side cutters. I mean, you weren't gonna recycle them were you? 
+																				 To put the Sermos on, you can either crimp or solder. Based on wisdom gleaned here, crimping is best, and what the connector was designed for, but the crimper made for the job is the only one that does a decent job (no substitutes! ) and it's very expensive! So...
+																				 To solder:
+																				 Start by gathering stuff- 15 to 25-watt iron, a thin-diameter electronic-grade solder, flux, wet sponge/rag, and the connectors. A "third hand" -type clamping rig would be, well, handy.
+																				 Cut and trim the wire, and strip the insulation back 3/8" from the end.
+																				 Dip the wire end in electronic (not plumbing, not acid, not corrosive) flux. 
+																				 Put a contact (the metal part of the connector) on the end of the wire. Push the end in all the way.
+																				 Clamp the wire upright, with the contact at the top. Use a metal clamp, or at least put a metal alligator clip on the wire as a heat sink.
+																				 Make sure the iron is hot, that thou may strike  Wipe the tip with the wet sponge/rag to clean. Apply the iron to the side of the contact. Touch the solder to the top end of the contact. After a few seconds, the flux inside should sizzle; shortly thereafter the solder should begin to melt and flow into the top of the contact. As it does, feed in an inch or so of solder to fill the contact. Pull the iron and solder back, count to five to let the joint harden, then gently wipe with wet rag.
+																				 Push the contact into a housing (pay attention to polarity and housing color!) until it snaps. A small flatblade screwdriver pushing on the bottom of the contact may help.
+
+																				 You're done! Repeat as necessary...
+
+																				 Steve
+																				   	
+																					 Sep 13, 2002, 09:26 AM	
+																					 #7
+																					 thor4944
+																					 Registered User
+
+																					 Ohio Wapak
+																					 Joined Feb 2002
+																					 3,678 Posts
+																					 thanks...sounds easy
+																					 THanks..sounds easy..but my question is why are those connectors not good..what could happen in the air?
+																					   	
+																						 Sep 13, 2002, 09:38 AM	
+																						 #8
+																						 thor4944
+																						 Registered User
+
+																						 Ohio Wapak
+																						 Joined Feb 2002
+																						 3,678 Posts
+																						 thanks so much for you time
+																						 Thanks so much for y our time and instructions!!! great!!
+																						   	
+																							 Sep 13, 2002, 09:45 AM	
+																							 #9
+																							 mkirsch1
+																							 Registered User
+																							 Joined Oct 2001
+																							 2,799 Posts
+																							 Tamiya connectors stretch out and get loose after you unplug them a few times. The pins are very small compared to Dean's Ultra or Sermos connectors. Larger pins transmit current more efficiently.
+																							   	
+																								 Sep 13, 2002, 09:45 AM	
+																								 #10
+																								 U2Steve
+																								 Now with more COWBELL!
+
+																								 Lexington, KY, USA
+																								 Joined Mar 2001
+																								 803 Posts
+																								 The main problem with Tamiya is that they weren't designed to be mated/demated repeatedly. The contacts loosen, resistance goes up, heat goes up with resistance, and eventually you get melted connections, or open connections, and airplane death .
+																								 I think personally the things must be basically free in bulk quantities, so that's what the manufacturers use...
+																								   	
+																									 Sep 13, 2002, 10:12 AM	
+																									 #11
+																									 DBCherry
+																									 Registered User
+																									 Worcester, MA.
+																									 Joined Nov 2001
+																									 1,408 Posts
+																									 Nice instructions Steve. Basic, easy to understand. Absolutely right on the money about the Tamiyas too.   
+																									 Good info here Thor.
+																									 Dennis-
+																									   	
+																										 Sep 13, 2002, 10:15 AM	
+																										 #12
+																										 thor4944
+																										 Registered User
+
+																										 Ohio Wapak
+																										 Joined Feb 2002
+																										 3,678 Posts
+																										 great info
+																										 Thanks so much again.!!!!!!
+																										   	
+																											 Sep 13, 2002, 10:24 AM	
+																											 #13
+																											 U2Steve
+																											 Now with more COWBELL!
+
+																											 Lexington, KY, USA
+																											 Joined Mar 2001
+																											 803 Posts
+																											 What this place is for...
+																											 Like I said: E-flight info should be available here- anything, anytime. If we ain't got it, we'll get it!  
+																											   	
+																												 Sep 13, 2002, 12:30 PM	
+																												 #14
+																												 Smash McCrash
+																												 89" Kool Aid drinker.
+
+																												 Ventura, California
+																												 Joined Dec 2001
+																												 3,098 Posts
+																												 A word of caution that is very important and should be common sense: Do not let the leads from the battery short together. When I am doing battery packs, I usually do 1 lead at a time, shrink wrap it then move on to the other. Shorting them is about the quickest way to ruin a good set of batteries or worse.
+
+																												 Mike
+																												   	
+																													 Sep 13, 2002, 04:01 PM	
+																													 #15
+																													 James Frolik
+																													 Long-Time Member
+
+																													 Cologne, Germany
+																													 Joined Dec 1996
+																													 2,256 Posts
+																													 In addition, the cheap Tamiya connectors also don't carry the higher amp loads very well that many eflight models experience.
+
+																													 My first foray into eflight was with a Graupner JU-52 followed by a robbe Dash 7. Both models used Tamiya connectors because...well, because they were the least expensive and I didn't know better. Flight times were dismal, particularly with the Dash 7 and it's four Speed 400/7.2v motors and 6x4 props -- like, about 1.5 minutes with a new, 8-cell RC2000 pack!
+
+																													 After repeated testing of God knows what [I was suppose to be looking for,] I read about the inefficiency of the Tamyia connectors. So I changed to 4mm gold connectors. Suddenly the Dash 7's flight times increased four fold! This is no joke.
+
+																													 Now I use 2mm or 4mm gold connectors on all my models, depending on the maximum amps expected. (Anything above roughly 15 amps I use the 4mm connectors.)
+																													   	
+																														Last edited by James Frolik; Sep 13, 2002 at 04:04 PM. 
+
+
