@@ -1,0 +1,30 @@
+http://www.mycncuk.com/forums/faqs-problems-solutions/2405-ballscrew-support-bearings-angular-self-align.html
+
+user/pass: bruin/qwerty
+
+
+Let me explain what I did with my machine......!
+
+It is a very simple but very effective way of mounting the stepper motor and also overcoming the problem of endfloat in the ballscrew.
+
+I will try and describe my solution, hang on, actually it was JohnS's solution, credit due were its due! 
+
+The design consists of a 25mm OD oldham style coupling, a piece of 2 1/2" square aluminium at 60mm long and 2 angular contact bearings (I used 7301's, 37mm OD 12mm ID).
+
+Step 1 -Face the 2 1/2" square and bore it straight through at 26mm, turn it round and face the other end then bore it 37mm to a depth of just under 24mm. The 37mm bore needs to be a push fit for the bearing and the 24mm depth needs to be slightly shy, from memory I think I did them at 23.90 - 23.95mm this is so the 2 angular contact bearings get clamped in position between the block and the face that the block is mounting to.
+
+Step 2 - 16mm x 5mm pitch ballscrew, turn one end down to 12mm OD, this again needs to be very accurate +0.00 -0.02 as it needs to be a good fit on the bearing. Turn it down for a length of approx 35mm, this length depends on the type of oldham coupling you are using. Screwcut the end at M12 x 1.25 (metric fine) to a length of approx 11mm, leave a length of 24mm untouched at the original 12mm dia as this will be were the angular contact bearings fit.
+
+Step 3 -Take one half of the oldham coupling and drill and tap it M12 x 1.25, basically turning it into the nut for the ballscrew.
+
+Step 4 - Take the other half of the oldham coupling and 'adjust' it to fit the stepper shaft.
+
+Step 5 - Slide the angular contact bearings onto the 12mm dia on the ballscrew then screw on the half of the oldham coupling which is tapped to hold the 2 bearings in place, tighten it just enough to take the backlash out of the bearings but do not over tighten it. Tighten the 2 grub screws to hold it in place.
+
+Step 6 - Slide the ballscrew with bearings into the block, bearings should be very slightly proud - 0.05-0.1. Mount block with screw onto machine, when tightened you should have no endfloat on ballscrew but it should rotate freely.
+
+Step 7 - Put the other half of the oldham coupling onto the stepper and offer it up to the block, you should find that the stepper shaft is too long and stops the motor from meeting the face of the block, cut the shaft down to suit. Dont forget to put the coupling disc in.
+
+Step 8 - Look up the address for John Stevenson Engineers in Long Eaton on Google and post 1 packet of hobnobs for each mount that you make, come on it was his idea so I think its only fair...!
+
+Drawing attached which should help you understand the above a little better.
