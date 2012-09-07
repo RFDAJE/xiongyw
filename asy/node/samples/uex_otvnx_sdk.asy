@@ -16,10 +16,10 @@ node doc_09f12568                     = node("doc", "d");
 node config_09f14a00                  = node("config", "d");
 node tools_09f14a28                   = node("tools", "d");
 sdk_09f02008.attach(ocode_09f12380);
-sdk_09f02008.attach(misc_09f12190);
 sdk_09f02008.attach(tools_09f14a28);
-sdk_09f02008.attach(config_09f14a00);
+sdk_09f02008.attach(misc_09f12190);
 sdk_09f02008.attach(make_09f12330);
+sdk_09f02008.attach(config_09f14a00);
 node L2_09f12098                      = node("L2", "d");
 node L0_09f120c0                      = node("L0", "d");
 node L1_09f12140                      = node("L1", "d");
@@ -35,10 +35,12 @@ node test_uex_09f121b8                = node("test_uex", "d");
 node ref_animation_09f121e0           = node("ref_animation", "d");
 node gravity_09f12210                 = node("gravity", "d");
 node ref_profiler_09f12288            = node("ref_profiler", "d");
+/*
 misc_09f12190.attach(test_uex_09f121b8);
 misc_09f12190.attach(ref_animation_09f121e0);
 misc_09f12190.attach(gravity_09f12210);
 misc_09f12190.attach(ref_profiler_09f12288);
+*/
 node ref_09f12238                     = node("ref", "d");
 node assets_09f12260                  = node("assets", "d");
 gravity_09f12210.attach(ref_09f12238);
@@ -50,15 +52,16 @@ ref_profiler_09f12288.attach(resource_09f122b8);
 ref_profiler_09f12288.attach(include_09f122e0);
 ref_profiler_09f12288.attach(src_09f12308);
 node NXSDK_09f12358                   = node("NXSDK", "d");
-make_09f12330.attach(NXSDK_09f12358);
-node libuex_09f123a8                  = node("libuex", "d");
-node nx_framework_09f124c0            = node("nx_framework", "d");
+//make_09f12330.attach(NXSDK_09f12358);
 node dll_appmgr_09f12518              = node("dll_appmgr", "d");
+node nx_framework_09f124c0            = node("nx_framework", "d");
+node libuex_09f123a8                  = node("libuex", "d");
 node lex_09f12540                     = node("lex", "d");
-ocode_09f12380.attach(libuex_09f123a8);
-ocode_09f12380.attach(nx_framework_09f124c0);
 ocode_09f12380.attach(dll_appmgr_09f12518);
+ocode_09f12380.attach(nx_framework_09f124c0);
+ocode_09f12380.attach(libuex_09f123a8);
 ocode_09f12380.attach(lex_09f12540);
+/*
 node doc_09f123d0                     = node("doc", "d");
 node include_09f123f8                 = node("include", "d");
 node src_09f12498                     = node("src", "d");
@@ -67,6 +70,7 @@ libuex_09f123a8.attach(include_09f123f8);
 libuex_09f123a8.attach(src_09f12498);
 node internal_09f124f0                = node("internal", "d");
 nx_framework_09f124c0.attach(internal_09f124f0);
+*/
 node images_09f12590                  = node("images", "d");
 doc_09f12568.attach(images_09f12590);
 node test_list_000_09f125e0           = node("test_list_000", "d");
@@ -340,9 +344,10 @@ node intl_09f14f30                    = node("intl", "d");
 node uexviewpp_09f14fd0               = node("uexviewpp", "d");
 tools_09f14a28.attach(uexcsspp_09f14a50);
 tools_09f14a28.attach(uexctlpp_09f14bc0);
-tools_09f14a28.attach(profiler_09f14c10);
-tools_09f14a28.attach(intl_09f14f30);
 tools_09f14a28.attach(uexviewpp_09f14fd0);
+tools_09f14a28.attach(intl_09f14f30);
+tools_09f14a28.attach(profiler_09f14c10);
+/*
 node lib_09f14a78                     = node("lib", "d");
 node misc_09f14aa0                    = node("misc", "d");
 node csspp_09f14b98                   = node("csspp", "d");
@@ -363,7 +368,7 @@ node src_09f14f58                     = node("src", "d");
 intl_09f14f30.attach(src_09f14f58);
 node lib_09f14ff8                     = node("lib", "d");
 uexviewpp_09f14fd0.attach(lib_09f14ff8);
-
+*/
 
 //change the following to draw_call_sequence() to produce call sequence.
 picture root = draw_dir_tree(sdk_09f02008);

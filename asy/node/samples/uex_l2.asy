@@ -44,14 +44,22 @@ node bin_08c08810                     = node("bin", "d");
 node ocod_08c092b0                    = node("ocod", "d");
 node config_08c09378                  = node("config", "d");
 node src_08c093f0                     = node("src", "d");
-opentv_08c07568.attach(ocod_08c092b0);
 opentv_08c07568.attach(src_08c093f0);
+opentv_08c07568.attach(ocod_08c092b0);
 opentv_08c07568.attach(bin_08c08810);
-opentv_08c07568.attach(config_08c09378);
 opentv_08c07568.attach(make_08c087e8);
+opentv_08c07568.attach(config_08c09378);
 
 node nx_08c0c330                      = node("nx", "d");
 otvnet_08c0c308.attach(nx_08c0c330);
+
+node nc_ref = node ("ref", "d");
+node nc_hot = node ("hot", "d");
+node nc_net_apps = node ("net_apps", "d");
+node nc_config = node ("config", "d");
+nx_08c0c330.attach(nc_ref, nc_hot, nc_net_apps, nc_config);
+
+
 
 node config_parser_08beffc0           = node("config_parser", "d");
 node make_08bf0090                    = node("make", "d");
@@ -59,10 +67,10 @@ node bin_08bf00b8                     = node("bin", "d");
 node stylesheets_08bf0130             = node("stylesheets", "d");
 node config_08bf0158                  = node("config", "d");
 otvmake_08beff98.attach(bin_08bf00b8);
-otvmake_08beff98.attach(config_parser_08beffc0);
 otvmake_08beff98.attach(make_08bf0090);
-otvmake_08beff98.attach(stylesheets_08bf0130);
 otvmake_08beff98.attach(config_08bf0158);
+otvmake_08beff98.attach(stylesheets_08bf0130);
+otvmake_08beff98.attach(config_parser_08beffc0);
 
 
 //change the following to draw_call_sequence() to produce call sequence.

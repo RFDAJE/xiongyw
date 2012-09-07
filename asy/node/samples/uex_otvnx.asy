@@ -25,20 +25,20 @@ node config_08c68a48                  = node("config", "d");
 node make_08c66378                    = node("make", "d");
 node tools_08c68a70                   = node("tools", "d");
 sdk_08c56050.attach(ocode_08c663c8);
-sdk_08c56050.attach(misc_08c661d8);
 sdk_08c56050.attach(tools_08c68a70);
-sdk_08c56050.attach(config_08c68a48);
+sdk_08c56050.attach(misc_08c661d8);
 sdk_08c56050.attach(make_08c66378);
+sdk_08c56050.attach(config_08c68a48);
 
 node templates_08c69090               = node("templates", "d");
 node include_08c6a0e8                 = node("include", "d");
 node ocode_08c690b8                   = node("ocode", "d");
 node native_08c69130                  = node("native", "d");
 node config_08c69108                  = node("config", "d");
-system_08c69068.attach(templates_08c69090);
 system_08c69068.attach(include_08c6a0e8);
 system_08c69068.attach(ocode_08c690b8);
 system_08c69068.attach(native_08c69130);
+system_08c69068.attach(templates_08c69090);
 system_08c69068.attach(config_08c69108);
 
 
@@ -60,21 +60,21 @@ node nx_quickset_08c6adf0             = node("nx_quickset", "d");
 node nx_pvr_08c6aee0                  = node("nx_pvr", "d");
 node include_08c6b070                 = node("include", "d");
 apps_08c6a138.attach(include_08c6b070);
-apps_08c6a138.attach(resources_08c6ada0);
-apps_08c6a138.attach(nx_popup_08c6a160);
-apps_08c6a138.attach(nx_menu_08c6a228);
-apps_08c6a138.attach(nx_mailbox_08c6a2f0);
-apps_08c6a138.attach(nx_live_player_08c6a3b8);
 apps_08c6a138.attach(nx_background_08c6a4b0);
 apps_08c6a138.attach(nx_foreground_08c6a580);
-apps_08c6a138.attach(nx_volume_08c6a650);
-apps_08c6a138.attach(nx_installation_08c6a718);
 apps_08c6a138.attach(nx_grid_08c6a810);
+apps_08c6a138.attach(nx_installation_08c6a718);
+apps_08c6a138.attach(nx_live_player_08c6a3b8);
+apps_08c6a138.attach(nx_mailbox_08c6a2f0);
+apps_08c6a138.attach(nx_menu_08c6a228);
+apps_08c6a138.attach(nx_popup_08c6a160);
+apps_08c6a138.attach(nx_pvr_08c6aee0);
+apps_08c6a138.attach(nx_quickset_08c6adf0);
 apps_08c6a138.attach(nx_settings_08c6abc0);
 apps_08c6a138.attach(nx_tests_08c6ad28);
-apps_08c6a138.attach(nx_quickset_08c6adf0);
-apps_08c6a138.attach(nx_pvr_08c6aee0);
+apps_08c6a138.attach(nx_volume_08c6a650);
 apps_08c6a138.attach(browser_launcher_08c6ab90);
+apps_08c6a138.attach(resources_08c6ada0);
 apps_08c6a138.attach(config_08c6adc8);
 
 
