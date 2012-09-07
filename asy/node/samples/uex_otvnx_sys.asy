@@ -8,48 +8,51 @@ texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
 
 
 
-node system_08a80008                  = node("MAIN/otvnx/system", "d");
+node system_08a80008                  = node("otvnx/system", "d");
 node templates_08a88050               = node("templates", "d");
 node ocode_08a88078                   = node("ocode", "d");
 node config_08a880a0                  = node("config", "d");
 node native_08a880c8                  = node("native", "d");
 node include_08a89080                 = node("include", "d");
-system_08a80008.attach(templates_08a88050);
 system_08a80008.attach(include_08a89080);
-system_08a80008.attach(ocode_08a88078);
 system_08a80008.attach(native_08a880c8);
+system_08a80008.attach(ocode_08a88078);
+system_08a80008.attach(templates_08a88050);
 system_08a80008.attach(config_08a880a0);
 
 node dll_blm_ca_08a900c0              = node("dll_blm_ca", "d");
 ocode_08a88078.attach(dll_blm_ca_08a900c0);
-node utility_08a880f0                 = node("utility", "d");
+
 node app_mgr_08a88260                 = node("app_mgr", "d");
-node file_system_08a88470             = node("file_system", "d");
-node meta_data_08a88568               = node("meta_data", "d");
+node connectivity_08a88d68            = node("connectivity", "d");
 node control_08a886f8                 = node("control", "d");
+node debug_08a888e8                   = node("debug", "d");
+node file_system_08a88470             = node("file_system", "d");
 node graphic_08a88720                 = node("graphic", "d");
 node input_08a88848                   = node("input", "d");
-node debug_08a888e8                   = node("debug", "d");
 node media_control_08a88ac8           = node("media_control", "d");
-node PVR_08a88c78                     = node("PVR", "d");
-node connectivity_08a88d68            = node("connectivity", "d");
-node services_08a88e18                = node("services", "d");
+node meta_data_08a88568               = node("meta_data", "d");
 node output_08a88ee8                  = node("output", "d");
+node PVR_08a88c78                     = node("PVR", "d");
+node services_08a88e18                = node("services", "d");
 node stb_mgr_08a88fb0                 = node("stb_mgr", "d");
-native_08a880c8.attach(utility_08a880f0);
+node utility_08a880f0                 = node("utility", "d");
+
 native_08a880c8.attach(app_mgr_08a88260);
-native_08a880c8.attach(file_system_08a88470);
-native_08a880c8.attach(meta_data_08a88568);
+native_08a880c8.attach(connectivity_08a88d68);
 native_08a880c8.attach(control_08a886f8);
+native_08a880c8.attach(debug_08a888e8);
+native_08a880c8.attach(file_system_08a88470);
 native_08a880c8.attach(graphic_08a88720);
 native_08a880c8.attach(input_08a88848);
-native_08a880c8.attach(debug_08a888e8);
 native_08a880c8.attach(media_control_08a88ac8);
-native_08a880c8.attach(PVR_08a88c78);
-native_08a880c8.attach(connectivity_08a88d68);
-native_08a880c8.attach(services_08a88e18);
+native_08a880c8.attach(meta_data_08a88568);
 native_08a880c8.attach(output_08a88ee8);
+native_08a880c8.attach(PVR_08a88c78);
+native_08a880c8.attach(services_08a88e18);
 native_08a880c8.attach(stb_mgr_08a88fb0);
+native_08a880c8.attach(utility_08a880f0);
+
 node pool_08a88118                    = node("pool", "d");
 node maths_08a88140                   = node("maths", "d");
 node timer_08a88168                   = node("timer", "d");

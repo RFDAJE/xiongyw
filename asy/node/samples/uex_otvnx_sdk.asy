@@ -8,7 +8,7 @@ texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
 
 
 
-node sdk_09f02008                     = node("MAIN/otvnx/sdk", "d");
+node sdk_09f02008                     = node("otvnx/sdk", "d");
 node misc_09f12190                    = node("misc", "d");
 node make_09f12330                    = node("make", "d");
 node ocode_09f12380                   = node("ocode", "d");

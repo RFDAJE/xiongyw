@@ -8,14 +8,14 @@ texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
 
 
 
-node nx_09273008                      = node("MAIN/otvnet/nx", "d");
+node nx_09273008                      = node("otvnet/nx", "d");
 node ref_0927b050                     = node("ref", "d");
 node net_apps_09283c20                = node("net_apps", "d");
 node config_09285220                  = node("config", "d");
 node hot_09285248                     = node("hot", "d");
 nx_09273008.attach(ref_0927b050);
-//nx_09273008.attach(net_apps_09283c20);
 nx_09273008.attach(hot_09285248);
+nx_09273008.attach(net_apps_09283c20);
 nx_09273008.attach(config_09285220);
 
 
@@ -33,7 +33,7 @@ ref_0927b050.attach(builtin_fonts_09283098);
 ref_0927b050.attach(translation_092830c8);
 ref_0927b050.attach(config_092831b8);
 
-
+/*
 node test_appmgr18_09283c48           = node("test_appmgr18", "d");
 node test_textdirection_09283c78      = node("test_textdirection", "d");
 node test_translation_09283d20        = node("test_translation", "d");
@@ -120,7 +120,7 @@ net_apps_09283c20.attach(test_fontspacing_092850e8);
 net_apps_09283c20.attach(test_appmgr13_09285190);
 net_apps_09283c20.attach(test_appmgr14_092851c0);
 net_apps_09283c20.attach(test_appmgr12_092851f0);
-
+*/
 
 node builtin_fonts_09285270           = node("builtin_fonts", "d");
 node translation_09285720             = node("translation", "d");

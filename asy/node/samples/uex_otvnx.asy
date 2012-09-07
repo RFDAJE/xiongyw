@@ -7,8 +7,7 @@ texpreamble("\setCJKmainfont{SimHei}");
 texpreamble("\setmonofont[Path=../fonts/]{andalemo.ttf}");
 
 
-
-node otvnx_08c4e008                   = node("MAIN/otvnx", "d");
+node otvnx_08c4e008                   = node("otvnx", "d");
 node sdk_08c56050                     = node("sdk", "d");
 node system_08c69068                  = node("system", "d");
 node config_08c6a110                  = node("config", "d");
