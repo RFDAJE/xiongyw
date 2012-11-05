@@ -1,0 +1,1125 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 修改历史：
+% 	2006-11-20:	创建(Word)；音的性质音高
+% 	2006-11-27:	八度相似性
+% 	2006-12-13:	五度相生法；12个五度，最大音差
+% 	2006-12-19:	五度相生函数和图形(gnuplot)
+% 	2006-12-25:	等比相生的计算；京房60律和钱乐之360律的意义；音的相似性及八度相似;
+%		2006-12-26: 由Word转换为LaTeX系统(CTex-2.4.6)
+%   2007-01-27: 开始音阶section
+%   2007-01-30: moving from gnuplot to metapost and fininally to asymptote for graphics;
+%               moving to pdflatex
+%
+%  $Id: pitch.tex 14 2007-04-02 15:07:52Z Administrator $
+%
+% problems:
+% - not italic in heading
+% + changing chinese font like "\verb" command: \newcommand{\fs}{\CJKfamily{fs}}
+% + enable footnote in table: mdwtab
+% + 在段落中改变局部几个文字的大小 {\footnotesize文字}或\small,\large, etc
+% - 统一设置table的content的字体
+% - 在floatingtable中把caption放到表格上方
+% * 设定缺省的英文字体 \usagepacket(times)
+% - 中文下面加着重点
+% - caption vs. caption2 (obsolete?): "captionlabeldelim"
+% + 正文引用的上标[1]: \ucite or \rcite as defined below
+% - bibitem 行距调整
+% - 俄文字母
+% - minipage中的table编号和正文中的如何保持连续
+% - \renewcommand{\refname}{参考文献} not working
+% + 数学公式中使用汉字：$\text{汉字}$
+%##############################################################################
+% preamble
+%##############################################################################
+\NeedsTeXFormat{LaTeX2e}
+
+\documentclass[12pt,twoside,a4paper]{article}
+
+
+\usepackage{CJK}
+\usepackage{CJKulem}   % \uline{}
+%\usepackage{pinyin,ruby}
+%\usepackage{CJKpunct}
+\usepackage{musixtex}    
+\usepackage{amssymb,amsmath,mathrsfs}
+\usepackage[pdftex]{graphicx}
+%\usepackage{emp}
+%\usepackage{epsf}
+\usepackage{indentfirst}
+\usepackage{fancyhdr}
+\usepackage{footnpag}
+%\usepackage{floatflt}
+%\usepackage{wrapfig}
+%\usepackage{picinpar}
+\usepackage{booktabs}
+\usepackage{syntonly}
+\usepackage{caption2}
+%\usepackage{listings}
+%\usepackage{fancyvrb}
+\usepackage{makeidx}
+\usepackage{url}
+%\usepackage{abstract}
+%\usepackage{minitoc}
+%\usepackage{asymptote}
+%\usepackage{layout}
+%\usepackage{multicol}
+% 注：如果使用epsf/floatflt/wrapfig/picinpar等package，
+%     则在加上musixtex后会报错 "No room for a new \dimen"
+
+%\usepackage{perpage}
+%\MakePerPage[172]{footnote}
+\usepackage{calc,pifont}
+% 脚注标号是带圈的数字
+%\addtocounter{footnote}{171}
+\newcounter{myfootnote}
+\renewcommand{\thefootnote}{\protect\setcounter{myfootnote}%
+{171+\the\value{footnote}}\protect\ding{\value{myfootnote}}}
+%\renewcommand{\thefootnote}{\ding{\value{footnote}}}
+
+
+
+\makeindex
+%\usepackage{caption}
+
+%\usepackage{mdwtab}
+%\usepackage{times}
+%\usepackage[sc]{mathpazo}
+
+%\syntaxonly
+
+\begin{CJK*}{GBK}{song}
+\title{音·律·调\thanks{\footnotesize\fs本文最新版本可从这里下载：\url{http://tstool.sf.net/misc/pitch.pdf.tgz}}}
+\author{
+\fs\footnotesize熊~育~武\thanks{\footnotesize\fs电子邮箱：\url{xiongyw@hotmail.com}}\\
+\fs\footnotesize北京市昌平区回龙观镇\\
+\fs\footnotesize二〇〇七年二月}
+\date{}
+\CJKtilde
+\CJKindent
+\end{CJK*}
+
+
+%--------------------------------------------------------------+
+% A4 (210x297mm) page metrics                                  |
+%                                                              |
+%
+%---- horizontal (210mm) ----
+\setlength{\hoffset}{0mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\textwidth}{155mm}
+
+%---- vertical (297mm) ----
+\setlength{\voffset}{0mm}
+\setlength{\topmargin}{0mm}
+\setlength{\headheight}{10mm}
+\setlength{\headsep}{4mm}
+\setlength{\textheight}{240mm}
+%                                                              |
+%--------------------------------------------------------------+
+
+% ---- 浮动体参数 ----
+\renewcommand{\topfraction}{0.98}
+\renewcommand{\textfraction}{0.02}
+\setlength{\floatsep}{4mm}
+
+%---- 行距和段距 ----
+\linespread{1.0}                  % 行距：1.0(单倍); 1.3(一倍半); 1.6(双倍)
+\setlength{\parskip}{0.3em}       % 段距
+\setlength{\parindent}{2em}       % 首行缩进
+\setlength{\tabcolsep}{0.3em}     % 表格相邻两栏之间隔的一半
+
+
+%---- others ----
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+%\fancyhead[LE,RO]{\small\hei\rightmark}
+\fancyhead[RO,LE]{\small\hei\leftmark}
+\fancyfoot[RO,LE]{\thepage}
+\setcounter{page}{1}
+
+
+%---- 中文字体 ----
+\newcommand{\song}{\CJKfamily{song}}
+\newcommand{\fs}{\CJKfamily{fs}}
+\newcommand{\hei}{\CJKfamily{hei}}
+\newcommand{\kai}{\CJKfamily{kai}}
+
+\newcommand{\abstrctnamefont}{\footnotesize\hei}
+\newcommand{\abstrcttextfont}{\footnotesize\kai}
+
+\newcommand{\cdash}{－\!\!\!－\!\!\!－}  % 中文破折号
+\newcommand{\cwave}{～}                  % 中文波浪号，表示范围
+\newcommand{\octeq}{八度等价}            % octave equivalence的中文翻译
+\newcommand{\cdos}{相似度}               % degree of similarity
+\newcommand{\cdoc}{和谐度}               % degree of consonance
+\newcommand{\cdod}{相异度}               % degree of dissimilarity
+\newcommand{\diagseq}{对角序列}
+\newcommand{\ratioasc}{音程升列}
+\newcommand{\docdes}{和谐降列}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+%\newcommand\keyword{}{\kai}              % 关键词
+\newcommand{\keyword}[1]{{\kai #1}}      % 关键词
+
+\newcommand{\CITE}[1]{\,\cite{#1}\,}                   % 
+\newcommand{\ucite}[1]{\,\textsuperscript{\cite{#1}}\,}   % 上角标引文
+
+\newcommand{\interval}[4]{\,${#1}\,{#2},\,{#3}\,{#4}$\,} % 区间如[1,2]写成\interval{[}{1}{2}{]}
+\newcommand{\octint}{\interval{[}{1}{2}{]}}            % [1,2]
+
+\newcommand{\myfrac}[2]{\,$\mathrm{{^{#1}}\!\!\diagup\!\!{_{#2}}}$\,}  % 紧凑型分数
+
+\newcommand{\n}[1]{$#1$}                              % number like "100"
+\newcommand{\N}[1]{\,\n{#1}\,}                        % number like "\,100\,"
+\newcommand{\nn}[2]{$#1$\,～\,$#2$}                   % 123～234
+\newcommand{\Nn}[2]{\,\nn{#1}{#2}}                    % 123～234
+\newcommand{\nN}[2]{\nn{#1}{#2}\,}                    % 123～234
+\newcommand{\NN}[2]{\,\nn{#1}{#2}\,}                  % 123～234
+
+%\newcommand{\kh}[1]{\,(#1)\,}                         % 英文括号 ()
+\newcommand{\kh}[1]{\!\!（#1）\!\!}                    % 中文括号（）
+
+\newcommand{\Hz}{$\mathrm{Hz}$}
+\newcommand{\hz}[1]{\,#1\,\Hz\,}                      % 123 Hz
+\newcommand{\HZ}[2]{\,#1\,～\,#2\,\Hz\,}              % 123～234 Hz
+
+
+%---- 重新定义图表，参考文献，章节和索引的标题 ----
+\renewcommand{\abstractname}{摘\quad要}
+\renewcommand{\contentsname}{目\quad录}
+\renewcommand{\figurename}{图}
+\renewcommand{\tablename}{表}
+\renewcommand{\refname}{参考文献}    % for articles
+%\renewcommand{\bibname}{参考文献}    % for book or report
+\renewcommand{\appendixname}{附录}     % not apply in article
+%\renewcommand{\chaptername}{}        % for book and report 
+\renewcommand{\indexname}{索\quad引}
+\renewcommand{\listfigurename}{插图索引}
+\renewcommand{\listtablename}{表格索引}
+
+
+%\renewcommand{\baselinestretch}{.5}\selectfont
+
+% ---- caption2 style ----
+\renewcommand{\captionlabeldelim}{~}
+\renewcommand{\captionstyle}{center}
+\renewcommand{\captionfont}{\small\hei}
+
+%\setlength{\abovecaptionskip}{0mm}
+%\setlength{\belowcaptionskip}{0mm}
+
+% 浮动表格的 caption 放置在表格的顶部，插图的 caption 在图形的下面
+\makeatletter
+\newcommand{\tabcaption}{\def\@captype{table}%
+                         \setlength{\abovecaptionskip}{0mm}%
+                         \setlength{\belowcaptionskip}{2mm}%
+                         \caption}
+\newcommand{\figcaption}{\def\@captype{figure}%
+                         \setlength{\abovecaptionskip}{2mm}%
+                         \setlength{\belowcaptionskip}{0mm}%
+                         \caption}
+\makeatother
+
+
+
+\graphicspath{{asy/}}
+
+\DeclareMathOperator{\octavize}{oct}
+\DeclareMathOperator{\dos}{dos}   % degree of similarity
+\DeclareMathOperator{\cent}{cent} % translate from freq ratio to cent
+
+%##############################################################################
+% body
+%##############################################################################
+\begin{document}
+\begin{CJK*}{GBK}{hei}
+\maketitle
+
+\begin{quotation}\kai\footnotesize
+{\hei摘要}\quad简要介绍了和音高相关的基础乐理知识（比如音高、音程、音阶、
+音律、和弦、调式等），包括对某些现象或概念的个人理解、学习心得，以及尚存
+的疑问。还探讨了一种定量研究音程和谐度的思路和方法，并介绍了初步的数值实
+验结果。
+
+\end{quotation}
+%\tableofcontents
+\thispagestyle{empty}
+\end{CJK*}
+\begin{CJK*}{GBK}{song}
+\CJKtilde
+\CJKindent
+
+%\layout
+
+\section{音的性质·音高}
+
+声音\footnote{在我国传统乐学中“声”和“音”有时候是互有分别的。东汉郑玄在《史记·乐书·集解》
+中有“宫、商、角、徵、羽，杂比曰音，单出曰声”，这里“声”是指单个的乐音，
+而“音”是指把单个的声组织起来而形成的音阶或曲调\kh{参见\CITE{hist2}第\NN{3}{5}页}；公孙尼子
+在《乐记》中有“知声而不知音者，禽兽也；知音而不知乐者，众庶也；惟君子为能知乐”，这里的“声”
+作音响，“音”作乐音，“乐”作音乐；嵇康在《声无哀乐论》中有“声之于音，犹形之于心也”，这里的
+“声”是指音乐的形式，而“音”是指音乐的内容(参见\CITE{temp2}第\N{19}页)。}是指发音体振动时
+所产生的能引起听觉的波，即声波。声波的频率范围
+在\HZ{20}{20\:000}之间，高于\hz{20\:000}的音称为超声波，低于\hz{20}的音称为次声波，人耳都
+感觉不到。在音乐中使用的乐音一般在\HZ{30}{4\:000}之间\kh{即钢琴的音域}，其中最富有
+表现力的乐音在\HZ{60}{1\:000}之间，对应于钢琴中间的四个八度音组\kh{大字组、
+小字组、小字一组和小字二组}，也大致对应于人声的音域。声音分为\keyword{乐音}
+\kh{music tone}和噪音两类，音乐中所使用的主要是乐音，噪音的使用较少\footnote{朝鲜族传统音乐
+对噪音使用的偏好特别突出\kh{参见\CITE{hist2}第\N{274}页}。}。若非特别指出，
+下文所指的都是乐音。
+
+发音体包罗万象，古人就有天籁、地籁、人籁之说，不过在音乐中涉及到的发音体主要
+包括人的声带以及各类乐器。我国传统上把乐器按材料分类，形成所谓“八音”
+即金、石、土、革、丝、木、匏、竹。近现代西方则是按照形制和演奏方式把乐器分为
+弦乐器、管乐器、键盘乐器、打击乐器等。这种分类方式能覆盖更多的材料，而且
+对乐器特征的概括也更合理，因此相比之下具有较大的优越性而被广泛采用。
+
+发音体的振动往往是由其不同尺度的各个部分的简谐振动合成的。比如一根弦的振动就是
+由其不同弦长的各个部分的简谐振动合成的，其中包括整个弦长的简谐振动，\myfrac{1}{2}弦长的简
+谐振动，\myfrac{1}{3}弦长的简谐振动，等等。相应的，在数学上也可以通过傅利叶分析把一个
+复杂的合成振动分解成的一系列不同频率、振幅和相位的简谐分量。
+
+只包含一个简谐分量的音称为\keyword{纯音}\kh{pure tone}，比如音叉产生的音可以近似
+认为是纯音；由多个简谐分量合成的音称为\keyword{复合音}\kh{compound tone}，通常的
+乐音都是复合音。复合音中频率最低的分量称为基本音或\keyword{基音}，其频率称为
+\keyword{基频}\kh{fundamental frequency}，它对应着发音体全长振动所产生的简谐分量；
+其它的分量统称为\keyword{泛音}\kh{overtones}，或者说它们构成一个\keyword{泛音
+系列}\kh{overtone series}。若非特别指出，下文中提到频率之处都指的是基频\footnote
+{人的听觉系统还有一个特点，就是即使当声音的基频被过滤掉之后，人感觉到的音高还是
+那个“不存在”的基频对应的音高，在这种\keyword{基频缺失}\kh{missing fundamental}的情况下产生的音高
+感觉被称为\keyword{虚音高}\kh{virtual pitch}。由于虚音高的存在，人们几乎感觉不到基频的缺失，
+这种现象被广泛应用在日常使用的电话系统中：语音的基频一般在\HZ{60}{400}之间，
+而电话的频带在\HZ{300}{3\:400}之间，这就是说，人耳在电话中接收到的语音波往往缺少
+基频成分，但由于虚音高的存在，人感觉不到基频的缺失。参见\CITE{oct1}。}。
+
+一般来讲，泛音的频率是基频的整数倍\footnote{如\cite{basic4}\,第\,204\cwave208\,页所述，
+并非所有类型的振动都只产生整数倍频率的泛音系列。弦振动和气柱振动产整数倍泛音，
+而膜、板、棒等振动则可以产生非整数倍的泛音。}，所以泛音也叫倍音，并依次称为二倍音、三倍音、四倍音等等，
+它们分别对应着发音体部分长度振动所产生的分量，其振幅通常小于基音的振幅。理论上讲泛音系列包含无
+穷多个泛音分量，但是高频率的分量由于振幅太小或频率太高，人耳感觉不到，故可以忽略不计。不同的乐器因其
+材料、形状、振动模式等的不同而有不同的泛音组成，表现为所谓\keyword{音色}\kh{timbre}或\keyword{音品}\kh{tone quality}上的差异。
+此外，乐音和噪音的主要区别就在于它们的泛音组成不同，比如从振幅的对比上，可以形象
+的认为乐音的基音和泛音主次分明而显得协调，但噪音的基音和泛音却主次不清而显得混乱。
+
+声波振动的客观物理属性反映在人脑中，产生相应的主观心理感受，表现为音的各种性质。
+具体地讲，振动的频率对应于音的高低即\keyword{音高}\kh{pitch}，振幅对应于音的强弱即音强
+或\keyword{响度}\kh{loudness}，振动持续的时间对应于音的长短即\keyword{音值}或\keyword{时值}\kh{duration}，振动的泛音组成
+对应于音色或音品\footnote{人耳对振动的相位不敏感。}。这四种性质，在音乐表现中都是非常
+重要的，其中音高和音值则具有更为重大的意义，因为音高和音值决定了音乐的曲调即音乐的基础
+和灵魂。本文主要讨论音高以及和它密切相关的概念如音程、音阶，音律，和弦，调式等等，
+而不涉及更多和音值、节拍、节奏等相关的内容。
+
+\iffalse
+声音的客观属性和主观性质的对应关系如表~\ref{tab_pitch}~所示。
+{\small\fs{
+	\begin{floatingtable}[r]{
+		\begin{minipage}[htbp]{.35\textwidth}
+			\setlength{\belowrulesep}{0mm} 
+			\setlength{\aboverulesep}{0mm}
+			% noted(bruin, 2006-12-29): needs to reset 'table' to 0 inside minipage,
+			% otherwise the 1st table will be shown as the 2nd table (wierd!!)
+			\setcounter{table}{0}  
+			\tabcaption{乐音的四种性质}\label{tab_pitch}
+			\begin{tabular}{c|c}
+				\toprule
+				\rule[0mm]{0mm}{4mm}
+				客观属性  &   主观性质\\
+				\midrule
+				频率      &   音高      \\\hline 
+				时间      &   音值(时值)\\\hline 
+				振幅      &   音强(响度)\\\hline 
+				泛音      &   音色(音品)\\
+				\bottomrule
+				\multicolumn{2}{@{}l}{{\footnotesize注：人耳对振动的相位不敏感。}}
+			\end{tabular}
+		\end{minipage}}
+	\end{floatingtable}
+}}
+\fi
+
+频率决定了音高，但这两者又有差别。频率是一个客观和绝对的概念，而音高是一个
+主观和相对的概念。比如，在没有其它音作参照的情况下，我们可以说某个音的频率
+是多少赫兹，但不能说这个音的音高是多少。所以当我们谈论音高时，要么谈论的是
+两个音之间的高低关系，要么是隐含着以某个标准频率为参照\cdash比如现在通
+行的国际标准\footnote{\CITE{hist7}介绍了该标准建立的曲折和充满争议的过程。}是
+把钢琴上小字一组\,$a^1$\,的基频定为\hz{440}。
+
+音高和频率正相关，即频率越大，音高就越高。但是这两者的关系并不是线性关系，
+而是近似的对数线性的关系；从另一个角度来讲，两个音的音高差别不是由其频率的
+差值\kh{频率差}来度量，而是由其频率的比值\kh{频率比}来度量。为方便起见，
+本文约定频率比为大的频率除以小的频率
+%\footnote{若约定频率比为小的频率除以的大频率亦可。}，
+%这样它的取值范围为\,0到\,1\,之间。但在数字的比较中，大数要比小数更直观一些。}，
+，以使得其值总大于或等于\,1。如果两对音的频率比相等，我们就感觉这两对音的
+音高差别相等，但此时它们的频率差并不一定相等。比如，\hz{300}和\hz{200}之间的
+音高差别与\hz{3\:000}和\hz{2\:000}之间的音高差别相等，因为它们的频率比都是\myfrac{3}{2}，
+但前一对音的频率差是\hz{100}，而后一对音的频率差是\hz{1\:000}，二者相差甚远。
+
+
+\section{音程的度量·音分}
+
+
+两个音之间的音高差别可以形象地理解为两个音高之间的“距离”，而正如两点之间的距离
+称为路程一样，两个音的音高之间的距离称为\keyword{音程}\kh{interval}\footnote{
+\CITE{basic5}第\N{109}页不同意这种类比：“音的高度也不应该以距离来衡量”；
+\CITE{basic3}第\N{13}页也认为：“音程的‘程’字\kh{即原文\,interval}，原是指距离或间隔，所以
+把这个字用于音上，不很妥切。因为音并非空间的物象，而是诉于人耳的一种感觉。对于这种感觉，
+不宜用空间距离的名称来命名”。其实大可不必过分囿于“距离”在空间上的本意，它的引申
+意义包括了在时间以及各种程度或指标上的差距，采用这些引申意义的目的就在
+于借助其空间本意的直观性来理解相对抽象的概念。特别地，在数学中，离开了对“距离”概念的抽象
+和推广，很难想象人们能够迈出从欧氏空间到度量空间的这重要一步，更不用说要建立更一般的拓扑空间概念了。
+音高中的“高”实际上就已经是借用了空间的概念来类比人耳的“感觉空间”，从这个角度来说，
+两个音之间的音程只不过是它们在音高空间中的距离罢了。}。
+%An interval is simply the distance between any two pitches in perceived pitch-space.}。
+为了探讨音程的性质\kh{比如大小、和谐、稳定、倾向等}以及确定各种的乐律，人们发明了一些定量地度量音程的方法。
+
+显然，最直接的方法就是用频率比来度量音程，它具有这样一些特点：频率比值与音程正相关，
+即比值越大，音程就越大；两个音程的和对应于两个比值的乘积；两个音程的差\kh{大音程减小音程}
+对应于两个比值相除的商；两个音程的倍数\kh{即大音程是小音程的几倍}对应于以小比值为底、
+大比值为真数的对数值。由于直接用频率比来计算音程的过程中需要用到乘除乃至对数运算，
+人们在其基础上陆续发明了一些更为简单、实用和直观的度量方法。这其中就包括现在
+最为广泛使用的用音分值来度量音程的方法。
+
+\keyword{音分}\kh{cent}的概念由英国语音学家、声学家兼数学家埃利斯
+\kh{Alexander John Ellis，\nn{1814}{1890}}于\N{1875}年提出并倡用。他把频率比值
+为\myfrac{2}{1}的音程\kh{即一个八度}细分为\N{1\:200}个单位，组成一个频率的等比数列，
+再把数列中相邻的两个频率之间的音程定义为一个音分。于是，一个音分对应的频率
+比值\kh{音程}就是这个等比数列的公比，其大小为$\sqrt[1200]{2}$，约等于\N{1.\:000\:577\:789\:507}。
+音分的概念是在十二平均律通行的基础上产生的。十二平均律把一个八度均分
+为\N{12}个半音音程，把一个半音音程再按\N{100}等份均分就得到\N{1}个音分，
+音分也因此而得名。应该指出，数学的进步特别是对数计算\footnote{对数
+萌芽于\N{16}世纪，创立于\N{17}世纪，是数值计算的一项革命。英国数学家
+纳皮尔\kh{John Napier, \nn{1550}{1617}}在\N{1614}年创立了对数理论，英国人冈特
+\kh{E. Gurter，\nn{1581}{1626}}于\N{1623}年根据对数原理发明了对数计算尺，推进了
+对数的应用。其后不久对数开始传入中国(参见\CITE{math1}第\NN{67}{69}页)。}%
+的成熟和广泛应用也是的音分概念得以产生和流行的必要条件。
+
+音分在音程的计算和应用中非常方便。首先，音分值的大小和音程的大小成线性
+正比关系，音程的加减直接对应于音分值的加减，音程和音程的倍数关系也对应于音分值
+的倍数关系；另外，音分作为音程的度量单位，大小也很合适，比如常用的音程都在
+几十到几百音分之间，而且人耳分辨音程的阈值也在\NN{6}{8}音分之间\footnote{参见
+\CITE{temp1}第\N{166}页。当然，不同的人分辨音程的能力也不一样，另外年龄以及是
+否有过专业训练等因素也对分辨力有影响。}，这些都使得音分的使用简单、方便和直观，
+所以它自从问世以来在国际间得到了广泛地使用。
+
+把音程从频率比换算到音分值也相当简单。式\,\eqref{cent}\,表示了这种换算关系，
+其中\,$x$\,代表频率比，$\cent(x)$\,代表转换后的音分值。
+%图\,\ref{fig_cent}\,画出了从\,1\,到\,4\,之间频率比(横坐标)和音分值(纵坐标)对应关系。
+%如果横坐标采用对数比例的话，图中的曲线将变成一条连接左下角和右上角的直线。
+
+\begin{equation}\label{cent}
+\cent(x) = 1200\log_2{x},\qquad x \geqslant 1
+\end{equation}
+
+%\begin{figure}[htpb]
+%\centering \includegraphics[width=.6\textwidth]{cent}
+%\figcaption{频率比和音分的对应关系}\label{fig_cent}
+%\end{figure}
+
+另外，除了频率比和音分值以外，人们还先后发明了几种其它的度量音程的方法。
+比如法国人沙伐\kh{F\'elix Savart，\nn{1791}{1841}}曾采用一种以\N{10}为底的对数值\kh{以沙伐为
+单位}来计算音程，德国人里曼\kh{Hugo Riemann，\nn{1849}{1919}}和爱兹\kh{Carl Eitz，\nn{1848}{1924}}
+曾采用一种以\N{2}为底的对数值\kh{以八度为单位\N{1}}来计算音程，日本人田边尚雄\kh{\nn{1883}{1984}}
+曾于二十世纪初发明了以十二平均律的全音为\N{1}半音为\N{0.5}的\keyword{平均音程值}\kh{centitone}来计算音程，
+等等\kh{参见\CITE{temp1}第\NN{23}{41}页}。
+
+可能是由于古代用铜壶滴漏不可能精确计量时间的原因，我国传统律学避开了频率而以振动体的
+长度“律寸”来度量音高和计算音律，并用整数或分数形式的长度比“律数”或“律度”来
+代表乐音的相对音高\footnote{参见\CITE{hist2}第\NN{29}{35}页，\CITE{temp2}第\N{23}、\NN{53}{55}页。}，
+这实际上等价于用频率比来度量音程，因为长度比就是频率比的倒数。比如，小于等于\,1\,的长度
+比\kh{如《史记·律书》所记载的十二律}就对应于大于等于\,1\,的频率比\kh{如本文的约定}，它们作为
+音程的度量是等价的。
+
+\iffalse
+传统音乐中还把“清”和“变、闰”放在某音名的前面，
+分别用来代表比该音高和低半音的音，比如“清角”比“角”高半音，“变徵”比“徵”低半
+音等；另外也用“清”与“浊”以及“少”与“太、下”来分别表示高与低一个八度的音，
+比如“清宫”、“少宫”比“宫”高一个八度，“浊宫”、“太宫”或“下宫”比“宫”
+低一个八度\footnote{参见\CITE{temp2}第\N{22}页。}。
+\fi
+
+另外，到目前为止，我们还没有提到大家熟知的用“度”来表示的音程概念\kh{如“纯五度”、
+“小三度”等}，这是因为它们的定义以及名称的来历等依赖于本文后面所要介绍的音阶概念\kh{特别
+是欧洲七声音阶}以及五线谱的发明和使用，它们确切的音程大小\kh{音分值}也和使用的
+律制相关\kh{比如平均律的纯五度是\N{700}音分，而纯律的纯五度约为\N{702}音分}。这些
+内容将在介绍音阶和音律的部分进一步讨论。
+
+
+\section{音程的协和性·\cdoc}
+
+古希腊的毕达哥拉斯学派认为万物皆为数，并且对整数\kh{以及两个整数之比形成的有理数}的巨大威力
+有着神秘的信仰。据说毕达哥拉斯\kh{Pythagoras，前\N{580}\cwave前\N{504}}曾经发现，两根相似的弦在同样的
+张力下，当其弦长之比为两个小整数之比\kh{指分子和分母都是小整数，如\myfrac{1}{2}、\myfrac{3}{2}等}时，
+则它们同时或先后发出的音是悦耳的\footnote{不同音高的两音，同时出现时构成\keyword{和声音程}\kh{harmonic interval}，
+相继出现时则构成\keyword{旋律音程}\kh{melodic interval}。人耳对音程的感知能力，与构成音程的两音在时间上的
+间隔有很大的关系，间隔越短则对前一个音高的记忆越强烈，故对整个音程的感知越清晰。
+显然，在和声音程的情况下\kh{时间间隔为零}这种感觉最明显。}，
+这无疑进一步应证了其“数决定一切”的学说。两个世纪以后的亚里士多德\kh{Aristotle，前\N{354}\cwave前\N{300}}
+不同意毕达哥拉斯的学说，他认为音乐的和谐与否，应该由听觉来判断，而不是由数学来决定。
+现代声学研究亦表明，对大多数人而言，和谐音的感知机理要比毕达哥拉斯“小整数比”原则
+复杂得多\,\ucite{dict3}。而从艺术和美学的角度来看待音乐和自然规律的关系，王耀华教授
+在\CITE{hist2}的《总序》中作了这样的概括：
+
+\begin{quotation}\fs\small
+……除了纯粹的自然规律，包括人类文明所创造的高科技手段的物质性规律不因国别、族别
+差异而有任何改变之外，在艺术规律和艺术手段之中，人们对自然和物质手段的选择却
+是大异其趣的。正因为有了人的选择、加工、处理方法的不同，所以，在相同的物质根
+据中所表现出来的色彩、风味、性格、情趣方面却大相径庭，而出现民族特点、地方特
+色、时代风格的千差万别。对于音乐文化来说，物理学中的声学基本理论固然相同，音
+乐形态诸要素的选择和音乐审美观的理解却因民族、地域、时代的不同而形成差异。
+\end{quotation}
+
+%不过在以后的岁月里，毕达哥拉斯的学说仍然一直占据着上风。
+
+%由此可见，音乐艺术的研究，包括这里音的和谐等现象的解释，除了从数学、物理等自然法则的角
+%度考察外，还应该从生理学、心理学的角度加以考察，并综合考虑历史、环境、文化、民族、时代
+%以及后天熏陶和教育等方面因素。
+
+如果借用\keyword{音体系}\kh{tonsystem}\footnote{所谓音体系，是指音乐中所用的乐音素材及其
+相互关系的总合，它概括为音律、音阶、调式、调性等诸多方面。参见\CITE{hist2}前言及第\N{323}页。}
+的概念，我们是不是可以这样来理解，即一个音体系的形成是由自然和人文这两个方面的因素来共同决定的。
+音体系之间的共性由这两个方面，特别是自然规律方面的共性所决定，而音体系之间的差异性
+则主要是由人文方面的差异性所决定的。相应的，研究音体系之间的共性主要是从自然规律\kh{如物
+理、数学、生理学等}的角度来考察，而研究体系之间的差异性则主要是从人文学科\kh{如历史、文化、
+心理、美学等}的角度来入手。
+
+在今天，美学的一般理论未必比毕达哥拉斯的时代更进步，但是从自然规律的角度来看，在关于
+为什么某些音程听起来是悦耳的这一点上，我们是否比毕达哥拉斯了解得更多呢？物理学和数学的
+进步使得从泛音的角度来进一步分析和解释音的和谐现象成为可能。比如从泛音的频率即音高组成
+上来看，两个音的和谐性可能和它们在泛音的频率组成上的共性相关，即音的和谐性是因为存在着
+这种共性，并且这种共性越多，它们听起来就越和谐，我们姑且把这种假说称为“\keyword{频率共性说}”。
+应该指出，实际上共性与和谐性并不一定具有必然的联系，因为音的共性，不管是频率还是振幅等
+上的共性，一旦我们给它一个确切的定义，它就是一个客观的概念，而和谐与否却是一个相对主观、
+无法确切定义的概念；另外，即使我们可以假设共性意味着和谐，但是反过来说“和谐意味着共性”
+却不一定成立，因为正如性格迥异的人可以和谐相处一样，两个不具备多少共性的音也有可能听起
+来是和谐的。总之，这里“频率共性说”应该被看成是对复杂现象的一种简化处理。至于这种简化
+有多少合理的成分、它是否具有什么实际的意义，以及能否对它作什么样的改进等等，则还需要更
+深入的研究。
+
+我们知道弦长和频率成反比，而且泛音的频率是基频的整数倍，于是自然地，当弦长比值中的整数
+越小时，两个泛音系列在频率组成上的共性就越多，这似乎恰好和毕达哥拉斯的学说相契合。
+表\,\ref{tab_comm}\,以钢琴上的四个音为例，以\,$\mathrm{C}$\,音的基频\kh{\hz{130.8}}为单位，
+列出了它们的基音和泛音系列的主要部分，从中可以直观地看出各个音之间共性的多少和频率或
+弦长比值的关系。
+
+
+{\small\fs{
+\begin{table}[htpb]
+	\centering
+	\setlength{\belowrulesep}{0mm} 
+	\setlength{\aboverulesep}{0mm}
+	\tabcaption{乐音的泛音组成在频率上的共性}\label{tab_comm}
+	\begin{tabular}{c|*{16}{p{1em}|}c}
+		\toprule
+		\rule[0mm]{0mm}{4mm}
+		音名 &    \multicolumn{17}{c}{基音和泛音的频率}\\
+		\midrule
+		\rule[1mm]{0mm}{3mm}
+		$\mathrm{C}$   & \bf{~1~} & ~2~ & ~3~ & ~4~ & ~5~ & ~6~ & ~7~ & ~8~ & ~9~ & 10 & 11 & 12 & 13 & 14 & 15 & 16 & \ldots \\\hline
+		\rule[1mm]{0mm}{3mm}
+		$\mathrm{c^1}$ &   & \bf{~2~} &   & ~4~ &   & ~6~ &   & ~8~ &   & 10 &    & 12 &    & 14 &    & 16 & \ldots \\\hline
+		\rule[1mm]{0mm}{3mm}
+		$\mathrm{g^1}$ &   &   & \bf{~3~} &   &   & ~6~ &   &   & ~9~ &    &    & 12 &    &    & 15 &    & \ldots\\\hline
+		\rule[1mm]{0mm}{3mm}
+		$\mathrm{c^2}$ &   &   &   & \bf{~4~} &   &   &   & ~8~ &   &    &    & 12 &    &    &    & 16 & \ldots \\
+		\bottomrule
+		\multicolumn{17}{@{}l}{{\footnotesize注：频率用\,$\mathrm{C}$\,音基频的倍数表示；加黑的数字代表基频。}}
+	\end{tabular}
+\end{table}
+}}
+
+当比值为\myfrac{1}{1}时，这两个音相同，共性最大；当比值为\myfrac{2}{1}\kh{$\mathrm{c^1:C}$}
+和\myfrac{3}{1}\kh{$\mathrm{g^1:C}$}时，低音的泛音中分别有\myfrac{1}{2}和\myfrac{1}{3}的频率分量和高音相同，
+并且高音的所有泛音在低音的泛音系列中都存在；
+当比值为\myfrac{3}{2}\kh{$\mathrm{g^1:c^1}$}时，低音的泛音中也有\myfrac{1}{3}的频率分量和高音
+相同，但此时高音中还存在着低音没有的泛音频率，比如\,$\mathrm{g^1}$\,中的\,3、9、15\,等代表的分
+量在\,$\mathrm{c^1}$\,中就不存在。
+
+%如果不考虑振幅和时值等因素，仅仅从泛音的频率构成的角度，
+如果能够定量地研究乐音之间在频率上的共性，那么，在前述“共性即和谐性”的假定下，定量地研究乐音之间
+的和谐性将成为可能。由于这里的共性仅仅考虑了频率即音高的因素，那么对应的音之间的和谐性应该仅仅代表
+了乐音在音高上表现出来的和谐性，亦即音程的和谐性。如果我们用\keyword{\cdos}\kh{degree of similarity, dos}
+来度量共性的大小，用\keyword{\cdoc}\kh{degree of consonance, doc}来度量和谐的程度，那么“共性即和谐性”
+的假定亦可以表述为“两个乐音在频率上的\cdos等于它们之间音程的\cdoc”。
+
+让我们尝试着把\cdos定义为两个泛音系列中相同频率的个数与所有不同频率的个数的比值。易知\cdos的最大值
+为\N{1}，最小值为\N{0}。如果把两个音的\cdos记为函数\,$\dos(a,b)$\,，则有
+
+\begin{equation}\label{dos}
+\dos(a,b)=\dos(b,a)=\dfrac{(a,b)}{[a,b]}=\dfrac{(a,b)^2}{ab}=\dfrac{1}{ab},\qquad (a,b)=1
+\end{equation}
+
+式\,\eqref{dos}\,中\,$a,b$\,为互素的两个整数，$a$/$b$\,等于两个音的基频之比。$(a,b)$\,代表\,$a,b$\,的
+最大公约数，$(a,b)=1$\,表示\,$a,b$\,互素；$[a,b]$\,代表\,$a,b$\,的最小公倍数；并且恒有
+关系式\,$(a,b)[a,b]=ab$\,。另外，\cdos和顺序无关，故\,$\dos(a,b)=\dos(b,a)$\,。
+
+应用式\,\eqref{dos}\,，我们再来看看表\,\ref{tab_comm}\,中各音之间的\cdos分别是多少：
+
+\begin{tabbing}
+\hspace*{.3\linewidth}$\dos(\mathrm{C},\mathrm{C})$~~~   \= $=$ \= $\dos(1,1)$ \= $=$ \= \myfrac{1}{1}\\[0.6ex]
+\hspace*{.3\linewidth}$\dos(\mathrm{C},\mathrm{c^1})$    \> $=$ \> $\dos(1,2)$ \> $=$ \> \myfrac{1}{2}\\[0.6ex]
+\hspace*{.3\linewidth}$\dos(\mathrm{C},\mathrm{g^1})$    \> $=$ \> $\dos(1,3)$ \> $=$ \> \myfrac{1}{3}\\[0.6ex]
+\hspace*{.3\linewidth}$\dos(\mathrm{C},\mathrm{c^2})$    \> $=$ \> $\dos(1,4)$ \> $=$ \> \myfrac{1}{4}\\[0.6ex]
+\hspace*{.3\linewidth}$\dos(\mathrm{c^1},\mathrm{g^1})$  \> $=$ \> $\dos(2,3)$ \> $=$ \> \myfrac{1}{6}\\[0.6ex]
+\hspace*{.3\linewidth}$\dos(\mathrm{g^1},\mathrm{c^2})$  \> $=$ \> $\dos(3,4)$ \> $=$ \> \myfrac{1}{12}
+\end{tabbing}
+
+根据上面的结果\kh{或者直接观察表\,\ref{tab_comm}}，$\mathrm{C}$\,和\,$\mathrm{g^1}$\,的
+\cdos为\myfrac{1}{3}，要大于\,$\mathrm{C}$\,和\,$\mathrm{c^2}$\,的\cdos\myfrac{1}{4}。如果按照\cdos的
+大小来衡量，$\mathrm{g^1}$\,应该比\,$\mathrm{c^2}$\,更“相似于”$\mathrm{C}$\,。但是当我们
+在钢琴上弹奏这三个音时，我们的耳朵却明确地告诉我们相反的结果，$\mathrm{g^1}$\,和\,
+$\mathrm{C}$、$\mathrm{c^2}$\,相比更像是一个“外来”音。
+
+看来，试图单纯从频率构成的角度来解释乐音的和谐性确实存在着一些困难，或许
+除了频率以外我们还应该考虑振幅和时值的因素\footnote{不同的乐器所产生的音，或相同的乐器所产生的不同的音，
+它们的各个泛音分量的振幅和时值随频率的变化规律存在着较大的差异。参见\CITE{basic4}第\NN{200}{202}页
+和\CITE{temp1}第\NN{14}{15}页。}，或者和谐性的解释已经超出了自然规律的范围，需要综合
+考虑民族、时代以及后天教育等人文因素，比如\CITE{oct1}认为人的听觉系统中存在一个认识音
+高和音程的“模板”，而这个“模板”可能不是天生的，而是通过后天的训练形成的。
+
+两个音在音高上表现出来的和谐关系实际上是它们之间的音程的一种属性，若假定共性代表了和谐性的，
+那么式\,\eqref{dos}\,定义的两个音的\cdos就可以同时理解为音程的\keyword{\cdoc}\kh{degree of consonance}。
+小整数比的音程由于其和谐性\kh{即有较大的\cdoc}，在音乐实践中特别是在纯律中有着广泛的应用。
+按\cdoc从大到小的顺序，表\,\ref{tab_intervals}\,列出了常见纯律音程的频率比、音分值、音程名
+以及对应的\cdoc\footnote{参见\CITE{temp1}第\NN{42}{43}页，这里“\cdoc”一列为笔者所加。}。
+其中\cdoc最高的前四个音程通常称为\keyword{纯协和}\kh{perfect consonance}音程，
+接下来的四个音程通常称为\keyword{次协和}\kh{imperfect consonance}音程，这两者又合称\keyword{协和音程}；
+表中和谐度最小的四个音程通常称被纳入\keyword{不协和}\kh{dissonance}音程的范围\footnote{参见\CITE{basic3}第\N{21}页
+以及\CITE{basic4}第\NN{133}{134}页。}。这里我们看到了定量的\cdoc排序与音乐实践中对音程协和感的
+定性划分之间的高度吻合。
+
+{\small\fs{
+		\begin{table}[htpb]
+			\centering
+			\setlength{\belowrulesep}{0mm} 
+			\setlength{\aboverulesep}{0mm}
+			\tabcaption{常见纯律音程}\label{tab_intervals}
+			\begin{tabular}{r r c c c c}
+				\toprule
+				\rule[0mm]{0mm}{4mm}
+				频率比  & 音分值 & 音程名 & \cdoc & &\\
+				\midrule
+				1/1~~~~  &      0~~~~    &   纯一度 &     1    &\vline&\\
+				2/1~~~~  & 1\:200~~~~    &   纯八度 &    1/2   &\vline& \raisebox{1.5ex}[0mm]{纯} \\
+				3/2~~~~  &    702~~~~    &   纯五度 &    1/6   &\vline& \raisebox{1.5ex}[0mm]{协} \\
+				4/3~~~~  &    498~~~~    &   纯四度 &    1/12  &\vline& \raisebox{1.5ex}[0mm]{和} \\\hline 
+				5/3~~~~  &    884~~~~    &   大六度 &    1/15  &\vline& \\
+				5/4~~~~  &    386~~~~    &   大三度 &    1/20  &\vline& \raisebox{1.5ex}[0mm]{次} \\
+				6/5~~~~  &    316~~~~    &   小三度 &    1/30  &\vline& \raisebox{1.5ex}[0mm]{协} \\
+				8/5~~~~  &    814~~~~    &   小六度 &    1/40  &\vline& \raisebox{1.5ex}[0mm]{和} \\\hline
+				9/5~~~~  & 1\:018~~~~    &   小七度 &    1/45  &\vline& \\
+				9/8~~~~  &    204~~~~    &   大二度 &    1/72  &\vline& \raisebox{1.5ex}[0mm]{不} \\
+			 10/9~~~~  &    182~~~~    &   小二度 &    1/90  &\vline& \raisebox{1.5ex}[0mm]{协} \\
+			 15/8~~~~  & 1\:088~~~~    &   大七度 &   1/120  &\vline& \raisebox{1.5ex}[0mm]{和} \\
+				\bottomrule
+			\end{tabular}
+	\end{table}
+}}
+
+\section{\octeq}\label{sect_octeq}
+
+在表\,\ref{tab_intervals}\,中除了纯一度\kh{亦称纯同度，perfect unison}以外，尤以八度音程的
+和谐性最为显著，具有“至高无上的音融合性”，%\footnote{\CITE{basic3}第\N{6}页。}
+在音乐实践中它似乎超出了相似而达到了相等的地步，即相距八度的两个音听起来好像是一样的，于是人们
+特别给这种现象取名为\keyword{\octeq}\kh{octave equivalence}。把一个曲调移高或移低一个八度演奏，
+或者用相差一个八度的两个声部同时演奏一个曲调，我们会觉得它和原来的曲调没有什么本质的不同，
+或者说没有什么新内容；我们自己在哼唱曲调时也会无意识地运用八度相等，当某个乐
+句的音高过高或过低\kh{即超过了自己的音域}，我们会自然地上移或下移一个八度再接着唱下
+去。此外，也有人从自然语言中女声比男声平均高一个八度的角度来解释八度相等。不过
+近现代生理学的实验和研究发现，\octeq的音程，特别是在高音区，实际上并不是严格
+的\myfrac{2}{1}关系，而是略微大于\myfrac{2}{1}，这种现象被称为\keyword{八度扩张}\kh{octave stretch}，在有些
+钢琴的调音中还会考虑到该因素。但是不管怎么样，对\octeq的认识和运用在世界上
+各种音乐体系中相当普遍地存在，有关研究还表明，\octeq现象在婴儿甚至动物\kh{比如猴子}
+的听觉系统中也都普遍存在，而绝大多数的音乐实践和音乐理论都明确或隐含地把\octeq作为
+假定的前提或公理\kh{参见\CITE{temp1}第\NN{296}{298}页以及\CITE{oct1,dict3}}。
+
+
+由于相等或相似具有传递性，我们可以把\octeq推广到频率比值是\myfrac{2}{1}的任意整数次幂
+的两个音上，可以认为凡是相差整数个八度的音都是等价的。比如\hz{200}的音
+和\hz{400}、\hz{800}、\hz{1\:600}的音听起来是“相同”的，其中\hz{200}和其它频率之间的
+音程分别为一个、两个和三个八度。
+
+
+正是由于听觉系统的这个特点，或者说基于\octeq的假定，使得人们有可能简化音程的研究，
+即通过只研究一个八度内的各音阶的音程关系从而推广到整个音域上去。于是以音程为基础的
+音阶、音律、调式、和声等的研究基本上都是把所有的音程“化归”到单个八度内以后进行的，
+我们把这个化归的过程简称为\keyword{八度化}\kh{octavization}。
+
+如果把八度化定义为频率比\,$x$\,的函数\,$\octavize(x)$\,，那么其定义式由式\,\eqref{oct}\,给出。
+
+\begin{equation}\label{oct}
+\octavize(x) = \dfrac{x}{\mbox{\large 2}^{\displaystyle \lfloor\log_2{x}\rfloor}},\qquad x > 0
+\end{equation}
+
+这里\,$\lfloor x\rfloor$\,为\,$x$\,的“地板”函数，如\,$\lfloor 2.3\rfloor=2$，$\lfloor -1.2\rfloor=-2$\,等。
+将频率比八度化实际上就是将其通过乘以或除以若干次\,2\,直到其值落到区间\octint之上为止，
+而这个“若干次”的确切数目就是\,$\lfloor\log_2{x}\rfloor$\,，因为\,$x$\,等于
+\,2\,的\,$\log_2{x}$\,次幂，这里\,$\log_2{x}$\,不一定是整数，所以要将它取整，
+从这个角度来看，式\,\eqref{oct}\,的意义也就很直观了。
+
+若用音分值来度量音程，那八度化就是把音分值取模\N{1\:200}。%，使得其使得其使得其落在\interval{[}{0}{1\:200}{]}之上。
+这个过程也等价于先把频率比式\,\eqref{oct}\,八度化以后再按式\,\eqref{cent}\,转化为音分值。
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% 这两个函数图可有可无
+\iffalse
+图\,\ref{fig_octavize}\,为式\,\eqref{oct}\,当频率比在\,$[\,0.25, 4\,]$\,上的函数图，
+其中横坐标采用对数比例表示初始频率比，纵坐标表示八度化以后的频率比。图\,\ref{fig_cent}\,表示在
+一个八度内频率比到音分的换算关系，亦即式\,\eqref{cent}\,当频率比在\octint上时的函数图。
+\begin{figure} 
+  \begin{minipage}[t]{0.5\textwidth} 
+    \centering 
+    \includegraphics[width=.9\textwidth]{octavize} 
+	\figcaption{八度化函数图}\label{fig_octavize}
+  \end{minipage}% 
+  \begin{minipage}[t]{0.5\textwidth} 
+    \centering 
+    \includegraphics[width=.9\textwidth]{cent} 
+	\figcaption{频率比和音分值的对应关系}\label{fig_cent}
+  \end{minipage}% 
+\end{figure}
+\fi
+%%%%%%%%%%%%%%%%%%%%%%%
+
+如果我们把音程八度化以后再运用式\,\eqref{dos}\,来考察音程的\cdoc，我们要在式\,\eqref{dos}\,中
+加上一个限制条件，即\,$1\leqslant a/b < 2$。此时表\,\ref{tab_comm}\,中存在的\,$\mathrm{g^1}$\,
+与\,$\mathrm{c^2}$\,、$\mathrm{C}$\,之间的矛盾也消失了，虽然这里并不存在清晰的逻辑关系，但
+从某种角度上来说，在承认\octeq假设的前提下，前面给出的\cdos的概念和定义或许还具有一定的意义。
+附录\,\ref{appendix_doc}\,对此作了进一步的数值实验，并得到一些有趣的结果。
+
+最后我们提出这样一个问题留待在下文中探讨：既然\octeq现象如此普遍和重要，那么在我国
+传统音乐理论中是如何称呼这一现象的？又是否存在一个对应于“八度”的音程术语？
+
+\iffalse
+笔者认为我国传统音乐理论中的“均”\kh{通“韵”}字曾具有八度音程
+的含义。“均”字在中国传统音乐理论中曾有多种含义，但都和音高或音程相关。
+《新唐书·杨收传》中有“夫旋宫以七声为均，均言韵也。古无韵字，尤言一韵声也”，
+它的意思是说音乐中的“均”好比诗词中的韵\footnote{参见\CITE{temp2}第\N{26}页。}。
+所谓“同均”，按照笔者的理解，可能是针对两个相差整数个八度的音而言的。
+而《隋书·音乐志》中有“一均之中，间有七声”，这句话可以解释
+成“在八度音程内有七个音”\footnote{参见\CITE{temp1}第\N{149}页。}，由此可见，
+“均”曾经确实具有“八度音程”的含义。
+\fi
+
+
+\section{音阶·音律}
+
+正如写作必先有文字、绘画必先有颜色一样，作乐则必先有音\cdash特别是乐音\cdash来作为
+音乐的词汇或素材。仅从乐音的主要性质之一即音高的角度来看，乐音的音高可以在整个音高空间\kh{对应
+于声波的频率范围}内连续变化，这样不同音高的数目从理论上讲是无限多的，从而可使用的
+乐音的词汇总量也是无穷多的。为了简化和统一对乐音\kh{特别是在音高方面}的使用，人们需
+要对音高空间进行离散化描述，使得可以使用的乐音数量既不太多又足够用来表达各种乐思，
+于是产生了\keyword{音阶}\kh{scale}、\keyword{音列}\kh{tbd}，以及用来确定音阶和音列
+的\keyword{律制}\kh{tuning system}。
+
+直观地讲，音阶就是指在音高上呈阶梯状顺序排列的一系列音，它们所覆盖的音高
+范围一般仅局限在一个八度以内，因为我们可以利用\octeq把这一个八度内的音阶推
+广到整个音高空间上去，从而达到简化音阶同时也简化对整个音高空间离散化的目的
+\footnote{应该指出，离散化的手段或者\octeq假定，不应该也不会成为束缚人们音乐创造力的
+樊篱：连续音高的变化手段\kh{如滑音、吟音、揉弦、摇声等}对丰富音乐的表现力起
+着重要的作用；如果哪一天有人发明或使用了超过一个八度的音阶，也不值得大惊小怪。}。
+所以，从使用目的的角度上讲，我们可以说音阶是在运用\octeq假定的基础上对音高
+空间进行离散化的工具。
+
+音阶中的每一个“台阶”代表一个不同的音高，称为一个\keyword{音级}\kh{tbd}。
+按照音阶中音级数目的多少，音阶可以分为四声音阶、五声音阶、六声音阶、七声音阶、
+八声音阶、十二声音阶等等。其中最常用的是\keyword{五声音阶}\kh{pentatonic scale}
+和\keyword{七声音阶}\kh{heptachord}，其它各声音阶可以看成是这两类音阶的简化或变化。
+而根据各音级之间的距离的不同，相同音级数目的音阶又存在多种不同的变体，比如我国
+汉族传统的古音阶、清乐音阶、燕乐音阶以及欧洲传统的大音阶、小音阶等就都
+同属于七声音阶。简言之，音阶由两个方面的因素来确定：音级的数目以及各音级之间的距离。
+
+通过音阶的离散化可以得到在整个音高空间范围内可以使用的所有乐音，把它们按照高低顺序
+排列起来就形成了所谓的音列，也就是音乐中可以使用的乐音词汇或素材。要确定一个音列
+需要两个方面的因素，即选定一种音阶，以及把这种音阶象铺设铁轨一样一段一段连续地
+“镶嵌”到整个音高空间上，从而得到一组具有绝对音高的音列。简言之，音列有两个方
+的因素来确定：一种音阶及它在音高空间中的绝对位置。
+
+%综合起来看，音级、音阶和音列之间的关系可以用图\,\ref{fig_series}\,来概括。
+
+综合起来看，音列、音阶和音级之间的关系可以用下面的示意图来概括。作为一个具体的例子，
+第二个示意图表现了在现代钢琴上由八十八个黑白键组成音列与构成它的音阶、音级之间的关系%
+\footnote{钢琴上的白键和黑键也各自构成一个音列，分别基于七声音阶和五声音阶。}。
+
+\begin{figure}[h]
+\centering \includegraphics{series} \\[4pt]
+\qquad\qquad \includegraphics{p_series} 
+%\figcaption{音级、音阶和音列之间的关系}\label{fig_series}
+\end{figure}
+
+介绍几种音阶：
+
+
+从理论上讲，可以存在无穷多种不同的音阶，而事实上在世界各地各民族中也正是存在着很
+多种不同的音阶。一个自然的问题就是，人们是根据什么原则或喜好来选择他们各自使用的
+音阶的呢？或者说，对于一种音阶而言，使用或发明它的人们是如何选择或确定它的两个因
+素即音级数目和音级间距离的呢？
+
+一个音列只有一个音阶吗？
+
+“律所以立均出度”“度律均钟，百官轨仪” 陈应时p122
+
+
+音程：级数和音数，性质。
+
+不大不小；
+
+律制的两种作用：定音阶（调式）和定绝对音高（调高）。
+
+调：调高(pitch)、调式（mode）、调高+调式
+
+调性(tonality)：由调高、调式、调高+调式决定的属性。（陈应时）
+
+转调：旋宫（移调）和犯调。扬调/出调
+
+转均/同均/均主
+
+
+图\,\ref{fig_scale7}\,为七声大音阶的示意图，纵向用音分值表示一个八度内的相对音高\kh{从\N{0}到\N{1\:200}}。
+它在一个八度内包括了七级“台阶”即七个不同的音高的音\kh{相差一个八度的两个\,do\,音视为同一个音级}，
+所以它属于七声音阶。
+
+\begin{figure}[htpb]
+\begin{music}
+\generalmeter{}%\meterfrac{4}{4}}
+\startextract\NOtes \sk\wh{cdefghij}\sk\enotes\endextract
+\end{music}
+\vspace{-1.5ex}
+\centering \quad\includegraphics[width=.43\textwidth]{scale7}\\\vspace{1ex}
+\centering \quad\includegraphics[width=.43\textwidth]{kbd}
+\figcaption{七声大音阶示意图}\label{fig_scale7}
+\end{figure}
+
+什么是音阶？\\
+为什么会产生音阶？\\
+有哪些音阶，各有什么特点？\\
+音阶构成不同音程的组合数。特征音程\\
+五线谱表现音高的特点。\\
+
+八度。\kh{“八度”是一个外来词，把这样一个音程称为“八”度而不是十度或二十度是和欧洲传统的七声音阶有关}。
+
+按从低到高的顺序，每个音级有一个
+用罗马数字表示的号数(如\,I、II、III、IV，等等)。这里的音级相当于我国传统音乐理论中的“均”，
+“同均”就是指不同八度内的两个或多个音级它们有相同的号数，或者说同均的音之间相差整数个八度音程。
+
+笔者认为我国传统音乐理论中的“均”\kh{y\`un，通“韵”}字曾具有八度音程
+的含义。“均”字在中国传统音乐理论中曾有多种含义，但都和音高或音程相关。
+《新唐书·杨收传》中有“夫旋宫以七声为均，均言韵也。古无韵字，尤言一韵声也”，
+它的意思是说音乐中的“均”好比诗词中的韵\footnote{参见\CITE{temp2}第\N{26}页。}。
+所谓“同均”，按照笔者的理解，可能是针对两个相差整数个八度的音而言的。
+而《隋书·音乐志》中有“一均之中，间有七声”，这句话可以解释
+成“在八度音程内有七个音”\footnote{参见\CITE{temp1}第\N{149}页。}，由此可见，
+“均”曾经确实具有“八度音程”的含义。
+
+
+
+
+
+\section{十二平均音律}
+
+三种主要律制为五度相生律、纯律和十二平均音律。
+
+从律制的产生年代来说，十二平均音律产生最晚，由于它最简单同时也具有坐标的性质，我们首先对它进行介绍。
+
+最早计算和应用十二平均律的是我国明代的朱载堉\kh{\nn{1536}{1611}}，但是由于受....等的限制
+，当时十二平均律在我国没有得到推广和继承。在乐律的部分会进一步介绍十二平均律和其
+它律制。
+
+%音差\kh{comma}，一种微小的音程。
+
+\section{五度相生律}
+\section{纯律}
+
+
+\begin{figure}[h]
+\centering \includegraphics{temp}
+\end{figure}
+
+如何看待上面三种主要的律制？冯文慈先生在\CITE{hist3}所收录的《略论我国当前律制问题》中
+认为要因地制宜采用律制，不必要也不可能统一律制：
+
+\begin{quotation}\fs\small
+……律学常识告诉我们，各种不同律制的产生和应用，各有其不同的社会历史条件，包括
+音乐结构风格的条件、乐种乐器的条件、民族习惯的条件、地域爱好的条件等等。从另一
+方面说，律制一旦形成，它本身自然就具有某一种客观适应性。所以我理解，采用何种律
+制应该是因乐制宜、因族制宜、因地制宜，或者说主要是因乐制宜，即按照不同时代、不
+同民族、不同地域的音乐品种乃至个别作品的结构特点等，决定采用何种律制，既不必要，
+也不可能齐步走，一刀切，都采用一种统一的律制。以单一的律制去适应各种音乐实践的
+客观要求，是一种脱离实际的主观愿望，是违背律制本身固有本性的一种幻想。
+
+……旋律之富于动力，沁人心脾，是五度相生律的特色；纵向结合之纯净无暇，是纯律的
+长处；调性之飞越翱翔，是十二平均律的精髓。能工巧匠，因乐制宜，择善而取，或加综
+合。律制不可不从，但又不可过于偏执。音乐艺术的生命必须有“数理之神”来保佑，但
+音乐艺术的魅力却并不在数理性的精密。如此看待实践中的律制问题，会比较切合实际。
+\end{quotation}
+
+
+
+\section{调式}
+
+
+
+
+%##############################################################################
+% 附录
+%##############################################################################
+\newpage
+
+\begin{appendix}
+
+
+\section{小整数比音程·\cdoc的应用}\label{appendix_doc}
+
+进一步的数值实验表明，小整数比音程以及音程\cdoc的概念和定义在特定的情况下会表现出某些有趣的现象，
+比如出现在常混沌中的分叉和自相似。
+
+用数学的语言来说，式\,\eqref{dos}\,定义了有理数域上从\octint到\interval{(}{0}{1}{]}的一个映射
+\footnote{易知该映射既不是一个单射也不是一个满射：比如\myfrac{21}{20}和\myfrac{28}{15}这
+两个频率比对应于同一个\cdos\myfrac{1}{420}，所以它不是单射；又比如没有任何一个频率比对应到\myfrac{1}{5}这个\cdos，
+所以它不是满射。}。由于有理数的稠密性，\octint上的有理数有无穷多个，不过像自然数一样，它是一种
+可列的\kh{enumerable}或可数的无穷，而不像实数一样为不可数无穷，亦即我们可以像自然数一样按某种关系
+把所有的有理数进行排序，在这种排序下我们可以说
+“第几个”或“前几个”有理数，而在实数的情况下这种说法将失去意义。由于有理数的稠密性，我们没有
+办法把\octint上的有理数按大小排序，但参照经典的“对角线”方法
+\footnote{德国数学家康托尔\kh{Georg Cantor，\nn{1845}{1918}}在\N{1895}年发表的一篇文章中给出了一种将所
+有有理数排序的“对角线”方法，以此证明有理数和自然数“一样多”。参见\CITE{math2}第\NN{61}{62}页。}，
+我们可以对\octint上的有理数进行类似的排序，并把该序列简称为\keyword{\diagseq}。
+图\,\ref{fig_diag_arrow}\,为这种排序方式的示意图。其中横坐标的取值代表分母，纵坐标的取值代表分子，
+整数坐标的格点代表有理数，而\octint上的有理数都限定在两条斜线围成扇形区域中。图中圆点代表\diagseq
+中的有理数，箭头的方向从序列中的前一点指向其后继点。可见这种排序的方法分内外两个循环，外循环是
+分母从\N{1}开始按自然数的顺序取值，内循环是在给定分母的情况下对分子也按自然数的顺序排序，同时满足
+分数的值在\octint上并剔除重复即相等的分数\footnote{如果某个点对应的分数不是真分数\kh{即分子与分母
+不互素}，则它必定代表一个重复的分数。}。
+
+图\,\ref{fig_diag_dot}\,为一个局部区域内的\diagseq中的点，它们组成了的一种“风格”别致的图案。
+可以看到，素数分母对应的扇形区域内的纵向点列，以及素数分子对应的横向点列，除去两端可能
+代表\N{1}或\N{2}的点外，全都是序列中的点，它们构成了图案中纵向和横向的连续点列。
+
+\begin{figure}[htpb] 
+  \begin{minipage}[h]{0.5\textwidth} 
+    \centering 
+    \includegraphics[width=.9\textwidth]{diag_arrow} 
+	\figcaption{\diagseq的生成顺序}\label{fig_diag_arrow}
+  \end{minipage}% 
+  \begin{minipage}[h]{0.5\textwidth} 
+    \centering 
+    \includegraphics[width=.9\textwidth]{diag_dots} 
+	\figcaption{\diagseq的点阵图案}\label{fig_diag_dot}
+  \end{minipage}% 
+\end{figure}
+
+在\diagseq中，频率比\kh{或音程}及其对应的\cdos大小都呈无序排列。如图\,\ref{fig_diag_trend}\,中
+前\N{100}项的变化趋势所示，随着序号的增长，频率比\kh{或音程}在\octint之间来回振荡，不收敛于
+任何值；对应的\cdos虽有局部振荡，却收敛于\N{0}。
+
+\begin{figure}[htpb]
+\centering \includegraphics[width=.9\textwidth]{diag_trend}%{diag_ratio_doc}
+\figcaption{\diagseq的频率比与\cdoc的变化趋势}\label{fig_diag_trend}
+\end{figure}
+
+为了考察大量数据的特点或规律，一个常用的方法就是把这些数据按某种方式画出来，形成平面的或立体的图像，
+以充分利用我们的直觉来寻找规律。图\,\ref{fig_diag_4in1}\,是把序号作为横坐标、频率比作为纵
+坐标画出的\diagseq的四幅平面点分布图，分别取\diagseq的前\N{500}、\N{1\:000}、\N{2\:000}和\N{10\:000}项。
+首先可以看出点的分布并不是杂乱的，而是呈现出一定的直线或曲线图案；另外在靠近纵轴附近有分叉的现象，
+并且随着点数的增多，分叉也增多并呈现出某种自相似的味道。应该指出，图中这种“分叉现象”
+是由于项数的增加导致点图被“横向压缩”后而出现的一种视觉效果。如果采用一致的横向比例，那么相同的
+部分点列所呈现的图案将完全相同。
+
+\begin{figure}[htpb]
+\centering \includegraphics[width=.9\textwidth]{diag_4in1}%diag_ratio_4in1}
+%\centering \includegraphics[width=.9\textwidth]{diag_ratio_4in1}
+\figcaption{\diagseq的频率比分布图}\label{fig_diag_4in1}
+\end{figure}
+
+我们虽然无法按照音程或者对应的\cdoc的大小给整个\diagseq重新排序，但是我们却总是可以给这个序列的
+前\,$n$\,项重新排序。我们把这样一个按音程从小到大排序的序列简称为\keyword{\ratioasc}，把按音程所对
+应的\cdoc从大到小排序的序列简称为\keyword{\docdes}\kh{由于音程到\cdoc的映射不是单射，我们还需要在把
+对应于同一个\cdoc的音程再按照分母的大小局部排序，比如约定分母越小越靠前}。应该强调指出，\ratioasc和
+\docdes只有在确定了\diagseq的前\,$n$\,项后才有意义，没有一个确定的\,$n$\,就没有一个确定的\ratioasc和
+\docdes。
+
+作为一个例子，表\,\ref{tab_seq}\,列出了当\,$n$\,取\N{12}时的\diagseq、\ratioasc与\docdes。
+
+{\small\fs{
+		\begin{table}[htpb]
+			\centering
+			\setlength{\belowrulesep}{0mm} 
+			\setlength{\aboverulesep}{0mm}
+			\tabcaption{\diagseq、\docdes和\ratioasc}\label{tab_seq}
+			\begin{tabular}{r *{3}{||c r c}}
+				\toprule
+				\rule[0mm]{0mm}{4mm}
+				序 & \multicolumn{3}{c||}{\diagseq} & \multicolumn{3}{c||}{\docdes} & \multicolumn{3}{c}{\ratioasc}\\
+				\cline{2-10}
+				%\rule[0mm]{0mm}{4mm}
+				号 &{\footnotesize频率比}&{\footnotesize音分值}&{\footnotesize\cdoc}
+				  &{\footnotesize频率比}&{\footnotesize音分值}&{\footnotesize\cdoc}
+				  &{\footnotesize频率比}&{\footnotesize音分值}&{\footnotesize\cdoc} \\
+				\midrule
+				1~~ & 1/1 &      0~~ & 1/1  & 1/1 &      0~~ & 1/1  & 1/1 &      0~~ & 1/1\\
+				2~~ & 2/1 & 1\:200~~ & 1/2  & 2/1 & 1\:200~~ & 1/2  & 7/6 &    267~~ & 1/42\\
+				3~~ & 3/2 &    702~~ & 1/6  & 3/2 &    702~~ & 1/6  & 6/5 &    316~~ & 1/30\\
+				4~~ & 4/3 &    498~~ & 1/12 & 4/3 &    498~~ & 1/12 & 5/4 &    386~~ & 1/20\\
+				5~~ & 5/3 &    884~~ & 1/15 & 5/3 &    884~~ & 1/15 & 4/3 &    498~~ & 1/12\\
+				6~~ & 5/4 &    386~~ & 1/20 & 5/4 &    386~~ & 1/20 & 7/5 &    583~~ & 1/35\\
+				7~~ & 7/4 &    969~~ & 1/28 & 7/4 &    969~~ & 1/28 & 3/2 &    702~~ & 1/6\\
+				8~~ & 6/5 &    316~~ & 1/30 & 6/5 &    316~~ & 1/30 & 8/5 &    814~~ & 1/40\\
+				9~~ & 7/5 &    583~~ & 1/35 & 7/5 &    583~~ & 1/35 & 5/3 &    884~~ & 1/15\\
+			 10~~ & 8/5 &    814~~ & 1/40 & 8/5 &    814~~ & 1/40 & 7/4 &    969~~ & 1/28\\
+			 11~~ & 9/5 & 1\:018~~ & 1/45 & 7/6 &    267~~ & 1/42 & 9/5 & 1\:018~~ & 1/45\\
+			 12~~ & 7/6 &    267~~ & 1/42 & 9/5 & 1\:018~~ & 1/45 & 2/1 & 1\:200~~ & 1/2\\
+				\bottomrule
+			\end{tabular}
+	\end{table}
+}}
+
+
+先来看看\docdes。图\,\ref{fig_docdes_2in1}\,是\N{500}和\N{2\:000}项\docdes的频率比分布状况。它和
+图\,\ref{fig_diag_4in1}\,表示的\diagseq的频率比分布总体上没有大的差别，这是因为
+如图\,\ref{fig_diag_trend}\,所展示的那样，\diagseq的\cdoc排序只存在一些局部的振荡，
+大体上还是按照递减的顺序排列的。
+
+\begin{figure}[htpb]
+\centering \includegraphics[width=.98\textwidth]{docdes_2in1}%docdes_ratio_2in1}
+\figcaption{\docdes的频率比分布图}\label{fig_docdes_2in1}
+\end{figure}
+
+再看\ratioasc。如图\,\ref{fig_ratioasc_trend}\,中前\N{500}项的变化趋势所示，
+随着序号的增长，频率比从\N{1}到\N{2}近似线性地递增；对应的\cdos\kh{对数比例}却上下
+起伏，形成一个钟形的图案，如果把这个图案逆时针转\N{90^\circ}，可以看到它在“分叉”等现象上
+和\diagseq或\docdes的频率比分布图相似。
+
+\begin{figure}[htpb]
+\centering \includegraphics[width=.98\textwidth]{ratioasc_trend}
+\figcaption{\ratioasc的频率比与\cdoc的变化趋势}\label{fig_ratioasc_trend}
+\end{figure}
+
+\ratioasc所对应的\cdoc序列实际上描述了一个八度范围内的一些音程即\octint上一些有理数
+对应的\cdoc，对于\octint内的无理数，\ratioasc中则没有对应的项。能否通过某种简单的转换，
+得到\octint上任意实数所对应音程的\cdoc呢？考虑到人耳对音程的分辨率\kh{\N{6}音分}，那么对于任何一个以
+音分值表示的音程，我们以该音分值为中心，以\N{6}为临域半径，可以得到一个音程区间，称之为该音程的“分辨区间”。
+我们假定人耳判断某音程的\cdoc等于其分辨区间内所有音程的\cdoc中的最大值\cdash正如乐观的人总是从好的方面来
+看待事物一样，这个假定也是从“乐观”的角度来确定音程的\cdoc，所以我们称这个假定为“乐观假定”。在乐观假定
+的基础上，我们就可以确定一个八度内任一音程的\cdoc了。将音分值按步长\N{3}从\N{0}增长到\N{1\:200}，求得每一级
+音分值所对应的\cdoc，我们就得到了图\,\ref{fig_cent_doc_steps}\,。
+
+\begin{figure}[htpb]
+\centering \includegraphics[width=.85\textwidth]{cent_doc}%_steps}
+\figcaption{八度内各音程的和谐度}\label{fig_cent_doc_steps}
+\end{figure}
+
+图中横坐标为一个八度内的音分值，纵坐标为音程对应的\cdoc\kh{对数比例}。如果参照表\,\ref{tab_intervals}\,把
+\cdoc\myfrac{1}{40}作为协和与不协和音程的分界线，即以图中\N{0.025}的水平虚线为界，则可以按该图把
+所有的音程分为协和音程和不协和音程。图中还标注出了表\,\ref{tab_seq}\,中所有\N{12}个音程所对应的有理数频率比，
+当然它们按\cdoc“高度”排列的顺序和表\,\ref{tab_seq}\,的顺序完全一致。
+
+将图\,\ref{fig_cent_doc_steps}\,中的协和音程\kh{共\N{10}个}与表\,\ref{tab_intervals}\,中
+列出的\N{8}个常用纯律协和音程相对比，我们发现有两个“特殊的”音程没有出现在
+表\,\ref{tab_intervals}\,中：\myfrac{7}{4}\kh{969音分}和\myfrac{7}{5}\kh{583音分}。
+再对比表\,\ref{tab_intervals}\,和表\,\ref{tab_seq}\,，我们发现以\N{7}为分子的音程\kh{\myfrac{7}{4}、
+\myfrac{7}{5}、\myfrac{7}{6}}都不包括在表\,\ref{tab_intervals}\,中。\myfrac{7}{4}\kh{969音分}通常
+被归入不协和音程的范围，但欧洲哲学家阿诺德·凯泽林\kh{Arnold Keyserling,\NN{1922}{2005}}以该音程为基础在\N{1971}年发明了一种五声
+音阶，他的学生 Ralph C.L.在此基础上作曲，并把这种音乐取名为\,\textit{Chakra Music}或\,\textit{PrimaSounds}\,\ucite{seven1,seven2}。 
+
+
+
+
+\CITE{seven2}:
+\begin{quote}
+It's as if our ears had a built in programming allowing us to hear - if we listen very carefully that is - that the seventh was fundamentally different from other harmonics. It sounds "sour" whereas other basic fractions, intervals, sound "sweet." In more precise musical terminology, the seventh sounds "dissonant," whereas the others sound "consonant." Most musicians with good theoretical training, or a very good ear, have long known about the phenomena of the seventh harmonic. A few physicists studying acoustics also know about the anomaly. But it was just considered one of those many quirks of nature with no special meaning. Arnold Keyserling appears to be the first in modern times to realize the significance of this acoustic phenomenon.
+
+When the acoustic seventh is taken as the basic interval for the creation of a musical scale, new tones and intervals (distances between the notes) result. The 7 to 4 ratio of the natural seventh harmonic creates a new musical scale, a five tone, pentatonic scale. The PrimaSounds scale uses twelve hertz is used as the fundamental tone (12 hertz is the mean value of alpha brain waves which are considered to be brain waves of between 10 to 14 hertz). Some temperament of the scale is then made to create a functioning musical scale. Temperament is a slight adjustment to tone frequencies which is made to preserve octave identity over scales, and is used in most musical scales, not just PrimaSounds. 
+\end{quote}
+
+其中\myfrac{7}{4}\kh{969音分}称为自然七度、
+和声七度或布鲁斯七度\footnote{参见\CITE{temp1}第\N{312}页。}。\myfrac{7}{5}\kh{583音分}？？？
+
+另外，在纯五度\kh{\N{702}音分}的左右两边各存在一个深且宽的“山谷”，它们正好就是\keyword{五度狼音}
+\footnote{狼音\kh{wolf}泛指不和谐的乐音\kh{wolf tone}或不协和的音程\kh{wolf interval}，前者通常是指弦乐器
+如小提琴上由于弦和琴体的共振导致的不和谐乐音，后者是指乐器调音不准或律制内在矛盾所导致一
+种不协和音程。这里的五度狼音属于后者。参见\CITE{temp1}第\NN{187}{189}页，
+以及\CITE{temp3}、\CITE{dict2}。}\kh{wolf fifth}“出没”的区域，我们姑且把这样的“山谷”称为“狼音谷”。不难看出，在纯四
+度\kh{\N{498}音分}、大六度\kh{\N{884}音分}、大三度\kh{\N{386}音分}、小三度\kh{\N{316}音分}和小六度\kh{\N{814}音分}等的
+左右也存在较明显的“狼音谷”。从图中还可以看出，纯协和音程\kh{如纯五和纯四}的增减音程\kh{加减半音即\N{100}音分}都
+变成不协和音程。
+
+
+%TODO:
+和弦的\cdoc
+
+
+\end{appendix}
+
+梁启超先生《清代学术概论》在评价“戴震和他的科学精神”时说：“‘不以人蔽己，不以己蔽人’二语，实震一生最
+得力处。盖学问之难也，初涉其途，未有不为人蔽者；及其稍深入，力求自脱于人蔽，而己旋自蔽矣。非廓然卓然，鉴
+空衡平，不失于彼，必失于此。”师古而不泥于古，尊师而不拘于师。
+
+%##############################################################################
+% 参考文献
+%##############################################################################
+\clearpage
+
+\begin{thebibliography}{99}
+\footnotesize
+\setlength{\parskip}{0mm}
+\bibitem{basic1} 斯波索宾~N~B~著.~音乐基本理论.~汪启璋~译.~北京:~人民音乐出版社,~1958%.~225~页
+\bibitem{basic2} 李重光.~音乐理论基础.~北京:~人民音乐出版社,~1962%.~253~页
+\bibitem{basic3} 该丘斯~柏西~著.~音乐的构成.~缪天瑞~编译.~北京:~人民音乐出版社,~1964%.~198~页
+\bibitem{basic4} 缪天瑞,~林剑.~基本乐理\kh{第二次修订版}.~北京:~人民音乐出版社,~2002%.~234~页
+\bibitem{basic5} 李重光.~简谱读法基础教程.~北京:~中国广播电视出版社,~2001%.~283~页
+\bibitem{basic6} 李重光.~五线谱读法基础教程.~北京:~中国广播电视出版社,~2001%.~311~页
+\bibitem{temp1}  缪天瑞.~律学\kh{第三次修订版}.~北京:~人民音乐出版社,~1996%.~326~页
+\bibitem{temp2}  陈应时.~中国乐律学探微\cdash陈应时音乐文集.~上海:~上海音乐学院出版社,~2004%.~576~页
+\bibitem{hist1}  王光祈.~中国音乐史.~广西:~广西师范大学出版社,~2005%.~189~页
+\bibitem{hist2}  童忠良,~谷杰,~周耘,~等.~中国传统乐学.~福建:~福建教育出版社,~2004%.~448~页
+\bibitem{hist3}  冯文慈.~中国音乐史学的回顾与反思\cdash冯文慈音乐文集.~上海:~上海音乐学院出版社,~2005%.~311~页
+\bibitem{hist4}  吴钊,~刘东升.~中国音乐史略\kh{增订本}.~北京:~人民音乐出版社,~1993%.~428~页
+\bibitem{hist5}  邢兆良.~朱载堉评传.~江苏:~南京大学出版社,~1998%.~355~页
+\bibitem{hist6}  田可文,~陈永.~西方音乐史\kh{修订版}.~湖北:~武汉大学出版社,~2005%.~262~页
+\bibitem{hist7}  Tennenbaum, Jonathan.~\textit{A Brief History of Musical Tuning}.\\
+                 \url{http://www.schillerinstitute.org/music/rev_tuning_hist.html}
+\bibitem{math1}  王青建.~数学史简编.~北京:~科学出版社,~2004%.~401~页
+\bibitem{math2}  克莱因~莫里斯~著.~古今数学思想\kh{第四册}.~邓东皋,~张恭庆,~等译.~上海:~上海科学技术出版社,~2002%.~372~页
+\bibitem{oct1}   Terhardt, Ernst.~\textit{Perception of Auditory Pitch} \& \textit{Perception of Musical Sound}\\
+                 \url{http://www.mmk.ei.tum.de/persons/ter.html}
+                 %\url{http://www.mmk.ei.tum.de/persons/ter/top/octequiv.html}\\
+                 %\url{http://www.mmk.ei.tum.de/persons/ter/top/pitch.html}\\
+                 %\url{http://www.mmk.ei.tum.de/persons/ter/top/virtualp.html}\\
+                 %\url{http://www.mmk.ei.tum.de/persons/ter/top/affinity.html}
+\bibitem{seven1} Keyserling, Arnold.~\textit{The Discovery of PrimaSounds}\\
+                 \url{http://www.primasounds.com/PrimaSounds/arnoldessay.html}
+\bibitem{seven2} Ralph C.L.~\textit{The Seventh Harmonic}\\
+                 \url{http://www.primasounds.com/PrimaSounds/ch13.html}     
+\bibitem{seven3} \url{http://www.reference.com/browse/wiki/Pentatonic_scale}                             
+\bibitem{dict3}  Monzo, Joe.~\textit{Octave Equivalence}\\
+                 \url{http://tonalsoft.com/enc/o/octave-equivalence.aspx}
+\bibitem{temp3}  Lewis, Pierre.~\textit{Understanding Temperaments}\\
+                 \url{http://pages.globetrotter.net/roule/temper.htm}
+\bibitem{dict1}  \url{http://www.dolmetsch.com/}
+\bibitem{dict2}  \url{http://en.wikipedia.org/wiki/Wolf_interval}
+\bibitem{temp4}  Gann, Kyle.~\textit{Just Intonation Explained} \& \textit{An Introduction to Historical Tunings}\\
+                 \url{http://www.kylegann.com/tuning.html}\\
+                 \url{http://www.kylegann.com/histune.html}
+\bibitem{misc1}  Polansky, Larry.~\textit{Pythagorean Comma}\\
+                 \url{http://eamusic.dartmouth.edu/~larry/owt/pythagorean_comma.pdf}
+\normalsize
+\end{thebibliography}
+
+
+
+
+
+\printindex
+
+
+
+
+
+%\fvset{fontsize=\scriptsize,numbers=left,numbersep=5pt,tabsize=2,xleftmargin=10pt,frame=single,baselinestretch=0.9}
+%\VerbatimInput{circle.c}
+
+% 在\end{CJK*}之前加\clearpage可以消除latex报错：: ! Argument of \CJK@XX has an extra }.: <inserted text>  \par : l.81 \end{document}
+\clearpage
+\end{CJK*}
+\end{document}
