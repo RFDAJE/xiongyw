@@ -1,7 +1,7 @@
 created(bruin, 2012-11-27)
 --------------------------
 
-1. The purpose is to extrace the character set of gb2312-80 
+1. The purpose is to extract the character set of gb2312-80 
    from unicode-encoded ttf font (which is usually available
    from Windows). The result TTF font is also unicode-encoded, 
    the gain is purely the size: the original TTF font normally 
