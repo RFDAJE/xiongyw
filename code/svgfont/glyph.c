@@ -23,7 +23,7 @@
 
 /* forward declarations */
 int get_next_glyph(const char* start, unsigned short* ucs2, char** glyph_start, size_t* glyph_size);  
-static int s_is_hit(unsigned short ucs2)
+static int s_is_hit(unsigned short ucs2);
 
 
 
@@ -125,7 +125,7 @@ int get_next_glyph(const char* start,     /* input */
      if(!unicode){ 
          *ucs2 = 0xffff;
      }
-     else{}
+     else{
          if(1 != sscanf(unicode + sizeof(UNICODE_POINT)-1, "%x\"", ucs2)){
              *ucs2 = 0xffff;
          }
