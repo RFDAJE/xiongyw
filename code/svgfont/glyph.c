@@ -1,7 +1,8 @@
 /* 
  * created(bruin, 2012-11-26): extract gb2312 glyphs from a unicode-encoded 
  * svg font file, and output (to stdout) them in svg font file format.
- * last updated(bruin, 2012-11-27)
+ * of course it can also be used to extract other sets of glyphs from a ttf font...
+ * last updated(bruin, 2012-11-28)
  */
 
 #include <sys/types.h>
@@ -77,7 +78,7 @@ int main(int argc, char* argv[])
     /*
      * loop through all the glyphs
      */
-    for(p = p_input_file;;){
+    for(;;){
         r = get_next_glyph(p, &ucs2, &glyph_start, &size);
         if (0 == r){
             /* so we reach the end of the glyphs, print the rest */
@@ -93,8 +94,8 @@ int main(int argc, char* argv[])
                 printf("%c", glyph_start[i]);
         }
 
-        p += size;
-	}
+        p = glyph_start + size;
+    }
 
 EXIT:
     
