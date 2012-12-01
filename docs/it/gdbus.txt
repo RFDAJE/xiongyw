@@ -1,0 +1,17 @@
+------
+|glib|
+======    <--- glib/dbus binding
+|dbus|
+------
+
+
+
+rpm -ql glib glib-devel
+rpm -ql glib2 glib2-devel
+rpm -ql dbus dbus-devel
+rpm -ql dbus-glib dbus-glib-devel
+man 1 dbus-binding-tool
+wget http://mirrors.sohu.com/fedora/releases/17/Everything/source/SRPMS/d/dbus-glib-0.92-3.fc17.src.rpm
+rpm -i dbus-glib-0.92-3.fc17.src.rpm
+man 1 gdbus
+
