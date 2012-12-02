@@ -1,0 +1,498 @@
+http://www.thomasstover.com/uds.html
+
+
+last updated, November 11, 2011
+
+Demystifying Unix Domain Sockets
+
+originally written in February 2006
+
+"Unix Domain Sockets? - I've Heard of Those Before"
+
+The often overlooked Unix domain socket facility is one of the most powerful features in any modern Unix. Most socket programing books for Unix discus the topic merely in an academic sense without ever explaining why it matters or what it is used for. Besides being the only way utilize certain abilities of the operating system, it is an area programers new to Linux, BSD, and other Unices definitely need to be aware of. This is not a tutorial on sockets, rather a review of the features and benefits of one area of sockets programming.
+
+Background and Context
+
+Unix domain sockets are sometimes called "local" sockets. This can be misleading as it implies that it has something to do with a loopback adapter. The closest thing to a Unix domain socket would be a pipe. Unix pipes are an integral cornerstone of the OS at large. Analogous to a water pipe with water flowing in one direction, a stream of bytes flows from the write side of a pipe to the read side. A separate open file descriptor maintains a reference to the read and write side of a pipe. The different sides of the pipe can be in different processes or threads as long as they reside on the same local computer. Let us review the distinguishing characteristics of pipes in Unix.
+
+Writes less than 4kb are atomic
+Pipes can be created and inherited across a fork() call, as well as shared between threads.
+Pipes can also be given a name in the file system. These fifos (or named pipes) exist beyond the lives of processes. Two different processes can obtain a reference to the pipe with open() as opposed to having to inherit a file descriptor.
+Writing to a pipe with a filled buffer results in a SIGSTOP signal.
+Pipes are generally considered to be faster than Unix domain sockets.
+Processes using pipes must still perform context switches with the kernel to use the read() and write() system calls.
+As an exception to the fact that pipes must be written from one side and read from the other, Solaris pipes are full duplex. On Linux and BSD for example, full duplex operations with pipes use two different pipes. Named pipes and unnamed pipes are essentially the same thing with named pipes being created with mkfifo(), and unnamed ones with pipe().
+
+This is not the case with the Windows API. Windows provides two very different facilities, for what it calls named and anonymous pipes. Anonymous pipes are available in all versions of Windows, and behave much like Unix pipes. Besides being slower, there are several other variations such as an adjustable pipe cache size that also effects the threshold for atomic writes. Windows named pipes are roughly analogous to Unix domain sockets. They are only available on the NT derived Windows versions, and do not use the Windows networking socket interface, winsock, at all. Consequently, traditional socket multiplexing strategies such as select() can not be used with Windows named pipes as they can with unix domain sockets. They do have the advantage of reaching across multiple computers over Server Message Block (SMB).
+
+Update: It is also worth mentioning that OS/2 has a named pipe that, depending on what information you are reading, may or may not be able to communicate with Windows named pipes via SMB. Such SMB named pipes can also exist on *nix boxes machines running Samba as part of facilities such as Winbind. Sadly, to my knowledge, there is no way to bridge a Unix domain socket with an SMB named pipe on a Unix environment using Samba without requiring adherence to the Samba project's license restrictions. Other conceivable avenues for such a bridge might involve Cygwin, or even socat.
+
+Update: Another worthwhile comparison to unix sockets is the Linux specific, netlink socket. Netlink sockets are used to comunicate between userspace and kernel space. For instance, to update routing or firewall information. It would be nice to find a good explanation of why another socket type was created instead of simply using unix sockets with perhaps abstract names (mentioned below).
+
+On with It
+
+A unix domain socket exists only inside a single computer. The word domain here has nothing to do with NIS, LDAP, or Windows, and instead refers to the file system. Unix domain sockets are identified by a file name in the file system like a named pipe would be. Programs communicating with a Unix domain socket must be on the same computer so they are not really a networking concept so much as they are an inter-process communication (IPC) concept. This explains why most networking books ignore them. They are interfaced with the same sockets API that is used for TCP/IP, UDP/IP, as well as other supported network protocols. You should be thinking at least two questions right now: "Why would a network program ever support Unix domain sockets as a transport?", and "Why would programs use a unix domain socket for an IPC mechanism instead of pipes, signals, or shared memory?". Here's some quick answers.
+
+Unix domain sockets are secure in the network protocol sense of the word, because:
+they cannot be eavesdropped on by a untrusted network
+remote computers cannot connect to them without some sort of forwarding mechanism
+They do not require a properly configured network, or even network support at all
+They are full duplex
+Many clients can be connect to the same server using the same named socket
+Both connectionless (datagram), and connection oriented (stream) communication is supported
+Unix domain sockets are secure in the IPC sense of the word, because:
+File permissions can be configured on the socket to limit access to certain users or groups
+Because everything that is going on takes place on the same computer controlled by a single kernel, the kernel knows everything about the socket and the parties on both sides. This means that server programs that need authentication can find out what user is connecting to them without having to obtain a user name and password.
+Open file descriptors from one process can be sent to another totally unrelated process
+Parties can know what PID is on the other side of a Unix domain Socket
+The path name for a socket is limited to UNIX_PATH_MAX bytes long. On Linux, this is defined as 108 UNIX(7).
+Not all of these features are available on every Unix. Worse there are variations on the way they are interfaced. Basic operations are pretty universally supported though. Let us move on to some examples.
+
+UPDATE: Many socket programs make use of the socketpair() function. This creates a matched pair of sockets without the usual, protocol specific, build up procedures. Typically this is used to create a socket to be for inter-thread communication, or communication with inherited processes. PF_UNIX is a valid choice for socketpair()'s domain parameter, allowing for another means to create a unix socket.
+
+Basic Connection-Oriented Client & Server
+
+We will start with a very basic client and a forking server. A forking server spawns a new process to handle each incoming connection. After a connection is closed, its handler process exits. This type of server frequently gets a bad reputation due to its poor performance as a web server. The reason it performs poorly as a web server is because with HTTP, every single request is made with its own connection.1 The server thus spends a relatively disproportional amount of time creating and destroying processes versus actually handling requests. What is not commonly understood is that for other types of protocols which maintain a single connection during the entire time the client uses the server, a forking server is considered an acceptable design. Take Open SSH for example. The primary problem with this design for non-web server applications is that it is no longer as straightforward to share information between all the various handler instances. Multiplexing and multi-threaded as well as all sorts of other designs are out there, but the simple fork()ing server is a good as it gets for illustrating examples. Think of it as the "hello world" of server designs. Take the following sources.
+
+1 UPDATE: While it is true that HTTP2's use of persistent connections does mitigate the above significantly, other aspects of why forking server designs might be choosen such as a 1:1 hanlder process to client user paradigm, are still not leveragable for HTTP.
+
+client1.c
+
+#include <stdio.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+#include <string.h>
+
+int main(void)
+{
+ struct sockaddr_un address;
+ int  socket_fd, nbytes;
+ char buffer[256];
+
+ socket_fd = socket(PF_UNIX, SOCK_STREAM, 0);
+ if(socket_fd < 0)
+ {
+  printf("socket() failed\n");
+  return 1;
+ }
+
+ /* start with a clean address structure */
+ memset(&address, 0, sizeof(struct sockaddr_un));
+ 
+ address.sun_family = AF_UNIX;
+ snprintf(address.sun_path, UNIX_PATH_MAX, "./demo_socket");
+
+ if(connect(socket_fd, 
+            (struct sockaddr *) &address, 
+            sizeof(struct sockaddr_un)) != 0)
+ {
+  printf("connect() failed\n");
+  return 1;
+ }
+
+ nbytes = snprintf(buffer, 256, "hello from a client");
+ write(socket_fd, buffer, nbytes);
+ 
+ nbytes = read(socket_fd, buffer, 256);
+ buffer[nbytes] = 0;
+
+ printf("MESSAGE FROM SERVER: %s\n", buffer);
+
+ close(socket_fd);
+
+ return 0;
+}
+
+
+server1.c
+
+#include <stdio.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+
+int connection_handler(int connection_fd)
+{
+ int nbytes;
+ char buffer[256];
+
+ nbytes = read(connection_fd, buffer, 256);
+ buffer[nbytes] = 0;
+
+ printf("MESSAGE FROM CLIENT: %s\n", buffer);
+ nbytes = snprintf(buffer, 256, "hello from the server");
+ write(connection_fd, buffer, nbytes);
+ 
+ close(connection_fd);
+ return 0;
+}
+
+int main(void)
+{
+ struct sockaddr_un address;
+ int socket_fd, connection_fd;
+ socklen_t address_length;
+ pid_t child;
+ 
+ socket_fd = socket(PF_UNIX, SOCK_STREAM, 0);
+ if(socket_fd < 0)
+ {
+  printf("socket() failed\n");
+  return 1;
+ } 
+
+ unlink("./demo_socket");
+
+ /* start with a clean address structure */
+ memset(&address, 0, sizeof(struct sockaddr_un));
+
+ address.sun_family = AF_UNIX;
+ snprintf(address.sun_path, UNIX_PATH_MAX, "./demo_socket");
+
+ if(bind(socket_fd, 
+         (struct sockaddr *) &address, 
+         sizeof(struct sockaddr_un)) != 0)
+ {
+  printf("bind() failed\n");
+  return 1;
+ }
+
+ if(listen(socket_fd, 5) != 0)
+ {
+  printf("listen() failed\n");
+  return 1;
+ }
+
+ while((connection_fd = accept(socket_fd, 
+                               (struct sockaddr *) &address,
+                               &address_length)) > -1)
+ {
+  child = fork();
+  if(child == 0)
+  {
+   /* now inside newly created connection handling process */
+   return connection_handler(connection_fd);
+  }
+
+  /* still inside server process */
+  close(connection_fd);
+ }
+
+ close(socket_fd);
+ unlink("./demo_socket");
+ return 0;
+}
+Armed with some basic knowledge of C, beginner level Unix system programing, beginner level sockets programing, how to lookup man pages, and Google, the above example will help you create a UDS client and server. To try it out open a couple terminal Windows, run the server in one, and the client in the other. After that try adding a something like sleep(15) to the server's connection handler, before it write()s back to the client. Bring up two more terminals, one with another instance of client and the other with top or ps -e, also netstat -ax. Experiment with that for a while. Learn anything?
+
+At this point there are several things we could do with this technology, that is: the ability to have running programs communicate with other arbitrary programs on the same computer. Taking into consideration where in the file system our socket is created and with what permissions, this could allow programs running with different credentials, that started at different times, or even with different login sessions (controlling ttys) to exchange data. A common example of a program that works like this is syslogd. On many unix types, programs use a unix domain socket to pass log messages to the syslog server.
+
+An Authenticated Server
+
+Let us imagine a database server like PostgreSQL. The server can force every client program that connects to it to authenticate itself with a user name and password. It does this so that it can enforce its internal security policies based on what account a client is connecting with. Having to authenticate with a user name / password pair every time can get old so often other authentication schemes such as key pair authentication are used alternatively. In the case of local logins (client is on the same machine as the server) a feature of unix domain sockets known as credentials passing can be used.
+
+This is one area that is going to be different everywhere, so check your reference material. Let us look at how its done in Linux.
+
+The Real Sockets IO API
+
+Those new and old to sockets programming are often unaware that the sockets API actually has its own IO routines: send(), sendto(), sendmsg(), recv(), recvfrom(), and recvmsg(). These functions operate on sockets, not file descriptors. Unix automatically creates a file descriptor for a socket when its created (with the same integer value) so that IO operations can be performed on the socket just as with normal file descriptors, that is with read(), write(), and the like. This is why most of the time the underlying socket IO functions don't need to be used directly. Certain features do require the use of the lower level functions (like UDP). This is also why in Windows with winsock version 2 or greater (this is the version that internally uses the same open source BSD sockets code, unlike winsock 1) the same send/recv socket IO functions are available (all though not advertised). Also note that Windows too, provides a way to use sockets as Windows file HANDLES.
+
+Linux uses a lower level socket function to grab the credentials of the process on the other side of unix domain socket, the multi-purpose getsockopt().
+
+Credentials passing on Linux
+
+ struct ucred credentials;
+ int ucred_length = sizeof(struct ucred);
+
+ /* fill in the user data structure */
+ if(getsockopt(connection_fd, SOL_SOCKET, SO_PEERCRED, &credentials, &ucred_length))
+ {
+  printf("could obtain credentials from unix domain socket");
+  return 1;
+ }
+
+ /* the process ID of the process on the other side of the socket */
+ credentials.pid;
+
+ /* the effective UID of the process on the other side of the socket  */
+ credentials.uid;
+
+ /* the effective primary GID of the process on the other side of the socket */
+ credentials.gid;
+
+ /* To get supplemental groups, we will have to look them up in our account
+    database, after a reverse lookup on the UID to get the account name.
+    We can take this opportunity to check to see if this is a legit account.
+ */
+
+File Descriptor Passing
+
+File descriptors can be sent from one process to another by two means. One way is by inheritance, the other is by passing through a unix domain socket. There are three reasons I know of why one might do this. The first is that on platforms that don't have a credentials passing mechanism but do have a file descriptor passing mechanism, an authentication scheme based on file system privilege demonstration could be used instead. The second is if one process has file system privileges that the other does not. The third is scenarios where a server will hand a connection's file descriptor to another already started helper process of some kind. Again this area is different from OS to OS. On Linux this is done with a socket feature known as ancillary data.
+
+It works by one side sending some data to the other (at least 1 byte) with attached ancillary data. Normally this facility is used for odd features of various underlying network protocols, such as TCP/IP's out of band data. This is accomplished with the lower level socket function sendmsg() that accepts both arrays of IO vectors and control data message objects as members of its struct msghdr parameter. Ancillary, also known as control, data in sockets takes the form of a struct cmsghdr. The members of this structure can mean different things based on what type of socket it is used with. Making it even more squirrelly is that most of these structures need to be modified with macros. Here are two example functions based on the ones available in Warren Gay's book mention at the end of this article. A socket's peer that read data sent to it by send_fd() without using recv_fd() would just get a single capital F.
+
+
+ int send_fd(int socket, int fd_to_send)
+ {
+  struct msghdr socket_message;
+  struct iovec io_vector[1];
+  struct cmsghdr *control_message = NULL;
+  char message_buffer[1];
+  /* storage space needed for an ancillary element with a paylod of length is CMSG_SPACE(sizeof(length)) */
+  char ancillary_element_buffer[CMSG_SPACE(sizeof(int))];
+  int available_ancillary_element_buffer_space;
+
+  /* at least one vector of one byte must be sent */
+  message_buffer[0] = 'F';
+  io_vector[0].iov_base = message_buffer;
+  io_vector[0].iov_len = 1;
+
+  /* initialize socket message */
+  memset(&socket_message, 0, sizeof(struct msghdr));
+  socket_message.msg_iov = io_vector;
+  socket_message.msg_iovlen = 1;
+
+  /* provide space for the ancillary data */
+  available_ancillary_element_buffer_space = CMSG_SPACE(sizeof(int));
+  memset(ancillary_element_buffer, 0, available_ancillary_element_buffer_space);
+  socket_message.msg_control = ancillary_element_buffer;
+  socket_message.msg_controllen = available_ancillary_element_buffer_space;
+
+  /* initialize a single ancillary data element for fd passing */
+  control_message = CMSG_FIRSTHDR(&socket_message);
+  control_message->cmsg_level = SOL_SOCKET;
+  control_message->cmsg_type = SCM_RIGHTS;
+  control_message->cmsg_len = CMSG_LEN(sizeof(int));
+  *((int *) CMSG_DATA(control_message)) = fd_to_send;
+
+  return sendmsg(socket, &socket_message, 0);
+ }
+
+
+ int recv_fd(int socket)
+ {
+  int sent_fd, available_ancillary_element_buffer_space;
+  struct msghdr socket_message;
+  struct iovec io_vector[1];
+  struct cmsghdr *control_message = NULL;
+  char message_buffer[1];
+  char ancillary_element_buffer[CMSG_SPACE(sizeof(int))];
+
+  /* start clean */
+  memset(&socket_message, 0, sizeof(struct msghdr));
+  memset(ancillary_element_buffer, 0, CMSG_SPACE(sizeof(int)));
+
+  /* setup a place to fill in message contents */
+  io_vector[0].iov_base = message_buffer;
+  io_vector[0].iov_len = 1;
+  socket_message.msg_iov = io_vector;
+  socket_message.msg_iovlen = 1;
+
+  /* provide space for the ancillary data */
+  socket_message.msg_control = ancillary_element_buffer;
+  socket_message.msg_controllen = CMSG_SPACE(sizeof(int));
+
+  if(recvmsg(socket, &socket_message, MSG_CMSG_CLOEXEC) < 0)
+   return -1;
+
+  if(message_buffer[0] != 'F')
+  {
+   /* this did not originate from the above function */
+   return -1;
+  }
+
+  if((socket_message.msg_flags & MSG_CTRUNC) == MSG_CTRUNC)
+  {
+   /* we did not provide enough space for the ancillary element array */
+   return -1;
+  }
+
+  /* iterate ancillary elements */
+   for(control_message = CMSG_FIRSTHDR(&socket_message);
+       control_message != NULL;
+       control_message = CMSG_NXTHDR(&socket_message, control_message))
+  {
+   if( (control_message->cmsg_level == SOL_SOCKET) &&
+       (control_message->cmsg_type == SCM_RIGHTS) )
+   {
+    sent_fd = *((int *) CMSG_DATA(control_message));
+    return sent_fd;
+   }
+  }
+
+  return -1;
+ }
+Datagram Unix Domain Sockets
+
+Most of the time programs that communicate over a network work with stream, or connection oriented technology. This is when an additional software layer such as TCP's Nagle algorithm creates a virtual communication circuit out of the many single atomic (stateless) packets used by a underlying packet switched network. Sometimes we want to instead simply work with individual packets, such is the case with UDP. This technology is often called datagram communication. This strategy allows for a variety of trade-offs. One is the ability to make a low overhead, high performance server with a single context or "main loop" that handles multiple simultaneous clients. Although unix domain sockets are not a network protocol they do utilize the sockets network interface, and as such also provide datagram features.
+
+Datagram communication works best with an application that can put a complete atomic message of some sort in a single packet. This can be a problem for UDP as various setbacks can limit the size of a packet to as little as 512 bytes. The limit for datagrams over a unix domain socket is much higher. A complete example is beyond our scope for this article. Those interested should find a UDP example (much easier to find) and combine that with the techniques above. Update: A practical example on this site that does use datagram unix sockets is the PLC data proxy server, dndataserver, from the LAD Tools project. Designing servers this way can be a decent strategy to allow multiple processes to simultaniously share a resource (in this case PLC serial network access), without as much complexity as a connection oriented server. Let us review some of the considerations with datagram unix sockets, before we examine some example code.
+
+If we want want messages (datagrams) from the server to be able to be sent back to the client, then the client will also need to bind to an address.
+The server has to use a sockaddr structure to hold some reference to the client's return address.
+server2.c
+
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(void)
+{
+ int socket_fd;
+ struct sockaddr_un server_address; 
+ struct sockaddr_un client_address; 
+ int bytes_received, bytes_sent, address_length;
+ int integer_buffer;
+ socklen_t address_length = sizeof(struct sockaddr_un);
+
+ if((socket_fd = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0)
+ {
+  perror("server: socket");
+  return 1;
+ }
+ 
+ memset(&server_address, 0, sizeof(server_address));
+ server_address.sun_family = AF_UNIX;
+ strcpy(server_address.sun_path, "./UDSDGSRV");
+ 
+ unlink("./UDSDGSRV");       
+ if(bind(socket_fd, (const struct sockaddr *) &server_address, sizeof(server_address)) < 0)
+ {
+  close(socket_fd);
+  perror("server: bind");
+  return 1;
+ }
+
+ while(1)
+ {
+  /* address_length is the length of the client's socket address structure.
+     Hear this should always be the same since these socets are of type struct sockaddr_un. 
+     However, code that could be used with different types of sockets, ie UDS and UPD should
+     take care to hold and pass the correct value back to sendto on reply.  */
+
+  bytes_received = recvfrom(socket_fd, (char *) &integer_buffer, sizeof(int), 0, 
+                            (struct sockaddr *) &(client_address),
+                            &address_length);
+
+  if(bytes_received != sizeof(int))
+  {
+   printf("datagram was the wrong size.\n");
+  } else {
+   integer_buffer += 5;
+
+   bytes_sent = sendto(socket_fd, (char *) &integer_buffer, sizeof(int), 0,
+                       (struct sockaddr *) &(client_address), 
+                        &address_length));
+  }
+ }
+
+ unlink("./UDSDGSRV");
+ close(socket_fd);
+
+ return 0;
+}
+client2.c
+
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+int main(void)
+{
+ int socket_fd;
+ struct sockaddr_un server_address; 
+ struct sockaddr_un client_address; 
+ int bytes_received, bytes_sent, address_length, integer_buffer;
+ socklen_t address_length;
+
+ if((socket_fd = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0)
+ {
+  perror("client: socket");
+  return 1;
+ }
+       
+ memset(&client_address, 0, sizeof(struct sockaddr_un));
+ client_address.sun_family = AF_UNIX;
+ strcpy(client_address.sun_path, "./UDSDGCLNT");
+
+ unlink("./UDSDGCLNT");
+ if(bind(socket_fd, (const struct sockaddr *) &client_address, 
+         sizeof(struct sockaddr_un)) < 0)
+ {
+  perror("client: bind");
+  return 1;
+ }
+
+ memset(&server_address, 0, sizeof(struct sockaddr_un));
+ server_address.sun_family = AF_UNIX;
+ strcpy(server_address.sun_path, "./UDSDGSRV");
+
+ integer_buffer = 5;
+
+ bytes_sent = sendto(socket_fd, (char *) &integer_buffer, sizeof(int), 0,
+                     (struct sockaddr *) &server_address, 
+                     sizeof(struct sockaddr_un));
+
+ address_length = sizeof(struct sockaddr_un);
+ bytes_received = recvfrom(socket_fd, (char *) &integer_buffer, sizeof(int), 0, 
+                           (struct sockaddr *) &(server_address),
+                           &address_length);
+
+ close(socket_fd);
+
+ if(bytes_received != sizeof(int))
+ {
+  printf("wrong size datagram\n");
+  return 1;
+ }
+
+ printf("%d\n", integer_buffer);
+
+ return 0;
+}
+Update: Broadcast Datagrams
+
+The other main reason datagrams are used in network programming is in broadcast and multicast tasks. Unfortunately, there is no broadcast mechanism in Unix domain sockets. Unix provides the killpg() call for sending a signal to all members of a process group. This can be used to implement a broadcast facility of sorts, potentially in conjunction with shared memory. Linux specifically, also has the futex() call which also has the ability signal more than one process. On Windows, take a look at the mail slots IPC facility.
+
+Abstract Names
+
+Another Linux specific feature is abstract names for unix domain sockets. Abstract named sockets are identical to regular UDS except that their name does not exist in the file system. This means two things: file permissions do not apply, and they can be accessed from inside chroot() jails. The trick is to make the first byte of the address name null. Look at the output from netstat -au to see what it looks while one of these abstract named sockets is in use. Example:
+
+setting the first byte to null
+
+ address.sun_family = AF_UNIX;
+ snprintf(address.sun_path, UNIX_PATH_MAX, "#demo_socket");
+ 
+ address.sun_path[0] = 0;
+
+ bind(socket_fd, (struct sockaddr *) &address, sizeof(struct sockaddr_un));
+Conclusion
+
+Even if you never need to directly program UD sockets, they are an important facet of understanding both the Unix security model and the inter-workings of the operating system. For those that do use them, they open up a world of possibilities.
+
+
+Further Reading
+
+     
+
+
+Contributing Credits
+
+November 2011 Jeffery D. Wheelhouse noticed the CMSG_SPACE(int) macro calls should actually be CMSG_SPACE(sizeof(int)) in the file descriptor passing code.
+
+May 2011 Mayer Alexander noticed the socket length parameter to many of the system calls was completely wrong.
+
+May 2011. Dennis Lubert wrote in about errors he found in the file descriptor code examples. Then he helped fix my fixes to those errors. :)
+
+April 2011. Adam Ludwikowski was kind enough to send in several spelling and typographical corrections.
+
+
+? 2006 - 2012 C. Thomas Stover
+
+cts at thomasstover.com
