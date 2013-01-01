@@ -1,0 +1,341 @@
+---------- Forwarded message ----------
+From: Mark S. Miller <erights@google.com>
+Date: Tue, Nov 16, 2010 at 3:44 PM
+Subject: "Future of Javascript" doc from our internal "JavaScript Summit"
+last week
+To: javascript-standard@google.com
+ 
+On November 10th and 11th, a number of Google teams representing a variety
+of viewpoints on client-side languages met to agree on a common vision for
+the future of Javascript.
+ 
+This document
+<
+https://docs.google.com/a/google.com/document/d/1aPluaNecjfam8MbF_ewsKRYh55klKM7xXQ8Bf4TCBTc/edit?hl=en
+ 
+is the result. It was first announced on Buzz at
+<
+http://www.google.com/buzz/a/google.com/komoroske/VxgE3F2yPyg/On-November-10th-and-11th-a-number-of-Google-teams
+ 
+Please forward this message to people and groups that should know about
+this. This internal list, javascript-standard@google.com, is the place we
+should have the Google-wide discussion of this document and these issues. If
+you'd like to join this discussion, please subscribe at <
+https://groups.google.com/a/google.com/group/javascript-standard/topics>.
+ 
+Executive Summary
+ 
+Javascript has fundamental flaws that cannot be fixed merely by evolving the
+language.  We'll adopt a two-pronged strategy for the future of Javascript:
+ 
+   - Harmony (low risk/low reward): continue working in conjunction with
+   TC39 (the EcmaScript standards body) to evolve Javascript
+   - Dash (high risk/high reward): Develop a new language (called Dash) that
+   aims to maintain the dynamic nature of Javascript but have a better
+   performance profile and be amenable to tooling for large projects. Push for
+   Dash to become an open standard and be adopted by other browsers. Developers
+   using Dash tooling will be able to use a cross-compiler to target Javascript
+   for browsers that do not support Dash natively.
+ 
+That¡¯s the 10,000 foot overview.  For more detail (including an FAQ), read
+on...
+------------------------------
+ 
+Future of Javascript State of affairs Building delightful applications on
+the web today is far too difficult.  The cyclone of innovation is
+increasingly moving off the web onto iOS and other closed platforms.
+Javascript has been a part of the web platform since its infancy, but the
+web has begun to outgrown it.   The web development community has been
+backed into using large amounts of JS largely to work around the
+deficiencies in the platform.   Complex web apps--the kind that Google
+specializes in--are struggling against the platform and working with a
+language that cannot be tooled and has inherent performance problems. Even
+smaller-scale apps written by hobbyist developers have to navigate a
+confusing labyrinth of frameworks and incompatible design patterns.
+ 
+The web has succeeded historically to some extent in spite of the web
+platform, based primarily on the strength of its reach.  The emergence of
+compelling alternative platforms like iOS has meant that the web platform
+must compete on its merits, not just its reach.  Javascript as it exists
+today will likely not be a viable solution long-term.  Something must
+change.
+Overview of two-pronged solution
+There are two ways to approach the problem: either we can try to evolve
+Javascript, or we can push for a new language that addresses core problems
+in Javascript that can¡¯t be repaired easily or quickly.
+ 
+The ¡°evolve Javascript¡± option is relatively low risk, but even in the best
+case it will take years and will be limited by fundamental problems in the
+language (like the existence of a single Number primitive).  Javascript has
+historical baggage that cannot be solved without a clean break. Thus,
+although it¡¯s low risk, it¡¯s also relatively low reward.
+ 
+The ¡°clean break¡± option is extremely high risk--it will be a huge challenge
+to convince other browser vendors to rally around a new language--but is the
+only way to escape the historic problems with Javascript.  Thus, its high
+risk is matched by the potential for a very high reward--a classic leapfrog
+strategy.
+ 
+Pursuing either strategy in isolation is likely to fail.  The evolve
+Javascript strategy, if executed in isolation, leaves the web in a hobbled
+state and unable to compete against the encroachment of other, less open
+platforms.  The clean break strategy, in isolation, would leave us in an
+undesirable situation if it were to fail--Javascript evolution would have
+slowed down or evolved in undesirable ways without our support, we would
+still have the fundamental flaws, and--worst of all--Google¡¯s leadership
+position on the web would be seriously damaged.
+ 
+The only solution is to execute the two strategies in parallel.  When the
+leapfrog attempt succeeds (that is, it is an open standard and browsers
+covering a majority of market share implement it), web programmers will have
+a viable and superior alternative to JavaScript.
+Harmony: Evolving Javascript
+It is paramount that Google continue to maintain a leadership position on
+important open web standards such as Harmony.  Harmony is the name of the
+agreed trajectory of EcmaScript in TC39. Our JS++ project (part of the
+larger Parkour project) will join with our Caja project¡¯s efforts to advance
+Harmony. Together, we will focus on improving the public Harmony spec and
+helping drive it forward at a faster pace in external standard committees
+and by leading by example in Chrome wherever possible.
+ 
+In order to help speed up what can be a long and drawn out standardization
+process, the  internal Harmony effort will experiment using a preprocessor
+on top of V8 to prototype features in a way that allows real code to be
+written against the proposal.  Details of this approach are yet to be
+determined.  The effort will also work with other browser vendors (e.g.
+Mozilla) to get experimental support included, providing further pressure to
+get Harmony standardized and widely implemented quickly.  Harmony will be
+implemented in V8 and JSC (Safari) simultaneously to avoid a WebKit
+compatibility gap.
+ 
+Developers who can focus solely on Chrome can expect to be able to see some
+Harmony features in Chrome (behind a flag) by the middle of 2011. Developers
+focusing on all browsers will have to wait multiple years for direct Harmony
+support, due to the relatively slow pace of the standardization process. To
+enable Harmony developers to target all earlier browsers, we will enhance
+our source-to-source translators (such as Caja¡¯s ES5-to-ES3 translator) to
+translate from a large subset of Harmony to earlier versions of JavaScript.
+ 
+Harmony will continue to be evangelized by Google externally as the
+evolution of Javascript.   The audience for Harmony is developers currently
+building on the web platform who wish to write standards-compliant
+JavaScript.  GWT, JSCompiler, and Caja continue to offer tooling support for
+Harmony for those that need it.
+Dash: The Clean Break
+Dash is the leapfrog effort that is designed to be a clean break from
+Javascript.  It will seek to keep the parts that have made the Internet so
+successful, but fill in holes everyone agrees it has.
+ 
+Dash is designed with three perspectives in mind:
+ 
+   - Performance -- Dash is designed with performance characteristics in
+   mind, so that it is possible to create VMs that do not have the performance
+   problems that all EcmaScript VMs must have.
+   - Developer Usability -- Dash is designed to keep the dynamic,
+   easy-to-get-started, no-compile nature of Javascript that has made the web
+   platform the clear winner for hobbyist developers.
+   - Ability to be Tooled -- Dash is designed to be more easily tooled (e.g.
+   with optional types) for large-scale projects that require
+   code-comprehension features such as refactoring and finding callsites.
+    Dash, however, does not require tooling to be effective--small-scale
+   developers may still be satisfied with a text editor.
+ 
+Dash is also designed to be securable, where that ability does not seriously
+conflict with the three main goals.
+ 
+Dash will be designed to be consumed in a number of locations:
+ 
+   - Browser VM -- Our aspiration is that Dash will ultimately be a viable
+   substitute for Javascript as the native client-side language of choice
+   across all browsers.
+   - Front-end Server -- Dash will be designed as a language that can be
+   used server-side for things up to the size of Google-scale Front Ends.  This
+   will allow large scale applications to unify on a single language for client
+   and front end code.
+   - Dash Cross Compiler -- Dash will be designed so that a large subset of
+   it can be compiled to target legacy Javascript platforms so teams that
+   commit to using Dash do not have to seriously limit their reach.  Platforms
+   that have a Dash VM can operate on the original Dash code without
+   translation and take advantage of the increased performance.  One of the
+   ways we will evolve Harmony is to be a better target for such compiled Dash
+   code.
+ 
+The goal of the Dash effort is ultimately to replace JavaScript as the
+lingua franca of web development on the open web platform.  We will
+proactively evangelize Dash with web developers and all other browser
+vendors and actively push for its standardization and adoption across the
+board.   This will be a difficult effort requiring finesse and
+determination, but we are committed to doing everything possible to help it
+succeed.
+ 
+While Dash is catching on with other browsers, we will promote it as the
+language for serious web development on the web platform; the compiler
+allows such developers to target other browsers before those browsers
+implement Dash.
+ 
+The Dash language effort will be driven by Lars Bak and his team in the
+Aarhus office.  Bruce Johnson¡¯s team in Atlanta will handle the tooling, and
+Pavel Feldman in STP will provide Web Inspector level support for Dash and
+Harmony.
+ 
+Dash will be spec complete and have working bits for the browser in Q1 2011.
+ Developers who can focus solely on Chrome can expect to be able to rely on
+some Dash features built into Chrome within a year.  Developers focusing on
+all browsers will have to make use of the Dash cross compiler to target
+other browsers, and, depending on the success of the evangelizing effort,
+might have to wait years for other browsers to implement native support for
+Dash.
+ 
+Although Dash is in the early stages of development, work is progressing
+rapidly.  You can learn more about the current proposal in this
+presentation<https://docs.google.com/a/google.com/present/view?id=c6b9wv4_27fzwwsddk&revision=_latest&start=0&theme=google&cwj=true>.
+ 
+FAQ Who authored this document?
+Brad Abrams, Erik Arvidsson, Lars Bak, Darin Fisher, Dimitri Glazkov, Dan
+Grove, Peter Hallam, Bruce Johnson, Alex Komoroske, John Lenz, Kasper Lund,
+Mark Miller , Ivan Posva, Alex Russell, and Joel Webber, who collectively
+represent TC39 (the EcmaScript standards body), WebKit, Parkour, Brightly,
+JSPrime, JS++, Closure, JSCompiler, V8, Dash, Joy, and GWT, among others.
+ 
+What happened to JSPrime?
+The JSPrime effort was begun to unify and be a (single!) successor to GWT
+and Closure/JSCompiler, suitable for large-scale development inside and
+outside Google, including being amenable to IDE-like tools and static
+compiler optimizations. The JSPrime team is happily folding its efforts into
+Dash now that everyone agrees Dash will explicitly include the same goals.
+ 
+What happened to JS++?
+The collection of features under the JS++ umbrella have been folded into
+Google efforts around the Harmony Javascript effort.   We continue to seek
+to improve the Javascript language to allow developers to better take
+advantage of our DOM improvements.  This is a better plan because it gives
+us fewer independent Javascript evolution vectors.
+ 
+What happened to Joy?
+The Joy templating and MVC systems are higher-level frameworks that will be
+built on top of Dash.
+ 
+Where can I learn more about Dash?
+Dash is still in the early stages of development, but work is progressing
+rapidly.  For an early look at the current proposal, see this
+presentation<https://docs.google.com/a/google.com/present/view?id=c6b9wv4_27fzwwsddk&revision=_latest&start=0&theme=google&cwj=true>
+.
+ 
+How will Dash interoperate with the huge body of existing JavaScript
+(JQuery, Analytics, etc)
+Moving to a new language will be a very large undertaking.  The specifics of
+how inter-operation with current Javascript would work is still an open
+question.
+ 
+What about the existing code bases for large Google Apps?  Won¡¯t they have
+to rebuild everything to take advantage of Dash?
+The Dash Cross Compiler should be capable of taking typed Closure code (with
+some restrictions) and converting to Dash.  Although the migration process
+won¡¯t be fully automatic, it should make moving over to a Dash codebase
+somewhat easier.
+ 
+How does this affect Web Inspector?
+Web inspector will continue to support Javascript including any new features
+of Harmony that we add to chrome.
+ 
+How does this affect our cloud IDE (Brightly)?
+Brightly will enable building any web application in V1 using today¡¯s
+Javascript plus the additions in Harmony.  As soon as it is ready, Brightly
+will support Dash as well.  We expect that the more prescriptive development
+aspects of Brightly that will come on line in the future will be more Dash
+focused.
+ 
+We expect Brightly itself to be the first application written in Dash.
+ 
+How will we get Harmony related changes into Chrome?
+Very carefully ;-).  V8 is carefully tuned for speed with the current
+Javascript standard rather than flexibility--this makes it very difficult to
+make experimental changes.   We are considering pre-processors and a number
+of other options, but ultimately the precise solution is still an open
+question.
+ 
+What about Go?
+Go is a very promising systems-programming language in the vein of C++.  We
+fully hope and expect that Go becomes the standard back-end language at
+Google over the next few years.   Dash is focused on client (and eventually
+Front-end server development).  The needs there are different (flexibility
+vs. stability) and therefore a different programming language is warranted.
+ 
+Will Dash run on the Server?  Android?
+Yes, but short term we are focused on the client.
+ 
+Does Dash replace Java?
+For many projects that will be a viable option but it requires significant
+engineering effort on Dash tooling and an extensive set of libraries.
+ 
+Is Dash statically typed and toolable?
+Dash is optionally-typed and with judicious use of types is as toolable as
+Java.  This enables ¡°grown up¡± developer tools such as code-refactoring,
+while still allowing small-scale or experimental projects the flexibility
+that dynamism provides.
+ 
+What is the future of the JSCompiler and GWT?
+JSCompiler and GWT were already on a merger path.  This effort gives us a
+direction for that unification around the Dash language.  We will actively
+support teams for a long time on the current generation of JSCompiler and
+GWT and provide fantastic co-existence and migration tools to Dash.
+ 
+Why are you killing Javascript?
+We are not!  Google has a huge interest in keeping the evolution of
+Javascript on track.  In fact, our investment in TC39 (the Javascript
+standards body) will likely increase somewhat, and we will continue to
+honestly and whole-heartedly improve the language within the constraints.
+ 
+What are the time frames?
+The Dash VM and Dash Cross Compiler will be developed in parallel with the
+language specification, and so should be available not long after the spec
+is settled (likely in early 2011).  However, the initial versions will not
+be heavily optimized (and thus not necessarily ready for production apps)
+until later (likely later 2011).
+ 
+Experimental Harmony features will begin showing up in Chrome (behind a
+flag) by midway through 2011, and will later be implemented simultaneously
+in V8 and JSC (Safari¡¯s Javascript engine) to avoid a WebKit compatibility
+gap.
+ 
+Why do you have two projects?  Why not just one?
+See the section above about why we¡¯re pursuing a two-pronged strategy.
+ 
+What will Google developers be using?
+We will strongly encourage Google developers start off targeting Chrome-only
+whenever possible as this gives us the best end user experience.  However,
+for some apps this will not make sense, so we are building a compiler for
+Dash that targets Javascript (ES3). We intend for existing Google teams
+using GWT and JSCompiler to eventually migrate to the Dash compiler.
+ 
+What if other browsers don¡¯t follow us with Dash?
+Lars has promised to ¡°sweet talk¡± the other browser vendors and, while we
+are all eager to see this, we recognize this is a very difficult road.  Our
+approach is to make an absolutely fantastic VM/Language and development
+environment and build great apps that fully leverage it in order to help
+other browsers see the wisdom in following.   Once Dash has had a chance to
+prove its stability and feasibility, we are committed to making Dash an open
+standard with involvement from the broader web community.
+ 
+However, in the event that other browsers don¡¯t follow, Dash can still be a
+success.  Developers that target only Chrome can rely on the Dash VM, and
+developers that target other browsers as well can still make use of the Dash
+compiler.  In this event, the wider web will be stuck with Javascript as the
+standard language--and that¡¯s precisely why we must continue investing in
+evolving Javascript.
+ 
+Why are you circumventing the standards process?
+We fully intend to cooperate fully with standards processes--the problem is
+that the current standard processes are limited to Javascript, which is not
+viable in the long term.  Any effort with the historic baggage that
+Javascript has will be extremely limited.  We need to make a clean break,
+make progress, and then engage the community.
+ 
+What will we say at Google IO about Dash/Harmony?
+Google deeply cares about the web.  We care about making the web
+incrementally better today (Harmony) as well as making it substantially
+better in the future (Dash).  Large scale applications should probably build
+on Dash; smaller-scale developers might want to stick with Harmony until the
+Dash standard gains ubiquity.  Given that Dash is such a big bet we are
+likely to spend much more time at IO on Dash, though of course we will spend
+some time on the leadership position Google is taking in Harmony.
