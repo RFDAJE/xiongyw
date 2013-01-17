@@ -1,0 +1,38 @@
+- abort: c-g
+- full cmd: m-x
+
+- exit: c-x c-c
+- suspend: c-z
+
+- open file: c-x c-f
+- replace file: c-x c-v
+- save file: c-x c-s
+- write file: c-x c-w
+
+- select buff: c-x b
+- kill buff: c-x k
+- list buffs: c-x c-b
+- buff r/o: c-x c-q
+
+- close win: c-x 0
+- single win: c-x 1
+- two hori wins: c-x 2
+- two vert wins: c-x 3
+- other win: c-x o
+
+- line number: ?
+
+- line wrap: m-x toogle-truncate-lines
+
+- cut line: c-k
+- cut region: c-w
+- copy: m-w
+- yank: c-y
+
+- undo: c-x uo
+
+- to buf head: m<
+- to buf tail: m>
+- page down: c-v
+- page up: m-v
+- center line: c-l
