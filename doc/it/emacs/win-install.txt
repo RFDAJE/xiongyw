@@ -1,0 +1,35 @@
+http://www.claremontmckenna.edu/pages/faculty/alee/emacs/emacs.html
+
+Installing Emacs on Windows 95/98/2K/NT/ME/XP/Vista/Windows 7
+
+July 3, 2012
+
+Many people have successfully installed emacs on Windows 95, 98, 2K, NT, ME, XP, Vista, and Windows 7 using the instructions below.
+
+Disclaimer: This page is being maintained mainly for my students. Use these instructions at your own risk if you are not a student taking one of my classes. There is no warranty in any form or shape whatsoever! There is no guarantee that these instructions are up-to-date although I will try to update them for my students on an on-going basis. With that understood you may continue with the rest of this page if you choose to accept these terms.
+
+Emacs version 24.1: This was the latest version available at the time of this writing (July 3, 2012).
+
+Follow these steps to download and install Emacs on your windows machine. There is no room for creativity here; you must follow the directions exactly - every single word.!.
+
+Pick the drive and a folder in which you want to install Emacs. I'll assume that it is C:\emacs, but you can choose a different one. If you choose a different drive or a different folder, you'll need to adapt the directions below accordingly.
+Create an empty folder C:\emacs.
+Go here and download the following (or the latest version if you find a newer one) at the bottom of that page into the folder that you created above:
+emacs-24.1-bin-i386.zip    30-Jul-2009 01:10   46M  
+      
+      At this point, you should have one file named emacs-24.1-bin-i386.zip of about 46 megabytes in the C:\emacs folder. Check to be sure.
+      Click on that file using Windows Explorer to extract files from that archived file. Your extracted files should go into C:\emacs folder. Once extraction is done, you will see a folder named emacs-24.1 under C:\emacs. Under emacs-24.1, you will see other folders including bin, etc, info, etc. At this point, you have downloaded and placed the files in the right places.
+      Depending on the operating system that you use, choose one of the following paths:
+      95 or 98: edit your autoexec.bat file and add this line:
+      set HOME=C:\emacs\
+             
+	     You will probably find autoexec.bat on your C: drive. Edit it with Notepad. You can't edit it by clicking on it. Start Notepad and then open it with the File menu in Notepad.
+	     2K, ME, XP, Vista: add HOME as an environment variable. Follow Start > Settings > Control Panel > System. Then select Advanced followed by Environment Variables. Then, add HOME as a user variable with its value C:\emacs\.
+	     Windows 7: add HOME as an environment variable. Follow Start > Control Panel > System and Security > System > Advanced system settings. Then select Advanced followed by Environment Variables. Then, add HOME as a user variable with its value C:\emacs\. (Note that this may be somewhat site dependent.)
+	     Restart your machine.
+	     Let's run emacs now. At this point, you might want to create an icon on your desktop for the Emacs that you just installed. Go to the C:\emacs\emacs-24.1\bin folder using Windows Explorer. There you will find a file named runemacs.exe. Create a shortcut, then you will see a file named runemacs.exe - Shortcut. Before you take it to the desktop or to the dock, you might want to change the default 'Start in' folder. Change it to whatever you like through the Properties menu of the shortcut file. In my case, I changed it from C:\emacs\emacs-24.1\bin to C:\alee, which is my home folder. Your emacs will use that folder as the base folder when it looks for a file to edit. Now, you are ready to take it to the desktop or the dock so that you can use it to run Emacs from there. Now, you should be in business - run it! If it doesn't work, you've made a mistake in one of the steps above. Double and triple check.
+	     Now you are ready to customize your emacs a little so that it will recognize the syntax of the source file that you will edit, e.g., Java files with the .java extension. Download init.txt to C:\emacs\.emacs.d\init.txt by right-clicking on the link. Yes, there should be a folder named .emacs.d by now since you have run emacs at least once by now. Download init.txt into that folder. Now, rename init.txt to be init.el. (Sorry about this extra step - it is due to the local peculiarity that I don't want to explain.)
+	     If you want to clean up a little, you may delete emacs-24.1-bin-i386.zip at this point. You still need .emacs.d and emacs-24.1 in the C:\emacs folder though.
+	     To learn how to use Emacs, try Emacs Tutorial that you can find under the Help menu in the Emacs window. Or, if you want a simpler version, try this tutorial that I wrote.
+	     [Only optionally because I want this to be a simple page that shows just enough to get started.] To learn how to customize Emacs or simply to see more help on it, try Emacs Help Guide by Hemant Kumar. (That site will talk about .emacs file, which is the unix/linux version of init.el.) I am sure there are many other sources of information on emacs out there, e.g., GNU Emacs FAQ For MS Windows, but Paul Fiorillo found this site.
+	     Maintained by Art Lee (alee at cmc dot edu). Last modified 09/10/2012 16:14:03 . . .
