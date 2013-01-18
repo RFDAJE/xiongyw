@@ -28,7 +28,7 @@
 - copy: m-w
 - yank: c-y
 
-- undo: c-x uo
+- undo: c-x u
 
 - to buf head: m<
 - to buf tail: m>
@@ -48,3 +48,5 @@ question part:
 - jump to a specific line
 - brace match (visual display, and jump back and forth)
 - reference searches in project: list all occurance in the project (like SourceInsight)
+- shell mode
+- reload .emacs or init.el
