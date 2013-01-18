@@ -20,7 +20,6 @@
 - two vert wins: c-x 3
 - other win: c-x o
 
-- line number: ?
 
 - line wrap: m-x toogle-truncate-lines
 
@@ -36,3 +35,16 @@
 - page down: c-v
 - page up: m-v
 - center line: c-l
+
+- line number: (require 'linum) (global-linum-mode 1)
+
+===================================
+question part:
+
+- search: change case-sensitive
+- search: match whole word or not
+- search within the file: search the focused item, then "persistently"
+  highlight all in the file or function, dismiss the highlight; move back and forth
+- jump to a specific line
+- brace match (visual display, and jump back and forth)
+- reference searches in project: list all occurance in the project (like SourceInsight)
