@@ -21,10 +21,10 @@
 - other win: c-x o
 
 
-- line wrap: m-x toogle-truncate-lines
-
-- cut line: c-k
+- cut to ^: c-u 0 c-k
+- cut to $: c-k
 - cut region: c-w
+
 - copy: m-w
 - yank: c-y
 
@@ -35,8 +35,16 @@
 - page down: c-v
 - page up: m-v
 - center line: c-l
+- goto line: m-x goto-line, m-g g
+
+- line wrap: m-x toggle-truncate-lines
+             m-x auto-fill-mode
+             (toggle-truncate-lines 0)
+             (auto-fill-mode 0)
 
 - line number: (require 'linum) (global-linum-mode 1)
+- reload .emacs or init.el: m-x eval-buffer
+- scale/reset font size: c-x c-=/-/0
 
 ===================================
 question part:
@@ -49,4 +57,7 @@ question part:
 - brace match (visual display, and jump back and forth)
 - reference searches in project: list all occurance in the project (like SourceInsight)
 - shell mode
-- reload .emacs or init.el
+- etags
+- moving region left/right with tab
+- tab2space
+- function body fold/unfold
