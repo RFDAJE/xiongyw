@@ -44,6 +44,7 @@
 
 - line number: (require 'linum) (global-linum-mode 1)
 - reload .emacs or init.el: m-x eval-buffer
+- eval expression in buffer: put the point after the expression, c-x c-e
 - scale/reset font size: c-x c-=/-/0
 
 ===================================
