@@ -4,7 +4,7 @@
 - exit: c-x c-c
 - suspend: c-z
 
-- open file: c-x c-f
+- find-file: c-x c-f
 - replace file: c-x c-v
 - save file: c-x c-s
 - write file: c-x c-w
@@ -20,12 +20,13 @@
 - two vert wins: c-x 3
 - other win: c-x o
 
+- mark-whole-buffer: c-x h
+- mark-paragraph: m-h
 
 - cut to ^: c-u 0 c-k
 - cut to $: c-k
 - cut region: c-w
-
-- copy: m-w
+- copy region: m-w
 - yank: c-y
 
 - undo: c-x u
@@ -36,6 +37,38 @@
 - page up: m-v
 - center line: c-l
 - goto line: m-x goto-line, m-g g
+
+- bookmark-set: c-x r m
+- bookmark-jump: c-x r b
+- bookmark-list: c-x r l, s/f/d/u/x/q
+
+- shell-command: m-!
+- shell-command-on-region: m-|
+- shell cmd output in current buffer: c-u ...
+- shell-mode: m-x shell
+
+- dired: c-x d
+- command: s: sort
+           f: edit
+           v: view 
+           q: quit
+           d: mark del
+           D: del now
+           #: mark auto-saves
+           ~: mark backups
+           u: undo
+           x: exec
+           g: refresh
+
+           C: copy
+           R: mv
+           Z: zip
+
+           !: shell 
+ 
+           m: mark
+           %m: mark by regexp
+           +: mkdir
 
 - line wrap: m-x toggle-truncate-lines
              m-x auto-fill-mode
