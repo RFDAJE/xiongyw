@@ -1,27 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
 ;;;; customize font and color
-;;;;
 ;;;; http://www.telecom.otago.ac.nz/tele402/emacs.php
-;;;;
-;;;; You can set all this in Emacs customise mode: from the Options menu,
-;;;; select Customise Emacs > Browse Costumisation Groups. Using the [+] icons,
-;;;; drill down into Faces > Basic Faces > Default. Check the Foreground and
-;;;; Background options, and use ¡°grey90¡± for the Foreground and ¡°black¡± for
-;;;; the Background. You can then try it out by clicking on
-;;;; State > Set for Current Session. You can use State > Revert to Save
-;;;; if you don¡¯t like your changes. Use State > Save for Future Sessions
-;;;; when you are happy with it.
-;;;; You can also use this to change the default font size. Temporary changes
-;;;; can be affected with Shift-Click on a buffer, then selecting one of the
-;;;; fonts shown (as as Misc > fixed).
-;;;; The Emacs customisation facility is very comprehensive, and there are ways
-;;;; to browse and search around it; some things are easier using it, other
-;;;; things are better done by editing your ~/.emacs file. By the way, the
-;;;; Customise facility edits your ~/.emacs, so you will want to close it
-;;;; before Customise is run.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -38,24 +17,15 @@
  '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "outline" :family "Andale Mono")))))
 
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
 ;;;; line number
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'linum)
 (global-linum-mode 1)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
 ;;;; org mode
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default directory
 (setq org-directory "~/journal")
@@ -69,11 +39,29 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; tabbar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;
+(require 'tabbar)
+(tabbar-mode t)
+;; just put all tabs in one group
+(setq tabbar-buffer-groups-function
+          (lambda ()
+            (list "All")))
+;; navigate among tabs
+(global-set-key [C-left] 'tabbar-backward-tab)
+(global-set-key [C-right] 'tabbar-forward-tab)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; display time
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;(setq display-time-24hr-format t)
+;;(setq display-time-day-and-date t)
+(setq display-time-format "[%Y-%m-%d %H:%M:%S]")
+(setq display-time-interval 1)
+(display-time-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; cscope for windows
-;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 1. download source tgz from "http://cscope.sf.net" and extract it. under
 ;;   "cscope-15.8a\contrib\xcscope" there are two files:
@@ -103,7 +91,11 @@
 ;; 5. ways to improve the cscope performance by changing command line options for building the database
 
 
-;;(setq shell-file-name "/C/Program Files (x86)/Git/bin/sh.exe")
+
+
+
+
+(setq shell-file-name "/C/Program Files (x86)/Git/bin/sh.exe")
 (setenv "PATH" "C:/Program Files (x86)/Git/bin")
 
 ;;
