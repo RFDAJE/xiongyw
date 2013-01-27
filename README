@@ -1,4 +1,15 @@
-- "yum install git" or "pacman -S git" on Linux
-- install "Git-1.7.11-preview20120620.exe" on windows
-- git clone https://xiongyw@github.com/xiongyw/xiongyw.git
+1. install git
+
+- Linux 
+  "yum install git" or "pacman -S git" on Linux
+
+- Windows: 
+
+  install "Git-1.7.11-preview20120620.exe";
+  Set the "PATH" environment variable, by putting "C:\Program Files (x86)\Git\bin" in the *front* of the list. This is to ensure we use the right "find.exe", not the one comes with Windows. To do so, go the steps similar to the following: Control Panel->System->Advanced settings->Environment Variable...
+  
+2. Clone the depot:
+
+- goto a directory desired
+- do: git clone https://xiongyw@github.com/xiongyw/xiongyw.git
 
