@@ -27,9 +27,8 @@
 (setq column-number-mode t)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; line number
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; line number
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'linum)
 (global-linum-mode t)
 
@@ -154,8 +153,12 @@
 (global-set-key (kbd "C-<f8>") 'flyspell-mode)
 
 
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; cursor-chg: http://www.emacswiki.org/emacs-en/ChangingCursorDynamically
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'cursor-chg)  ; Load the library
+(toggle-cursor-type-when-idle 1) ; Turn on cursor change when Emacs is idle
+(change-cursor-mode 1) ; Turn on change for overwrite, read-only, and input mode
 
 
 
