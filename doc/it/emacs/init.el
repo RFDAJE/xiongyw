@@ -14,15 +14,29 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "outline" :family "Andale Mono")))))
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 150 :width normal :foundry "outline" :family "Andale Mono")))))
 
+(setq visible-bell t) ; no beep
+(setq inhibit-startup-message t) ; no splash screen
+
+; always case-sensitive, don't be too smart
+(setq-default case-fold-search nil) 
+(setq-default case-replace nil)
+
+(setq transient-mark-mode t)
+(setq column-number-mode t)
+(fset 'yes-or-no-p 'y-or-n-p)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; line number
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'linum)
-(global-linum-mode 1)
+(global-linum-mode t)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; ido-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(ido-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; org mode
@@ -36,7 +50,7 @@
 ;; default folder
 (setq org-default-notes-file
       (concat org-directory (concat (format-time-string "%Y") ".org")))
-
+(setq org-support-shift-select t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; tabbar
@@ -50,6 +64,10 @@
 ;; navigate among tabs
 (global-set-key [C-left] 'tabbar-backward-tab)
 (global-set-key [C-right] 'tabbar-forward-tab)
+
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; display time
@@ -91,12 +109,49 @@
 ;; 5. ways to improve the cscope performance by changing command line options for building the database
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; match paren: http://hi.baidu.com/skyyjl/item/64b8b8a5676b77d95bf191af
+;;;; modified(bruin, 2013-01-26)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun goto-match (arg)
+  (interactive "p")
+  (let ((stop nil) (c 1) (p-save (point)) (forward t) (self "") (target ""))
+    (cond ((looking-at "}") (setq forward nil) (setq self "}") (setq target "{"))
+          ((looking-at "{") (setq forward t)   (setq self "{") (setq target "}"))
+          ((looking-at ")") (setq forward nil) (setq self ")") (setq target "("))
+          ((looking-at "(") (setq forward t)   (setq self "(") (setq target ")"))
+          ((looking-at ">") (setq forward nil) (setq self ">") (setq target "<"))
+          ((looking-at "<") (setq forward t)   (setq self "<") (setq target ">"))
+          ((looking-at "\\]") (setq forward nil) (setq self "\\]") (setq target "\\["))
+          ((looking-at "\\[") (setq forward t)   (setq self "\\[") (setq target "\\]"))
+          (t (setq stop t) (setq c -1)))
+    (while (not stop)
+      (progn
+        (if forward (forward-char 1) (backward-char 1))
+        (cond ((looking-at target) (setq c (1- c)))
+              ((looking-at self) (setq c (1+ c))))
+        (if (or (= c 0) (= (point) (point-max))) (setq stop t))))
+    (if (= c -1) (self-insert-command (or arg 1)))
+    (if (> c 0) (goto-char p-save))))
+
+
+(global-set-key "%" 'goto-match)
+
+(show-paren-mode t)
 
 
 
 
-(setq shell-file-name "/C/Program Files (x86)/Git/bin/sh.exe")
+;(add-to-list 'load-path "c:/emacs/emacs-24.2/site-lisp/magit-1.2.0")
+;(require 'magit)
+
+
+(setq shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
 (setenv "PATH" "C:/Program Files (x86)/Git/bin")
+
+
+
+
 
 ;;
 ;; File .emacs - These commands are executed when GNU emacs starts up.
@@ -460,3 +515,14 @@ menu, add it to the menu bar."
 
 ;; End of file.
 (put 'scroll-left 'disabled nil)
+
+
+;;; This was installed by package-install.el.
+;;; This provides support for the package system and
+;;; interfacing with ELPA, the package archive.
+;;; Move this code earlier if you want to reference
+;;; packages in your .emacs.
+(when
+    (load
+     (expand-file-name "~/.emacs.d/elpa/package.el"))
+  (package-initialize))
