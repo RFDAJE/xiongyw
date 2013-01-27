@@ -3,6 +3,7 @@ created(bruin, 2012-05-05)
 last updated: 2012-05-06
 ---------------------------------------------------------------------------------
 
+
 + References:
 http://blog.csdn.net/leo_wanta/article/details/6885821
 http://hi.baidu.com/creative_in_the_sky/blog/item/8f4c0851919353120df3e3e8.html
@@ -196,3 +197,5 @@ pacman -S kde
 /etc/rc.conf: DEAMONS={...kdm...}
 pacman -S kdebase-workspace
 ~/.xinitrc: exec ck-launch-session startkde
+
+
