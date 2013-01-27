@@ -141,12 +141,33 @@
 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; aspell: http://blog.sina.com.cn/s/blog_8e8bd6b90100tgtw.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
+(setq ispell-program-name "aspell")
+(setq-default ispell-program-name "aspell")
+(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
+(require 'ispell)
+;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(global-set-key (kbd "<f8>") 'ispell-word)
+(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+
+
+
+
+
+
+
+
 
 ;(add-to-list 'load-path "c:/emacs/emacs-24.2/site-lisp/magit-1.2.0")
 ;(require 'magit)
 
 
-(setq shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
+;(setq shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
+(setq explicit-shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
+
 (setenv "PATH" "C:/Program Files (x86)/Git/bin")
 
 
