@@ -1,0 +1,4 @@
+1. download the latest precompiled binary 
+   as of 2013-01-27:
+   "wget http://ftp.gnu.org/gnu/windows/emacs/emacs-24.2-bin-i386.zip"
+   48973954 bytes: emacs-24.2-bin-i386.zip
