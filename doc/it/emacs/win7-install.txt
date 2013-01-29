@@ -1,4 +1,77 @@
-1. download the latest precompiled binary 
-   as of 2013-01-27:
-   "wget http://ftp.gnu.org/gnu/windows/emacs/emacs-24.2-bin-i386.zip"
+1. Download the latest precompiled binary 
+   As of 2013-01-27: "wget http://ftp.gnu.org/gnu/windows/emacs/emacs-24.2-bin-i386.zip"
    48973954 bytes: emacs-24.2-bin-i386.zip
+
+2. Create emacs directory and extract the zip to this directory, as below
+
+   Suppose you want to put all emacs stuff under "d:/emacs", then:
+
+     d:\emacs
+        +---emacs-24.2
+            +---bin
+            +---etc
+            |   +---charsets
+            |   +---e
+            |   +---gnus
+            |   +---icons
+            |   +---images
+            |   +---nxml
+            |   +---org
+            |   +---refcards
+            |   +---schema
+            |   +---srecode
+            |   +---themes
+            |   \---tutorials
+            +---info
+            +---leim
+            +---lisp
+            |   +---calc
+            |   +---calendar
+            |   +---cedet
+            |   +---emacs-lisp
+            |   +---emulation
+            |   +---erc
+            |   +---eshell
+            |   +---gnus
+            |   +---international
+            |   +---language
+            |   +---mail
+            |   +---mh-e
+            |   +---net
+            |   +---nxml
+            |   +---obsolete
+            |   +---org
+            |   +---play
+            |   +---progmodes
+            |   +---term
+            |   +---textmodes
+            |   +---url
+            |   \---vc
+            \---site-lisp   
+        
+3. HOME Environment Variable Setup
+
+- Launch emacs by double clicking "D:\emacs\emacs-24.2\bin\runemcas.exe" (or create a shortcut and drop it on the task bar)
+- Type: "M-x getenv RET HOME RET" to get the HOME environment variable value, e.g. "C:\Users\bruin\AppData\Roaming". 
+- Go there to have a look, a new directory is created by emacs: ".emacs.d".
+- Create a new file "init.el" there, put the following line:
+
+  (setenv "HOME" "d:/github/xiongyw/doc/it/emacs")
+  (load-file "~/.emacs.d/init.el")
+
+- Put the following in "~/init.el":
+
+
+(setq default-directory "~/../../../")
+;; set load path 
+(let* ((my-lisp-dir "~/.emacs.d/") 
+(default-directory my-lisp-dir)) 
+(setq load-path (cons my-lisp-dir load-path)) 
+(normal-top-level-add-subdirs-to-load-path)) 
+;; auto-save-list
+(setq auto-save-list-file-prefix "~/../../../../auto-save-list/.saves-")
+
+
+- Type "M-x apropos RET process-environment RET" to get a full list of environment variables.
+
+4. Shell

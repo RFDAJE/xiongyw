@@ -1,3 +1,19 @@
+;; check the host: windows or linux
+(setq WINDOWS (not (null (getenv "COMSPEC"))))
+
+(setq default-directory "~/../../../")
+;; set load path 
+(let* ((my-lisp-dir "~/.emacs.d/") 
+(default-directory my-lisp-dir)) 
+(setq load-path (cons my-lisp-dir load-path)) 
+(normal-top-level-add-subdirs-to-load-path)) 
+;; auto-save-list
+(setq auto-save-list-file-prefix "~/../../../../../auto-save-list/.saves-")
+
+
+; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
+(require 'git-emacs)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; customize font and color
 ;;;; http://www.telecom.otago.ac.nz/tele402/emacs.php
@@ -119,10 +135,6 @@
           ((looking-at "{") (setq forward t)   (setq self "{") (setq target "}"))
           ((looking-at ")") (setq forward nil) (setq self ")") (setq target "("))
           ((looking-at "(") (setq forward t)   (setq self "(") (setq target ")"))
-          ((looking-at ">") (setq forward nil) (setq self ">") (setq target "<"))
-          ((looking-at "<") (setq forward t)   (setq self "<") (setq target ">"))
-          ((looking-at "\\]") (setq forward nil) (setq self "\\]") (setq target "\\["))
-          ((looking-at "\\[") (setq forward t)   (setq self "\\[") (setq target "\\]"))
           (t (setq stop t) (setq c -1)))
     (while (not stop)
       (progn
@@ -540,13 +552,3 @@ menu, add it to the menu bar."
 ;; End of file.
 (put 'scroll-left 'disabled nil)
 
-
-;;; This was installed by package-install.el.
-;;; This provides support for the package system and
-;;; interfacing with ELPA, the package archive.
-;;; Move this code earlier if you want to reference
-;;; packages in your .emacs.
-(when
-    (load
-     (expand-file-name "~/.emacs.d/elpa/package.el"))
-  (package-initialize))
