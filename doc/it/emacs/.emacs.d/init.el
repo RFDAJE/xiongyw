@@ -9,7 +9,8 @@
 (normal-top-level-add-subdirs-to-load-path)) 
 ;; auto-save-list
 (setq auto-save-list-file-prefix "~/../../../../../auto-save-list/.saves-")
-
+;; book mark file
+(setq bookmark-default-file      "~/../../../../../bookmark.emacs")
 
 ; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
 (require 'git-emacs)
