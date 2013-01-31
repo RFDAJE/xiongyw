@@ -11,6 +11,8 @@
 (setq auto-save-list-file-prefix "~/../../../../../auto-save-list/.saves-")
 ;; book mark file
 (setq bookmark-default-file      "~/../../../../../bookmark.emacs")
+;; *Messsage* size
+(setq message-log-max 10000)
 
 ; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
 (require 'git-emacs)

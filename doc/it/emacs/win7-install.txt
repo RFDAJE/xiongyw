@@ -73,5 +73,7 @@
 
 
 - Type "M-x apropos RET process-environment RET" to get a full list of environment variables.
+- "describe-variable": C-h v variable-name RET
+- M-: (message "%s" variable-name)
 
 4. Shell
