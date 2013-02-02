@@ -1,3 +1,14 @@
+;; measure the loading time per file.
+(defadvice load (around load-with-time-logging)
+  "display the load time for each file."
+  (let ((now (float-time)))
+    ad-do-it
+    (message "%2.2f seconds is used." (- (float-time) now))))
+(ad-activate 'load)
+
+;; sr speedbar: http://www.emacswiki.org/emacs-en/SrSpeedbar
+;(require 'sr-speedbar)
+
 ;; check the host: windows or linux
 (setq WINDOWS (not (null (getenv "COMSPEC"))))
 
@@ -15,7 +26,10 @@
 (setq message-log-max 10000)
 
 ; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
-(require 'git-emacs)
+; (require 'git-emacs)
+
+; magit
+(require 'magit)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; customize font and color
