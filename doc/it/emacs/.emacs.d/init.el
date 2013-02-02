@@ -10,7 +10,8 @@
 ;(require 'sr-speedbar)
 
 ;; check the host: windows or linux
-(setq WINDOWS (not (null (getenv "COMSPEC"))))
+;(setq WINDOWS (not (null (getenv "COMSPEC"))))
+;; note: there is a predefined variable "system-type"...
 
 (setq default-directory "~/../../../")
 ;; set load path 
@@ -26,10 +27,10 @@
 (setq message-log-max 10000)
 
 ; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
-; (require 'git-emacs)
+(require 'git-emacs)
 
 ; magit
-(require 'magit)
+;(require 'magit)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; customize font and color
