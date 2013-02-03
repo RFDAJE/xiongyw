@@ -568,5 +568,5 @@ menu, add it to the menu bar."
 ;(info "(emacs) Windows HOME")
 
 ;; End of file.
-(put 'scroll-left 'disabled nil)
+
 
