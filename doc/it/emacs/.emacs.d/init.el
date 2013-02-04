@@ -191,7 +191,8 @@
 (change-cursor-mode 1) ; Turn on change for overwrite, read-only, and input mode
 
 
-
+;; ue-next-line
+(require 'ue)
 
 
 ;(add-to-list 'load-path "c:/emacs/emacs-24.2/site-lisp/magit-1.2.0")

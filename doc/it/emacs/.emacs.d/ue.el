@@ -65,3 +65,4 @@
 ;; activate the advices for the next-line command  
 (ad-activate 'next-line)
 
+(provide 'ue)
