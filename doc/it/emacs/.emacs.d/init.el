@@ -32,6 +32,12 @@
 ; magit
 ;(require 'magit)
 
+(setq frame-title-format
+      '((:eval (funcall (lambda () (if buffer-file-name
+                                       buffer-file-name
+                                     (buffer-name)))))))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; customize font and color
 ;;;; http://www.telecom.otago.ac.nz/tele402/emacs.php
@@ -42,7 +48,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(custom-enabled-themes (quote (tango-dark))))
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(send-mail-function (quote smtpmail-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -571,3 +578,4 @@ menu, add it to the menu bar."
 ;; End of file.
 
 
+(put 'upcase-region 'disabled nil)
