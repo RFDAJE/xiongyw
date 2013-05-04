@@ -1,0 +1,27 @@
+installation ubuntu 13.04 x86_64
+
+
+
+- Download "ubuntu-13.04-desktop-amd64.iso" and boot from it.
+- Click "install ubuntu", tick "download updates while installing" and "install this third-party software"
+
+
+ssh:
+
+- sudo apt-get install openssh-server
+- netstat -an|grep 22
+- ps -ef|grep ssh
+
+native zfs:
+
+- sudo add-apt-repository ppa:zfs-native/stable
+- sudo apt-get update
+- sudo apt-get install native-zfs
+- sudo modprobe zfs
+- dmesg|grep ZFS
+- lsmod|grep zfs
+
+
+other packages:
+
+htop
