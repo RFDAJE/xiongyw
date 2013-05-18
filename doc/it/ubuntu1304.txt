@@ -126,6 +126,117 @@ native zfs:
 - dmesg|grep ZFS
 - lsmod|grep zfs
 
+testing zpool using multipe partitions on /dev/sdb: 
+
+bruin@u1304:~$ sudo parted -l /dev/sdb
+Model: ATA Samsung SSD 840 (scsi)
+Disk /dev/sda: 120GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system     Name  Flags
+ 1      1049kB  99.6MB  98.6MB  fat32                 boot
+ 2      99.6MB  112GB   111GB   ext4
+ 3      112GB   120GB   8532MB  linux-swap(v1)
+
+
+Model: ATA Hitachi HTS54322 (scsi)
+Disk /dev/sdb: 250GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system  Name  Flags
+ 1      1049kB  41.9GB  41.9GB
+ 2      41.9GB  83.9GB  41.9GB
+ 3      83.9GB  126GB   41.9GB
+ 4      126GB   168GB   41.9GB
+ 5      168GB   210GB   41.9GB
+ 6      210GB   250GB   40.3GB
+
+
+bruin@u1304:~$ 
+
+
+-> raidz2:
+
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 
+invalid vdev specification: raidz2 requires at least 3 devices
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 sdb3
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             39G  128K   39G   1% /tank
+bruin@u1304:~$ sudo zpool destroy tank
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 sdb3 sdb4
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             77G  128K   77G   1% /tank
+bruin@u1304:~$ sudo zpool destroy tank
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 sdb3 sdb4 sdb5
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank            115G     0  115G   0% /tank
+bruin@u1304:~$ sudo zpool destroy tank
+
+-> raidz3:
+
+invalid vdev specification: raidz3 requires at least 4 devices
+bruin@u1304:~$ sudo zpool create tank raidz3 sdb1 sdb2 sdb3 sdb4
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             39G     0   39G   0% /tank
+
+-> add into zpool:
+
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 sdb3
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             39G     0   39G   0% /tank
+bruin@u1304:~$ sudo zpool list
+NAME   SIZE  ALLOC   FREE    CAP  DEDUP  HEALTH  ALTROOT
+tank   117G   315K   117G     0%  1.00x  ONLINE  -
+bruin@u1304:~$ sudo zpool status
+  pool: tank
+ state: ONLINE
+  scan: none requested
+config:
+
+  NAME        STATE     READ WRITE CKSUM
+	tank        ONLINE       0     0     0
+	  raidz2-0  ONLINE       0     0     0
+	    sdb1    ONLINE       0     0     0
+	    sdb2    ONLINE       0     0     0
+	    sdb3    ONLINE       0     0     0
+
+errors: No known data errors
+bruin@u1304:~$ sudo cp -a /usr /tank/usr
+^Cbruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             39G  476M   38G   2% /tank
+bruin@u1304:~$ sudo zpool add -f tank sdb4
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank             77G  481M   77G   1% /tank
+bruin@u1304:~$ sudo zpool status
+  pool: tank
+ state: ONLINE
+  scan: none requested
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	tank        ONLINE       0     0     0
+	  raidz2-0  ONLINE       0     0     0
+	    sdb1    ONLINE       0     0     0
+	    sdb2    ONLINE       0     0     0
+	    sdb3    ONLINE       0     0     0
+	  sdb4      ONLINE       0     0     0
+
+errors: No known data errors
+bruin@u1304:~$ sudo zpool list
+NAME   SIZE  ALLOC   FREE    CAP  DEDUP  HEALTH  ALTROOT
+tank   156G  1.41G   155G     0%  1.00x  ONLINE  -
+bruin@u1304:~$ 
+
+
 
 + htop
 
