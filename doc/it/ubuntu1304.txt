@@ -129,6 +129,10 @@ native zfs:
 
 + htop
 
++ ibus:
+
+  ibus-daemon -drx
+  
 + smth
   http://www.newsmth.net/bbstcon.php?board=LinuxApp&gid=784272
 
