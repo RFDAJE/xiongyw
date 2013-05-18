@@ -26,8 +26,18 @@ Pass 5: Checking group summary information
 /dev/sda2: 171058/6812640 files (0.2% non-contiguous), 1227135/27197440 blocks
 ubuntu@ubuntu:~$ 
     
-    reboot
-    # dmesg | grep EXT4
+    reboot and check:
+
+bruin@u1304:~$ dmesg|grep EXT4
+[    0.933890] EXT4-fs (sda2): mounted filesystem without journal. Opts: (null)
+[    1.081853] EXT4-fs (sda2): re-mounted. Opts: discard,errors=remount-ro
+
+  - check trim is supported by the firmware:
+    
+    ~$ sudo hdparm -I /dev/sda |grep TRIM
+     *	Data Set Management TRIM supported (limit 8 blocks)
+     *	Deterministic read ZEROs after TRIM
+
   - /etc/fstab: adding "discard,noatime,nodiratime" for each partition:
 
 bruin@u1304:/etc$ cat /etc/fstab
@@ -46,38 +56,36 @@ UUID=E6B8-9972  /boot/efi       vfat    defaults        0       1
 UUID=ea646862-9090-4daf-8196-a551a01ac5df none            swap    sw              0       0
 bruin@u1304:/etc$ 
     
-    check trim is supported by the firmware:
+   - reboot and check:
+
+bruin@u1304:~$ mount
+/dev/sda2 on / type ext4 (rw,noatime,nodiratime,discard,errors=remount-ro)
+proc on /proc type proc (rw,noexec,nosuid,nodev)
+sysfs on /sys type sysfs (rw,noexec,nosuid,nodev)
+none on /sys/fs/cgroup type tmpfs (rw)
+none on /sys/fs/fuse/connections type fusectl (rw)
+none on /sys/kernel/debug type debugfs (rw)
+none on /sys/kernel/security type securityfs (rw)
+none on /sys/firmware/efi/efivars type efivarfs (rw)
+udev on /dev type devtmpfs (rw,mode=0755)
+devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=0620)
+tmpfs on /run type tmpfs (rw,noexec,nosuid,size=10%,mode=0755)
+none on /run/lock type tmpfs (rw,noexec,nosuid,nodev,size=5242880)
+none on /run/shm type tmpfs (rw,nosuid,nodev)
+none on /run/user type tmpfs (rw,noexec,nosuid,nodev,size=104857600,mode=0755)
+/dev/sda1 on /boot/efi type vfat (rw)
+gvfsd-fuse on /run/user/bruin/gvfs type fuse.gvfsd-fuse (rw,nosuid,nodev,user=bruin)
+bruin@u1304:~$ 
+  
     
-    ~$ sudo hdparm -I /dev/sda |grep TRIM
-     *	Data Set Management TRIM supported (limit 8 blocks)
-	   *	Deterministic read ZEROs after TRIM
+- hdd tools: gsmartcontrol, gparted, hdparm
 
-    verifying trim works after reboot:
+bruin@u1304:~$ sudo hdparm -t /dev/sda
 
-Testing automatic TRIM:
-To Test if Trim is working issue the following commands (adapted from here):
+/dev/sda:
+ Timing buffered disk reads: 1540 MB in  3.00 seconds = 513.19 MB/sec
+bruin@u1304:~$ 
 
-cd  / #or whatever part of the file system is on the SSD
-sudo dd if=/dev/urandom of=tempfile count=100 bs=512k oflag=direct # you will not need sudo for these to work, if your SSD is in /home for example
-sudo hdparm --fibmap tempfile    
-
-From the output copy the number under "begin_LBA" and use it in the next command. Also check the system name of your SSD: System->Administration->Disk Utility (sda, sdb, or sdc ...)
-
-sudo hdparm --read-sector 2638848 /dev/sda #replace 2638848 with the number obtained before and /sda with your SSD drive
-
-you should receive a a long string of characters for those sectors
-
-sudo rm tempfile
-sync
-sudo hdparm --read-sector 2638848 /dev/sda
-
-even after removing the file the sectors are still not empty. Wait a while then run the command again
-
-sudo hdparm --read-sector 2638848 /dev/sda
-
-if you get only zeros, then automatic TRIM is working.
-    
-- hdd tools: gsmartcontrol, gparted
 - emacs
 - tex/asy
 - chrome
