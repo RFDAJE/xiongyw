@@ -98,7 +98,10 @@ bruin@u1304:~$ sudo hdparm -Tt /dev/sda
  Timing buffered disk reads: 1540 MB in  3.00 seconds = 512.80 MB/sec
 bruin@u1304:~$ 
 
+- firefox cache setting:
+url: about:config
 
+browser.cache.disk.parent_directory: /tmp
 
 
 - ibus
