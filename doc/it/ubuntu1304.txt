@@ -306,7 +306,17 @@ bruin@u1304:~$
 
 + ibus:
 
+  
   ibus-daemon -drx
+  
+  autostart ibus:
+  
+bruin@u1304:~$ sudo ln -s /usr/share/applications/ibus.desktop /etc/xdg/autostart/
+[sudo] password for bruin: 
+bruin@u1304:~$ 
+
+  logout and login...
+
   
 + smth
   http://www.newsmth.net/bbstcon.php?board=LinuxApp&gid=784272
