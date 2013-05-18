@@ -7,7 +7,7 @@ installation ubuntu 13.04 x86_64
 
 - video card, printer
 - audio/video
-- ssd 4k
+- ssd 4k trim
 - hdd tools: gsmartcontrol, gparted
 - emacs
 - tex/asy
