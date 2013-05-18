@@ -104,11 +104,23 @@ url: about:config
 browser.cache.disk.parent_directory: /tmp
 
 
-- ibus
+
 - emacs
 - tex/asy
 - chrome
-- vbox/kvm/xen
++ vbox
+  - usb for xp guests: (for www.cmbchina.com)
+  
+    download "guest additions" from www.virtualbox.org and install it;
+    from within the xp vm's "device" menu, click install "guest add-ons", and install the add-on from within the xp.
+    add the current user into vboxuser group
+      bruin@u1304:~$ sudo usermod -G vboxusers -a bruin
+      bruin@u1304:~$ grep vbox /etc/group
+      vboxusers:x:125:bruin
+    logoff and login again
+    restart the xp vm...
+  
+- kvm/xen
 - smb
 
 ssh:
