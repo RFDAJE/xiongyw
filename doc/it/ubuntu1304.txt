@@ -13,8 +13,19 @@ installation ubuntu 13.04 x86_64
   - http://zengshenghai.blog.51cto.com/58529/979204
   
   - disable journaling, under usb live environment, for each ext4 partition:
-    # sudo tune2fs -O ^has_journal /dev/sda2
-    # sudo e2fsck -f /dev/sda2
+
+ubuntu@ubuntu:~$ sudo tune2fs -O ^has_journal /dev/sda2
+tune2fs 1.42.5 (29-Jul-2012)
+ubuntu@ubuntu:~$ sudo e2fsck -f /dev/sda2
+e2fsck 1.42.5 (29-Jul-2012)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+/dev/sda2: 171058/6812640 files (0.2% non-contiguous), 1227135/27197440 blocks
+ubuntu@ubuntu:~$ 
+    
     reboot
     # dmesg | grep EXT4
   - /etc/fstab: adding "discard,noatime,nodiratime" for each partition:
