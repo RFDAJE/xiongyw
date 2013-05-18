@@ -80,10 +80,11 @@ bruin@u1304:~$
     
 - hdd tools: gsmartcontrol, gparted, hdparm
 
-bruin@u1304:~$ sudo hdparm -t /dev/sda
+bruin@u1304:~$ sudo hdparm -Tt /dev/sda
 
 /dev/sda:
- Timing buffered disk reads: 1540 MB in  3.00 seconds = 513.19 MB/sec
+ Timing cached reads:   28552 MB in  2.00 seconds = 14292.27 MB/sec
+ Timing buffered disk reads: 1540 MB in  3.00 seconds = 512.80 MB/sec
 bruin@u1304:~$ 
 
 - emacs
