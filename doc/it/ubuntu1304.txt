@@ -5,6 +5,15 @@ installation ubuntu 13.04 x86_64
 - Download "ubuntu-13.04-desktop-amd64.iso" and boot from it.
 - Click "install ubuntu", tick "download updates while installing" and "install this third-party software"
 
+- video card, printer
+- audio/video
+- ssd 4k
+- hdd tools: gsmartcontrol, gparted
+- emacs
+- tex/asy
+- chrome
+- vbox/kvm/xen
+- smb
 
 ssh:
 
@@ -22,6 +31,15 @@ native zfs:
 - lsmod|grep zfs
 
 
-other packages:
++ htop
 
-htop
++ smth
+  http://www.newsmth.net/bbstcon.php?board=LinuxApp&gid=784272
+
+bruin@u1304:~$ cat smth
+#!/usr/bin/expect -f
+spawn luit -encoding gbk telnet bbs.newsmth.net
+interact {
+        timeout 30 { send "\0"}
+        }
+  
