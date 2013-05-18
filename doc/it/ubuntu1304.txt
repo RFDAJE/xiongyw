@@ -266,6 +266,29 @@ config:
 errors: No known data errors
 bruin@u1304:~$ 
 
+bruin@u1304:~$ sudo zpool create tank raidz2 sdb1 sdb2 sdb3 sdb4 sdb5 sdb6
+bruin@u1304:~$ sudo zpool status
+  pool: tank
+ state: ONLINE
+  scan: none requested
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	tank        ONLINE       0     0     0
+	  raidz2-0  ONLINE       0     0     0
+	    sdb1    ONLINE       0     0     0
+	    sdb2    ONLINE       0     0     0
+	    sdb3    ONLINE       0     0     0
+	    sdb4    ONLINE       0     0     0
+	    sdb5    ONLINE       0     0     0
+	    sdb6    ONLINE       0     0     0
+
+errors: No known data errors
+bruin@u1304:~$ df -h /tank
+Filesystem      Size  Used Avail Use% Mounted on
+tank            147G  128K  147G   1% /tank
+bruin@u1304:~$ 
+
 
 + htop
 
