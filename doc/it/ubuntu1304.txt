@@ -87,6 +87,10 @@ bruin@u1304:~$ sudo hdparm -Tt /dev/sda
  Timing buffered disk reads: 1540 MB in  3.00 seconds = 512.80 MB/sec
 bruin@u1304:~$ 
 
+
+
+
+- ibus
 - emacs
 - tex/asy
 - chrome
