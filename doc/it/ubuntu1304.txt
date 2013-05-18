@@ -7,7 +7,65 @@ installation ubuntu 13.04 x86_64
 
 - video card, printer
 - audio/video
-- ssd 4k trim
++ ssd 4k trim
+  - 4k should be managed by parted already
+  - http://space.itpub.net/7575/viewspace-759061
+  - http://zengshenghai.blog.51cto.com/58529/979204
+  
+  - disable journaling, under usb live environment, for each ext4 partition:
+    # sudo tune2fs -O ^has_journal /dev/sda1
+    # sudo e2fsck -f /dev/sda1
+    reboot
+    # dmesg | grep EXT4
+  - /etc/fstab: adding "discard,noatime,nodiratime" for each partition:
+
+bruin@u1304:/etc$ cat /etc/fstab
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/sda2 during installation
+UUID=59711746-f088-4929-bdea-f10d3f29e240 /               ext4    discard,noatime,nodiratime,errors=remount-ro 0       1
+# /boot/efi was on /dev/sda1 during installation
+UUID=E6B8-9972  /boot/efi       vfat    defaults        0       1
+# swap was on /dev/sda3 during installation
+UUID=ea646862-9090-4daf-8196-a551a01ac5df none            swap    sw              0       0
+bruin@u1304:/etc$ 
+    
+    check trim is supported by the firmware:
+    
+    ~$ sudo hdparm -I /dev/sda |grep TRIM
+     *	Data Set Management TRIM supported (limit 8 blocks)
+	   *	Deterministic read ZEROs after TRIM
+
+    verifying trim works after reboot:
+
+Testing automatic TRIM:
+To Test if Trim is working issue the following commands (adapted from here):
+
+cd  / #or whatever part of the file system is on the SSD
+sudo dd if=/dev/urandom of=tempfile count=100 bs=512k oflag=direct # you will not need sudo for these to work, if your SSD is in /home for example
+sudo hdparm --fibmap tempfile    
+
+From the output copy the number under "begin_LBA" and use it in the next command. Also check the system name of your SSD: System->Administration->Disk Utility (sda, sdb, or sdc ...)
+
+sudo hdparm --read-sector 2638848 /dev/sda #replace 2638848 with the number obtained before and /sda with your SSD drive
+
+you should receive a a long string of characters for those sectors
+
+sudo rm tempfile
+sync
+sudo hdparm --read-sector 2638848 /dev/sda
+
+even after removing the file the sectors are still not empty. Wait a while then run the command again
+
+sudo hdparm --read-sector 2638848 /dev/sda
+
+if you get only zeros, then automatic TRIM is working.
+    
 - hdd tools: gsmartcontrol, gparted
 - emacs
 - tex/asy
