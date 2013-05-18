@@ -38,9 +38,9 @@ bruin@u1304:~$ dmesg|grep EXT4
      *	Data Set Management TRIM supported (limit 8 blocks)
      *	Deterministic read ZEROs after TRIM
 
-  - /etc/fstab: adding "discard,noatime,nodiratime" for each partition:
+  - /etc/fstab: adding "discard,noatime,nodiratime" for each partition, and tmpfs entries:
 
-bruin@u1304:/etc$ cat /etc/fstab
+bruin@u1304:~$ cat /etc/fstab
 # /etc/fstab: static file system information.
 #
 # Use 'blkid' to print the universally unique identifier for a
@@ -54,11 +54,17 @@ UUID=59711746-f088-4929-bdea-f10d3f29e240 /               ext4    discard,noatim
 UUID=E6B8-9972  /boot/efi       vfat    defaults        0       1
 # swap was on /dev/sda3 during installation
 UUID=ea646862-9090-4daf-8196-a551a01ac5df none            swap    sw              0       0
-bruin@u1304:/etc$ 
-    
-   - reboot and check:
 
-bruin@u1304:~$ mount
+tmpfs /tmp       tmpfs defaults,noatime,mode=1777 0 0
+tmpfs /var/tmp   tmpfs defaults,noatime,mode=1777 0 0
+tmpfs /var/log   tmpfs defaults,noatime,mode=0755 0 0
+tmpfs /var/spool tmpfs defaults,noatime,mode=1777 0 0
+
+bruin@u1304:~$ 
+    
+   - reboot/mount and check:
+bruin@u1304:~$ sudo mount -a
+bruin@u1304:~$ mount 
 /dev/sda2 on / type ext4 (rw,noatime,nodiratime,discard,errors=remount-ro)
 proc on /proc type proc (rw,noexec,nosuid,nodev)
 sysfs on /sys type sysfs (rw,noexec,nosuid,nodev)
@@ -75,7 +81,12 @@ none on /run/shm type tmpfs (rw,nosuid,nodev)
 none on /run/user type tmpfs (rw,noexec,nosuid,nodev,size=104857600,mode=0755)
 /dev/sda1 on /boot/efi type vfat (rw)
 gvfsd-fuse on /run/user/bruin/gvfs type fuse.gvfsd-fuse (rw,nosuid,nodev,user=bruin)
+tmpfs on /tmp type tmpfs (rw,noatime,mode=1777)
+tmpfs on /var/spool type tmpfs (rw,noatime,mode=1777)
+tmpfs on /var/tmp type tmpfs (rw,noatime,mode=1777)
+tmpfs on /var/log type tmpfs (rw,noatime,mode=0755)
 bruin@u1304:~$ 
+
   
     
 - hdd tools: gsmartcontrol, gparted, hdparm
