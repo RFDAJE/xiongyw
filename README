@@ -1,7 +1,9 @@
 1. install git
 
 - Linux 
-  "yum install git" or "pacman -S git" on Linux
+  "yum install git"
+  "pacman -S git"
+  "apt-get install git"
 
 - Windows: 
 
