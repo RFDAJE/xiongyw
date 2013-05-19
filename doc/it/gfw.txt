@@ -1,0 +1,13 @@
+firefox: sshd+autoproxy
+
+bruin@u1304:~$ cat sshd.sh
+#!/bin/bash
+# 2: ssh-2
+# 4: ipv4
+# C: compression
+# f: background
+# N: just port forwarding, no cmd
+# D: binding to localhost:7070
+
+ssh -24CfN -D 7070 xiongyw@216.194.70.6
+
