@@ -1,12 +1,17 @@
 /* created(bruin, 2006-07-14): generating prime number by "Sieve of Eratosthenes" from ancient greek */
 
+/* noted(bruin, 2013-06-07): prime number on the web, https://oeis.org/A000040 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
+/* this could be as large as 2^64 on 64-bit machines */
+typedef unsigned long long int prime_t;
+
 /* use this file to save known prime numbers already calculated.
-    the first 4 bytes of the file is the total number (unsigned long) of primes stored in the db,
-    following by an array of primes. each element is unsigned int, and the index of the array is the
+    the first sizeof(prime_t) bytes of the file is the total number of primes stored in the db,
+    following by an array of primes. each element is a prime_t, and the index of the array is the
     index of the prime number. e.g., the first bunch of prime number should be:
 
     index: prime
@@ -19,12 +24,12 @@
     ......
     
   */
-
-typedef unsigned long long prime_t;
-
 #define PRIME_DB_FILE_NAME "prime.db"
-/* we store this number of prime number in db, start from the first prime number "2" */
-#define TOTAL_PRIME_NUMBER (100 * 1000 * 1000)   
+
+/* how many prime numbers to be stored in the db, starting from the first prime number "2" */
+#define TOTAL_PRIME_NUMBER (300 * 1000 * 1000)   
+
+/* the maximum sieve size */
 #define MAX_SIEVE_SIZE       2000000 
 
 struct factor_node;
@@ -34,11 +39,7 @@ typedef struct{
 	struct factor_node* next;
 }factor_node;
 
-#if (0)
-prime_t g_prime[TOTAL_PRIME_NUMBER];
-#else
 prime_t *g_prime;
-#endif
 prime_t g_sieve[MAX_SIEVE_SIZE];
 
 
@@ -59,7 +60,7 @@ int s_is_index_found(factor_node* root, int index)
 	while(root){
 		if(root->prime_index == index)
 			return 1;
-		root=root->next;
+		root=(factor_node*)(root->next);
 	}
 	return 0;
 }
@@ -83,11 +84,11 @@ int main()
 	}
 	else{
 		if(1 != fread(&next_prime_index, sizeof(prime_t), 1, fp)){
-			printf("ERROR: can not read prime count %d in %s\n", next_prime_index, PRIME_DB_FILE_NAME);
+			printf("ERROR: can not read prime count %lld in %s\n", next_prime_index, PRIME_DB_FILE_NAME);
 			next_prime_index = 0;
 		}
 		else{
-			printf("INFO: %d of prime numbers are stored in '%s'. reading it...\n", next_prime_index, PRIME_DB_FILE_NAME);
+			printf("INFO: %lld of prime numbers are stored in '%s'. reading it...\n", next_prime_index, PRIME_DB_FILE_NAME);
 			if(next_prime_index >= TOTAL_PRIME_NUMBER)
 				next_prime_index = TOTAL_PRIME_NUMBER;
 			if(next_prime_index != fread(g_prime, sizeof(prime_t), next_prime_index, fp)){
@@ -98,7 +99,7 @@ int main()
 		fclose(fp);
 	}
 
-	printf("INFO: this session starts to find the prime number with index %d...\n", next_prime_index);
+	printf("INFO: this session starts to find the prime number with index %lld...\n", next_prime_index);
 
 	do{
 		next_prime_index = sieve_prime(next_prime_index);
@@ -109,7 +110,7 @@ int main()
 	if(next_prime_index > TOTAL_PRIME_NUMBER)
 		next_prime_index = TOTAL_PRIME_NUMBER;
 
-#if (1)
+#if (0)
 	/* print the primes to STDOUT */
 	print_prime_db(next_prime_index);
 #endif
@@ -164,7 +165,7 @@ int main()
 		}
 		/* printf(" => prime=%d loglog(%d)=%f, factor=%3d, log(f)=%f\n", num_primes, i, log(log(i)), num_factors, log(num_factors)); */
 		loglog = log(log(i));
-		printf(" => prime=%d loglog(%d)=%f, delta=%f\n", num_primes, i, loglog, num_primes - loglog); 
+		printf(" => prime=%lld loglog(%d)=%f, delta=%f\n", num_primes, i, loglog, num_primes - loglog); 
 		
 		free_factor_list(root);
 	}
@@ -370,7 +371,7 @@ int main()
 	}
 #endif
 
-#if (1)
+#if (0)
 	/* test: FP(n) denotes the total number of primes appeared in the factorization 
 	      of the first n members of the fibonacci series.
 	      we define F(1)=2 and F(2)=3. 
@@ -420,7 +421,7 @@ int main()
 					fpn ++;
 				}
 				
-				root = root->next;
+				root = (factor_node*)(root->next);
 			}
 
 			printf("f(%d)=%d, FP(%d)=%d, %f\n", i, f3, i, fpn, fpn * 1.0 / i);
@@ -457,7 +458,7 @@ prime_t sieve_prime(prime_t next_index)
 		g_prime[7] = 19;
 		g_prime[8] = 23;	
 
-		printf("INFO: sieve session starts: next_prime_index=%d\n", next_index);
+		printf("INFO: sieve session starts: next_prime_index=%lld\n", next_index);
 		return 9;
 	}
 
@@ -475,14 +476,14 @@ prime_t sieve_prime(prime_t next_index)
 		sieve_stop = sieve_start + sieve_size - 1;
 	}
 
-	printf("INFO: sieve session starts: next_prime_index=%d. ", next_index);
-	printf("sieve_range: [%d, %d]; sieve_size:%d\n", sieve_start, sieve_stop, sieve_size);
+	printf("INFO: sieve session starts: next_prime_index=%lld. ", next_index);
+	printf("sieve_range: [%lld, %lld]; sieve_size:%lld\n", sieve_start, sieve_stop, sieve_size);
 	for(i = 0; i < sieve_size; i ++)
 		g_sieve[i] = sieve_start + i;
 
 	/* sieve by all known primes...... */
 	for(i = 0; i <= last_index; i ++){
-		int the_prime = g_prime[i], smallest, sieve_index;
+		prime_t the_prime = g_prime[i], smallest, sieve_index;
 
 		/* find the smallest multiple of "the_prime" in the sieve */
 		smallest = sieve_start / the_prime * the_prime;
@@ -545,7 +546,7 @@ int print_prime_db(prime_t prime_count)
 			printf("\n%04d: ", line_index);
 			line_index ++;
 		}
-		printf("%5d ", g_prime[i]);
+		printf("%5lld ", g_prime[i]);
 	}
 	printf("\n");
 	return 0;
@@ -585,7 +586,7 @@ factor_node* factorize(prime_t num)
 		    the_prime = g_prime[i];
 		}
 		else{
-			printf("the number of prime numbers is too small for factorizing %d. quitting...\n");
+			printf("the number of prime numbers is too small for factorizing %lld. quitting...\n", num);
 			exit(1);
 		}
 #if (0)		
