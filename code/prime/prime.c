@@ -27,7 +27,7 @@ typedef unsigned long long int prime_t;
 #define PRIME_DB_FILE_NAME "prime.db"
 
 /* how many prime numbers to be stored in the db, starting from the first prime number "2" */
-#define TOTAL_PRIME_NUMBER (300 * 1000 * 1000)   
+#define TOTAL_PRIME_NUMBER (10 * 1000 * 1000)   
 
 /* the maximum sieve size */
 #define MAX_SIEVE_SIZE       2000000 
@@ -42,11 +42,24 @@ typedef struct{
 prime_t *g_prime;
 prime_t g_sieve[MAX_SIEVE_SIZE];
 
+#if (0)
+prime_t get_prime(prime_t idx)
+{
+	return g_prime[idx];
+}
 
+/* return 0 for errors */
+prime_t set_prime(prime_t idx, prime_t value)
+{
+	if(idx >= TOTAL_PRIME_NUMBER)
+		return 0;
 
+	g_prime[idx] = value;
+	return value;
+}
+#endif
 
-
-prime_t sieve_prime(prime_t next_index);
+prime_t sieve_prime(prime_t next_index, prime_t* known_primes);
 int save_prime_db(prime_t next_index);
 int print_prime_db(prime_t next_index);
 int free_factor_list(factor_node* root);
@@ -71,7 +84,8 @@ int main()
 	prime_t i, j, next_prime_index = 0;
 	FILE* fp;
 
-	g_prime = (prime_t*)malloc(sizeof(prime_t) * TOTAL_PRIME_NUMBER);
+	/* a value 0 means the prime number at that index is not yet determined */
+	g_prime = (prime_t*)calloc(TOTAL_PRIME_NUMBER, sizeof(prime_t));
 	if(!g_prime){
 		printf("ERROR: can not malloc array to store prime numbers, abort!\n");
 		return - 1;
@@ -102,7 +116,7 @@ int main()
 	printf("INFO: this session starts to find the prime number with index %lld...\n", next_prime_index);
 
 	do{
-		next_prime_index = sieve_prime(next_prime_index);
+		next_prime_index = sieve_prime(next_prime_index, g_prime);
 	}while(next_prime_index < TOTAL_PRIME_NUMBER) ;
 
 	save_prime_db(next_prime_index);
@@ -440,23 +454,33 @@ int main()
 }
 
 
-/* return the next_prime_index */
-prime_t sieve_prime(prime_t next_index)
+/*
+ * next_index [in]: the index of the next prime number to be determined. 
+ * known_primes [in/out]: the array of the known primes, starting from 
+ * the 1st one (2) to the one before "next_index", the function will add primes into the array.
+ *
+ * return: the index of the next un-determined prime number 
+ *         return 0 for errors.
+ */
+prime_t sieve_prime(prime_t next_index, prime_t* known_primes)
 {
 	prime_t last_prime, sieve_start, sieve_stop, sieve_size;
 	prime_t i, last_index, next_index_return = next_index;
 	
+	if(!known_primes)
+		return 0;
+
 	if(next_index == 0){
 		/* populate the first bunch of known primes */
-		g_prime[0] = 2;
-		g_prime[1] = 3;
-		g_prime[2] = 5;
-		g_prime[3] = 7;
-		g_prime[4] = 11;
-		g_prime[5] = 13;
-		g_prime[6] = 17;
-		g_prime[7] = 19;
-		g_prime[8] = 23;	
+		known_primes[0] = 2;
+		known_primes[1] = 3;
+		known_primes[2] = 5;
+		known_primes[3] = 7;
+		known_primes[4] = 11;
+		known_primes[5] = 13;
+		known_primes[6] = 17;
+		known_primes[7] = 19;
+		known_primes[8] = 23;	
 
 		printf("INFO: sieve session starts: next_prime_index=%lld\n", next_index);
 		return 9;
@@ -464,7 +488,7 @@ prime_t sieve_prime(prime_t next_index)
 
 	/* calcuate the sieve size and populate the sieve with nature numbers */
 	last_index = next_index - 1;
-	last_prime = g_prime[last_index];
+	last_prime = known_primes[last_index];
 
 	sieve_start = last_prime + 1;
 	sieve_stop = last_prime * last_prime;
@@ -483,7 +507,7 @@ prime_t sieve_prime(prime_t next_index)
 
 	/* sieve by all known primes...... */
 	for(i = 0; i <= last_index; i ++){
-		prime_t the_prime = g_prime[i], smallest, sieve_index;
+		prime_t the_prime = known_primes[i], smallest, sieve_index;
 
 		/* find the smallest multiple of "the_prime" in the sieve */
 		smallest = sieve_start / the_prime * the_prime;
@@ -506,7 +530,7 @@ prime_t sieve_prime(prime_t next_index)
 	for(i = 0; i < sieve_size; i ++){
 		if(g_sieve[i] != 0){
 			/* printf("INFO: found new prime: %d -> %d\n", next_index_return, g_sieve[i]); */
-			g_prime[next_index_return] = g_sieve[i];
+			known_primes[next_index_return] = g_sieve[i];
 			next_index_return ++;
 			if(next_index_return >= TOTAL_PRIME_NUMBER)
 				break;
