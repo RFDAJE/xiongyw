@@ -50,7 +50,7 @@ typedef unsigned long long int prime_t;
 
 /* used as argument to thread_start() */
 struct thread_info {
-    pthread_t thread_id;        /* id returned by pthread_create() */
+    pthread_t tid;        /* id returned by pthread_create() */
     int core_idx;               /* the idx of the core this thread setaffinity to */
 
     prime_t *known_primes;      /* array of the known primes */
@@ -110,6 +110,8 @@ int main(int argc, char *argv[])
     prime_t i, j, num_primes_in_db = 0, next_prime_index = 0;
     FILE *fp;
 
+    printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
+    
     process_args(argc, argv);
 
     if (s_show_help) {
@@ -258,6 +260,7 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
         s_sieve[i] = sieve_start + i;
 
     /* this loop is the heart of the algo: sieve by all known primes...... */
+    
     if (!s_smp) {
         for (i = 0; i <= last_index; i++) {
             prime_t the_prime = known_primes[i];
@@ -278,7 +281,9 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
             while (sieve_index < sieve_size);
 
         }
-    } else {                    /* SMP version */
+    } else
+
+        {                    /* SMP version */
         struct thread_info *tinfo;
         pthread_attr_t attr;
         int res;
@@ -309,27 +314,31 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
             tinfo[tnum].sieve_size = sieve_size;
             tinfo[tnum].sieve_start = sieve_start;
 
-            s = pthread_create(&(tinfo[tnum].thread_id), &attr, &thread_start, &tinfo[tnum]);
+            s = pthread_create(&(tinfo[tnum].tid), &attr, &thread_start, &tinfo[tnum]);
             if (s != 0)
                 handle_error_en(s, "pthread_create");
 
-            PRIME_debug(("tnum=%d, tid=%lu\n", tnum, tinfo[tnum].thread_id));
+            //PRIME_debug(("tnum=%d, tid=%lu\n", tnum, tinfo[tnum].tid));
         }
 
+        //sleep(4);
+        
         /* destroy the thread attributes object, since it is no longer needed */
         s = pthread_attr_destroy(&attr);
         if (s != 0)
             handle_error_en(s, "pthread_attr_destroy");
 
         /* now join with each thread */
-        for (tnum = 0; tnum < num_cores; tnum++) {
-            PRIME_debug(("to join: tnum=%d, tid=%lu\n", tnum, tinfo[tnum].thread_id));
-            s = pthread_join(tinfo[tnum].thread_id, (void *)(&res));
+        for (tnum = 0; tnum < num_cores; tnum ++) {
+            PRIME_debug(("to join: tnum=%d, tid=%lu\n", tnum, tinfo[tnum].tid));
+#if (1)            
+            s = pthread_join(tinfo[tnum].tid, (void *)(&res));
             if(s == ESRCH)
                 printf("ESRCH\n");
             
             if (s != 0)
                 handle_error_en(s, "pthread_join");
+#endif            
         }
 
         free(tinfo);
@@ -356,7 +365,7 @@ static void *thread_start(void *arg)
     struct thread_info *tinfo = (struct thread_info *)arg;
 
     PRIME_debug(("tid=%lu, core_idx=%d, start_idx=%llu, last_idx=%llu, step=%llu, sieve_size=%llu, sieve_start=%llu\n",
-                 tinfo->thread_id, tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size,
+                 tinfo->tid, tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size,
                  tinfo->sieve_start));
 
     /* sanity check */
@@ -365,10 +374,13 @@ static void *thread_start(void *arg)
         exit(1);
     }
 
-    stick_this_thread_to_core(tinfo->core_idx);
+    //stick_this_thread_to_core(tinfo->core_idx);
 
     /* start sieving */
     for (i = tinfo->start_idx; i <= tinfo->last_idx; i += tinfo->step) {
+
+        //sleep(1);
+        
         prime_t the_prime = tinfo->known_primes[i];
         prime_t smallest, sieve_index;
 
@@ -387,6 +399,8 @@ static void *thread_start(void *arg)
         while (sieve_index < tinfo->sieve_size);
 
     }
+
+    PRIME_debug(("tid=%lu returning...\n", pthread_self()));
 
     return 0;
 }
