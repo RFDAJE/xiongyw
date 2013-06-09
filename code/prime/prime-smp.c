@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <getopt.h>
 
 #define PRIME_DEBUG
 
@@ -36,6 +37,10 @@
 
 #define PRIME_DB_FILE_NAME "prime.db"
 #define LINE_COUNT  10          /* print 10 primes for each line */
+#define K (1000)
+#define M (1000 * K)
+#define G (1000 * M)
+#define T (1000 * G)
 
 /*##############################################################
   # typedefs
@@ -67,6 +72,23 @@ prime_t *g_prime = NULL;
   # static variables definition
   #############################################################*/
 
+static struct option const s_long_options[] = {
+    {"help", no_argument, 0, 'h'},
+    {"verbose", no_argument, 0, 'v'},
+
+    {"print", no_argument, 0, 'p'},
+    {"smp", no_argument, 0, 's'},
+
+    {0, 0, 0, 0}
+};
+
+/* flags to be determined by options */
+static int s_show_help = 0;
+static int s_verbose = 0;
+static int s_print = 0;
+static int s_smp = 0;
+static char *s_num_primes = NULL;
+
 /*##############################################################
   # local function forward declarations
   #############################################################*/
@@ -76,6 +98,8 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes);
 static void *thread_start(void *arg);
 static int save_prime_db(prime_t next_index);
 static int print_prime_db(prime_t prime_count);
+static void process_args(int argc, char *argv[]);
+static void show_help(void);
 
 /*##############################################################
   # global function implementations
@@ -84,6 +108,22 @@ int main(int argc, char *argv[])
 {
     prime_t i, j, num_primes_in_db = 0, next_prime_index = 0;
     FILE *fp;
+
+    process_args(argc, argv);
+
+    if (s_show_help) {
+        show_help();
+        exit(0);
+    }
+
+    if (!s_num_primes) {
+        show_help();
+        exit(0);
+    } else {
+        PRIME_debug(("num_primes=%s\n", s_num_primes));
+
+        exit(0);
+    }
 
     g_prime = (prime_t *) calloc(TOTAL_PRIME_NUMBER, sizeof(prime_t));
     if (!g_prime) {
@@ -379,6 +419,60 @@ static int print_prime_db(prime_t prime_count)
     }
     printf("\n");
     return 0;
+}
+
+static void process_args(int argc, char *argv[])
+{
+    int c, option_index;
+
+    if (argc == 1) {
+        s_show_help = 1;
+        return;
+    }
+
+    for (;;) {
+        c = getopt_long(argc, argv, "hvps", s_long_options, &option_index);
+        if (c == -1)
+            break;
+        switch (c) {
+        case 'h':
+            s_show_help = 1;
+            break;
+        case 'v':
+            s_verbose = 1;
+            break;
+        case 'p':
+            s_print = 1;
+            break;
+        case 's':
+            s_smp = 1;
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (optind < argc) {
+        s_num_primes = argv[optind];
+    } else {
+        s_show_help = 1;
+    }
+}
+
+static void show_help(void)
+{
+
+    fprintf(stderr, "Usage: sieve [options] ... num_primes\n\n");
+
+    fprintf(stderr,
+            "Options:\n"
+            "  -h, --help       print this help, then exit\n"
+            "  -v, --verbose    verbosely report processing\n"
+            "  -p, --print      print out primes to console when done\n"
+            "  -s, --smp        using multiple threads (on different cores) for sieving\n" "\n");
+
+    fprintf(stderr, "num_primes: the total number of primes to be determined, starting from 2.\n");
+    fprintf(stderr, "            can be of unit kK/mM/gG/tT, which are 10^3, 10^6, 10^9, and 10^12 respectively.\n");
 }
 
 /*##############################################################
