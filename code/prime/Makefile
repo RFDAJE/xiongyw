@@ -4,4 +4,6 @@ all:
 	gcc -g prime.c -lm -o prime
 	gcc -g prime-smp.c -lm -lpthread -o smp
 clean:
-	rm prime smp
+	-rm prime smp
+cleandb:
+	-rm prime.db
