@@ -40,7 +40,7 @@
 #define K (1000)
 #define M (1000 * K)
 #define G (1000 * M)
-#define T (1000 * G)
+#define T (M * M)
 
 /*##############################################################
   # typedefs
@@ -87,7 +87,8 @@ static int s_show_help = 0;
 static int s_verbose = 0;
 static int s_print = 0;
 static int s_smp = 0;
-static char *s_num_primes = NULL;
+static prime_t s_num_primes = 0;
+static char s_unit[10];
 
 /*##############################################################
   # local function forward declarations
@@ -113,21 +114,16 @@ int main(int argc, char *argv[])
 
     if (s_show_help) {
         show_help();
-        exit(0);
+        return 0;
     }
 
-    if (!s_num_primes) {
-        show_help();
-        exit(0);
-    } else {
-        PRIME_debug(("num_primes=%s\n", s_num_primes));
+    PRIME_debug(("s_smp=%d, s_verbose=%d, s_print=%d\n", s_smp, s_verbose, s_print));
 
-        exit(0);
-    }
+    PRIME_debug(("s_num_primes=%llu\n", s_num_primes));
 
-    g_prime = (prime_t *) calloc(TOTAL_PRIME_NUMBER, sizeof(prime_t));
+    g_prime = (prime_t *) calloc(s_num_primes, sizeof(prime_t));
     if (!g_prime) {
-        PRIME_debug(("ERROR: can not malloc array to store prime numbers, abort!\n"));
+        PRIME_debug(("ERROR: can not malloc array to store %llu prime numbers, abort!\n", s_num_primes));
         return -1;
     }
 
@@ -143,8 +139,12 @@ int main(int argc, char *argv[])
             num_primes_in_db = 0;
             next_prime_index = 0;
         } else {
-            PRIME_debug(("INFO: %lld of prime numbers are stored in '%s'. reading them...\n", num_primes_in_db,
-                         PRIME_DB_FILE_NAME));
+
+            PRIME_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", num_primes_in_db,
+                         PRIME_DB_FILE_NAME, s_num_primes));
+            if(num_primes_in_db > s_num_primes)
+                num_primes_in_db = s_num_primes;
+            
             if (num_primes_in_db != fread(g_prime, sizeof(prime_t), num_primes_in_db, fp)) {
                 PRIME_debug(("ERROR: reading db file '%s' failed. ignore the db content.", PRIME_DB_FILE_NAME));
                 num_primes_in_db = 0;
@@ -160,8 +160,8 @@ int main(int argc, char *argv[])
      * now sieve when applicable...
      */
 
-    while (next_prime_index < TOTAL_PRIME_NUMBER) {
-        PRIME_debug(("INFO: this session starts to find the prime number with index %lld...\n", next_prime_index));
+    while (next_prime_index < s_num_primes) {
+        PRIME_debug(("INFO: this session starts to find the prime number with index %llu...\n", next_prime_index));
         next_prime_index = sieve_prime_smp(next_prime_index, g_prime);
     }
 
@@ -175,7 +175,8 @@ int main(int argc, char *argv[])
     /*
      * print the primes to console
      */
-    print_prime_db(next_prime_index);
+    if (s_print)
+        print_prime_db(next_prime_index);
 
     return 0;
 }
@@ -234,7 +235,7 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
         known_primes[7] = 19;
         known_primes[8] = 23;
 
-        PRIME_debug(("INFO: sieve session starts: next_prime_index=%lld\n", next_index));
+        PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu\n", next_index));
         return 9;
     }
 
@@ -251,36 +252,33 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
         sieve_stop = sieve_start + sieve_size - 1;
     }
 
-    PRIME_debug(("INFO: sieve session starts: next_prime_index=%lld.\n", next_index));
-    PRIME_debug(("sieve_range: [%lld, %lld]; sieve_size:%lld\n", sieve_start, sieve_stop, sieve_size));
+    PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu.\n", next_index));
+    PRIME_debug(("sieve_range: [%llu, %llu]; sieve_size:%llu\n", sieve_start, sieve_stop, sieve_size));
     for (i = 0; i < sieve_size; i++)
         s_sieve[i] = sieve_start + i;
 
     /* this loop is the heart of the algo: sieve by all known primes...... */
-#if (0)
-    for (i = 0; i <= last_index; i++) {
-        prime_t the_prime = known_primes[i];
-        prime_t smallest, sieve_index;
+    if (!s_smp) {
+        for (i = 0; i <= last_index; i++) {
+            prime_t the_prime = known_primes[i];
+            prime_t smallest, sieve_index;
 
-        /* find the first/smallest multiple of "the_prime" in the sieve */
-        smallest = sieve_start / the_prime * the_prime;
-        if (smallest < sieve_start)
-            smallest += the_prime;
-        sieve_index = smallest - sieve_start;
-        if (sieve_index >= MAX_SIEVE_SIZE)
-            continue;
+            /* find the first/smallest multiple of "the_prime" in the sieve */
+            smallest = sieve_start / the_prime * the_prime;
+            if (smallest < sieve_start)
+                smallest += the_prime;
+            sieve_index = smallest - sieve_start;
+            if (sieve_index >= MAX_SIEVE_SIZE)
+                continue;
 
-        PRIME_debug(("INFO: prime[%d]=%d. smallest=%d, sieve_index=%d\n", i, the_prime, smallest, sieve_index));
+            do {
+                s_sieve[sieve_index] = 0;
+                sieve_index += the_prime;
+            }
+            while (sieve_index < sieve_size);
 
-        do {
-            s_sieve[sieve_index] = 0;
-            sieve_index += the_prime;
-        } while (sieve_index < sieve_size);
-
-    }
-#else                           /* SMP version */
-
-    {
+        }
+    } else {                    /* SMP version */
         struct thread_info *tinfo;
         pthread_attr_t attr;
         int res;
@@ -301,7 +299,6 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
             handle_error("calloc");
 
         /* create one thread for each core */
-
         for (tnum = 0; tnum < num_cores; tnum++) {
             tinfo[tnum].core_idx = tnum;
             tinfo[tnum].known_primes = known_primes;
@@ -312,9 +309,11 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
             tinfo[tnum].sieve_size = sieve_size;
             tinfo[tnum].sieve_start = sieve_start;
 
-            s = pthread_create(&tinfo[tnum].thread_id, &attr, &thread_start, &tinfo[tnum]);
+            s = pthread_create(&(tinfo[tnum].thread_id), &attr, &thread_start, &tinfo[tnum]);
             if (s != 0)
                 handle_error_en(s, "pthread_create");
+
+            PRIME_debug(("tnum=%d, tid=%lu\n", tnum, tinfo[tnum].thread_id));
         }
 
         /* destroy the thread attributes object, since it is no longer needed */
@@ -324,22 +323,25 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
 
         /* now join with each thread */
         for (tnum = 0; tnum < num_cores; tnum++) {
+            PRIME_debug(("to join: tnum=%d, tid=%lu\n", tnum, tinfo[tnum].thread_id));
             s = pthread_join(tinfo[tnum].thread_id, (void *)(&res));
+            if(s == ESRCH)
+                printf("ESRCH\n");
+            
             if (s != 0)
                 handle_error_en(s, "pthread_join");
         }
 
         free(tinfo);
     }
-#endif
 
     /* collect primes remain in the sieve */
     for (i = 0; i < sieve_size; i++) {
         if (s_sieve[i] != 0) {
-            //PRIME_debug(("INFO: found new prime: %lld -> %lld\n", next_index_return, s_sieve[i]));
+            //PRIME_debug(("INFO: found new prime: %llu -> %llu\n", next_index_return, s_sieve[i]));
             known_primes[next_index_return] = s_sieve[i];
             next_index_return++;
-            if (next_index_return >= TOTAL_PRIME_NUMBER)
+            if (next_index_return >= s_num_primes)
                 break;
         }
     }
@@ -353,9 +355,9 @@ static void *thread_start(void *arg)
     prime_t i;
     struct thread_info *tinfo = (struct thread_info *)arg;
 
-    PRIME_debug(("tid=%d, core_idx=%d, start_idx=%lld, last_idx=%lld, step=%lld, sieve_size=%lld, sieve_start=%lld\n",
-                 tinfo->thread_id,
-                 tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size, tinfo->sieve_start));
+    PRIME_debug(("tid=%lu, core_idx=%d, start_idx=%llu, last_idx=%llu, step=%llu, sieve_size=%llu, sieve_start=%llu\n",
+                 tinfo->thread_id, tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size,
+                 tinfo->sieve_start));
 
     /* sanity check */
     if (!tinfo->known_primes || !tinfo->sieve) {
@@ -381,7 +383,8 @@ static void *thread_start(void *arg)
         do {
             tinfo->sieve[sieve_index] = 0;
             sieve_index += the_prime;
-        } while (sieve_index < tinfo->sieve_size);
+        }
+        while (sieve_index < tinfo->sieve_size);
 
     }
 
@@ -397,7 +400,7 @@ static int save_prime_db(prime_t num_of_primes)
         PRIME_debug(("ERROR: can not open file %s for writting...\n", PRIME_DB_FILE_NAME));
         return -1;
     } else {
-        PRIME_debug(("INFO: saving %lld primes into db file %s...\n", num_of_primes, PRIME_DB_FILE_NAME));
+        PRIME_debug(("INFO: saving %llu primes into db file %s...\n", num_of_primes, PRIME_DB_FILE_NAME));
         fwrite(&num_of_primes, sizeof(prime_t), 1, fp);
         fwrite(g_prime, sizeof(prime_t), num_of_primes, fp);
         fclose(fp);
@@ -434,6 +437,7 @@ static void process_args(int argc, char *argv[])
         c = getopt_long(argc, argv, "hvps", s_long_options, &option_index);
         if (c == -1)
             break;
+
         switch (c) {
         case 'h':
             s_show_help = 1;
@@ -453,7 +457,46 @@ static void process_args(int argc, char *argv[])
     }
 
     if (optind < argc) {
-        s_num_primes = argv[optind];
+        int n = sscanf(argv[optind], "%llu%s", &s_num_primes, s_unit);
+
+        PRIME_debug(("s_num_primes=%llu, s_unit=%s\n", s_num_primes, s_unit));
+
+        switch (n) {
+        case 1:
+            break;
+        case 2:
+            if (1 != strlen(s_unit)) {
+                s_show_help = 1;
+            } else {
+                switch (s_unit[0]) {
+                case 'k':
+                case 'K':
+                    s_num_primes *= K;
+                    break;
+                case 'm':
+                case 'M':
+                    s_num_primes *= M;
+                    break;
+                case 'g':
+                case 'G':
+                    s_num_primes *= G;
+                    break;
+                case 't':
+                case 'T':
+                    s_num_primes *= M;
+                    s_num_primes *= M;
+                    break;
+                default:
+                    s_show_help = 1;
+                    break;
+                }
+            }
+            break;
+        default:
+            s_show_help = 1;
+            break;
+        }
+
     } else {
         s_show_help = 1;
     }
@@ -471,8 +514,10 @@ static void show_help(void)
             "  -p, --print      print out primes to console when done\n"
             "  -s, --smp        using multiple threads (on different cores) for sieving\n" "\n");
 
-    fprintf(stderr, "num_primes: the total number of primes to be determined, starting from 2.\n");
-    fprintf(stderr, "            can be of unit kK/mM/gG/tT, which are 10^3, 10^6, 10^9, and 10^12 respectively.\n");
+    fprintf(stderr,
+            "Argument:\n"
+            "  num_primes:      the total number of primes to be determined, starting from 2.\n"
+            "                   can be of unit kK/mM/gG/tT, which are 10^3, 10^6, 10^9, and 10^12 respectively.\n");
 }
 
 /*##############################################################
