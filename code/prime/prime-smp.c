@@ -50,7 +50,7 @@ typedef unsigned long long int prime_t;
 
 /* used as argument to thread_start() */
 struct thread_info {
-    pthread_t tid;        /* id returned by pthread_create() */
+    pthread_t tid;              /* id returned by pthread_create() */
     int core_idx;               /* the idx of the core this thread setaffinity to */
 
     prime_t *known_primes;      /* array of the known primes */
@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
     prime_t i, j, num_primes_in_db = 0, next_prime_index = 0;
     FILE *fp;
 
-    printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
-    
+    // printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
+
     process_args(argc, argv);
 
     if (s_show_help) {
@@ -144,9 +144,9 @@ int main(int argc, char *argv[])
 
             PRIME_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", num_primes_in_db,
                          PRIME_DB_FILE_NAME, s_num_primes));
-            if(num_primes_in_db > s_num_primes)
+            if (num_primes_in_db > s_num_primes)
                 num_primes_in_db = s_num_primes;
-            
+
             if (num_primes_in_db != fread(g_prime, sizeof(prime_t), num_primes_in_db, fp)) {
                 PRIME_debug(("ERROR: reading db file '%s' failed. ignore the db content.", PRIME_DB_FILE_NAME));
                 num_primes_in_db = 0;
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
      */
 
     while (next_prime_index < s_num_primes) {
-        PRIME_debug(("INFO: this session starts to find the prime number with index %llu...\n", next_prime_index));
+        //PRIME_debug(("INFO: this session starts to find the prime number with index %llu...\n", next_prime_index));
         next_prime_index = sieve_prime_smp(next_prime_index, g_prime);
     }
 
@@ -254,13 +254,13 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
         sieve_stop = sieve_start + sieve_size - 1;
     }
 
-    PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu.\n", next_index));
+    PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu. ", next_index));
     PRIME_debug(("sieve_range: [%llu, %llu]; sieve_size:%llu\n", sieve_start, sieve_stop, sieve_size));
     for (i = 0; i < sieve_size; i++)
         s_sieve[i] = sieve_start + i;
 
     /* this loop is the heart of the algo: sieve by all known primes...... */
-    
+
     if (!s_smp) {
         for (i = 0; i <= last_index; i++) {
             prime_t the_prime = known_primes[i];
@@ -282,15 +282,15 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
 
         }
     } else
-
-        {                    /* SMP version */
+    {                           /* SMP version */
         struct thread_info *tinfo;
         pthread_attr_t attr;
-        int res;
-        int s, tnum;
+        int s;
+        void *res;
+        int tidx;               /* thread index */
 
         int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-        PRIME_debug(("num_cores=%d\n", num_cores));
+        //PRIME_debug(("num_cores=%d\n", num_cores));
 
         /* initialize thread creation attributes */
         s = pthread_attr_init(&attr);
@@ -304,41 +304,31 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
             handle_error("calloc");
 
         /* create one thread for each core */
-        for (tnum = 0; tnum < num_cores; tnum++) {
-            tinfo[tnum].core_idx = tnum;
-            tinfo[tnum].known_primes = known_primes;
-            tinfo[tnum].start_idx = tinfo[tnum].core_idx;
-            tinfo[tnum].last_idx = last_index;
-            tinfo[tnum].step = num_cores;
-            tinfo[tnum].sieve = s_sieve;
-            tinfo[tnum].sieve_size = sieve_size;
-            tinfo[tnum].sieve_start = sieve_start;
+        for (tidx = 0; tidx < num_cores; tidx++) {
+            tinfo[tidx].core_idx = tidx;
+            tinfo[tidx].known_primes = known_primes;
+            tinfo[tidx].start_idx = tinfo[tidx].core_idx;
+            tinfo[tidx].last_idx = last_index;
+            tinfo[tidx].step = num_cores;
+            tinfo[tidx].sieve = s_sieve;
+            tinfo[tidx].sieve_size = sieve_size;
+            tinfo[tidx].sieve_start = sieve_start;
 
-            s = pthread_create(&(tinfo[tnum].tid), &attr, &thread_start, &tinfo[tnum]);
+            s = pthread_create(&(tinfo[tidx].tid), &attr, &thread_start, &tinfo[tidx]);
             if (s != 0)
                 handle_error_en(s, "pthread_create");
-
-            //PRIME_debug(("tnum=%d, tid=%lu\n", tnum, tinfo[tnum].tid));
         }
 
-        //sleep(4);
-        
         /* destroy the thread attributes object, since it is no longer needed */
         s = pthread_attr_destroy(&attr);
         if (s != 0)
             handle_error_en(s, "pthread_attr_destroy");
 
         /* now join with each thread */
-        for (tnum = 0; tnum < num_cores; tnum ++) {
-            PRIME_debug(("to join: tnum=%d, tid=%lu\n", tnum, tinfo[tnum].tid));
-#if (1)            
-            s = pthread_join(tinfo[tnum].tid, (void *)(&res));
-            if(s == ESRCH)
-                printf("ESRCH\n");
-            
+        for (tidx = 0; tidx < num_cores; tidx++) {
+            s = pthread_join(tinfo[tidx].tid, &res);
             if (s != 0)
                 handle_error_en(s, "pthread_join");
-#endif            
         }
 
         free(tinfo);
@@ -364,9 +354,11 @@ static void *thread_start(void *arg)
     prime_t i;
     struct thread_info *tinfo = (struct thread_info *)arg;
 
+#if (0)
     PRIME_debug(("tid=%lu, core_idx=%d, start_idx=%llu, last_idx=%llu, step=%llu, sieve_size=%llu, sieve_start=%llu\n",
                  tinfo->tid, tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size,
                  tinfo->sieve_start));
+#endif
 
     /* sanity check */
     if (!tinfo->known_primes || !tinfo->sieve) {
@@ -374,13 +366,11 @@ static void *thread_start(void *arg)
         exit(1);
     }
 
-    //stick_this_thread_to_core(tinfo->core_idx);
+    stick_this_thread_to_core(tinfo->core_idx);
 
     /* start sieving */
     for (i = tinfo->start_idx; i <= tinfo->last_idx; i += tinfo->step) {
 
-        //sleep(1);
-        
         prime_t the_prime = tinfo->known_primes[i];
         prime_t smallest, sieve_index;
 
@@ -399,8 +389,6 @@ static void *thread_start(void *arg)
         while (sieve_index < tinfo->sieve_size);
 
     }
-
-    PRIME_debug(("tid=%lu returning...\n", pthread_self()));
 
     return 0;
 }
