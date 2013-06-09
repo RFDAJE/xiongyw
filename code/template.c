@@ -2,11 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+/*
+ * beautify me with: indent -linux -l132 -nut -i4
+ */
+
 /*##############################################################
   # debug definition
   #############################################################*/
 
 #ifdef TEMPLATE_DEBUG
+#define STMT(stuff) do { stuff } while (0)
 #define TEMOKATE_debug(a) STMT(                             \
     printf("[%s(%04d)] ", __FILE__[0] == '/'?             \
         ((strrchr(__FILE__,'/')==NULL)?__FILE__:(strrchr(__FILE__,'/')+1)):   \
@@ -16,6 +21,15 @@
 #else
 #define TEMPLATE_debug(a)
 #endif /* TEMPLATE_DEBUG */
+
+/*##############################################################
+  # other definitions
+  #############################################################*/
+
+/*##############################################################
+  # typedefs
+  #############################################################*/
+
 
 /*##############################################################
   # globle variables definition
