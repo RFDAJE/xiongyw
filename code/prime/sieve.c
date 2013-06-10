@@ -101,8 +101,8 @@ static char s_unit[10];
   # local function forward declarations
   #############################################################*/
 static void *thread_start(void *arg);
-static int stick_this_thread_to_core(int core_idx);
-static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes);
+static int set_affinity(int core_idx);
+static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp);
 static void *thread_start(void *arg);
 static int save_prime_db(prime_t next_index);
 static int print_prime_db(prime_t prime_count);
@@ -114,7 +114,7 @@ static void show_help(void);
   #############################################################*/
 int main(int argc, char *argv[])
 {
-    prime_t i, j, num_primes_in_db = 0, next_prime_index = 0;
+    prime_t num_primes_in_db = 0, next_prime_index = 0;
     FILE *fp;
 
     // printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
         } else {
 
             PRIME_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", num_primes_in_db,
-                         PRIME_DB_FILE_NAME, s_num_primes));
+                         PRIME_DB_FILE_NAME, s_num_primes < num_primes_in_db ? s_num_primes : num_primes_in_db));
             if (num_primes_in_db > s_num_primes)
                 num_primes_in_db = s_num_primes;
 
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
 
     while (next_prime_index < s_num_primes) {
         //PRIME_debug(("INFO: this session starts to find the prime number with index %llu...\n", next_prime_index));
-        next_prime_index = sieve_prime_smp(next_prime_index, g_prime);
+        next_prime_index = sieve_prime(next_prime_index, g_prime, s_smp);
     }
 
     /*
@@ -198,10 +198,9 @@ int main(int argc, char *argv[])
  * core_idx range: [0, num_cores-1];
  * return: 0 for success, otherwise failure
  */
-static int stick_this_thread_to_core(int core_idx)
+static int set_affinity(int core_idx)
 {
-    int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-    if (core_idx < 0 || core_idx >= num_cores)
+    if (core_idx < 0 || core_idx >= sysconf(_SC_NPROCESSORS_ONLN))
         return EINVAL;
 
     cpu_set_t cpuset;
@@ -213,19 +212,20 @@ static int stick_this_thread_to_core(int core_idx)
 
 /*
  * next_index [in]: the index of the next prime number to be determined. 
- * known_primes [in/out]: the array of the known primes, starting from 
- * the 1st one (2) to the one before "next_index", the function will add primes into the array.
+ * known_primes [in/out]: the array of the known primes, starting from
+ *                 the 1st one (2) to the one before "next_index",
+ *                 the function will add primes into the array.
+ * smp [in]: bool, 1 for multi-threads.
  *
  * return: the index of the next un-determined prime number 
  *         return 0 for errors.
  */
-static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
+static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
 {
     static prime_t s_sieve[MAX_SIEVE_SIZE];
 
     prime_t last_prime, last_index;     /* the last known prime and its index */
     prime_t sieve_start, sieve_stop, sieve_size;        /* sieve range: [sieve_start, sieve_stop] */
-    prime_t *sieve;             /* the sieve array */
 
     prime_t i, next_index_return = next_index;
 
@@ -269,7 +269,7 @@ static prime_t sieve_prime_smp(prime_t next_index, prime_t * known_primes)
 
     /* this loop is the heart of the algo: sieve by all known primes...... */
 
-    if (!s_smp) {
+    if (!smp) {
         for (i = 0; i <= last_index; i++) {
             prime_t the_prime = known_primes[i];
             prime_t smallest, sieve_index;
@@ -391,7 +391,7 @@ static void *thread_start(void *arg)
         exit(1);
     }
 
-    stick_this_thread_to_core(tinfo->core_idx);
+    set_affinity(tinfo->core_idx);
 
     /* start sieving */
     for (i = tinfo->start_idx; i <= tinfo->last_idx; i += tinfo->step) {

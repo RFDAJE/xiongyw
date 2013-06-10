@@ -13,6 +13,7 @@
 - kill buff: c-x k
 - list buffs: c-x c-b
 - buff r/o: c-x c-q
+- revert buff: m-x revert-buffer
 
 - close win: c-x 0
 - single win: c-x 1

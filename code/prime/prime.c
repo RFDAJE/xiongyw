@@ -81,7 +81,7 @@ int s_is_index_found(factor_node * root, int index)
 int main()
 {
 
-    prime_t i, j, next_prime_index = 0;
+    prime_t next_prime_index = 0;
     FILE *fp;
 
     /* a value 0 means the prime number at that index is not yet determined */
