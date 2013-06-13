@@ -1,5 +1,6 @@
 /*
  * noted(bruin, 2013-06-10): updated to support SMP and getopt
+ * noted(bruin, 2013-06-13): added mmap() for saving primes 
  */
 #define _GNU_SOURCE
 #include <unistd.h>
@@ -11,6 +12,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <getopt.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define PRIME_DEBUG
 
@@ -78,12 +83,13 @@ prime_t *g_prime = NULL;
 /*##############################################################
   # static variables definition
   #############################################################*/
+static char s_optstring[] = "hvpms";
 
 static struct option const s_long_options[] = {
     {"help", no_argument, 0, 'h'},
     {"verbose", no_argument, 0, 'v'},
-
     {"print", no_argument, 0, 'p'},
+    {"mmap", no_argument, 0, 'm'},
     {"smp", no_argument, 0, 's'},
 
     {0, 0, 0, 0}
@@ -94,6 +100,7 @@ static int s_show_help = 0;
 static int s_verbose = 0;
 static int s_print = 0;
 static int s_smp = 0;
+static int s_mmap = 0;          /* using mmap() for accessing prime db */
 static prime_t s_num_primes = 0;
 static char s_unit[10];
 
@@ -115,7 +122,12 @@ static void show_help(void);
 int main(int argc, char *argv[])
 {
     prime_t num_primes_in_db = 0, next_prime_index = 0;
-    FILE *fp;
+    FILE *fp = NULL;
+
+    struct stat fstat;
+    int fd = -1;                /* file descriptor of the prime db */
+    prime_t file_size = 0;
+    int db_exist = 0;
 
     // printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
 
@@ -126,43 +138,92 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    PRIME_debug(("s_smp=%d, s_verbose=%d, s_print=%d\n", s_smp, s_verbose, s_print));
+    PRIME_debug(("s_smp=%d, s_verbose=%d, s_print=%d, s_mmap=%d\n", s_smp, s_verbose, s_print, s_mmap));
 
     PRIME_debug(("s_num_primes=%llu\n", s_num_primes));
 
-    g_prime = (prime_t *) calloc(s_num_primes, sizeof(prime_t));
-    if (!g_prime) {
-        PRIME_debug(("ERROR: can not malloc array to store %llu prime numbers, abort!\n", s_num_primes));
-        return -1;
-    }
-
-    /*
-     * try to read the db into ram first
-     */
-    fp = fopen(PRIME_DB_FILE_NAME, "r");
-    if (fp == NULL) {
-        PRIME_debug(("INFO: %s does not exist.\n", PRIME_DB_FILE_NAME));
-    } else {
-        if (1 != fread(&num_primes_in_db, sizeof(prime_t), 1, fp)) {
-            PRIME_debug(("ERROR: can not read prime count in %s\n", PRIME_DB_FILE_NAME));
-            num_primes_in_db = 0;
-            next_prime_index = 0;
+    if (!s_mmap) {
+        g_prime = (prime_t *) calloc(s_num_primes, sizeof(prime_t));
+        if (!g_prime) {
+            PRIME_debug(("ERROR: can not malloc array to store %llu prime numbers, abort!\n", s_num_primes));
+            return -1;
+        }
+        /*
+         * try to read the db into ram first
+         */
+        fp = fopen(PRIME_DB_FILE_NAME, "r");
+        if (fp == NULL) {
+            PRIME_debug(("INFO: %s does not exist.\n", PRIME_DB_FILE_NAME));
         } else {
-
-            PRIME_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", num_primes_in_db,
-                         PRIME_DB_FILE_NAME, s_num_primes < num_primes_in_db ? s_num_primes : num_primes_in_db));
-            if (num_primes_in_db > s_num_primes)
-                num_primes_in_db = s_num_primes;
-
-            if (num_primes_in_db != fread(g_prime, sizeof(prime_t), num_primes_in_db, fp)) {
-                PRIME_debug(("ERROR: reading db file '%s' failed. ignore the db content.", PRIME_DB_FILE_NAME));
+            if (1 != fread(&num_primes_in_db, sizeof(prime_t), 1, fp)) {
+                PRIME_debug(("ERROR: can not read prime count in %s\n", PRIME_DB_FILE_NAME));
                 num_primes_in_db = 0;
                 next_prime_index = 0;
             } else {
-                next_prime_index = num_primes_in_db;
+
+                PRIME_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", num_primes_in_db,
+                             PRIME_DB_FILE_NAME, s_num_primes < num_primes_in_db ? s_num_primes : num_primes_in_db));
+                if (num_primes_in_db > s_num_primes)
+                    num_primes_in_db = s_num_primes;
+
+                if (num_primes_in_db != fread(g_prime, sizeof(prime_t), num_primes_in_db, fp)) {
+                    PRIME_debug(("ERROR: reading db file '%s' failed. ignore the db content.", PRIME_DB_FILE_NAME));
+                    num_primes_in_db = 0;
+                    next_prime_index = 0;
+                } else {
+                    next_prime_index = num_primes_in_db;
+                }
             }
+            fclose(fp);
         }
-        fclose(fp);
+    } else {
+
+        file_size = (1 + s_num_primes) * sizeof(prime_t);
+        PRIME_debug(("required file_size=%llu\n", file_size));
+
+        /* get the file stat */
+        if (-1 == stat(PRIME_DB_FILE_NAME, &fstat)) {
+            PRIME_debug(("stat(%s) failed, errno=%d, assuming file does not exist.\n", PRIME_DB_FILE_NAME, errno));
+            db_exist = 0;
+        } else {
+            db_exist = 1;
+        }
+        PRIME_debug(("db_exist=%d, st_size=%ld\n", db_exist, fstat.st_size));
+
+        /* get the file descriptor */
+        if ((fd = open(PRIME_DB_FILE_NAME, O_CREAT | O_RDWR | O_NOATIME, 00666)) == -1) {
+            PRIME_debug(("open(%s,...) failed. errno=%d, abort.\n", PRIME_DB_FILE_NAME, errno));
+            exit(1);
+        }
+        //PRIME_debug(("fd=%d\n", fd));
+
+        /* make sure the file grows to desired size before mmap() */
+        if (!db_exist || file_size > fstat.st_size) {
+            if (-1 == lseek(fd, file_size - 1, SEEK_SET)) {
+                PRIME_debug(("lseek(%llu) failed. abort\n", file_size));
+                exit(1);
+            }
+            write(fd, "", 1);
+        }
+
+        /* mmap the whole file */
+        g_prime = (prime_t *) mmap(NULL, file_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        if (g_prime == MAP_FAILED) {
+            PRIME_debug(("mmap(...,%s,...) failed, errno=%d, abort.\n", PRIME_DB_FILE_NAME, errno));
+            close(fd);
+            exit(1);
+        }
+        //PRIME_debug(("g_prime=%p\n", (void *)g_prime));
+
+        if (db_exist) {
+            num_primes_in_db = g_prime[0];
+            PRIME_debug(("num_primes_in_db=%llu\n", num_primes_in_db));
+            next_prime_index = s_num_primes < num_primes_in_db ? s_num_primes : num_primes_in_db;
+        } else {
+            num_primes_in_db = 0;
+            next_prime_index = 0;
+        }
+        g_prime += 1;           /* skip the header: number of the primes in the db */
     }
 
     /*
@@ -175,9 +236,9 @@ int main(int argc, char *argv[])
     }
 
     /*
-     * save in db only if we have more...
+     * save in db only if we have more and if not using mmap()...
      */
-    if (next_prime_index > num_primes_in_db) {
+    if (next_prime_index > num_primes_in_db && !s_mmap) {
         save_prime_db(next_prime_index);
     }
 
@@ -186,6 +247,17 @@ int main(int argc, char *argv[])
      */
     if (s_print)
         print_prime_db(next_prime_index);
+
+    /*
+     * munmap() when applicable
+     */
+    if (s_mmap) {
+        if (next_prime_index > num_primes_in_db)
+            *(g_prime - 1) = next_prime_index;
+        munmap((void *)(g_prime - 1), file_size);
+        g_prime = NULL;
+        close(fd);
+    }
 
     return 0;
 }
@@ -461,7 +533,7 @@ static void process_args(int argc, char *argv[])
     }
 
     for (;;) {
-        c = getopt_long(argc, argv, "hvps", s_long_options, &option_index);
+        c = getopt_long(argc, argv, s_optstring, s_long_options, &option_index);
         if (c == -1)
             break;
 
@@ -477,6 +549,9 @@ static void process_args(int argc, char *argv[])
             break;
         case 's':
             s_smp = 1;
+            break;
+        case 'm':
+            s_mmap = 1;
             break;
         default:
             break;
@@ -539,6 +614,7 @@ static void show_help(void)
             "  -h, --help       print this help, then exit\n"
             "  -v, --verbose    verbosely report processing\n"
             "  -p, --print      print out primes to console when done\n"
+            "  -m, --mmap       using mmap() to access (rw) the prime db\n"
             "  -s, --smp        using multiple threads (on different cores) for sieving\n" "\n");
 
     fprintf(stderr,
