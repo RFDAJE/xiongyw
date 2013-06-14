@@ -1,8 +1,10 @@
 /*
  * noted(bruin, 2013-06-10): updated to support SMP and getopt
- * noted(bruin, 2013-06-13): added mmap() for saving primes 
+ * noted(bruin, 2013-06-13): added mmap() for saving primes
+ * noted(bruin, 2013-06-14): set the max sieve size according to physical ram size
  */
 #define _GNU_SOURCE
+#define _LARGEFILE64_SOURCE
 #include <unistd.h>
 #include <sched.h>
 #include <pthread.h>
@@ -42,13 +44,14 @@
  * the bigger the sieve size, the faster the sieving process, for the same number of primes.
  * however,  when sieve size grows, more memory is needed and the speed-up margin decreases.
  */
-#define MAX_SIEVE_SIZE                   (100 * 1000 * 1000)
+//#define MAX_SIEVE_SIZE                   (100 * 1000 * 1000)
 
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg)  do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 #define PRIME_DB_FILE_NAME "prime.db"
 #define LINE_COUNT  10          /* print 10 primes for each line */
+
 #define K (1000)
 #define M (1000 * K)
 #define G (1000 * M)
@@ -79,7 +82,8 @@ struct thread_info {
   # globle variables definition
   #############################################################*/
 prime_t *g_prime = NULL;
-
+prime_t *g_sieve = NULL;
+prime_t g_max_sieve_size = 0;
 /*##############################################################
   # static variables definition
   #############################################################*/
@@ -104,6 +108,9 @@ static int s_mmap = 0;          /* using mmap() for accessing prime db */
 static prime_t s_num_primes = 0;
 static char s_unit[10];
 
+/* system physical memory info: page size and num of physical pages */
+static int s_pagesize = 0;
+static int s_phys_pages = 0;
 /*##############################################################
   # local function forward declarations
   #############################################################*/
@@ -129,7 +136,9 @@ int main(int argc, char *argv[])
     prime_t file_size = 0;
     int db_exist = 0;
 
-    // printf("sizeof(pthread_t)=%lu, sizeof(prime_t)=%lu\n", sizeof(pthread_t), sizeof(prime_t));
+    /*
+     * process and print the option/arguments
+     */
 
     process_args(argc, argv);
 
@@ -139,14 +148,37 @@ int main(int argc, char *argv[])
     }
 
     PRIME_debug(("s_smp=%d, s_verbose=%d, s_print=%d, s_mmap=%d\n", s_smp, s_verbose, s_print, s_mmap));
-
     PRIME_debug(("s_num_primes=%llu\n", s_num_primes));
 
+    /*
+     * determine the sieve size and allocate it
+     */
+    s_pagesize = sysconf(_SC_PAGESIZE);
+    s_phys_pages = sysconf(_SC_PHYS_PAGES);
+
+    /* maximumly use half of the physical RAM for the sieve */
+    g_max_sieve_size = s_pagesize * s_phys_pages / sizeof(prime_t) / 2;
+
+    PRIME_debug(("pagesize=%d, phys_pages=%d=>total_ram=%d(MiB); max_sieve_size=%.1f (M)\n",
+                 s_pagesize, s_phys_pages, s_pagesize * s_phys_pages / 1024 / 1024, (float)g_max_sieve_size / M));
+
+    /* malloc the global sieve */
+    g_sieve = (prime_t *) malloc(g_max_sieve_size * sizeof(prime_t));
+    if (!g_sieve) {
+        PRIME_debug(("malloc() for sieve failed.\n"));
+        exit(1);
+    }
+
+    /*
+     * setup the prime array
+     */
     if (!s_mmap) {
         g_prime = (prime_t *) calloc(s_num_primes, sizeof(prime_t));
         if (!g_prime) {
-            PRIME_debug(("ERROR: can not malloc array to store %llu prime numbers, abort!\n", s_num_primes));
-            return -1;
+            PRIME_debug(("ERROR: can not malloc array to store %llu prime numbers. try using '-m' option?\n", s_num_primes));
+            if (g_sieve)
+                free(g_sieve);
+            exit(1);
         }
         /*
          * try to read the db into ram first
@@ -179,7 +211,12 @@ int main(int argc, char *argv[])
     } else {
 
         file_size = (1 + s_num_primes) * sizeof(prime_t);
-        PRIME_debug(("required file_size=%llu\n", file_size));
+        PRIME_debug(("required file_size=%llu. (size_t)(-1)=%u\n", file_size, (size_t) (-1)));
+        if (file_size > (size_t) (-1)) {
+            PRIME_debug(("the file size is larger than 2^%d bytes, which is the maximum size can be mmap()ed. giving up...\n",
+                         sizeof(size_t) * 8));
+            exit(1);
+        }
 
         /* get the file stat */
         if (-1 == stat(PRIME_DB_FILE_NAME, &fstat)) {
@@ -195,12 +232,11 @@ int main(int argc, char *argv[])
             PRIME_debug(("open(%s,...) failed. errno=%d, abort.\n", PRIME_DB_FILE_NAME, errno));
             exit(1);
         }
-        //PRIME_debug(("fd=%d\n", fd));
 
         /* make sure the file grows to desired size before mmap() */
         if (!db_exist || file_size > fstat.st_size) {
-            if (-1 == lseek(fd, file_size - 1, SEEK_SET)) {
-                PRIME_debug(("lseek(%llu) failed. abort\n", file_size));
+            if (-1 == lseek64(fd, file_size - 1, SEEK_SET)) {
+                PRIME_debug(("lseek64(%llu) failed. abort\n", file_size));
                 exit(1);
             }
             write(fd, "", 1);
@@ -259,6 +295,12 @@ int main(int argc, char *argv[])
         close(fd);
     }
 
+    /*
+     * free the sieve
+     */
+    if (g_sieve)
+        free(g_sieve);
+
     return 0;
 }
 
@@ -294,7 +336,7 @@ static int set_affinity(int core_idx)
  */
 static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
 {
-    static prime_t s_sieve[MAX_SIEVE_SIZE];
+    //    static prime_t s_sieve[MAX_SIEVE_SIZE];
 
     prime_t last_prime, last_index;     /* the last known prime and its index */
     prime_t sieve_start, sieve_stop, sieve_size;        /* sieve range: [sieve_start, sieve_stop] */
@@ -328,8 +370,8 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
     sieve_stop = last_prime * last_prime;       /* this is the up-bound that the current known primes can sieve */
     sieve_size = sieve_stop - sieve_start + 1;
 
-    if (sieve_size > MAX_SIEVE_SIZE) {
-        sieve_size = MAX_SIEVE_SIZE;
+    if (sieve_size > g_max_sieve_size) {
+        sieve_size = g_max_sieve_size;
         sieve_stop = sieve_start + sieve_size - 1;
     }
 
@@ -337,7 +379,7 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
                  next_index, sieve_start, sieve_stop, sieve_size));
 
     for (i = 0; i < sieve_size; i++)
-        s_sieve[i] = sieve_start + i;
+        g_sieve[i] = sieve_start + i;
 
     /* this loop is the heart of the algo: sieve by all known primes...... */
 
@@ -351,11 +393,11 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
             if (smallest < sieve_start)
                 smallest += the_prime;
             sieve_index = smallest - sieve_start;
-            if (sieve_index >= MAX_SIEVE_SIZE)
+            if (sieve_index >= g_max_sieve_size)
                 continue;
 
             do {
-                s_sieve[sieve_index] = 0;
+                g_sieve[sieve_index] = 0;
                 sieve_index += the_prime;
             }
             while (sieve_index < sieve_size);
@@ -407,7 +449,7 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
             tinfo[tidx].start_idx = tinfo[tidx].core_idx;
             tinfo[tidx].last_idx = last_index;
             tinfo[tidx].step = num_cores;
-            tinfo[tidx].sieve = s_sieve;
+            tinfo[tidx].sieve = g_sieve;
             tinfo[tidx].sieve_size = sieve_size;
             tinfo[tidx].sieve_start = sieve_start;
 
@@ -433,9 +475,9 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
 
     /* collect primes remain in the sieve */
     for (i = 0; i < sieve_size; i++) {
-        if (s_sieve[i] != 0) {
-            //PRIME_debug(("INFO: found new prime: %llu -> %llu\n", next_index_return, s_sieve[i]));
-            known_primes[next_index_return] = s_sieve[i];
+        if (g_sieve[i] != 0) {
+            //PRIME_debug(("INFO: found new prime: %llu -> %llu\n", next_index_return, g_sieve[i]));
+            known_primes[next_index_return] = g_sieve[i];
             next_index_return++;
             if (next_index_return >= s_num_primes)
                 break;
