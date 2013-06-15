@@ -2,6 +2,12 @@
  * noted(bruin, 2013-06-10): updated to support SMP and getopt
  * noted(bruin, 2013-06-13): added mmap() for saving primes
  * noted(bruin, 2013-06-14): set the max sieve size according to physical ram size
+ *
+ * todo:
+ *  - don't sieve even numbers: done.
+ *  - using a single bit instead of prime_t to represent numbers in the sieve: performance not good, dropped.
+ *  - avoid multiple sieving for a single number
+ *  - compress the prime db?
  */
 #define _GNU_SOURCE
 #define _LARGEFILE64_SOURCE
@@ -114,15 +120,19 @@ static int s_phys_pages = 0;
 /*##############################################################
   # local function forward declarations
   #############################################################*/
+static void do_sieve(prime_t * known_primes, prime_t start_idx, prime_t stop_idx, prime_t idx_step, prime_t * sieve,
+                     prime_t sieve_start, prime_t sieve_size);
 static void *thread_start(void *arg);
 static int set_affinity(int core_idx);
-static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp);
+static prime_t sieve_prime(prime_t * known_primes, prime_t start_idx, prime_t stop_idx, int smp);
 static void *thread_start(void *arg);
 static int save_prime_db(prime_t next_index);
 static int print_prime_db(prime_t prime_count);
 static void process_args(int argc, char *argv[]);
 static void show_help(void);
 
+static int check_prime_between_n2p1_n2pn(void);
+static int check_prime_between_ns_np1s(void);
 /*##############################################################
   # global function implementations
   #############################################################*/
@@ -157,10 +167,11 @@ int main(int argc, char *argv[])
     s_phys_pages = sysconf(_SC_PHYS_PAGES);
 
     /* maximumly use half of the physical RAM for the sieve */
-    g_max_sieve_size = s_pagesize * s_phys_pages / sizeof(prime_t) / 2;
+    g_max_sieve_size = (prime_t) s_pagesize *s_phys_pages / sizeof(prime_t) / 2;
+    //g_max_sieve_size = (prime_t) s_pagesize *s_phys_pages / 2;  /* one byte flag for each element in the sieve */
 
-    PRIME_debug(("pagesize=%d, phys_pages=%d=>total_ram=%d(MiB); max_sieve_size=%.1f (M)\n",
-                 s_pagesize, s_phys_pages, s_pagesize * s_phys_pages / 1024 / 1024, (float)g_max_sieve_size / M));
+    PRIME_debug(("pagesize=%d, phys_pages=%d=>total_ram=%llu(MiB); max_sieve_size=%.1f (M)\n",
+                 s_pagesize, s_phys_pages, (prime_t) s_pagesize * s_phys_pages / 1024 / 1024, (float)g_max_sieve_size / M));
 
     /* malloc the global sieve */
     g_sieve = (prime_t *) malloc(g_max_sieve_size * sizeof(prime_t));
@@ -211,9 +222,9 @@ int main(int argc, char *argv[])
     } else {
 
         file_size = (1 + s_num_primes) * sizeof(prime_t);
-        PRIME_debug(("required file_size=%llu. (size_t)(-1)=%u\n", file_size, (size_t) (-1)));
+        PRIME_debug(("required file_size=%llu. max mmap() length: (size_t)(-1)=%lu\n", file_size, (size_t) (-1)));
         if (file_size > (size_t) (-1)) {
-            PRIME_debug(("the file size is larger than 2^%d bytes, which is the maximum size can be mmap()ed. giving up...\n",
+            PRIME_debug(("the file size is larger than 2^%lu bytes, which is the maximum size can be mmap()ed. giving up...\n",
                          sizeof(size_t) * 8));
             exit(1);
         }
@@ -268,7 +279,7 @@ int main(int argc, char *argv[])
 
     while (next_prime_index < s_num_primes) {
         //PRIME_debug(("INFO: this session starts to find the prime number with index %llu...\n", next_prime_index));
-        next_prime_index = sieve_prime(next_prime_index, g_prime, s_smp);
+        next_prime_index = sieve_prime(g_prime, next_prime_index, s_num_primes, s_smp);
     }
 
     /*
@@ -277,6 +288,8 @@ int main(int argc, char *argv[])
     if (next_prime_index > num_primes_in_db && !s_mmap) {
         save_prime_db(next_prime_index);
     }
+    // check_prime_between_n2p1_n2pn();
+    // check_prime_between_ns_np1s();
 
     /*
      * print the primes to console
@@ -325,29 +338,32 @@ static int set_affinity(int core_idx)
 }
 
 /*
- * next_index [in]: the index of the next prime number to be determined. 
  * known_primes [in/out]: the array of the known primes, starting from
- *                 the 1st one (2) to the one before "next_index",
+ *                 the 1st one (2) to the one before "start_idx",
  *                 the function will add primes into the array.
- * smp [in]: bool, 1 for multi-threads.
+ * start_idx: the index of the next prime number to be determined.
+ * stop_idx: stop if we reach to this index 
+ * smp: bool, 1 for multi-threads.
  *
  * return: the index of the next un-determined prime number 
  *         return 0 for errors.
  */
-static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
+static prime_t sieve_prime(prime_t * known_primes, prime_t start_idx, prime_t stop_idx, int smp)
 {
-    //    static prime_t s_sieve[MAX_SIEVE_SIZE];
-
     prime_t last_prime, last_index;     /* the last known prime and its index */
-    prime_t sieve_start, sieve_stop, sieve_size;        /* sieve range: [sieve_start, sieve_stop] */
 
-    prime_t i, next_index_return = next_index;
+    /* the seive does not contain any even number bigger than 2 */
+    prime_t sieve_start;        /* the smallest & first number in the sieve */
+    prime_t sieve_stop;         /* the lagest & last number in the sieve */
+    prime_t sieve_size;         /* number of numbers in the sieve */
+
+    prime_t i, next_index_return = start_idx;
 
     if (!known_primes)
         return 0;
 
-    if (next_index == 0) {
-        /* populate the first bunch of known primes */
+    if (start_idx == 0) {
+        /* populate the first bunch of known primes, don't need a sieve */
         known_primes[0] = 2;
         known_primes[1] = 3;
         known_primes[2] = 5;
@@ -358,70 +374,36 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
         known_primes[7] = 19;
         known_primes[8] = 23;
 
-        PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu\n", next_index));
+        PRIME_debug(("INFO: sieve session starts: next_prime_index=%llu\n", start_idx));
         return 9;
     }
 
-    /* calcuate the sieve size and populate the sieve with nature numbers */
-    last_index = next_index - 1;
+    /* calcuate the biggest number can be sieved with the known prime db */
+    last_index = start_idx - 1;
     last_prime = known_primes[last_index];
 
-    sieve_start = last_prime + 1;
-    sieve_stop = last_prime * last_prime;       /* this is the up-bound that the current known primes can sieve */
-    sieve_size = sieve_stop - sieve_start + 1;
+    sieve_start = last_prime + 2;       /* skip the first even number bigger than 'last_prime' */
+    sieve_stop = last_prime * last_prime;       /* this has to be an odd number */
 
+    /* don't waste time in sieving even numbers */
+    sieve_size = (sieve_stop - sieve_start) / 2 + 1;
+
+    /* we may not have enough space for accomendating the 'sieve_size'. shrink it then */
     if (sieve_size > g_max_sieve_size) {
         sieve_size = g_max_sieve_size;
-        sieve_stop = sieve_start + sieve_size - 1;
+        sieve_stop = sieve_start + (sieve_size - 1) * 2;
     }
 
     PRIME_debug(("INFO: session starts: next_prime_index=%llu, sieve_range: [%llu, %llu], sieve_size:%llu\n",
-                 next_index, sieve_start, sieve_stop, sieve_size));
+                 start_idx, sieve_start, sieve_stop, sieve_size));
 
+    /* populate the sieve */
     for (i = 0; i < sieve_size; i++)
-        g_sieve[i] = sieve_start + i;
-
-    /* this loop is the heart of the algo: sieve by all known primes...... */
+        g_sieve[i] = sieve_start + i * 2;
 
     if (!smp) {
-        for (i = 0; i <= last_index; i++) {
-            prime_t the_prime = known_primes[i];
-            prime_t smallest, sieve_index;
-
-            /* find the first/smallest multiple of "the_prime" in the sieve */
-            smallest = sieve_start / the_prime * the_prime;
-            if (smallest < sieve_start)
-                smallest += the_prime;
-            sieve_index = smallest - sieve_start;
-            if (sieve_index >= g_max_sieve_size)
-                continue;
-
-            do {
-                g_sieve[sieve_index] = 0;
-                sieve_index += the_prime;
-            }
-            while (sieve_index < sieve_size);
-
-        }
+        do_sieve(known_primes, 1, last_index, 1, g_sieve, sieve_start, sieve_size);
     } else {
-
-        /*
-         * SMP version...
-         *
-         * a benchmark when sieving 50M primes on Intel E3-1230V2@3.3GHz (Ubuntu13.04),
-         * using the same max sieve size 2M:
-         *
-         * - UP:
-         * real 2m38.631s
-         * user 2m38.000s
-         * sys  0m0.232s
-         *
-         * - SMP (note the SMP effect that "user + sys > real" ): 
-         * real 0m42.108s
-         * user 4m54.324s
-         * sys  0m0.420s
-         */
-
         struct thread_info *tinfo;
         pthread_attr_t attr;
         int s;
@@ -446,7 +428,7 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
         for (tidx = 0; tidx < num_cores; tidx++) {
             tinfo[tidx].core_idx = tidx;
             tinfo[tidx].known_primes = known_primes;
-            tinfo[tidx].start_idx = tinfo[tidx].core_idx;
+            tinfo[tidx].start_idx = tinfo[tidx].core_idx + 1;   /* don't sieve by g_prime[0]=2 */
             tinfo[tidx].last_idx = last_index;
             tinfo[tidx].step = num_cores;
             tinfo[tidx].sieve = g_sieve;
@@ -473,13 +455,13 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
         free(tinfo);
     }
 
-    /* collect primes remain in the sieve */
+    /* reap primes remain in the sieve */
     for (i = 0; i < sieve_size; i++) {
         if (g_sieve[i] != 0) {
-            //PRIME_debug(("INFO: found new prime: %llu -> %llu\n", next_index_return, g_sieve[i]));
             known_primes[next_index_return] = g_sieve[i];
+            //PRIME_debug(("INFO: found new prime: %llu -> %llu\n", next_index_return, g_sieve[i]));
             next_index_return++;
-            if (next_index_return >= s_num_primes)
+            if (next_index_return >= stop_idx)
                 break;
         }
     }
@@ -487,17 +469,48 @@ static prime_t sieve_prime(prime_t next_index, prime_t * known_primes, int smp)
     return next_index_return;
 }
 
+static void do_sieve(prime_t * known_primes,    /* [in]: prime db */
+                     prime_t start_idx, /* start_idx of the prime used to sieve */
+                     prime_t stop_idx,  /* stop_idx... */
+                     prime_t idx_step,  /* step of prime idx */
+                     prime_t * sieve,   /* [in/out]: the sieve w/o even numbers */
+                     prime_t sieve_start,       /* the number represented by sieve[0] */
+                     prime_t sieve_size)
+{                               /* sieve array size */
+    int i;
+    prime_t p, dp;
+    prime_t smallest, sieve_index;
+    prime_t sieve_stop = sieve_start + (sieve_size - 1) * 2;
+
+    for (i = start_idx; i <= stop_idx; i += idx_step) {
+        p = known_primes[i];
+        dp = p * 2;
+
+        /* find the smallest & odd multiple of "p" within the sieve */
+        smallest = sieve_start / p;
+        if (!(smallest % 2))
+            smallest += 1;
+        smallest *= p;
+
+        if (smallest < sieve_start)
+            smallest += dp;
+        if (smallest > sieve_stop)
+            continue;
+
+        /* sieve now */
+        sieve_index = (smallest - sieve_start) / 2;
+        do {
+            sieve[sieve_index] = 0;
+            sieve_index += p;
+        }
+        while (sieve_index < sieve_size);
+    }
+}
+
 /* sieving function for each thread */
 static void *thread_start(void *arg)
 {
-    prime_t i;
     struct thread_info *tinfo = (struct thread_info *)arg;
-
-#if (0)
-    PRIME_debug(("tid=%lu, core_idx=%d, start_idx=%llu, last_idx=%llu, step=%llu, sieve_size=%llu, sieve_start=%llu\n",
-                 tinfo->tid, tinfo->core_idx, tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve_size,
-                 tinfo->sieve_start));
-#endif
 
     /* sanity check */
     if (!tinfo->known_primes || !tinfo->sieve) {
@@ -507,27 +520,8 @@ static void *thread_start(void *arg)
 
     set_affinity(tinfo->core_idx);
 
-    /* start sieving */
-    for (i = tinfo->start_idx; i <= tinfo->last_idx; i += tinfo->step) {
-
-        prime_t the_prime = tinfo->known_primes[i];
-        prime_t smallest, sieve_index;
-
-        /* find the first/smallest multiple of "the_prime" in the sieve */
-        smallest = tinfo->sieve_start / the_prime * the_prime;
-        if (smallest < tinfo->sieve_start)
-            smallest += the_prime;
-        sieve_index = smallest - tinfo->sieve_start;
-        if (sieve_index >= tinfo->sieve_size)
-            continue;
-
-        do {
-            tinfo->sieve[sieve_index] = 0;
-            sieve_index += the_prime;
-        }
-        while (sieve_index < tinfo->sieve_size);
-
-    }
+    do_sieve(tinfo->known_primes,
+             tinfo->start_idx, tinfo->last_idx, tinfo->step, tinfo->sieve, tinfo->sieve_start, tinfo->sieve_size);
 
     return 0;
 }
@@ -665,6 +659,115 @@ static void show_help(void)
             "                   can be of unit kK/mM/gG/tT, which are 10^3, 10^6, 10^9, and 10^12 respectively.\n");
 }
 
+/*
+ * check wheather or not there is at least one prime in [n^2+1, n^2+n]
+ */
+static int check_prime_between_n2p1_n2pn(void)
+{
+    prime_t n, n2p1, n2pn, idx;
+    int found;
+    for (n = 0;; n++) {
+
+        n2p1 = n * n + 1;
+        n2pn = n * n + n;
+
+        if (n2pn > g_prime[s_num_primes - 1]) {
+            PRIME_debug(("valid at least upto n=%lld, no enough primes in the db\n", n - 1));
+            PRIME_debug(("n^2+n=%llu\n", (n - 1) * (n - 1) + n));
+            PRIME_debug(("lagest prime in db: g_prime[%llu]=%llu\n", s_num_primes - 1, g_prime[s_num_primes - 1]));
+            return 0;
+        }
+
+        found = 0;
+
+        for (idx = 0; idx < s_num_primes; idx++) {
+            if (g_prime[idx] >= n2p1 || g_prime[idx] <= n2pn) {
+                found = 1;
+                goto c1;
+            }
+        }
+ c1:
+        if (!found) {
+            PRIME_debug(("not found for n=%llu\n", n));
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+/*
+ * check wheather or not there is at least one prime in [n^2, (n+1)^2]
+ * Legendre conjection
+ */
+static int check_prime_between_ns_np1s(void)
+{
+    prime_t n, ns, np1s, idx;
+    int found;
+    for (n = 0;; n++) {
+
+        ns = n * n;
+        np1s = (n + 1) * (n + 1);
+
+        if (np1s > g_prime[s_num_primes - 1]) {
+            PRIME_debug(("legendre conjection is valid at least upto n=%lld, no enough primes in the db\n", n - 1));
+            PRIME_debug(("(n+1)^2=%llu\n", n * n));
+            PRIME_debug(("lagest prime in db: g_prime[%llu]=%llu\n", s_num_primes - 1, g_prime[s_num_primes - 1]));
+            return 0;
+        }
+
+        found = 0;
+
+        for (idx = 0; idx < s_num_primes; idx++) {
+            if (g_prime[idx] >= ns || g_prime[idx] <= np1s) {
+                found = 1;
+                goto c1;
+            }
+        }
+ c1:
+        if (!found) {
+            PRIME_debug(("not found for n=%llu\n", n));
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
 /*##############################################################
   # local functions for debug only
   #############################################################*/
+
+/*
+ * benchmarks
+ *
+ *
+  platform: Intel E3-1230V2@3.3GHz, 8GiB RAM, Ubuntu13.04
+
+ * 2013-06-10: using the same max sieve size 2M, sieving 50M primes
+- UP:
+real 2m38.631s
+user 2m38.000s
+sys 0m0.232s
+ 
+- SMP (note the SMP effect that "user + sys > real" ):
+real 0m42.108s
+user 4m54.324s
+sys 0m0.420s
+
+ * 2013-06-15:  not sieving even numbers:
+ bruin@u1304:~/github/xiongyw/code/prime$ rm prime.db
+ bruin@u1304:~/github/xiongyw/code/prime$ time { ./sieve 50m; } | grep 0m
+
+ real0m18.001s
+ user0m16.608s
+ sys0m1.000s
+ bruin@u1304:~/github/xiongyw/code/prime$ rm prime.db
+ bruin@u1304:~/github/xiongyw/code/prime$ time { ./sieve 50m -s; } | grep 0m
+
+ real0m10.236s
+ user0m51.632s
+ sys0m1.196s
+ 
+ 
+ */
