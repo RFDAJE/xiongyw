@@ -2,12 +2,10 @@
  * noted(bruin, 2013-06-10): updated to support SMP and getopt
  * noted(bruin, 2013-06-13): added mmap() for saving primes
  * noted(bruin, 2013-06-14): set the max sieve size according to physical ram size
- *
- * todo:
- *  - don't sieve even numbers: done.
- *  - using a single bit instead of prime_t to represent numbers in the sieve: performance not good, dropped.
- *  - avoid multiple sieving for a single number
- *  - compress the prime db?
+ * noted(bruin, 2013-06-15): not sieving even numbers added; tested using byte as
+ *    flag in sieve, the performance drops too much...idea dropped; optimizing
+ *    the second loop of the sieving process: may not applicable in smp scenario;
+ *    compress the db? to be investigated...
  */
 #define _GNU_SOURCE
 #define _LARGEFILE64_SOURCE
@@ -742,7 +740,7 @@ static int check_prime_between_ns_np1s(void)
  * benchmarks
  *
  *
-  platform: Intel E3-1230V2@3.3GHz, 8GiB RAM, Ubuntu13.04
+  platform: Intel E3-1230V2@3.3GHz, 8GiB RAM, 128GB SSD, Ubuntu13.04 64-bit
 
  * 2013-06-10: using the same max sieve size 2M, sieving 50M primes
 - UP:
@@ -768,6 +766,13 @@ sys 0m0.420s
  real0m10.236s
  user0m51.632s
  sys0m1.196s
- 
+
+ * 2013-06-15: generating 10 billion primes
+ bruin@u1304:~/github/xiongyw/code/prime$ time ./sieve 10g -ms
+
+ real202m39.121s
+ user577m6.644s
+ sys143m37.072s
+  
  
  */
