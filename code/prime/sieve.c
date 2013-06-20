@@ -1,5 +1,4 @@
-#define _GNU_SOURCE
-#define _LARGEFILE64_SOURCE
+#define _GNU_SOURCE             /* for CPU_ZERO() etc, and pthread_setaffinity_np()  */
 #include <unistd.h>
 #include <sched.h>
 #include <pthread.h>

@@ -1,11 +1,7 @@
 all:
-	-indent -linux -l132 -nut -i4 prime.c
-	-indent -linux -l132 -nut -i4 main.c
-	-indent -linux -l132 -nut -i4 sieve.h
-	-indent -linux -l132 -nut -i4 sieve.c
-	gcc -Wall -g prime.c -lm -o prime
-	gcc -Wall -g main.c sieve.c -lm -lpthread -o sieve
+	-indent -linux -l132 -nut -i4  main.c sieve.h sieve.c db.h db.c
+	gcc -Wall -g main.c sieve.c db.c -lm -lpthread -o sieve
 clean:
-	-rm prime smp
+	-rm sieve
 cleandb:
 	-rm prime.db
