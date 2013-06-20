@@ -18,8 +18,10 @@
 #include <getopt.h>
 #include <sys/types.h>
 
+#include "prime.h"
 #include "sieve.h"
 #include "db.h"
+#include "gcd.h"
 
 #define PRIME_DEBUG
 

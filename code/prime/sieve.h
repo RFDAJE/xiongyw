@@ -6,8 +6,7 @@
 #define G (1000 * M)
 #define T (M * M)
 
-/* this allows 2^64 integer value on 32-bit platforms */
-typedef unsigned long long int prime_t;
+#include "prime.h"
 
 prime_t sieve_init(void);
 void sieve_fini(void);
