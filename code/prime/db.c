@@ -61,7 +61,6 @@ static prime_t s_db_size = 0;   /* the number of primes already in the db */
 prime_t *db_init(prime_t max_size, prime_t * current_size, int is_mmap)
 {
 
-    prime_t next_prime_index = 0;
     FILE *fp = NULL;
 
     struct stat fstat;
@@ -95,7 +94,6 @@ prime_t *db_init(prime_t max_size, prime_t * current_size, int is_mmap)
             if (1 != fread(&s_db_size, sizeof(prime_t), 1, fp)) {
                 DB_debug(("ERROR: can not read prime count in %s\n", PRIME_DB_FILE_NAME));
                 s_db_size = 0;
-                next_prime_index = 0;
             } else {
 
                 DB_debug(("INFO: %llu of prime numbers are stored in '%s'. reading %llu of them...\n", s_db_size,
@@ -106,9 +104,6 @@ prime_t *db_init(prime_t max_size, prime_t * current_size, int is_mmap)
                 if (s_db_size != fread(s_prime, sizeof(prime_t), s_db_size, fp)) {
                     DB_debug(("ERROR: reading db file '%s' failed. ignore the db content.", PRIME_DB_FILE_NAME));
                     s_db_size = 0;
-                    next_prime_index = 0;
-                } else {
-                    next_prime_index = s_db_size;
                 }
             }
             fclose(fp);
@@ -158,10 +153,8 @@ prime_t *db_init(prime_t max_size, prime_t * current_size, int is_mmap)
         if (db_exist) {
             s_db_size = s_prime[0];
             DB_debug(("s_db_size=%llu\n", s_db_size));
-            next_prime_index = s_max_size < s_db_size ? s_max_size : s_db_size;
         } else {
             s_db_size = 0;
-            next_prime_index = 0;
         }
         s_prime += 1;           /* skip the header: number of the primes in the db */
     }

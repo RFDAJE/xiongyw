@@ -1,6 +1,5 @@
 /* http://en.wikipedia.org/wiki/Generating_primes */
 
-
 #define _GNU_SOURCE             /* for CPU_ZERO() etc, and pthread_setaffinity_np()  */
 #include <unistd.h>
 #include <sched.h>
