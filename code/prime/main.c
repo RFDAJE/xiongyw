@@ -22,6 +22,9 @@
 #include "sieve.h"
 #include "db.h"
 #include "gcd.h"
+#include "fact.h"
+
+#include "tests.h"
 
 #define PRIME_DEBUG
 
@@ -125,6 +128,13 @@ int main(int argc, char *argv[])
 
     if (s_print)
         print_prime_db(s_num_primes, db);
+
+    /*
+     * do some tests
+     */
+    //print_twin_primes(db, s_num_primes - 1);
+    //print_prime_of_prime(db, s_num_primes - 1);
+    output_asy_primes(db, s_num_primes - 1);
 
     /* we are done */
     sieve_fini();
