@@ -1,6 +1,11 @@
 ;; the file content for "~/.emacs.d/init.el"
 ;;
 
+;; asyptote
+;;(add-to-list 'load-path "C:/Program Files/Asymptote")
+(add-to-list 'load-path "/usr/share/asymptote")
+(require 'asy-mode)
+
 ;; measure the loading time per file.
 (defadvice load (around load-with-time-logging)
   "display the load time for each file."
