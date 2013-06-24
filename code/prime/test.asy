@@ -1,7 +1,10 @@
 import graph;
+
 size(200,IgnoreAspect);
 //size(200);
 file f=binput("prime.db");
+f.singleint(false);  // 64-bit 
+f.signedint(false);  // unsigned 
 int total=f;
 write(total);
 int i = 0;
@@ -10,9 +13,9 @@ pair[] p1, p2, p3, p4;
 while(true) {
   int p=f;
   if(eof(f)) break;
-  if(p==0) continue;
+  //  if(p==0) continue;
   p1.push((i, p));
-  //  write(i, p);
+  write(i, p);
   ++ i;
 }
 
