@@ -134,7 +134,6 @@ int main(int argc, char *argv[])
      */
     //print_twin_primes(db, s_num_primes - 1);
     //print_prime_of_prime(db, s_num_primes - 1);
-    output_asy_primes(db, s_num_primes - 1);
 
     /* we are done */
     sieve_fini();

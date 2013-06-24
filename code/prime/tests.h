@@ -13,7 +13,8 @@ int print_twin_primes(prime_t * db, prime_t max_db_idx);
 
 int print_prime_of_prime(prime_t * db, prime_t max_db_idx);
 
-
+#if (0)
 int output_asy_primes(prime_t * db, prime_t max_db_idx);
+#endif
 
 #endif                          /* __TESTS_H__  */

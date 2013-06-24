@@ -69,6 +69,7 @@ int print_prime_of_prime(prime_t * db, prime_t max_db_idx)
     return 0;
 }
 
+#if (0)
 int output_asy_primes(prime_t * db, prime_t max_db_idx)
 {
     prime_t i;
@@ -81,23 +82,23 @@ int output_asy_primes(prime_t * db, prime_t max_db_idx)
            "pen grid_pen = linewidth(0.01) + /* dashed + */ gray(0.1);\n" "pen dot_pen = linewidth(dot_radius * 2) + red;\n");
 
     /* draw dots */
-    for (i = 0; i <= max_db_idx; i++){
-        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t)log2(db[i]));
+    for (i = 0; i <= max_db_idx; i++) {
+        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t) log2(db[i]));
         //printf("dot((%llu,%llu), dot_pen);\n", i, db[i] / scale);
     }
 
-    for(i = 0; db[i] <= max_db_idx; i ++){
-        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t)log2(db[db[i]]));
+    for (i = 0; db[i] <= max_db_idx; i++) {
+        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t) log2(db[db[i]]));
         //printf("dot((%llu,%llu), dot_pen);\n", i, db[db[i]] / scale);
     }
-        
-    for(i = 0; db[db[i]] <= max_db_idx; i ++){
-        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t)log2(db[db[db[i]]]));
+
+    for (i = 0; db[db[i]] <= max_db_idx; i++) {
+        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t) log2(db[db[db[i]]]));
         //printf("dot((%llu,%llu), dot_pen);\n", i, db[db[db[i]]] / scale);
     }
-    
-    for(i = 0; db[db[db[i]]] <= max_db_idx; i ++){
-        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t)log2(db[db[db[db[i]]]]));
+
+    for (i = 0; db[db[db[i]]] <= max_db_idx; i++) {
+        printf("dot((%llu,%llu), dot_pen);\n", i, (prime_t) log2(db[db[db[db[i]]]]));
         //printf("dot((%llu,%llu), dot_pen);\n", i, db[db[db[db[i]]]] / scale);
     }
 
@@ -106,12 +107,13 @@ int output_asy_primes(prime_t * db, prime_t max_db_idx)
     for (i = 1; i < max_db_idx; i++)
         printf("draw((%llu,0)--(%llu,%llu),grid_pen); \n", i, i, db[max_db_idx]);       /* vertical */
     for (i = 1; i < db[max_db_idx]; i++)
-        printf("draw((0,%llu)--(%llu,%llu),grid_pen); \n", i, max_db_idx, i);    /* horizontal */
+        printf("draw((0,%llu)--(%llu,%llu),grid_pen); \n", i, max_db_idx, i);   /* horizontal */
 #endif
-    
+
     /* border */
-    printf("draw(box((0,0),(%llu,%llu)),border_pen);\n", max_db_idx, (prime_t)log2(db[max_db_idx]));
+    printf("draw(box((0,0),(%llu,%llu)),border_pen);\n", max_db_idx, (prime_t) log2(db[max_db_idx]));
     //printf("draw(box((0,0),(%llu,%llu)),border_pen);\n", max_db_idx, db[max_db_idx] /scale);
 
     return 0;
 }
+#endif
