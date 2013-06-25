@@ -13,16 +13,16 @@
 ;(setq WINDOWS (not (null (getenv "COMSPEC"))))
 ;; note: there is a predefined variable "system-type"...
 
-(setq default-directory "~/../../../")
+(setq default-directory "~/../../")
 ;; set load path 
 (let* ((my-lisp-dir "~/.emacs.d/") 
 (default-directory my-lisp-dir)) 
 (setq load-path (cons my-lisp-dir load-path)) 
 (normal-top-level-add-subdirs-to-load-path)) 
 ;; auto-save-list
-(setq auto-save-list-file-prefix "~/../../../../../auto-save-list/.saves-")
+(setq auto-save-list-file-prefix "~/../../../../auto-save-list/.saves-")
 ;; book mark file
-(setq bookmark-default-file      "~/../../../../../bookmark.emacs")
+(setq bookmark-default-file      "~/../../../../bookmark.emacs")
 ;; *Messsage* size
 (setq message-log-max 10000)
 
@@ -55,7 +55,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 150 :width normal :foundry "outline" :family "Andale Mono")))))
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 132 :width normal :foundry "outline" :family "Andale Mono")))))
 
 (setq visible-bell t) ; no beep
 (setq inhibit-startup-message t) ; no splash screen
@@ -180,14 +180,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; aspell: http://blog.sina.com.cn/s/blog_8e8bd6b90100tgtw.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
-(setq ispell-program-name "aspell")
-(setq-default ispell-program-name "aspell")
-(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
-(require 'ispell)
+;(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
+;(setq ispell-program-name "aspell")
+;(setq-default ispell-program-name "aspell")
+;(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
+;(require 'ispell)
 ;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(global-set-key (kbd "<f8>") 'ispell-word)
-(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+;(global-set-key (kbd "<f8>") 'ispell-word)
+;(global-set-key (kbd "C-<f8>") 'flyspell-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
