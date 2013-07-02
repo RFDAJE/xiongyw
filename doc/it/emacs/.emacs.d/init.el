@@ -207,9 +207,15 @@
 ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; JSShell: http://www.emacswiki.org/emacs/jsshell-bundle.el
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'jsshell-bundle)
+
 
 ;; ue-next-line
 (require 'ue)
+
 
 
 ;(add-to-list 'load-path "c:/emacs/emacs-24.2/site-lisp/magit-1.2.0")
