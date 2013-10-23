@@ -1,37 +1,55 @@
+;;
 ;; measure the loading time per file.
-(defadvice load (around load-with-time-logging)
-  "display the load time for each file."
-  (let ((now (float-time)))
-    ad-do-it
-    (message "%2.2f seconds is used." (- (float-time) now))))
-(ad-activate 'load)
+;;
+;(defadvice load (around load-with-time-logging)
+;  "display the load time for each file."
+;  (let ((now (float-time)))
+;    ad-do-it
+;    (message "%2.2f seconds is used." (- (float-time) now))))
+;(ad-activate 'load)
 
-;; sr speedbar: http://www.emacswiki.org/emacs-en/SrSpeedbar
-;(require 'sr-speedbar)
 
-;; check the host: windows or linux
-;(setq WINDOWS (not (null (getenv "COMSPEC"))))
-;; note: there is a predefined variable "system-type"...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; it's assumed that the HOME "~" is pointing to "git/xiongyw/doc/it/emacs/"
+;; now we want the "default-directory" points to "git/xiongyw/"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq default-directory "~/../../../")
 
-(setq default-directory "~/../../")
-;; set load path 
-(let* ((my-lisp-dir "~/.emacs.d/") 
-(default-directory my-lisp-dir)) 
-(setq load-path (cons my-lisp-dir load-path)) 
-(normal-top-level-add-subdirs-to-load-path)) 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; set load path
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq load-path (append (list "~/.emacs.d/"
+                              "~/.emacs.d/git-emacs/"
+                              "~/.emacs.d/haskell-mode/"
+                              "~/.emacs.d/auto-complete-1.3.1/"
+                              "~/.emacs.d/yasnippet/"
+;                              "~/.emacs.d/lintnode/"
+                              nil) load-path))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; auto-save-list
-(setq auto-save-list-file-prefix "~/../../../../auto-save-list/.saves-")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq auto-save-list-file-prefix (concat default-directory "auto-save-list/.saves-"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; book mark file
-(setq bookmark-default-file      "~/../../../../bookmark.emacs")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq bookmark-default-file (concat default-directory "bookmark.emacs"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; *Messsage* size
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq message-log-max 10000)
 
-; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; git-emacs: http://www.cnblogs.com/holbrook/archive/2012/04/26/2470923.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'git-emacs)
 
-; magit
-;(require 'magit)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; set frame title as the file name
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq frame-title-format
       '((:eval (funcall (lambda () (if buffer-file-name
                                        buffer-file-name
@@ -39,8 +57,8 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; customize font and color
-;;;; http://www.telecom.otago.ac.nz/tele402/emacs.php
+;; customize font and color
+;; http://www.telecom.otago.ac.nz/tele402/emacs.php
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -57,10 +75,20 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :background "black" :foreground "grey90" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 132 :width normal :foundry "outline" :family "Andale Mono")))))
 
-(setq visible-bell t) ; no beep
-(setq inhibit-startup-message t) ; no splash screen
 
-; always case-sensitive, don't be too smart
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; no beep
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq visible-bell t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; no splash screen
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq inhibit-startup-message t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; always case-sensitive, don't be too smart
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq-default case-fold-search nil) 
 (setq-default case-replace nil)
 
@@ -68,8 +96,84 @@
 (setq column-number-mode t)
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; line number
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; auto-complete: https://github.com/auto-complete/auto-complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'auto-complete-config)
+; Make sure we can find the dictionaries
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/auto-complete-1.3.1/dict/")
+; Use dictionaries by default
+(setq-default ac-sources (add-to-list 'ac-sources 'ac-source-dictionary))
+(global-auto-complete-mode t)
+; Start auto-completion after 2 characters of a word
+(setq ac-auto-start 2)
+; case sensitivity is important when finding matches
+(setq ac-ignore-case nil)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;Yasnippet: https://github.com/capitaomorte/yasnippet
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'yasnippet)
+(yas-global-mode 1)
+;; Load the snippet files themselves
+(yas/load-directory "~/.emacs.d/yasnippet/snippets/text-mode/")
+;; Let's have snippets in the auto-complete dropdown
+(add-to-list 'ac-sources 'ac-source-yasnippet)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;lintnode: https://github.com/davidmiller/lintnode.git
+;git clone https://github.com/davidmiller/lintnode.git
+;cd lintnode
+;npm install express connect-form haml underscore
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;(require 'flymake-jslint)
+;; Make sure we can find the lintnode executable
+;(setq lintnode-location "~/.emacs.d/lintnode")
+;; JSLint can be... opinionated
+;(setq lintnode-jslint-excludes (list 'nomen 'undef 'plusplus 'onevar 'white))
+;; Start the server when we first open a js file and start checking
+;(add-hook 'js-mode-hook
+;          (lambda ()
+;            (lintnode-hook)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; JavaScript: setting up emacs as a javascript editing environment for fun and profit
+;; http://blog.deadpansincerity.com/2011/05/setting-up-emacs-as-a-javascript-editing-environment-for-fun-and-profit/
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;; node.js, 2013-10-14
+;; http://www.emacswiki.org/emacs/NodeJs, "M-x run-js"
+(require 'js-comint)
+;; Use node as our repl: first verify in emacs shell that "node --interactive" works
+(setq inferior-js-program-command "node --interactive")
+(add-hook 'js2-mode-hook '(lambda () 
+			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+			    (local-set-key "\C-cb" 'js-send-buffer)
+			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
+			    (local-set-key "\C-cl" 'js-load-file-and-go)
+			    ))
+
+(setq inferior-js-mode-hook
+      (lambda ()
+        ;; We like nice colors
+        (ansi-color-for-comint-mode-on)
+        ;; Deal with some prompt nonsense
+        (add-to-list 'comint-preoutput-filter-functions
+                     (lambda (output)
+                       (replace-regexp-in-string ".*1G\.\.\..*5G" "..."
+                     (replace-regexp-in-string ".*1G.*3G" "&gt;" output))))))
+        
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; line number
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'linum)
 (global-linum-mode t)
 
@@ -91,6 +195,17 @@
 (setq org-default-notes-file
       (concat org-directory (concat (format-time-string "%Y") ".org")))
 (setq org-support-shift-select t)
+(add-hook 'org-mode-hook
+          (lambda ()
+            ;; auto-fill mode off
+            (auto-fill-mode -1)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; enough: get rid of auto-fill!!!
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(turn-off-auto-fill)
+(remove-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; tabbar
@@ -147,6 +262,17 @@
 ;; complain it can not find the executable when it tries to build the db. 
 ;;
 ;; 5. ways to improve the cscope performance by changing command line options for building the database
+
+
+
+;; sr speedbar: http://www.emacswiki.org/emacs-en/SrSpeedbar
+;(require 'sr-speedbar)
+
+;; check the host: windows or linux
+;(setq WINDOWS (not (null (getenv "COMSPEC"))))
+;; note: there is a predefined variable "system-type"...
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -208,7 +334,7 @@
 ;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; JSShell: http://www.emacswiki.org/emacs/jsshell-bundle.el
+;; JSShell: http://www.emacswiki.org/emacs/jsshell-bundle.el: M-x jsshell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'jsshell-bundle)
 
@@ -365,8 +491,7 @@
 
 
 ;; Text-based modes (including mail, TeX, and LaTeX modes) are auto-filled.
-
-(add-hook 'text-mode-hook (function turn-on-auto-fill))
+;(add-hook 'text-mode-hook (function turn-on-auto-fill))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

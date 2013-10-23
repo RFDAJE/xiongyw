@@ -10,70 +10,49 @@
         +---emacs-24.2
             +---bin
             +---etc
-            |   +---charsets
-            |   +---e
-            |   +---gnus
-            |   +---icons
-            |   +---images
-            |   +---nxml
-            |   +---org
-            |   +---refcards
-            |   +---schema
-            |   +---srecode
-            |   +---themes
-            |   \---tutorials
             +---info
             +---leim
             +---lisp
-            |   +---calc
-            |   +---calendar
-            |   +---cedet
-            |   +---emacs-lisp
-            |   +---emulation
-            |   +---erc
-            |   +---eshell
-            |   +---gnus
-            |   +---international
-            |   +---language
-            |   +---mail
-            |   +---mh-e
-            |   +---net
-            |   +---nxml
-            |   +---obsolete
-            |   +---org
-            |   +---play
-            |   +---progmodes
-            |   +---term
-            |   +---textmodes
-            |   +---url
-            |   \---vc
             \---site-lisp   
         
-3. HOME Environment Variable Setup
+3. HOME environment & Init file
+
+This is to set change the HOME environment to point to the "doc/it/emacs" subdirectory of the local git workspace.
+How Emcas find Init file: "http://www.gnu.org/software/emacs/manual/html_node/emacs/Find-Init.html#Find-Init": 
+here we stick to "..\.emacs.d\init.el", not using ".emacs" or ".emacs.el".
 
 - Launch emacs by double clicking "D:\emacs\emacs-24.2\bin\runemcas.exe" (or create a shortcut and drop it on the task bar)
-- Type: "M-x getenv RET HOME RET" to get the HOME environment variable value, e.g. "C:\Users\bruin\AppData\Roaming". 
-- Go there to have a look, a new directory is created by emacs: ".emacs.d".
-- Create a new file "init.el" there, put the following line:
+- Type: "M-x getenv RET HOME RET" to get the default HOME environment variable value, e.g. "C:\Users\xiongyw\AppData\Roaming". 
+- Go there to have a look, a new directory is created by emacs: "..\Roaming\.emacs.d\".
+- Create a new file "..\Roaming\.emacs.d\init.el", and put the
+- following line to change the HOME and manually load the real "init.el", the "rabbit-hole":
 
   (setenv "HOME" "d:/github/xiongyw/doc/it/emacs")
   (load-file "~/.emacs.d/init.el")
 
-- Put the following in "~/init.el":
 
-
-(setq default-directory "~/../../../")
-;; set load path 
-(let* ((my-lisp-dir "~/.emacs.d/") 
-(default-directory my-lisp-dir)) 
-(setq load-path (cons my-lisp-dir load-path)) 
-(normal-top-level-add-subdirs-to-load-path)) 
-;; auto-save-list
-(setq auto-save-list-file-prefix "~/../../../../auto-save-list/.saves-")
 
 
 - Type "M-x apropos RET process-environment RET" to get a full list of environment variables.
 - "describe-variable": C-h v variable-name RET
 - M-: (message "%s" variable-name)
 
-4. Shell
+4. git
+
+5. aspell
+
+6. node.js, npm
+
+copy "nodejs\node.exe" to "git\bin\" to enable emacs to run "node --interactive".
+
+7. lintnode
+
+git clone https://github.com/davidmiller/lintnode.git
+cd lintnode
+npm install express connect-form haml underscore
+
+6. javascript
+
+7. haskell
+
+8. shell

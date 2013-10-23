@@ -1,0 +1,127 @@
+       - what happens internally at "var xxx = xxx || {};" when "xxx" exists?
+       - expr vs. stmt: http://en.wikipedia.org/wiki/CAL_Actor_Language#Statements_and_expressions
+       - prototype vs __proto__: __proto__ type is supposed to be a hidden link, so prototype is provided...
+         http://anykoro.sinaapp.com/2012/01/31/javascript%E4%B8%ADfunctionobjectprototypes__proto__%E7%AD%89%E6%A6%82%E5%BF%B5%E8%AF%A6%E8%A7%A3/
+         http://www.cnblogs.com/snandy/archive/2012/09/01/2664134.html
+         http://hi-gp.iteye.com/blog/1460980
+
+
+         0. environment & basic operators
+            - Chrome w/ F12; node.js; emacs (js-comint, M-x run-js)
+            - ===, typeof
+            - alert(), console.log()
+            - multi-line console in chrome DevTool: shift+enter
+         1. data types:
+            - 5 immutable primitives: boolean, number, string, null, undefined
+            - 1 compounded mutable data type: object (unsorted, named/keyed; associative-array; hash; map; dictionary)
+            - the 3 primitives (boolean, number, string) have their JSE built-in object equivalent (i.e., wrapper object): Boolean, Number, String;
+              JSE *automatically* and *temporarily* creates wrapper objects for primitives when the context suggests so.
+                > var i=1.2;
+                undefined
+                > typeof i;
+                'number'
+                > i.p="blahblah";
+                'blahblah'
+                > i.p
+                undefined
+                > typeof i;
+                'number'
+            - arrays are just special objects (i.e., arr[0] === arr["0"]):
+
+                > var arr=[];
+                undefined
+                > typeof arr;
+                'object'
+                > typeof [];
+                'object'
+                > arr.length;
+                0
+                > arr[0]="0";
+                '0'
+                > arr[1]="1";
+                '1'
+                > arr.length;
+                2
+                > arr["two"]="2";
+                '2'
+                > arr.length;
+                2
+                > for(prop_name in arr) console.log(prop_name+":"+arr[prop_name]);
+                0:0
+                1:1
+                two:2
+                undefined
+                > arr["0"]
+                '0'
+                > arr["1"]
+                '1'
+                > arr["0"]="zero";
+                'zero'
+                > arr[0]
+                'zero'
+                > arr[0] === arr["0"]
+                true
+                > arr[1] === arr["1"]
+                true
+                > arr[2] === arr["2"]
+                true
+                > arr[200] === arr["200"]
+                true
+                >
+            - function type is another special object type
+            - JSE built-in objects: Global (invisible), Math, JSON, and function objects: Boolean, Number, String, Object, Function, Array, RegExp, Error, Date
+            - objects are passed around by references, they are *never* copied.
+
+         2. objects, function objects, objects created by "new func()"
+            - objects are containers of key-value pairs;
+            - each object has both properties: "__proto__" and "constructor"
+            - function objects are those created by "function" keyword or "new Function()";
+            - functions are objects which has some more properties:  "prototype", its context, its code, "apply", "call", "bind"...
+            - what happens when a function object is invoked by "new": http://hi-gp.iteye.com/blog/1460980
+               "var x = new f()" can be regarded as executed in 3 steps:
+                  a) var x = {};
+                  b) x.__proto__ = f.prototype;
+                  c) f.call(x);
+
+                typeof f === "function"
+                typeof x === "object"
+                x.__proto__ === f.prototype;
+            - what happens when a function object is created:
+                function foo(){...}
+
+
+      + var stmt hoisting: 
+        - "the good parts", p 113: function statements are subject to hoisting. (function stmt is a shortcut of var stmt)
+        - "the definitive guide": $4.3.1, JS has no block scope;
+        - because of the hoist, function stmt is forbidden in for/if stmt.
+
+             > var scope="g";
+             undefined
+             > function f(){
+             ... console.log(scope);
+             ... var scope="l";
+             ... console.log(scope);
+             ... }
+             undefined
+             > f();
+             undefined
+             l
+             undefined
+             >
+
+             > function o(){
+             ... var priv=0;
+             ... i();
+             ... function i(){ priv += 1; console.log(priv);}
+             ... i();
+             ... }
+             undefined
+             > o();
+             1
+             2
+             undefined
+             >
+      + definition and declaration: C & JavaScript
+        - "undefined" in JS really means "unassigned".
+      + function arguments evaluation strategy: call-by-value, call-by-need, call-by-name, applicative-order...
+      + execution context, call object, scope chain: 
