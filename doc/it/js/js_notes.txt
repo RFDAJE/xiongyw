@@ -1,3 +1,4 @@
+
        - what happens internally at "var xxx = xxx || {};" when "xxx" exists?
        - expr vs. stmt: http://en.wikipedia.org/wiki/CAL_Actor_Language#Statements_and_expressions
        - prototype vs __proto__: __proto__ type is supposed to be a hidden link, so prototype is provided...
@@ -14,6 +15,30 @@
          1. data types:
             - 5 immutable primitives: boolean, number, string, null, undefined
             - 1 compounded mutable data type: object (unsorted, named/keyed; associative-array; hash; map; dictionary)
+            - primitives are reference by values (while objects are referenced by pointers)
+              http://docstore.mik.ua/orelly/webprog/jscript/ch11_02.htm
+
+              > var a = 1, b = a;
+              undefined
+              > b
+              1
+              > a = 2;
+              2
+              > b
+              1
+              >             
+
+              > var a = "a"
+              undefined
+              > var b = a;
+              undefined
+              > b
+              'a'
+              > a="x"
+              'x'
+              > b
+              'a'
+              > 
             - the 3 primitives (boolean, number, string) have their JSE built-in object equivalent (i.e., wrapper object): Boolean, Number, String;
               JSE *automatically* and *temporarily* creates wrapper objects for primitives when the context suggests so.
                 > var i=1.2;
@@ -125,3 +150,56 @@
         - "undefined" in JS really means "unassigned".
       + function arguments evaluation strategy: call-by-value, call-by-need, call-by-name, applicative-order...
       + execution context, call object, scope chain: 
+
++ "https://github.com/kaizouman/fpsmeter": why this (self.rate=...) is possible, what does it mean, and what happened under the hood?
+
+        var self = window.FPSMeter = {
+           run : function(rate) {
+               self.rate = rate ? rate : 1;
+           ......
+
+function scope? anything about closure?
+
+> var obj={
+... f:function(){
+..... obj.p = 3.1415926;
+..... console.log(obj.p);
+..... }
+... }
+undefined
+> typeof obj
+'object'
+> typeof obj.f
+'function'
+> typeof obj.p
+'undefined'
+> obj
+{ f: [Function] }
+> obj.f()
+3.1415926
+undefined
+> typeof obj.p
+'number'
+> obj.p
+3.1415926
+> 
+
++ for(var p in o){
+     console.log(o[p])
+  }
+
+
+> var o={"name":"bob"};
+undefined
+> for(var p in o) {console.log(o[p]);}
+bob
+undefined
+> o.p === o["p"]
+true
+> typeof p
+'string'
+> p
+'name'
+> o.p !== o[p]
+true
+>     
