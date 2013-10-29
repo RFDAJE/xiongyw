@@ -1,3 +1,4 @@
+
 1. Download the latest precompiled binary 
    As of 2013-01-27: "wget http://ftp.gnu.org/gnu/windows/emacs/emacs-24.2-bin-i386.zip"
    48973954 bytes: emacs-24.2-bin-i386.zip
@@ -55,4 +56,6 @@ npm install express connect-form haml underscore
 
 7. haskell
 
-8. shell
+8. shell & eshell
+   http://www.masteringemacs.org/articles/2010/11/01/running-shells-in-emacs-overview/
+   how to open file in Emacs via eshell: "$find-file yourfile"
