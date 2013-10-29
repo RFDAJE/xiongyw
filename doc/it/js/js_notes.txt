@@ -101,7 +101,7 @@
             - objects are containers of key-value pairs;
             - each object has both properties: "__proto__" and "constructor"
             - function objects are those created by "function" keyword or "new Function()";
-            - functions are objects which has some more properties:  "prototype", its context, its code, "apply", "call", "bind"...
+            - functions are objects which has some more properties:  "prototype", code, "apply", "call", "bind"...& "context (this)", "arguments", "return value" at invocation time;
             - what happens when a function object is invoked by "new": http://hi-gp.iteye.com/blog/1460980
                "var x = new f()" can be regarded as executed in 3 steps:
                   a) var x = {};
@@ -114,11 +114,14 @@
             - what happens when a function object is created:
                 function foo(){...}
 
+            - function "invocation context": "this" is determined at the invocation time, not by the definition time.
+              (), apply(), call(), new
 
-      + var stmt hoisting: 
+      + var declaration hoisting: 
         - "the good parts", p 113: function statements are subject to hoisting. (function stmt is a shortcut of var stmt)
         - "the definitive guide": $4.3.1, JS has no block scope;
-        - because of the hoist, function stmt is forbidden in for/if stmt.
+        - because of the hoist, function stmt is forbidden in for/if stmt; and because of this restriction, function declaration is not a true stmt;
+        - var declaration is hoisted, but assignment is not. see the 3rd example for function expression in an assginement stmt.
 
              > var scope="g";
              undefined
@@ -146,10 +149,22 @@
              2
              undefined
              >
+             > function o(){
+             ... if(typeof f === "undefined")
+             ... console.log("undefined");
+             ... else
+             ... f();
+             ... var f=function(){console.log("f is assgined")}
+             ... }
+             undefined
+             > o();
+             undefined
+             undefined
+             >
       + definition and declaration: C & JavaScript
         - "undefined" in JS really means "unassigned".
-      + function arguments evaluation strategy: call-by-value, call-by-need, call-by-name, applicative-order...
-      + execution context, call object, scope chain: 
+      + function arguments evaluation strategy: applicative-order vs. normal order
+      + execution context, call object, scope chain: bind, call, apply
 
 + "https://github.com/kaizouman/fpsmeter": why this (self.rate=...) is possible, what does it mean, and what happened under the hood?
 
@@ -203,3 +218,8 @@ true
 > o.p !== o[p]
 true
 >     
+
+
+
++ self-modifying code: toString(), new Function(), and eval()
+  - http://www.i-programmer.info/programming/javascript/989-javascript-jems-self-modifying-code.html
