@@ -1,0 +1,42 @@
+# Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+#  
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without 
+# modifications, as long as this notice is preserved.
+# 
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+AC_PREREQ(2.59)
+AC_INIT(b2f, 0.0.1, xiongyw@hotmail.com)
+AM_INIT_AUTOMAKE()
+AC_CONFIG_SRCDIR([config.h.in])
+AM_CONFIG_HEADER(config.h)
+
+
+# Checks for programs.
+AC_PROG_CC
+
+
+# Checks for libraries.
+AC_CHECK_LIB([m], [pow])
+
+# Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_CHECK_HEADERS([malloc.h string.h])
+ 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([pow])
+
+AC_CONFIG_FILES([Makefile
+                 doc/Makefile
+                 m4/Makefile
+                 src/Makefile])
+AC_OUTPUT
+
