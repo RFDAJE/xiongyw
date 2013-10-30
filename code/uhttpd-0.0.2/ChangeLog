@@ -1,0 +1,13 @@
+-------------------------------------------------------------------------
+-- ChangeLog
+-------------------------------------------------------------------------
+
+0.0.2 build 2004-07-14
+
+- add javascript for directy listing: sort on type/name/size/time
+
+0.0.1 build 2004-07-12
+
+- replaced makefiles with autoconf/automake
+
+

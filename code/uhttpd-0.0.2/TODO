@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------
+-- TODO list
+
+Legend:
+
+- : not implemented
+* : partially implemented
++ : implemented
+(yyyy-mm-dd, yyyy-mm-dd): proposed and implemented date
+-------------------------------------------------------------------------
++ handle uhttpd_LDADD on both linux and sunos (2004-07-14, 2004-07-15)
+	linux: uhttpd_LDADD=-lm -lresolv -lpthread 
+	SunOS: uhttpd_LDADD=-lm -lresolv -lpthread -lsocket -lnsl
+    note: add AC_CHECK_LIB() in configure.in
+- add _REENTRANT into config.h (2004-07-13, )
++ autoconf/automake
+- getopt
+- url encoding/decoding
++ virtual host
+- cleaning up: more generic tcp_server implementation
+  syslog
+  free vhost list
+  signal handling
++ atomic log file writing
+- keepalive
++ html script for sorting (?, 2004-07-14)
+- generic request parser and response writer
