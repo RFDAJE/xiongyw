@@ -38,7 +38,7 @@
 #define LOG_FACILITY    LOG_USER
 #define LOG_PRIORITY    LOG_INFO
 
-const char usage[] = "Usage: httpd [-c configfile]\n\n";
+const char usage[] = "Usage (as root): httpd [-c configfile]\n\n";
 const char conf_file[] = "/etc/uhttpd.conf";
 
 /* global variables */
