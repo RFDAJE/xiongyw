@@ -95,7 +95,7 @@ int handle_get_request(int sd, const char *url,     /* input  */
 						int *bytes_sent,            /* output, excluding http headers */
 						int is_head){               /* input, 0 for "GET", others for HEAD request */
 
-	char url_cp[MAX_FILE_NAME_SIZE + 2];  /* local copy of the url */
+	char url_cp[MAX_PATH_NAME_SIZE + 2];  /* local copy of the url */
 	char fullpath[MAX_PATH_NAME_SIZE + 1]; 
 
 	struct stat st;
@@ -108,9 +108,9 @@ int handle_get_request(int sd, const char *url,     /* input  */
 	
 
 	if(strlen(url) == 1 && url[0] == '/')
-		snprintf(url_cp, MAX_FILE_NAME_SIZE, "/%s", g_vhosts[host_index].default_file);
+		snprintf(url_cp, MAX_PATH_NAME_SIZE, "/%s", g_vhosts[host_index].default_file);
 	else
-		snprintf(url_cp, MAX_FILE_NAME_SIZE, "%s", url);
+		snprintf(url_cp, MAX_PATH_NAME_SIZE, "%s", url);
 
 
 	log_debug_msg(LOG_INFO, "url after copy and default check=%s", url_cp);

@@ -50,7 +50,7 @@ int  doresponse(int sd){
 	socklen_t           clilen = sizeof(cliaddr);
 	char        request[MAX_REQUEST_SIZE + 1];
 	uint16_t    req_size;   /* request packet size */
-	char        url[MAX_FILE_NAME_SIZE + 1];
+	char        url[MAX_PATH_NAME_SIZE + 1];
 	char        host[MAX_DOMAIN_NAME_SIZE + 7]; /* count ":port_number" */
 	int         index;
 	char        *p1, *p2;
@@ -91,7 +91,7 @@ int  doresponse(int sd){
 
 
 		/* determing the url requested */
-		if(!(p1 = strchr(request, '/')) || !(p2 = strchr(p1, ' ')) || (p2 - p1) > MAX_FILE_NAME_SIZE){
+		if(!(p1 = strchr(request, '/')) || !(p2 = strchr(p1, ' ')) || (p2 - p1) > MAX_PATH_NAME_SIZE){
 			status_code = 400;
 			write_status_line(sd, status_code, "Bad Request: bad url");
 			write(sd, CRLF, 2);
