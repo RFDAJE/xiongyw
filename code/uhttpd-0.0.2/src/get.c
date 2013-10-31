@@ -235,7 +235,7 @@ int handle_get_request(int sd, const char *url,     /* input  */
 
 /* added(bruin, 2004-07-14): the dir html can be divided into 5 parts, 3 are dynamic content, 2 are 
    static javascript (s_js1[] and s_js2[]):
-    1. (dynamic): <html><head><title>Index of /directory/name</title>
+    1. (dynamic): <html><head><title>Folder: /directory/name</title>
 	2. (static): s_js1[]
 	3. (dynamic): directory entries as 2 dimensional array in javascript
 	4. (static): s_js2[]
@@ -258,29 +258,14 @@ static char s_js1[] =
 "	get_element(to_show).style.display = \"block\";\n"
 "}\n"
 "\n"
-"function sort_by_type(a, b){\n"
-"	var x = a.type;\n"
-"	var y = b.type;\n"
-"	return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
+"function sort_by_column(col){\n"
+"	return function (a,b){\n"
+" 		  var x = a[col];\n"
+"		  var y = b[col];\n"
+"		  return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
+"	        }\n"
 "}\n"
 "\n"
-"function sort_by_name(a, b){\n"
-"	var x = a.name;\n"
-"	var y = b.name;\n"
-"	return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
-"}\n"
-"\n"
-"function sort_by_size(a, b){\n"
-"	var x = a.size;\n"
-"	var y = b.size;\n"
-"	return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
-"}\n"
-"\n"
-"function sort_by_time(a, b){\n"
-"	var x = a.time;\n"
-"	var y = b.time;\n"
-"	return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
-"}\n"
 "function size_with_comma(size){\n"
 "	if(size < 0) return \"-\"\n"
 "	var s = \"\" + size;\n"
@@ -304,18 +289,24 @@ static char s_js1[] =
 "	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_type_\" + (((col == \"type\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Type</a>&nbsp;\" + ((col == \"type\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
 "	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_name_\" + (((col == \"name\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Name</a>&nbsp;\" + ((col == \"name\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
 "	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_size_\" + (((col == \"size\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Size</a>&nbsp;\" + ((col == \"size\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
-"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_time_\" + (((col == \"time\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Last Modified</a>&nbsp;\" + ((col == \"time\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
+"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_time_\" + (((col == \"time\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Modified</a>&nbsp;\" + ((col == \"time\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
 "	return docW;\n"
 "}\n"
 "\n"
 "function render_table_row(i){\n"
-"	return \"<tr><td>\" + ENTRIES[i].type + \"</td><td><a href='\" + ENTRIES[i].href + \"'>\" + ENTRIES[i].name + \"</a></td><td align=right>\" + size_with_comma(ENTRIES[i].size) + \"</td><td>\" + ENTRIES[i].time + \"</td>\";\n"
+"	if(ENTRIES[i].type === 'd')  // bold directories\n"
+"		return \"<tr><td>\" + ENTRIES[i].type + \"</td><td><b><a href='\" + ENTRIES[i].href + \"'>\" + ENTRIES[i].name + \"</a></b></td><td align=right>\" + size_with_comma(ENTRIES[i].size) + \"</td><td>\" + ENTRIES[i].time + \"</td>\";\n"
+"	else\n"
+"		return \"<tr><td>\" + ENTRIES[i].type + \"</td><td>   <a href='\" + ENTRIES[i].href + \"'>\" + ENTRIES[i].name + \"</a>    </td><td align=right>\" + size_with_comma(ENTRIES[i].size) + \"</td><td>\" + ENTRIES[i].time + \"</td>\";\n"
 "}\n"
 "\n"
 "</script>\n";
 
+
+
+
 /* 
-"</head><body bgcolor=#d0d0d0><b>Index of /gist/images/</b><br><br>\n"
+"</head><body tyle=\"background-color:#f0f0f0\"<b>Folder: /gist/images/</b><br><br>\n"
 "<script language='javascript'>\n"
 "\n"
 "var i;\n"
@@ -323,10 +314,31 @@ static char s_js1[] =
 "// two dimensional array\n";
 */
 
+
+
+
+
 static char s_js2[] = 
-"];\n\n"
+"];\n"
+"\n"
+"\n"
+"// remove the '.' directory, if exist\n"
+"for(i = 0; i < ENTRIES.length; i ++){\n"
+"	if(ENTRIES[i].name === '.'){\n"
+"		ENTRIES.splice(i, 1);\n"
+"		break;\n"
+"	}\n"
+"}\n"
+"\n"
+"// prefix '/' before directores\n"
+"for(i = 0; i < ENTRIES.length; i ++){\n"
+"	if(ENTRIES[i].type === 'd'){\n"
+"		ENTRIES[i].name = '/' + ENTRIES[i].name;\n"
+"	}\n"
+"}\n"
+"\n"
 "////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_type);\n"
+"ENTRIES.sort(sort_by_column(\"type\"));\n"
 "document.write(\"<div id='d_type_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
 "document.write(render_table_header(\"type\", true));\n"
 "for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
@@ -339,7 +351,7 @@ static char s_js2[] =
 "\n"
 "\n"
 "////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_name);\n"
+"ENTRIES.sort(sort_by_column(\"name\"));\n"
 "document.write(\"<div id='d_name_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
 "document.write(render_table_header(\"name\", true));\n"
 "for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
@@ -352,7 +364,7 @@ static char s_js2[] =
 "\n"
 "\n"
 "////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_size);\n"
+"ENTRIES.sort(sort_by_column(\"size\"));\n"
 "document.write(\"<div id='d_size_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
 "document.write(render_table_header(\"size\", true));\n"
 "for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
@@ -365,7 +377,7 @@ static char s_js2[] =
 "\n"
 "\n"
 "////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_time);\n"
+"ENTRIES.sort(sort_by_column(\"time\"));\n"
 "document.write(\"<div id='d_time_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
 "document.write(render_table_header(\"time\", true));\n"
 "for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
@@ -380,6 +392,7 @@ static char s_js2[] =
 "get_element(\"d_type_d\").style.display = \"block\";\n"
 "\n"
 "</script>\n";
+
 
 
 static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, int *bytes_sent){
@@ -433,7 +446,7 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	tail_size = 0;
 
 	/* html header */
-	head_size = snprintf(head, MAX_HEAD_SIZE, "<html><head><title>Index of %s</title>\n", 
+	head_size = snprintf(head, MAX_HEAD_SIZE, "<html><head><title>Folder: %s</title>\n", 
                        p_dirpath + strlen(root_dir));
 	log_debug_msg(LOG_INFO, "head_size=%d>%s", head_size, head);
 		
@@ -445,7 +458,7 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	}
 	content_buf_size = INIT_CONTENT_SIZE;
 
-  content_size = snprintf(content, INIT_CONTENT_SIZE, "</head><body bgcolor=#d0d0d0><b>Index of %s"
+  content_size = snprintf(content, INIT_CONTENT_SIZE, "</head><body tyle=\"background-color:#f0f0f0\"<b>Folder: %s"
                 "</b><br><br>\n<script language='javascript'>\nvar i;\n// two dimensional array\n"
                 "var ENTRIES = [\n",  p_dirpath + strlen(root_dir));
 

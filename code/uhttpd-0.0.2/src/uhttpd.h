@@ -26,4 +26,6 @@ typedef struct{
 extern unsigned int g_nvhosts;  /* number of virtual hosts */
 extern VHOST *g_vhosts;         /* array holds virtual hosts config */
 
+#define DEBUG
+
 #endif /* __HTTPD_H__ */

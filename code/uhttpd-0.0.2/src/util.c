@@ -74,9 +74,20 @@ char* get_mime_type(const char* filename){
            strcasecmp(dot, ".htm")  == 0)
 		return "text/html";
 
+	if(strcasecmp(dot, ".xml") == 0)
+		return "text/xml";
+
+	if(strcasecmp(dot, ".js") == 0)
+		return "text/javascript";
+
+	if(strcasecmp(dot, ".svg") == 0)
+		return "text/svg";
+
 	if(strcasecmp(dot, ".txt") == 0 || 
            strcasecmp(dot, ".c")   == 0 || 
            strcasecmp(dot, ".h")   == 0 ||
+           strcasecmp(dot, ".cfg") == 0 ||
+           strcasecmp(dot, ".el")  == 0 ||
 	   strcasecmp(dot, ".cpp") == 0)
 		return "text/plain";
 
