@@ -14,10 +14,8 @@ table td{
 table th a:link,table th a:visited {color:#ffffff;}
 table th a:hover,table th a:active {color:#dddd33;}
 
+</style></head><body> 
 
-</style>
-
-</head><body> 
 <pre><b>Folder: /xxx/yyy/</b><br>
 
 <script language='javascript'>
@@ -27,177 +25,159 @@ var ENTRIES = [
 {type: 'd', name: '.', size: -1, time: '2013-02-01 16:54', href: 'xxx/.'},
 {type: '-', name: 'avaricious', size: 68, time: '2013-02-01 16:54', href: 'xxxolocate'},
 {type: 'd', name: '..', size: -1, time: '2013-02-01 16:55', href: 'xxx'},
-{type: '-', name: 'dictum', size: 6268, time: '2013-02-01 16:54', href: 'xxx'},
-{type: '-', name: 'anaerobic', size: 273, time: '2013-02-01 16:54', href: 'xxx'},
-{type: '-', name: 'metabolism', size: 755, time: '2013-02-01 16:54', href: 'xxx'},
-{type: 'd', name: 'pedal', size: 76, time: '2013-02-01 16:54', href: 'xxx'},
-{type: '-', name: 'crank', size: 87, time: '2013-02-01 16:54', href: 'xxx'},
-{type: '-', name: 'spoke', size: 86, time: '2013-02-01 16:54', href: 'xxxx'},
-{type: '-', name: 'freehub', size: 320, time: '2013-02-01 16:54', href: 'xxx'}];
-
-function get_element(id){
-	return document.all? document.all[id] : document.getElementById(id);
-}
-function hide_n_show(to_hide, to_show){
-	get_element(to_hide).style.display = "none";
-	get_element(to_show).style.display = "block";
-}
-
-// col: column name, string
-// is_asc: boolean
-function sort_by_column(col, is_asc){
-	return function (a,b){
- 		  var x = a[col];
-		  var y = b[col];
-                  var ord = 0;
-                  if(x > y) ord = is_asc? 1 : - 1;
-                  if(x < y) ord = is_asc? - 1 : 1;
-                  return ord;
-	        }
-}
-
-function size_with_comma(size){
-	if(size < 0) return "-"
-	var s = "" + size;
-	var result = ""
-	var mod = s.length % 3;
-	var n = parseInt((s.length - 1) / 3);
-	if(mod == 0) mod = 3
-	if(mod) result += s.substring(0, mod);
-	for(var i = 0; i < n; i ++){
-		result += "," + s.substring(mod + i * 3, mod + i * 3 + 3);
-	}
-	return result;
-}
-
-// col: column name, one of "type"/"name"/"size"/"time"
-// asc: true/false, ascending? 
-function render_table_header(col, asc){
-	var cur_div = "d_" + col + (asc? "_a" : "_d");
-	var docW = "";
-	docW += "<tr>";
-	docW += "<th><a href='javascript: hide_n_show(\"" + cur_div + "\", \"d_type_" + (((col == "type") && asc)? "d\"" : "a\"") + ")'>Type</a>&nbsp;" + ((col == "type")?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
-	docW += "<th><a href='javascript: hide_n_show(\"" + cur_div + "\", \"d_name_" + (((col == "name") && asc)? "d\"" : "a\"") + ")'>Name</a>&nbsp;" + ((col == "name")?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
-	docW += "<th><a href='javascript: hide_n_show(\"" + cur_div + "\", \"d_size_" + (((col == "size") && asc)? "d\"" : "a\"") + ")'>Size</a>&nbsp;" + ((col == "size")?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
-	docW += "<th><a href='javascript: hide_n_show(\"" + cur_div + "\", \"d_time_" + (((col == "time") && asc)? "d\"" : "a\"") + ")'>Modified</a>&nbsp;" + ((col == "time")?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
-	return docW;
-}
-
-function render_table_row(i){
-	if(ENTRIES[i].type === 'd')  // bold directories
-		return "<tr><td>" + ENTRIES[i].type + "</td><td><b><a href='" + ENTRIES[i].href + "'>" + ENTRIES[i].name + "</a></b></td><td align=right>" + size_with_comma(ENTRIES[i].size) + "</td><td>" + ENTRIES[i].time + "</td>";
-	else
-		return "<tr><td>" + ENTRIES[i].type + "</td><td>   <a href='" + ENTRIES[i].href + "'>" + ENTRIES[i].name + "</a>    </td><td align=right>" + size_with_comma(ENTRIES[i].size) + "</td><td>" + ENTRIES[i].time + "</td>";
-}
+{type: '-', name: 'dictum', size: 6268, time: '2013-03-01 16:54', href: 'xxx'},
+{type: '-', name: 'anaerobic', size: 273, time: '2013-04-01 16:54', href: 'xxx'},
+{type: '-', name: 'metabolism', size: 755, time: '2013-05-01 16:54', href: 'xxx'},
+{type: 'd', name: 'pedal', size: 76, time: '2013-06-01 16:54', href: 'xxx'},
+{type: '-', name: 'crank', size: 87, time: '2013-07-01 16:54', href: 'xxx'},
+{type: '-', name: 'spoke', size: 86, time: '2013-08-01 16:54', href: 'xxxx'},
+{type: '-', name: 'freehub', size: 320, time: '2013-12-01 16:54', href: 'xxx'}];
 
 
-
-var i;
-
-
-// remove the '.' directory, if exist
-/*
-for(i = 0; i < ENTRIES.length; i ++){
-	if(ENTRIES[i].name === '.'){
-		ENTRIES.splice(i, 1);
-		break;
-	}
-}
-
-// prefix '/' before directores
-for(i = 0; i < ENTRIES.length; i ++){
-	if(ENTRIES[i].type === 'd'){
-		ENTRIES[i].name = '/' + ENTRIES[i].name;
-	}
-}
+/**
+* hide and show DIV elements
+*
+* @param {String} to_hide, the id of DIV to hide
+* @param {String} to_show, the id of DIV to show
+* @return none
 */
+function hide_n_show(to_hide, to_show){
+    document.getElementById(to_hide).style.display = "none";
+    document.getElementById(to_show).style.display = "block";
+}
+
+/** 
+* return a compare function for sort()
+*
+* @param {String} col: the name of the column to sort by
+* @param {Boolean} ascending: ascending (true) or descending (false)
+* @return {Function} The compare function for Array.prototype.sort()
+*/
+function sort_by_column(col, ascending){
+    return function (a,b){
+        var ord = 0;
+        if(a[col] > b[col]) ord = ascending? 1 : - 1;
+        if(a[col] < b[col]) ord = ascending? - 1 : 1;
+        return ord;
+    }
+}
+
+/**
+* convert a number into string seperated by commas
+*
+* @param {Number} size: the size
+* @return {String} a converted string
+*/
+function size_with_comma(size){
+    if(size < 0) return "-"
+    var s = "" + size;
+    var result = ""
+    var mod = s.length % 3;
+    var n = parseInt((s.length - 1) / 3);
+    if(mod == 0) mod = 3
+    if(mod) result += s.substring(0, mod);
+    for(var i = 0; i < n; i ++){
+	result += "," + s.substring(mod + i * 3, mod + i * 3 + 3);
+    }
+    return result;
+}
+
+/**
+* return a table header
+*
+* @param {String} col: the name of the column by which the table is sorted
+* @param {Boolean} ascending: ascending (true) or descending (false)
+* @return {String} string to be added to the document
+*/
+function render_table_header(col, asc){
+    var header = ["type", "name", "size", "time"];
+    var cur_div = "d_" + col + (asc? "_a" : "_d");
+    var th = function(column){
+        return "<th><a href='javascript: hide_n_show(\"" + 
+               cur_div + "\", \"d_" + column +"_" + (((col == column) && asc)? 
+               "d\"" : "a\"") + ")'>"+column.toUpperCase()+"</a>&nbsp;" + 
+               ((col == column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
+    }
+
+    var docW = "<tr>";
+    docW += header.map(th).join(" ");
+    
+    return docW;
+}
+
+/**
+* return  a row
+*
+* @param {Object} x: an entry in the array
+* @return {String} the string to be written to the document
+*/
+function render_a_row(x){
+    var b = (x.type === 'd');  // put text for directories <bold>
+    return "<tr><td>" + x.type + "</td><td>" + (b? "<b>":"") + "<a href='" + x.href + "'>" + x.name + "</a>" + (b? "</b>":"") + "</td><td align=right>" + size_with_comma(x.size) + "</td><td>" + x.time + "</td>";
+}
 
 // filter the '.' entry and prefix '/' before directories
 ENTRIES = ENTRIES.filter(function(x){return x.name != '.'}).map(function(x){if(x.type === 'd') x.name = '/' + x.name; return x});
 
+/*
+* sort2() keeps the '/..' folder at the top
+*
+*@param {Function} cmp: a compare function required by sort()
+*@return {Array} the array is sorted in place
+*/
+ENTRIES.sort2 = function (cmp){
 
-// keep '..' always at the top line
-Array.prototype.sort2 = function(cmp){
+     var dotdot =  this.filter(function(x){return x.name === '/..';});
+     var rest = this.filter(function(x){return x.name != '/..';}).sort(cmp);
 
-               var dotdot =  this.filter(function(x){return x.name === '/..';});
-               var rest = this.filter(function(x){return x.name != '/..';});
+     this.length = 0; // empty the array
 
-               rest.sort(cmp);
-               this.length = 0;
-               if(dotdot.length != 0){   
-                   this.push(dotdot[0]); 
-               }
+     if(dotdot.length != 0){   
+         this.push(dotdot[0]); 
+     }
 
-               for(var i = 0; i < rest.length; i ++)   this.push(rest[i]);
+     for(var i = 0; i < rest.length; i ++){
+         this.push(rest[i]);
+     }
 
-               return this;
+     return this;
+}
+
+/** 
+* write a div to the document
+* 
+* @param {String} column: the name of the column by which the table is sorted
+* @param {Boolean} is_asc: ascending (true) or descending (false)
+* @param {String} id: the DIV element id
+* @return: none
+*/
+function write_div(column, is_asc, id){
+    ENTRIES.sort2(sort_by_column(column, is_asc));
+    document.write("<div id='"+ id +"' style='display:none'><table>");
+    document.write(render_table_header(column, is_asc));
+    document.write(ENTRIES.map(render_a_row).join(" "));
+    document.write("</table></div>");
 }
 
 
+// now write DIVs
+write_div("type", true,  "d_type_a");
+write_div("type", false, "d_type_d");
 
-////////////////////////////////////////////////////////////////////////
-ENTRIES.sort2(sort_by_column("type", true));
-document.write("<div id='d_type_a' style='display:none'><table>");
-document.write(render_table_header("type", true));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));  // use reduce() instead!
-document.write("</table></div>");
+write_div("name", true,  "d_name_a");
+write_div("name", false, "d_name_d");
 
-ENTRIES.sort2(sort_by_column("type", false));
-document.write("<div id='d_type_d' style='display:none'><table>");
-document.write(render_table_header("type", false));
-//for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
+write_div("size", true,  "d_size_a");
+write_div("size", false, "d_size_d");
 
-////////////////////////////////////////////////////////////////////////
-ENTRIES.sort2(sort_by_column("name", true));
-document.write("<div id='d_name_a' style='display:none'><table>");
-document.write(render_table_header("name", true));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
+write_div("time", true,  "d_time_a");
+write_div("time", false, "d_time_d");
 
-
-ENTRIES.sort2(sort_by_column("name", false));
-document.write("<div id='d_name_d' style='display:none'><table>");
-document.write(render_table_header("name", false));
-//for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
-
-
-
-////////////////////////////////////////////////////////////////////////
-ENTRIES.sort2(sort_by_column("size", true));
-document.write("<div id='d_size_a' style='display:none'><table>");
-document.write(render_table_header("size", true));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
-
-
-ENTRIES.sort2(sort_by_column("size", false));
-document.write("<div id='d_size_d' style='display:none'><table>");
-document.write(render_table_header("size", false));
-//for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
-
-
-////////////////////////////////////////////////////////////////////////
-ENTRIES.sort2(sort_by_column("time", true));
-document.write("<div id='d_time_a' style='display:none'><table>");
-document.write(render_table_header("time", true));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
-
-ENTRIES.sort2(sort_by_column("time", false));
-document.write("<div id='d_time_d' style='display:none'><table>");
-document.write(render_table_header("time", false));
-//for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
-for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
-document.write("</table></div>");
-
-// show one div 
-get_element("d_type_d").style.display = "block";
+// show the default DIV 
+document.getElementById("d_type_d").style.display = "block";
 
 </script>
-<br><hr><address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address></body></html>
+<br><hr>
+<address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address>
+</body>
+</html>
