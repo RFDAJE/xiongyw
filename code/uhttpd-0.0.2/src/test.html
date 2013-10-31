@@ -1,5 +1,40 @@
-<html><head><title>Index of /p4/OTV_UEX/NX_TOOLS/workspace_tools/</title>
-<script launguage="javascript">
+<html><head><title>Title</title>
+<style>
+
+table {border-collapse:collapse;}
+table tr:nth-child(odd)	 {background-color:#F2F2F2;}
+table tr:nth-child(even) {background-color:#ffffff;}
+table th{
+	color:#ffffff;background-color:#555555;border:1px solid #555555;font-size:12px;padding:3px;vertical-align:top;text-align:left;
+}
+table td{
+	border:1px solid #d4d4d4;padding:3px;padding-top:3px;padding-bottom:3px;vertical-align:top;
+}
+
+table th a:link,table th a:visited {color:#ffffff;}
+table th a:hover,table th a:active {color:#dddd33;}
+
+
+</style>
+
+</head><body> 
+<pre><b>Folder: /xxx/yyy/</b><br>
+
+<script language='javascript'>
+
+// two dimensional array
+var ENTRIES = [
+{type: 'd', name: '.', size: -1, time: '2013-02-01 16:54', href: 'xxx/.'},
+{type: '-', name: 'avaricious', size: 68, time: '2013-02-01 16:54', href: 'xxxolocate'},
+{type: 'd', name: '..', size: -1, time: '2013-02-01 16:55', href: 'xxx'},
+{type: '-', name: 'dictum', size: 6268, time: '2013-02-01 16:54', href: 'xxx'},
+{type: '-', name: 'anaerobic', size: 273, time: '2013-02-01 16:54', href: 'xxx'},
+{type: '-', name: 'metabolism', size: 755, time: '2013-02-01 16:54', href: 'xxx'},
+{type: 'd', name: 'pedal', size: 76, time: '2013-02-01 16:54', href: 'xxx'},
+{type: '-', name: 'crank', size: 87, time: '2013-02-01 16:54', href: 'xxx'},
+{type: '-', name: 'spoke', size: 86, time: '2013-02-01 16:54', href: 'xxxx'},
+{type: '-', name: 'freehub', size: 320, time: '2013-02-01 16:54', href: 'xxx'}];
+
 function get_element(id){
 	return document.all? document.all[id] : document.getElementById(id);
 }
@@ -55,22 +90,9 @@ function render_table_row(i){
 		return "<tr><td>" + ENTRIES[i].type + "</td><td>   <a href='" + ENTRIES[i].href + "'>" + ENTRIES[i].name + "</a>    </td><td align=right>" + size_with_comma(ENTRIES[i].size) + "</td><td>" + ENTRIES[i].time + "</td>";
 }
 
-</script>
-</head><body tyle="background-color:#f0f0f0"<b>Index of /p4/OTV_UEX/NX_TOOLS/workspace_tools/</b><br><br>
-<script language='javascript'>
+
+
 var i;
-// two dimensional array
-var ENTRIES = [
-{type: 'd', name: '.', size: -1, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/.'},
-{type: '-', name: 'olocate', size: 68, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/olocate'},
-{type: 'd', name: '..', size: -1, time: '2013-02-01 16:55', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/..'},
-{type: '-', name: 'omake', size: 6268, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/omake'},
-{type: '-', name: 'search_symbol', size: 273, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/search_symbol'},
-{type: '-', name: 'search_undefined', size: 755, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/search_undefined'},
-{type: 'd', name: 'cleanbak', size: 76, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/cleanbak'},
-{type: '-', name: 'sub_ch', size: 87, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/sub_ch'},
-{type: '-', name: 'sub_ocx', size: 86, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/sub_ocx'},
-{type: '-', name: 'u8dump', size: 320, time: '2013-02-01 16:54', href: '/p4/OTV_UEX/NX_TOOLS/workspace_tools/u8dump'}];
 
 
 // remove the '.' directory, if exist
@@ -100,34 +122,28 @@ Array.prototype.sort2 = function(cmp){
                var dotdot =  this.filter(function(x){return x.name === '/..';});
                var rest = this.filter(function(x){return x.name != '/..';});
 
-               // sort the rest lines
-               if(rest){
-                   rest.sort(cmp);
-               }
-
-               // empty the array first
+               rest.sort(cmp);
                this.length = 0;
-
-               if(dotdot){   
+               if(dotdot.length != 0){   
                    this.push(dotdot[0]); 
                }
 
-               if(rest){
-                   for(var i = 0; i < rest.length; i ++)   this.push(rest[i]);
-               }
+               for(var i = 0; i < rest.length; i ++)   this.push(rest[i]);
 
                return this;
 }
 
+
+
 ////////////////////////////////////////////////////////////////////////
 ENTRIES.sort2(sort_by_column("type", true));
-document.write("<div id='d_type_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_type_a' style='display:none'><table>");
 document.write(render_table_header("type", true));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));  // use reduce() instead!
 document.write("</table></div>");
 
 ENTRIES.sort2(sort_by_column("type", false));
-document.write("<div id='d_type_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_type_d' style='display:none'><table>");
 document.write(render_table_header("type", false));
 //for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
@@ -135,14 +151,14 @@ document.write("</table></div>");
 
 ////////////////////////////////////////////////////////////////////////
 ENTRIES.sort2(sort_by_column("name", true));
-document.write("<div id='d_name_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_name_a' style='display:none'><table>");
 document.write(render_table_header("name", true));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
 document.write("</table></div>");
 
 
 ENTRIES.sort2(sort_by_column("name", false));
-document.write("<div id='d_name_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_name_d' style='display:none'><table>");
 document.write(render_table_header("name", false));
 //for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
@@ -152,14 +168,14 @@ document.write("</table></div>");
 
 ////////////////////////////////////////////////////////////////////////
 ENTRIES.sort2(sort_by_column("size", true));
-document.write("<div id='d_size_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_size_a' style='display:none'><table>");
 document.write(render_table_header("size", true));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
 document.write("</table></div>");
 
 
 ENTRIES.sort2(sort_by_column("size", false));
-document.write("<div id='d_size_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_size_d' style='display:none'><table>");
 document.write(render_table_header("size", false));
 //for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
@@ -168,13 +184,13 @@ document.write("</table></div>");
 
 ////////////////////////////////////////////////////////////////////////
 ENTRIES.sort2(sort_by_column("time", true));
-document.write("<div id='d_time_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_time_a' style='display:none'><table>");
 document.write(render_table_header("time", true));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
 document.write("</table></div>");
 
 ENTRIES.sort2(sort_by_column("time", false));
-document.write("<div id='d_time_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>");
+document.write("<div id='d_time_d' style='display:none'><table>");
 document.write(render_table_header("time", false));
 //for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));
 for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));
@@ -184,4 +200,4 @@ document.write("</table></div>");
 get_element("d_type_d").style.display = "block";
 
 </script>
-<br><hr><address><small>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></small></address></body></html>
+<br><hr><address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address></body></html>
