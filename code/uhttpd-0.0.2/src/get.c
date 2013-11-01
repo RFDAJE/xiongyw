@@ -233,166 +233,196 @@ int handle_get_request(int sd, const char *url,     /* input  */
 }
 
 
-/* added(bruin, 2004-07-14): the dir html can be divided into 5 parts, 3 are dynamic content, 2 are 
-   static javascript (s_js1[] and s_js2[]):
-    1. (dynamic): <html><head><title>Folder: /directory/name</title>
-	2. (static): s_js1[]
-	3. (dynamic): directory entries as 2 dimensional array in javascript
-	4. (static): s_js2[]
-	5. (dynamc): uhttpd version info, author info, and </body></html>
+/* modified(bruin, 2013-11-01): the html page for directories can be divided into 3 parts: 
+   1. part1: <html><head><title>%s</title><style>...</style></head><body>...var table=
+   2. part2: the 2-dimensiona array generated dynamically
+   3. part3: the rest.
 
-   the following is the two static js code fragment. generate this string from plain java script by 
-   the following sequence:
+   convert html text into C string:
     -  s/\\/\\\\/g
     -  s/\"/\\\"/g
     -  s/^/\"/g
     -  s/$/\\n\"/g 
 */
-static char s_js1[] =
-"<script launguage=\"javascript\">\n"
-"function get_element(id){\n"
-"	return document.all? document.all[id] : document.getElementById(id);\n"
+static char s_part1[] =
+"<html><head><title>%s</title>\n"
+"<style>\n"
+"\n"
+"table {border-collapse:collapse;}\n"
+"table tr:nth-child(odd)	 {background-color:#F2F2F2;}\n"
+"table tr:nth-child(even) {background-color:#ffffff;}\n"
+"table th{\n"
+"	color:#ffffff;background-color:#555555;border:1px solid #555555;font-size:12px;padding:3px;vertical-align:top;text-align:left;\n"
 "}\n"
-"function hide_n_show(to_hide, to_show){\n"
-"	get_element(to_hide).style.display = \"none\";\n"
-"	get_element(to_show).style.display = \"block\";\n"
+"table td{\n"
+"	border:1px solid #d4d4d4;padding:3px;padding-top:3px;padding-bottom:3px;vertical-align:top;\n"
 "}\n"
 "\n"
-"function sort_by_column(col){\n"
-"	return function (a,b){\n"
-" 		  var x = a[col];\n"
-"		  var y = b[col];\n"
-"		  return ((x < y) ? - 1 : ((x > y) ? 1 : 0));\n"
-"	        }\n"
-"}\n"
+"table th a:link,table th a:visited {color:#ffffff;}\n"
+"table th a:hover,table th a:active {color:#dddd33;}\n"
 "\n"
-"function size_with_comma(size){\n"
-"	if(size < 0) return \"-\"\n"
-"	var s = \"\" + size;\n"
-"	var result = \"\"\n"
-"	var mod = s.length % 3;\n"
-"	var n = parseInt((s.length - 1) / 3);\n"
-"	if(mod == 0) mod = 3\n"
-"	if(mod) result += s.substring(0, mod);\n"
-"	for(var i = 0; i < n; i ++){\n"
-"		result += \",\" + s.substring(mod + i * 3, mod + i * 3 + 3);\n"
-"	}\n"
-"	return result;\n"
-"}\n"
+"div { display: none; }\n"
 "\n"
-"// col: column name, one of \"type\"/\"name\"/\"size\"/\"time\"\n"
-"// asc: true/false, ascending? \n"
-"function render_table_header(col, asc){\n"
-"	var cur_div = \"d_\" + col + (asc? \"_a\" : \"_d\");\n"
-"	var docW = \"\";\n"
-"	docW += \"<tr>\";\n"
-"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_type_\" + (((col == \"type\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Type</a>&nbsp;\" + ((col == \"type\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
-"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_name_\" + (((col == \"name\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Name</a>&nbsp;\" + ((col == \"name\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
-"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_size_\" + (((col == \"size\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Size</a>&nbsp;\" + ((col == \"size\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
-"	docW += \"<th><a href='javascript: hide_n_show(\\\"\" + cur_div + \"\\\", \\\"d_time_\" + (((col == \"time\") && asc)? \"d\\\"\" : \"a\\\"\") + \")'>Modified</a>&nbsp;\" + ((col == \"time\")?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
-"	return docW;\n"
-"}\n"
+"</style></head><body> \n"
 "\n"
-"function render_table_row(i){\n"
-"	if(ENTRIES[i].type === 'd')  // bold directories\n"
-"		return \"<tr><td>\" + ENTRIES[i].type + \"</td><td><b><a href='\" + ENTRIES[i].href + \"'>\" + ENTRIES[i].name + \"</a></b></td><td align=right>\" + size_with_comma(ENTRIES[i].size) + \"</td><td>\" + ENTRIES[i].time + \"</td>\";\n"
-"	else\n"
-"		return \"<tr><td>\" + ENTRIES[i].type + \"</td><td>   <a href='\" + ENTRIES[i].href + \"'>\" + ENTRIES[i].name + \"</a>    </td><td align=right>\" + size_with_comma(ENTRIES[i].size) + \"</td><td>\" + ENTRIES[i].time + \"</td>\";\n"
-"}\n"
+"<pre><b>Folder: %s</b><br>\n"
 "\n"
-"</script>\n";
-
-
-
-
-/* 
-"</head><body tyle=\"background-color:#f0f0f0\"<b>Folder: /gist/images/</b><br><br>\n"
 "<script language='javascript'>\n"
 "\n"
-"var i;\n"
-"\n"
-"// two dimensional array\n";
-*/
-
-
-
-
-
-static char s_js2[] = 
+"// a table in 2-dimensional array & its table header\n"
+"var th = ['Type','Name','Size','Modified','href'];\n"
+"var table = [\n";
+static char s_part3[] =
 "];\n"
 "\n"
-"\n"
-"// remove the '.' directory, if exist\n"
-"for(i = 0; i < ENTRIES.length; i ++){\n"
-"	if(ENTRIES[i].name === '.'){\n"
-"		ENTRIES.splice(i, 1);\n"
-"		break;\n"
-"	}\n"
+"/**\n"
+"* hide and show DIV elements\n"
+"*\n"
+"* @param {String} to_hide, the id of DIV to hide\n"
+"* @param {String} to_show, the id of DIV to show\n"
+"* @return none\n"
+"*/\n"
+"function hide_n_show(to_hide, to_show){\n"
+"    document.getElementById(to_hide).style.display = \"none\";\n"
+"    document.getElementById(to_show).style.display = \"block\";\n"
 "}\n"
 "\n"
-"// prefix '/' before directores\n"
-"for(i = 0; i < ENTRIES.length; i ++){\n"
-"	if(ENTRIES[i].type === 'd'){\n"
-"		ENTRIES[i].name = '/' + ENTRIES[i].name;\n"
-"	}\n"
+"\n"
+"/** \n"
+"* return a compare function for sort()\n"
+"*\n"
+"* @param {Number} col: the index of the column to sort by\n"
+"* @param {Boolean} ascending: ascending (true) or descending (false)\n"
+"* @return {Function} The compare function for Array.prototype.sort()\n"
+"*/\n"
+"function sort_by_col(col, ascending){\n"
+"    return function (a,b){\n"
+"        var ord = 0;\n"
+"        if(a[col] > b[col]) ord = ascending? 1 : - 1;\n"
+"        if(a[col] < b[col]) ord = ascending? - 1 : 1;\n"
+"        return ord;\n"
+"    }\n"
 "}\n"
 "\n"
-"////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_column(\"type\"));\n"
-"document.write(\"<div id='d_type_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"type\", true));\n"
-"for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
-"\n"
-"document.write(\"<div id='d_type_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"type\", false));\n"
-"for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
-"\n"
-"\n"
-"////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_column(\"name\"));\n"
-"document.write(\"<div id='d_name_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"name\", true));\n"
-"for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
-"\n"
-"document.write(\"<div id='d_name_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"name\", false));\n"
-"for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
+"/**\n"
+"* convert a number into string seperated by commas\n"
+"*\n"
+"* @param {Number} size: the size\n"
+"* @return {String} a converted string\n"
+"*/\n"
+"function size_with_comma(size){\n"
+"    if(size < 0) return \"-\"\n"
+"    var s = \"\" + size;\n"
+"    var result = \"\"\n"
+"    var mod = s.length % 3;\n"
+"    var n = parseInt((s.length - 1) / 3);\n"
+"    if(mod == 0) mod = 3\n"
+"    if(mod) result += s.substring(0, mod);\n"
+"    for(var i = 0; i < n; i ++){\n"
+"	result += \",\" + s.substring(mod + i * 3, mod + i * 3 + 3);\n"
+"    }\n"
+"    return result;\n"
+"}\n"
 "\n"
 "\n"
-"////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_column(\"size\"));\n"
-"document.write(\"<div id='d_size_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"size\", true));\n"
-"for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
+"/**\n"
+"* return a html table row <tr> for the header\n"
+"*\n"
+"* @param {Number} col: the index of the column by which the table is sorted\n"
+"* @param {Boolean} ascending: ascending (true) or descending (false)\n"
+"* @return {String} string to be added to the document\n"
+"*/\n"
+"function gen_table_header(col, asc){\n"
+"    var cur_div = \"d_\" + th[col] + (asc? \"_a\" : \"_d\");\n"
+"    /**\n"
+"    * @param {Number} column: the index of the table column\n"
+"    * @return {String}: a <th> in the <tr>\n"
+"    */\n"
+"    var header = function(column){\n"
+"        return \"<th><a href='javascript: hide_n_show(\\\"\" + \n"
+"               cur_div + \"\\\", \\\"d_\" + th[column] +\"_\" + (((col === column) && asc)? \n"
+"               \"d\\\"\" : \"a\\\"\") + \")'>\" + th[column] +\"</a>&nbsp;\" + \n"
+"               ((col === column)?(asc? \"&uarr;\" : \"&darr;\") : \"&nbsp;\") + \"</th>\";\n"
+"    }\n"
 "\n"
-"document.write(\"<div id='d_size_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"size\", false));\n"
-"for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
+"    return \"<tr>\" + [0,1,2,3].map(header).join(\" \") + \"</tr>\";\n"
+"}\n"
+"\n"
+"/**\n"
+"* return a content row in html\n"
+"*\n"
+"* @param {Array} x: an entry in the table array\n"
+"* @return {String} the string to be written to the document\n"
+"*/\n"
+"function gen_a_table_row(x){\n"
+"    var d = (x[0] === 'd');  // put text for directories <bold>, and keep type empty for files, size as '-'\n"
+"    return \"<tr>\" + \n"
+"           \"<td>\" + (d? x[0] : \"\") + \"</td>\" + \n"
+"           \"<td>\" + (d? \"<b>\":\"\") + \"<a href='\" + x[4] + \"'>\" + x[1] + \"</a>\" + (d? \"</b>\":\"\") + \"</td>\" +\n"
+"           \"<td align=right>\" + (d? \"-\": size_with_comma(x[2])) + \"</td>\" +  \n"
+"           \"<td>\" + x[3] + \"</td>\" +\n"
+"           \"</tr>\";\n"
+"}\n"
 "\n"
 "\n"
-"////////////////////////////////////////////////////////////////////////\n"
-"ENTRIES.sort(sort_by_column(\"time\"));\n"
-"document.write(\"<div id='d_time_a' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"time\", true));\n"
-"for(i = 0; i < ENTRIES.length; i ++) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
+"table = table.filter(function(x){return x[1] != '.'}).map(function(x){if(x[0] === 'd') x[1] = '/' + x[1]; return x});\n"
 "\n"
-"document.write(\"<div id='d_time_d' style='display:none'><table border=1 cellpadding=2 cellspacing=0>\");\n"
-"document.write(render_table_header(\"time\", false));\n"
-"for(i = ENTRIES.length - 1; i >= 0; i --) document.write(render_table_row(i));\n"
-"document.write(\"</table></div>\");\n"
+"/*\n"
+"* sort() keeps the '/..' folder at the top\n"
+"*\n"
+"*@param {Function} cmp: a compare function required by sort()\n"
+"*@return {Array} the array is sorted in place\n"
+"*/\n"
+"table.sort = function (cmp){\n"
 "\n"
-"// show one div \n"
-"get_element(\"d_type_d\").style.display = \"block\";\n"
+"     var dotdot =  this.filter(function(x){return x[1] === '/..';});\n"
+"     var rest = this.filter(function(x){return x[1] != '/..';}).sort(cmp);\n"
 "\n"
-"</script>\n";
-
+"     this.length = 0; // empty the array\n"
+"\n"
+"     if(dotdot.length != 0){   \n"
+"         this.push(dotdot[0]); \n"
+"     }\n"
+"\n"
+"     for(var i = 0; i < rest.length; i ++){\n"
+"         this.push(rest[i]);\n"
+"     }\n"
+"\n"
+"     return this;\n"
+"}\n"
+"\n"
+"\n"
+"/** \n"
+"* generate a div to be written to the document\n"
+"* \n"
+"* @param {Number} column: the index of the column by which the table is sorted\n"
+"* @param {Boolean} is_asc: ascending (true) or descending (false)\n"
+"* @param {String} id: the DIV element id\n"
+"* @return {String} the div content\n"
+"*/\n"
+"function gen_a_div(column, is_asc, id){\n"
+"    var div = \"\";\n"
+"    table.sort(sort_by_col(column, is_asc));\n"
+"//    div = div + \"<div id='\"+ id +\"' style='display:none'><table>\";\n"
+"    div = div + \"<div id='\"+ id + \"'><table>\";\n"
+"    div = div + gen_table_header(column, is_asc);\n"
+"    div = div + table.map(gen_a_table_row).join(\" \");\n"
+"    div = div + \"</table></div>\";\n"
+"    return div;\n"
+"}\n"
+"\n"
+"\n"
+"// fold on the columns, each column produces two divs (ascending and descending)\n"
+"document.write([0, 1, 2, 3].reduce(function(acc, col){ return acc + gen_a_div(col, true, 'd_' + th[col] + '_a') + gen_a_div(col, false, 'd_' + th[col] + '_d');}, \"\")); \n"
+"\n"
+"// show first DIV by default\n"
+"document.getElementById(\"d_\" + th[0] + \"_d\").style.display = \"block\";\n"
+"\n"
+"</script>\n"
+"<br><hr>\n"
+"<address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-%s.tar.gz'>uhttpd v%s</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address>\n"
+"</body>\n"
+"</html>\n";
 
 
 static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, int *bytes_sent){
@@ -405,8 +435,8 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 #define TIME_FIELD_SIZE         36 
 #define MAX_ENTRY_SIZE          (FLAG_FIELD_SIZE + NAME_FIELD_SIZE + SIZE_FIELD_SIZE + TIME_FIELD_SIZE + 1024)
 
-#define MAX_HEAD_SIZE           2048
-#define MAX_TAIL_SIZE           2048
+#define MAX_HEAD_SIZE           4096
+#define MAX_TAIL_SIZE           8192
 
 
 	struct dirent **list;
@@ -445,12 +475,11 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	content_size = 0;
 	tail_size = 0;
 
-	/* html header */
-	head_size = snprintf(head, MAX_HEAD_SIZE, "<html><head><title>Folder: %s</title>\n", 
-                       p_dirpath + strlen(root_dir));
+	/* part 1 */
+	head_size = snprintf(head, MAX_HEAD_SIZE, s_part1, p_dirpath + strlen(root_dir), p_dirpath + strlen(root_dir));
 	log_debug_msg(LOG_INFO, "head_size=%d>%s", head_size, head);
 		
-
+        /* part 2 */
 	content = malloc(INIT_CONTENT_SIZE);
 	if(!content){
 		log_debug_msg(LOG_INFO, "malloc(INIT_CONTENT_SIZE) fail");
@@ -458,10 +487,11 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	}
 	content_buf_size = INIT_CONTENT_SIZE;
 
-  content_size = snprintf(content, INIT_CONTENT_SIZE, "</head><body tyle=\"background-color:#f0f0f0\"<b>Folder: %s"
+        /*
+        content_size = snprintf(content, INIT_CONTENT_SIZE, "</head><body style=\"background-color:#f0f0f0\"<b>Folder: %s"
                 "</b><br><br>\n<script language='javascript'>\nvar i;\n// two dimensional array\n"
                 "var ENTRIES = [\n",  p_dirpath + strlen(root_dir));
-
+        */
 	for(i = 0; i < n; i ++){
 
 		snprintf(fullpath, MAX_PATH_NAME_SIZE, "%s%s", p_dirpath, list[i]->d_name);
@@ -474,10 +504,10 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 			return 0;
 		}
 
-		/* display format: type, name, size, time */
+		/* output format: [type, name, size, time] */
 		strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
 		
-		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "{type: '%s', name: '%s', size: %d, time: '%s', href: '%s%s'},\n",
+		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "['%s', '%s', %d, '%s', '%s%s'],\n",
 									S_ISDIR(st.st_mode)? "d" : "-",
 									list[i]->d_name,
 									S_ISDIR(st.st_mode)? - 1 : st.st_size,
@@ -501,31 +531,27 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 		free(list[i]);
 	}
 	free(list);
-	content_size -= 2;  /* delete the comma (and the \n) after the last entry */
+        //	content_size -= 2;  /* delete the comma (and the \n) after the last entry */
 
-	/* html tail */
-	tail_size = snprintf(tail, MAX_TAIL_SIZE, "<br><hr><address><small>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-%s.tar.gz'>uhttpd v%s</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></small></address></body></html>", VERSION, VERSION);
+	/* part 3 */
+	tail_size = snprintf(tail, MAX_TAIL_SIZE, s_part3, VERSION, VERSION);
 	log_debug_msg(LOG_INFO, "tail_size=%d>%s", tail_size, tail);
 	
 	*status_code = 200;
 	write_status_line(sd, *status_code, "");
 	write_general_header(sd);
 	write_response_header(sd, NULL);
-	write_entity_header(sd, head_size + strlen(s_js1) + content_size + strlen(s_js2) + tail_size, "text/html");
+	write_entity_header(sd, head_size + content_size +  tail_size, "text/html");
 
 	/* entity-body: the html page(head + content + tail) */
 	write(sd, CRLF, 2);
 	*bytes_sent = 0;
 	*bytes_sent += write(sd, head, head_size);
-	log_debug_msg(LOG_INFO, "html head done");
-	*bytes_sent += write(sd, s_js1, strlen(s_js1));
-	log_debug_msg(LOG_INFO, "js1 done");
+	log_debug_msg(LOG_INFO, "part 1 done");
 	*bytes_sent += write(sd, content, content_size);
-	log_debug_msg(LOG_INFO, "html content done");
-	*bytes_sent += write(sd, s_js2, strlen(s_js2));
-	log_debug_msg(LOG_INFO, "js2 done");
+	log_debug_msg(LOG_INFO, "part2 done");
 	*bytes_sent += write(sd, tail, tail_size);
-	log_debug_msg(LOG_INFO, "html tail done");
+	log_debug_msg(LOG_INFO, "part3 done");
 
 	free(content);
 	/*closedir(dp);	*/
