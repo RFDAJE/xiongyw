@@ -14,16 +14,13 @@ table td{
 table th a:link,table th a:visited {color:#ffffff;}
 table th a:hover,table th a:active {color:#dddd33;}
 
+div { display: none; }
+
 </style></head><body> 
 
-<pre><b>Folder: /xxx/yyy/</b><br>
+<pre><b>Folder: %s</b><br>
 
 <script language='javascript'>
-// todo
-// animation during div switch
-// no - for files under "type" column, and dirs under "size" column
-
-
 
 // a table in 2-dimensional array & its table header
 var th = ['Type','Name','Size','Modified','href'];
@@ -34,7 +31,7 @@ var table = [
 ['-', 'dictum', 6268, '2013-03-01 16:54', 'xxx'],
 ['-', 'anaerobic', 273, '2013-04-01 16:54', 'xxx'],
 ['-', 'metabolism', 755, '2013-05-01 16:54', 'xxx'],
-['d', 'pedal', 76, '2013-06-01 16:54', 'xxx'],
+['d', 'pedal', -1, '2013-06-01 16:54', 'xxx'],
 ['-', 'crank', 87, '2013-07-01 16:54', 'xxx'],
 ['-', 'spoke', 86, '2013-08-01 16:54', 'xxxx'],
 ['-', 'freehub', 320, '2013-12-01 16:54', 'xxx']];
@@ -119,8 +116,13 @@ function gen_table_header(col, asc){
 * @return {String} the string to be written to the document
 */
 function gen_a_table_row(x){
-    var b = (x[0] === 'd');  // put text for directories <bold>
-    return "<tr><td>" + x[0] + "</td><td>" + (b? "<b>":"") + "<a href='" + x[4] + "'>" + x[1] + "</a>" + (b? "</b>":"") + "</td><td align=right>" + size_with_comma(x[2]) + "</td><td>" + x[3] + "</td>";
+    var d = (x[0] === 'd');  // put text for directories <bold>, and keep type empty for files, size as '-'
+    return "<tr>" + 
+           "<td>" + (d? x[0] : "") + "</td>" + 
+           "<td>" + (d? "<b>":"") + "<a href='" + x[4] + "'>" + x[1] + "</a>" + (d? "</b>":"") + "</td>" +
+           "<td align=right>" + (d? "-": size_with_comma(x[2])) + "</td>" +  
+           "<td>" + x[3] + "</td>" +
+           "</tr>";
 }
 
 
@@ -162,7 +164,8 @@ table.sort = function (cmp){
 function gen_a_div(column, is_asc, id){
     var div = "";
     table.sort(sort_by_col(column, is_asc));
-    div = div + "<div id='"+ id +"' style='display:none'><table>";
+//    div = div + "<div id='"+ id +"' style='display:none'><table>";
+    div = div + "<div id='"+ id + "'><table>";
     div = div + gen_table_header(column, is_asc);
     div = div + table.map(gen_a_table_row).join(" ");
     div = div + "</table></div>";
