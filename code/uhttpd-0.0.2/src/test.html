@@ -19,20 +19,25 @@ table th a:hover,table th a:active {color:#dddd33;}
 <pre><b>Folder: /xxx/yyy/</b><br>
 
 <script language='javascript'>
+// todo
+// animation during div switch
+// no - for files under "type" column, and dirs under "size" column
 
-// two dimensional array
-var ENTRIES = [
-{type: 'd', name: '.', size: -1, time: '2013-02-01 16:54', href: 'xxx/.'},
-{type: '-', name: 'avaricious', size: 68, time: '2013-02-01 16:54', href: 'xxxolocate'},
-{type: 'd', name: '..', size: -1, time: '2013-02-01 16:55', href: 'xxx'},
-{type: '-', name: 'dictum', size: 6268, time: '2013-03-01 16:54', href: 'xxx'},
-{type: '-', name: 'anaerobic', size: 273, time: '2013-04-01 16:54', href: 'xxx'},
-{type: '-', name: 'metabolism', size: 755, time: '2013-05-01 16:54', href: 'xxx'},
-{type: 'd', name: 'pedal', size: 76, time: '2013-06-01 16:54', href: 'xxx'},
-{type: '-', name: 'crank', size: 87, time: '2013-07-01 16:54', href: 'xxx'},
-{type: '-', name: 'spoke', size: 86, time: '2013-08-01 16:54', href: 'xxxx'},
-{type: '-', name: 'freehub', size: 320, time: '2013-12-01 16:54', href: 'xxx'}];
 
+
+// a table in 2-dimensional array & its table header
+var th = ['Type','Name','Size','Modified','href'];
+var table = [
+['d', '.', -1, '2013-02-01 16:54', 'xxx/.'],
+['-', 'avaricious', 68, '2013-02-01 16:54', 'xxxolocate'],
+['d', '..', -1, '2013-02-01 16:55', 'xxx'],
+['-', 'dictum', 6268, '2013-03-01 16:54', 'xxx'],
+['-', 'anaerobic', 273, '2013-04-01 16:54', 'xxx'],
+['-', 'metabolism', 755, '2013-05-01 16:54', 'xxx'],
+['d', 'pedal', 76, '2013-06-01 16:54', 'xxx'],
+['-', 'crank', 87, '2013-07-01 16:54', 'xxx'],
+['-', 'spoke', 86, '2013-08-01 16:54', 'xxxx'],
+['-', 'freehub', 320, '2013-12-01 16:54', 'xxx']];
 
 /**
 * hide and show DIV elements
@@ -46,14 +51,15 @@ function hide_n_show(to_hide, to_show){
     document.getElementById(to_show).style.display = "block";
 }
 
+
 /** 
 * return a compare function for sort()
 *
-* @param {String} col: the name of the column to sort by
+* @param {Number} col: the index of the column to sort by
 * @param {Boolean} ascending: ascending (true) or descending (false)
 * @return {Function} The compare function for Array.prototype.sort()
 */
-function sort_by_column(col, ascending){
+function sort_by_col(col, ascending){
     return function (a,b){
         var ord = 0;
         if(a[col] > b[col]) ord = ascending? 1 : - 1;
@@ -82,53 +88,54 @@ function size_with_comma(size){
     return result;
 }
 
+
 /**
-* return a table header
+* return a html table row <tr> for the header
 *
-* @param {String} col: the name of the column by which the table is sorted
+* @param {Number} col: the index of the column by which the table is sorted
 * @param {Boolean} ascending: ascending (true) or descending (false)
 * @return {String} string to be added to the document
 */
-function render_table_header(col, asc){
-    var header = ["type", "name", "size", "time"];
-    var cur_div = "d_" + col + (asc? "_a" : "_d");
-    var th = function(column){
+function gen_table_header(col, asc){
+    var cur_div = "d_" + th[col] + (asc? "_a" : "_d");
+    /**
+    * @param {Number} column: the index of the table column
+    * @return {String}: a <th> in the <tr>
+    */
+    var header = function(column){
         return "<th><a href='javascript: hide_n_show(\"" + 
-               cur_div + "\", \"d_" + column +"_" + (((col == column) && asc)? 
-               "d\"" : "a\"") + ")'>"+column.toUpperCase()+"</a>&nbsp;" + 
-               ((col == column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
+               cur_div + "\", \"d_" + th[column] +"_" + (((col === column) && asc)? 
+               "d\"" : "a\"") + ")'>" + th[column] +"</a>&nbsp;" + 
+               ((col === column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
     }
 
-    var docW = "<tr>";
-    docW += header.map(th).join(" ");
-    
-    return docW;
+    return "<tr>" + [0,1,2,3].map(header).join(" ") + "</tr>";
 }
 
 /**
-* return  a row
+* return a content row in html
 *
-* @param {Object} x: an entry in the array
+* @param {Array} x: an entry in the table array
 * @return {String} the string to be written to the document
 */
-function render_a_row(x){
-    var b = (x.type === 'd');  // put text for directories <bold>
-    return "<tr><td>" + x.type + "</td><td>" + (b? "<b>":"") + "<a href='" + x.href + "'>" + x.name + "</a>" + (b? "</b>":"") + "</td><td align=right>" + size_with_comma(x.size) + "</td><td>" + x.time + "</td>";
+function gen_a_table_row(x){
+    var b = (x[0] === 'd');  // put text for directories <bold>
+    return "<tr><td>" + x[0] + "</td><td>" + (b? "<b>":"") + "<a href='" + x[4] + "'>" + x[1] + "</a>" + (b? "</b>":"") + "</td><td align=right>" + size_with_comma(x[2]) + "</td><td>" + x[3] + "</td>";
 }
 
-// filter the '.' entry and prefix '/' before directories
-ENTRIES = ENTRIES.filter(function(x){return x.name != '.'}).map(function(x){if(x.type === 'd') x.name = '/' + x.name; return x});
+
+table = table.filter(function(x){return x[1] != '.'}).map(function(x){if(x[0] === 'd') x[1] = '/' + x[1]; return x});
 
 /*
-* sort2() keeps the '/..' folder at the top
+* sort() keeps the '/..' folder at the top
 *
 *@param {Function} cmp: a compare function required by sort()
 *@return {Array} the array is sorted in place
 */
-ENTRIES.sort2 = function (cmp){
+table.sort = function (cmp){
 
-     var dotdot =  this.filter(function(x){return x.name === '/..';});
-     var rest = this.filter(function(x){return x.name != '/..';}).sort(cmp);
+     var dotdot =  this.filter(function(x){return x[1] === '/..';});
+     var rest = this.filter(function(x){return x[1] != '/..';}).sort(cmp);
 
      this.length = 0; // empty the array
 
@@ -143,38 +150,31 @@ ENTRIES.sort2 = function (cmp){
      return this;
 }
 
+
 /** 
-* write a div to the document
+* generate a div to be written to the document
 * 
-* @param {String} column: the name of the column by which the table is sorted
+* @param {Number} column: the index of the column by which the table is sorted
 * @param {Boolean} is_asc: ascending (true) or descending (false)
 * @param {String} id: the DIV element id
-* @return: none
+* @return {String} the div content
 */
-function write_div(column, is_asc, id){
-    ENTRIES.sort2(sort_by_column(column, is_asc));
-    document.write("<div id='"+ id +"' style='display:none'><table>");
-    document.write(render_table_header(column, is_asc));
-    document.write(ENTRIES.map(render_a_row).join(" "));
-    document.write("</table></div>");
+function gen_a_div(column, is_asc, id){
+    var div = "";
+    table.sort(sort_by_col(column, is_asc));
+    div = div + "<div id='"+ id +"' style='display:none'><table>";
+    div = div + gen_table_header(column, is_asc);
+    div = div + table.map(gen_a_table_row).join(" ");
+    div = div + "</table></div>";
+    return div;
 }
 
 
-// now write DIVs
-write_div("type", true,  "d_type_a");
-write_div("type", false, "d_type_d");
+// fold on the columns, each column produces two divs (ascending and descending)
+document.write([0, 1, 2, 3].reduce(function(acc, col){ return acc + gen_a_div(col, true, 'd_' + th[col] + '_a') + gen_a_div(col, false, 'd_' + th[col] + '_d');}, "")); 
 
-write_div("name", true,  "d_name_a");
-write_div("name", false, "d_name_d");
-
-write_div("size", true,  "d_size_a");
-write_div("size", false, "d_size_d");
-
-write_div("time", true,  "d_time_a");
-write_div("time", false, "d_time_d");
-
-// show the default DIV 
-document.getElementById("d_type_d").style.display = "block";
+// show first DIV by default
+document.getElementById("d_" + th[0] + "_d").style.display = "block";
 
 </script>
 <br><hr>
