@@ -14,12 +14,48 @@ table td{
 table th a:link,table th a:visited {color:#ffffff;}
 table th a:hover,table th a:active {color:#dddd33;}
 
-div { display: none; }
+div { display: none;
+
+    }
+
+div#container{ display: block;
+
+
+      -webkit-perspective: 800px;
+         -moz-perspective: 800px;
+           -o-perspective: 800px;
+              perspective: 800px;
+      -webkit-transition: -webkit-transform 10s linear;
+         -moz-transition: -moz-transform 10s linear;
+           -o-transition: -o-transform 10s linear;
+              transition: transform 10s linear;
+      -webkit-transform-style: preserve-3d;
+         -moz-transform-style: preserve-3d;
+           -o-transform-style: preserve-3d;
+              transform-style: preserve-3d;
+              transform-origin: 10%;
+      -webkit-transform-origin: 10%;
+}
+
+div.deg90 {
+              transform:rotateY(180deg);
+      -webkit-transform:rotateY(180deg);
+}
+
+div.deg360 {
+              transform:rotateY(360deg);
+      -webkit-transform:rotateY(360deg);
+}
+
+div.deg270 {
+transform:rotateY(330deg);
+-webkit-transform:rotateY(330deg);
+}
 
 </style></head><body> 
 
 <pre><b>Folder: %s</b><br>
-
+<div id="container">
 <script language='javascript'>
 
 // a table in 2-dimensional array & its table header
@@ -36,6 +72,11 @@ var table = [
 ['-', 'spoke', 86, '2013-08-01 16:54', 'xxxx'],
 ['-', 'freehub', 320, '2013-12-01 16:54', 'xxx']];
 
+var f = function(){
+    document.getElementById("container").className = " ";
+//    document.getElementById("container").className = "deg360";
+}
+
 /**
 * hide and show DIV elements
 *
@@ -44,8 +85,23 @@ var table = [
 * @return none
 */
 function hide_n_show(to_hide, to_show){
-    document.getElementById(to_hide).style.display = "none";
-    document.getElementById(to_show).style.display = "block";
+    var body_width = window.getComputedStyle(document.body, null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER);
+    var table_width = window.getComputedStyle(document.getElementById("t"+to_hide), null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER);
+
+var percent = table_width / 2. / body_width * 100;
+//alert(body_width + ',' + table_width + ',' + percent);
+
+    // chang the "contain" style: transform-origin property
+    document.getElementById("container").style["transform-origin"] = percent + "%";
+    document.getElementById("container").style["-webkit-transform-origin"] = percent + "%";
+
+//    document.getElementById(to_hide).className = "deg90";
+//    document.getElementById(to_hide).style.display = "none";
+
+//    document.getElementById(to_show).style.display = "block";
+//    document.getElementById(to_show).className = "deg0";
+    document.getElementById("container").addEventListener('webkitTransitionEnd', f, false);
+    document.getElementById("container").className = "deg90";
 }
 
 
@@ -162,15 +218,14 @@ table.sort = function (cmp){
 * @return {String} the div content
 */
 function gen_a_div(column, is_asc, id){
-    var div = "";
     table.sort(sort_by_col(column, is_asc));
-//    div = div + "<div id='"+ id +"' style='display:none'><table>";
-    div = div + "<div id='"+ id + "'><table>";
+    var div = "<div id='"+ id + "'><table id='t" + id + "'>";
     div = div + gen_table_header(column, is_asc);
     div = div + table.map(gen_a_table_row).join(" ");
     div = div + "</table></div>";
     return div;
 }
+
 
 
 // fold on the columns, each column produces two divs (ascending and descending)
@@ -180,6 +235,7 @@ document.write([0, 1, 2, 3].reduce(function(acc, col){ return acc + gen_a_div(co
 document.getElementById("d_" + th[0] + "_d").style.display = "block";
 
 </script>
+</div>
 <br><hr>
 <address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address>
 </body>
