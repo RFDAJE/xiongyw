@@ -16,7 +16,7 @@ table th a:hover,table th a:active {color:#dddd33;}
 
 
 /*
- * updated(bruin, 2013-11-03): card-flipping animation
+ * noted(bruin, 2013-11-03): card-flipping animation
  *
  * ref: http://davidwalsh.name/css-flip
  * 
@@ -34,12 +34,12 @@ table th a:hover,table th a:active {color:#dddd33;}
     </div>
 </div>
 
-for all the table divs, one and only one of them is visible; the visibility
+for all divs directly contains a table, one and only one of them is visible; the visibility
 of them are controlled by their "display" property: "none" or "block".
 
-2. flipping of the "flipper" div is triggered by changing its class: 
+2. rotating of the "flipper" div is triggered by changing its class: 
 - class=""     : show the front, i.e, no rotation
-- class="edge" : show the edge, i.e, rotate 90 degree. it's invisible at this position.
+- class="edge" : show the edge, i.e, rotate 90 degree. it's effectively invisible at this position.
 - class="back" : show the back, i.e., rotate 180 degree
 
 note that the 180 deg rotation is done in two steps, a 90 deg rotation followed by 
@@ -53,10 +53,12 @@ when the hook is called:
 - trigger the 2nd 90 deg rotation by changing flipper's class to either "back" or "".
 
 3. the width of the "container" div: the y-axis of the horizontal rotation needs to be 
-in the middle of the table width, not middle of screen or body width. 
+in the middle of the table width, to get the best rotation result. 
 to this end, we need to dynamiclly specify the correct "width" property of the "container" div.
-this is done at the begining of each flipping process, by checking the width of the shown table
-and adding a small margin.
+if the div width is not set, then the y-axis is at the middle of the page body, which is not
+what we wanted.
+dynamically setting the div width is done at the begining of each flipping process, by checking the 
+width of the shown table and adding a small margin.
 
 */
 
@@ -233,8 +235,8 @@ function gen_table_header(col, asc){
      */
     var header = function(column){
         return "<th><a href=\"javascript: hide_n_show('" + 
-               div_id(col, asc) + "', '" + div_id(column, !asc) + "')\">" + th[column] +"</a>&nbsp;" + 
-               ((col === column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
+            div_id(col, asc) + "', '" + div_id(column, !asc) + "')\">" + th[column] +"</a>&nbsp;" + 
+            ((col === column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
     }
 
     return "<tr>" + [0,1,2,3].map(header).join(" ") + "</tr>";
@@ -267,7 +269,7 @@ function gen_a_table_row(x){
  * @return {String} the div content
  */
 function gen_a_div(col, asc){
-    table.sort(sort_by_col(col, asc));
+    table.sort2(sort_by_col(col, asc));
     var div = "<div class='table' id='"+ div_id(col, asc) + "'><table id='" + table_id(col, asc) + "'>";
     div = div + gen_table_header(col, asc);
     div = div + table.map(gen_a_table_row).join(" ");
@@ -277,29 +279,36 @@ function gen_a_div(col, asc){
 
 
 /*
-* this sort() is to always keep the '..' entry at the top
-*
-*@param {Function} cmp: a compare function required by sort()
-*@return {Array} the array is sorted in place
-*/
-table.sort = function (cmp){
+ * sort2() is to always keep the '..' entry at the top
+ *
+ * @param {Function} cmp: a compare function required by sort2()
+ * @return {Array} the array is sorted in place
+ *
+ * noted(bruin, 2013-11-03): 
+ * - it also works to add the sort() to the "table" object directly (thus masking the prototype's sort). 
+ *   the drawback is that whenever we do "table=table.filter()", the new sort() is gone from the "table". 
+ * - it will goes into a infinity recursive call if we override the Array.prototype.sort(), as in the case
+ *   here we still need to call original sort() to sort the "rest" array.
+ */
+Array.prototype.sort2 = function (cmp){
 
     var parent = '..';
     var dotdot = this.filter(function(x){return x[1] === parent;});
     var rest = this.filter(function(x){return x[1] != parent;}).sort(cmp);
 
-     this.length = 0; // empty the array
+    this.length = 0; // empty the array
 
-     if(dotdot.length != 0){   
-         this.push(dotdot[0]); 
-     }
+    if(dotdot.length != 0){   
+        this.push(dotdot[0]); 
+    }
 
-     for(var i = 0; i < rest.length; i ++){
-         this.push(rest[i]);
-     }
+    for(var i = 0; i < rest.length; i ++){
+        this.push(rest[i]);
+    }
 
-     return this;
+    return this;
 }
+
 
 ////////////////////////////////////////////////////////////
 // table processing starts...
