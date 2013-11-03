@@ -152,6 +152,7 @@ var table = [
  */
 function hide_n_show(to_hide, to_show){
 
+    // define hook inside so it has access to arguments "to_hide" and "to_show"
     var hook = function(){
         document.getElementById("flipper").removeEventListener('webkitTransitionEnd', hook, false);
         document.getElementById(to_show).style.display = "block";
@@ -162,42 +163,23 @@ function hide_n_show(to_hide, to_show){
             document.getElementById("flipper").className = "";
     }
 
-    var body_width = window.getComputedStyle(document.body, null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER);
+    // to dynamically set a good width for the out-most container DIV
     var table_width = window.getComputedStyle(document.getElementById("t"+to_hide), null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER) + 10;
-
     document.getElementById("container").style.width = table_width + "px";
 
-
-var percent = table_width / 2. / body_width * 100;
-//alert(body_width + ',' + table_width + ',' + percent);
-
-    // chang the "contain" style: transform-origin property
-//    document.getElementById("container_asc").style["transform-origin"] = percent + "% 0%";
-//    document.getElementById("container_asc").style["-webkit-transform-origin"] = percent + "% 0%";
-
-//    document.getElementById("container_dsc").style["transform-origin"] = percent + "% 0%";
-//    document.getElementById("container_dsc").style["-webkit-transform-origin"] = percent + "% 0%";
-
     document.getElementById("flipper").addEventListener('webkitTransitionEnd', hook, false);
+    // let it go...
     document.getElementById("flipper").className = "edge";
-
-//    document.getElementById(to_hide).className = "deg90";
-//    document.getElementById(to_hide).style.display = "none";
-
-//    document.getElementById(to_show).style.display = "block";
-//    document.getElementById(to_show).className = "deg0";
-//    document.getElementById("container_asc").className = "deg90";
-//    document.getElementById("container_dsc").className = "deg_90";
 }
 
 
 /** 
-* return a compare function for sort()
-*
-* @param {Number} col: the index of the column to sort by
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {Function} The compare function for Array.prototype.sort()
-*/
+ * return a compare function for sort()
+ *
+ * @param {Number} col: the index of the column to sort by
+ * @param {Boolean} ascending: ascending (true) or descending (false)
+ * @return {Function} The compare function for Array.prototype.sort()
+ */
 function sort_by_col(col, ascending){
     return function (a,b){
         var ord = 0;
@@ -208,11 +190,11 @@ function sort_by_col(col, ascending){
 }
 
 /**
-* convert a number into string seperated by commas
-*
-* @param {Number} size: the size
-* @return {String} a converted string
-*/
+ * convert a number into string seperated by commas
+ *
+ * @param {Number} size: the size
+ * @return {String} a converted string
+ */
 function size_with_comma(size){
     if(size < 0) return "-"
     var s = "" + size;
@@ -227,41 +209,28 @@ function size_with_comma(size){
     return result;
 }
 
-/**
-* return div id
-*
-* @param {Number} col: the index of the column by which the table is sorted
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {String} the id of the div
-*/
+/* id rules for tables and their parent divs */
 function div_id(col, asc){
     return th[col] + (asc? "_asc" : "_dsc");
 }
 
-/**
-* return table id
-*
-* @param {Number} col: the index of the column by which the table is sorted
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {String} the id of the table
-*/
 function table_id(col, asc){
     return "t" + div_id(col, asc);
 }
 
 
 /**
-* return a html table row <tr> for the header
-*
-* @param {Number} col: the index of the column by which the table is sorted
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {String} string to be added to the document
-*/
+ * return a html table row <tr> for the header
+ *
+ * @param {Number} col: the index of the column by which the table is sorted
+ * @param {Boolean} ascending: ascending (true) or descending (false)
+ * @return {String} string to be added to the document
+ */
 function gen_table_header(col, asc){
     /**
-    * @param {Number} column: the index of the table column
-    * @return {String}: a <th> in the <tr>
-    */
+     * @param {Number} column: the index of the table column
+     * @return {String}: a <th> in the <tr>
+     */
     var header = function(column){
         return "<th><a href=\"javascript: hide_n_show('" + 
                div_id(col, asc) + "', '" + div_id(column, !asc) + "')\">" + th[column] +"</a>&nbsp;" + 
@@ -272,13 +241,16 @@ function gen_table_header(col, asc){
 }
 
 /**
-* return a content row in html
-*
-* @param {Array} x: an entry in the table array
-* @return {String} the string to be written to the document
-*/
+ * return a content row in html
+ *
+ * @param {Array} x: an entry in the table array
+ * @return {String} the string to be written to the document
+ */
 function gen_a_table_row(x){
-    var d = (x[0] === 'd');  // put text for directories <bold>, and keep type empty for files, size as '-'
+    // for directories: bold the text, prefix the name with "/", keep the "Size" field as '-'
+    // for files: keep the "Type" field empty
+    var d = (x[0] === 'd');  
+
     return "<tr>" + 
            "<td>" + (d? x[0] : "") + "</td>" + 
            "<td>" + (d? "<b>":"") + "<a href='" + x[4] + "'>" + (d? "/" : "") + x[1] + "</a>" + (d? "</b>":"") + "</td>" +
@@ -287,13 +259,25 @@ function gen_a_table_row(x){
            "</tr>";
 }
 
+/** 
+ * generate a div which encapsulates a table
+ * 
+ * @param {Number} col: the index of the column by which the table is sorted
+ * @param {Boolean} asc: ascending (true) or descending (false)
+ * @return {String} the div content
+ */
+function gen_a_div(col, asc){
+    table.sort(sort_by_col(col, asc));
+    var div = "<div class='table' id='"+ div_id(col, asc) + "'><table id='" + table_id(col, asc) + "'>";
+    div = div + gen_table_header(col, asc);
+    div = div + table.map(gen_a_table_row).join(" ");
+    div = div + "</table></div>";
+    return div;
+}
 
-//table = table.filter(function(x){return x[1] != '.'}).map(function(x){if(x[0] === 'd') x[1] = '/' + x[1]; return x});
-
-table = table.filter(function(x){return x[1] != '.'});
 
 /*
-* sort() keeps the '..' folder at the top
+* this sort() is to always keep the '..' entry at the top
 *
 *@param {Function} cmp: a compare function required by sort()
 *@return {Array} the array is sorted in place
@@ -301,7 +285,7 @@ table = table.filter(function(x){return x[1] != '.'});
 table.sort = function (cmp){
 
     var parent = '..';
-    var dotdot =  this.filter(function(x){return x[1] === parent;});
+    var dotdot = this.filter(function(x){return x[1] === parent;});
     var rest = this.filter(function(x){return x[1] != parent;}).sort(cmp);
 
      this.length = 0; // empty the array
@@ -317,43 +301,30 @@ table.sort = function (cmp){
      return this;
 }
 
+////////////////////////////////////////////////////////////
+// table processing starts...
+////////////////////////////////////////////////////////////
 
-/** 
-* generate a div to be written to the document
-* 
-* @param {Number} col: the index of the column by which the table is sorted
-* @param {Boolean} asc: ascending (true) or descending (false)
-* @return {String} the div content
-*/
-function gen_a_div(col, asc){
-    table.sort(sort_by_col(col, asc));
-    var div = "<div class='table' id='"+ div_id(col, asc) + "'><table id='" + table_id(col, asc) + "'>";
-    div = div + gen_table_header(col, asc);
-    div = div + table.map(gen_a_table_row).join(" ");
-    div = div + "</table></div>";
-    return div;
-}
+// 1. filter out the '.' entry, if any
+table = table.filter(function(x){return x[1] != '.'});
 
-
-
+// 2. generate and output the html content
 var html = "<div id='container'>";
 html += "<div id='flipper'>";
 // front: put descending ordered tables
 html += "<div id='front'>";
-html += [0, 1, 2, 3].reduce(function(acc, col){ 
-        return acc + gen_a_div(col, false);}, ""); 
+html += [0, 1, 2, 3].reduce(function(acc, col){return acc + gen_a_div(col, false);}, ""); 
 html += "</div>";
 // back: put ascending ordered tables
 html += "<div id='back'>";
-html += [0, 1, 2, 3].reduce(function(acc, col){ 
-        return acc + gen_a_div(col, true);}, ""); 
+html += [0, 1, 2, 3].reduce(function(acc, col){return acc + gen_a_div(col, true);}, ""); 
 html += "</div>";
 html += "</div>";
 
 document.write(html);
 
 
-// show a div on the front pane, as the default table
+// 3. show a div on the front pane, as the default table
 document.getElementById(div_id(0, false)).style.display = "block";
 
 </script>
