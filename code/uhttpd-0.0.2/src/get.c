@@ -16,6 +16,8 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -29,6 +31,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <dirent.h>
+#include <errno.h>
 
 #include "uhttpd.h"
 #include "util.h"
@@ -845,7 +848,7 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 		log_debug_msg(LOG_INFO, "fullpath=%s", fullpath);
 		if(stat(fullpath, &st)){
 			*status_code = 500;
-			log_debug_msg(LOG_INFO, "stat(%s) fail", fullpath);
+			log_debug_msg(LOG_INFO, "stat(%s) fail: %s", fullpath, strerror(errno));
 			write_status_line(sd, *status_code, "server internal error");
 			write(sd, CRLF, 2);
 			return 0;
@@ -854,10 +857,10 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 		/* output format: [type, name, size, time] */
 		strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
 		
-		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "['%s', '%s', %d, '%s', '%s%s'],\n",
+		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "['%s', '%s', %llu, '%s', '%s%s'],\n",
 									S_ISDIR(st.st_mode)? "d" : "-",
 									list[i]->d_name,
-									S_ISDIR(st.st_mode)? - 1 : st.st_size,
+                                     S_ISDIR(st.st_mode)? - 1 : st.st_size,
 									timebuf,
                                     p_dirpath + strlen(root_dir), list[i]->d_name); 
 
