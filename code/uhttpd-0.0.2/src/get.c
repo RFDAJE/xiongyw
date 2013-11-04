@@ -239,10 +239,12 @@ int handle_get_request(int sd, const char *url,     /* input  */
    3. part3: the rest.
 
    convert html text into C string:
-    -  s/\\/\\\\/g
-    -  s/\"/\\\"/g
-    -  s/^/\"/g
-    -  s/$/\\n\"/g 
+    -  s/\\/\\\\/g   : this is to replace \ to "\\"
+    -  s/\"/\\\"/g   : this is to replace " to \"
+    -  s/^/\"/g      : this is to add " at the begining of each line
+    -  s/$/\\n\"/g   : this to to add \n" at the tail of each line
+
+   batch convert: $cat test.html | sed -e 's@\\@\\\\@g' | sed -e 's@\"@\\\"@g' | sed -e 's@^@\"@g' | sed -e 's@$@\\n\"@g'
 */
 static char s_part1[] =
 "<html><head><title>%s</title>\n"
