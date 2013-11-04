@@ -67,8 +67,10 @@ char* get_mime_type(const char* filename){
 	char* dot;
 	dot = strrchr(filename, '.');
 	
+/*
 	if(!dot)
 		return "application/octet-stream";
+*/
 
 	if(strcasecmp(dot, ".html") == 0 || 
            strcasecmp(dot, ".htm")  == 0)
@@ -134,7 +136,7 @@ char* get_mime_type(const char* filename){
 		return "video/x-msvideo";
 
          
-	return "application/octet-stream";
+	return "text/plain";
 }
 
 int write_status_line(int sd, int status_code, const char* reason_phrase){
