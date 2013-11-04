@@ -8,6 +8,7 @@ Legend:
 + : implemented
 (yyyy-mm-dd, yyyy-mm-dd): proposed and implemented date
 -------------------------------------------------------------------------
+- add "#define _FILE_OFFSET_BITS 64" into the autoconf???
 + handle uhttpd_LDADD on both linux and sunos (2004-07-14, 2004-07-15)
 	linux: uhttpd_LDADD=-lm -lresolv -lpthread 
 	SunOS: uhttpd_LDADD=-lm -lresolv -lpthread -lsocket -lnsl

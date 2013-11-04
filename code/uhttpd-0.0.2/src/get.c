@@ -17,10 +17,12 @@
 */
 
 
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+
+#define _FILE_OFFSET_BITS 64
+
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>

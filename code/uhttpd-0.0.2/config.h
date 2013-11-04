@@ -197,9 +197,6 @@
 /* Version number of package */
 #define VERSION "0.0.2"
 
-/* stat() limitation on big files */
-#define _FILE_OFFSET_BITS 64
-
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 
@@ -217,5 +214,3 @@
 
 /* Define as `fork' if `vfork' does not work. */
 /* #undef vfork */
-
-#define DEBUG
