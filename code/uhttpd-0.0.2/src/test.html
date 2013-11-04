@@ -14,13 +14,121 @@ table td{
 table th a:link,table th a:visited {color:#ffffff;}
 table th a:hover,table th a:active {color:#dddd33;}
 
-div { display: none; }
+
+/*
+ * noted(bruin, 2013-11-03): card-flipping animation
+ *
+ * ref: http://davidwalsh.name/css-flip
+ * 
+
+1. the page elemens is arranged as below:
+
+<div id="flip-container"">
+    <div id="flipper">
+	<div id="front">
+	    <!-- front content: descending tables divs -->
+	</div>
+	<div id="back">
+	    <!-- back content: ascending tables divs -->
+	</div>
+    </div>
+</div>
+
+for all divs directly contains a table, one and only one of them is visible; the visibility
+of them are controlled by their "display" property: "none" or "block".
+
+2. rotating of the "flipper" div is triggered by changing its class: 
+- class=""     : show the front, i.e, no rotation
+- class="edge" : show the edge, i.e, rotate 90 degree. it's effectively invisible at this position.
+- class="back" : show the back, i.e., rotate 180 degree
+
+note that the 180 deg rotation is done in two steps, a 90 deg rotation followed by 
+another 90 deg. the reason is to obtain a right time to switch the table div to be shown.
+below is the steps of the flipping process:
+- add a hook to transitionEnd event
+- trigger the 1st 90 deg rotation by changing flipper's class to "edge"
+when the hook is called:
+- remove the hook from the event
+- switch the shown table div
+- trigger the 2nd 90 deg rotation by changing flipper's class to either "back" or "".
+
+3. the width of the "container" div: the y-axis of the horizontal rotation needs to be 
+in the middle of the table width, to get the best rotation result. 
+to this end, we need to dynamiclly specify the correct "width" property of the "container" div.
+if the div width is not set, then the y-axis is at the middle of the page body, which is not
+what we wanted.
+dynamically setting the div width is done at the begining of each flipping process, by checking the 
+width of the shown table and adding a small margin.
+
+*/
+
+/* DIVs which directly contain table are of "table" class, and are not displayed by default */
+div.table {display: none;}
+
+/* the out-most container, which keeps perspective */
+div#container {
+	-webkit-perspective: 1000px;
+           -moz-perspective: 1000px;
+             -o-perspective: 1000px;
+                perspective: 1000px;
+}
+
+/* flip speed goes here */
+div#flipper {
+	-webkit-transition: 100ms;
+	   -moz-transition: 100ms;
+	     -o-transition: 100ms;
+	        transition: 100ms;
+   -webkit-transform-style: preserve-3d;
+      -moz-transform-style: preserve-3d;
+        -o-transform-style: preserve-3d;
+           transform-style: preserve-3d;
+}
+
+/* horizontally rotate 90 deg to show the edge (effectively invisible) */
+div#flipper.edge{
+	-webkit-transform: rotateY(90deg);
+	   -moz-transform: rotateY(90deg);
+	     -o-transform: rotateY(90deg);
+	        transform: rotateY(90deg);
+}
+
+/* horizontally rotate 180 deg to show the back */
+div#flipper.back{
+	-webkit-transform: rotateY(180deg);
+	   -moz-transform: rotateY(180deg);
+	     -o-transform: rotateY(180deg);
+	        transform: rotateY(180deg);
+}
+
+/* hide backface of both front and back panes */
+div#front, div#back {
+	-webkit-backface-visibility: hidden;
+	   -moz-backface-visibility: hidden;
+	     -o-backface-visibility: hidden;
+	        backface-visibility: hidden;
+}
+
+/* place the front pane above the back pane */
+div#front {
+	z-index: 2;
+}
+
+/* the back pane is initially showing its back */
+div#back {
+	-webkit-transform: rotateY(180deg);
+	   -moz-transform: rotateY(180deg);
+	     -o-transform: rotateY(180deg);
+	        transform: rotateY(180deg);
+}
+
+
 
 </style></head><body> 
-
 <pre><b>Folder: %s</b><br>
 
 <script language='javascript'>
+
 
 // a table in 2-dimensional array & its table header
 var th = ['Type','Name','Size','Modified','href'];
@@ -36,26 +144,44 @@ var table = [
 ['-', 'spoke', 86, '2013-08-01 16:54', 'xxxx'],
 ['-', 'freehub', 320, '2013-12-01 16:54', 'xxx']];
 
+
 /**
-* hide and show DIV elements
-*
-* @param {String} to_hide, the id of DIV to hide
-* @param {String} to_show, the id of DIV to show
-* @return none
-*/
+ * hide and show DIV elements: this effectively trigger the flipping process
+ *
+ * @param {String} to_hide, the id of DIV to hide
+ * @param {String} to_show, the id of DIV to show
+ * @return none
+ */
 function hide_n_show(to_hide, to_show){
-    document.getElementById(to_hide).style.display = "none";
-    document.getElementById(to_show).style.display = "block";
+
+    // define hook inside so it has access to arguments "to_hide" and "to_show"
+    var hook = function(){
+        document.getElementById("flipper").removeEventListener('webkitTransitionEnd', hook, false);
+        document.getElementById(to_show).style.display = "block";
+        document.getElementById(to_hide).style.display = "none";
+        if(to_show.indexOf("asc") > 0)
+            document.getElementById("flipper").className = "back";
+        else
+            document.getElementById("flipper").className = "";
+    }
+
+    // to dynamically set a good width for the out-most container DIV
+    var table_width = window.getComputedStyle(document.getElementById("t"+to_hide), null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER) + 10;
+    document.getElementById("container").style.width = table_width + "px";
+
+    document.getElementById("flipper").addEventListener('webkitTransitionEnd', hook, false);
+    // let it go...
+    document.getElementById("flipper").className = "edge";
 }
 
 
 /** 
-* return a compare function for sort()
-*
-* @param {Number} col: the index of the column to sort by
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {Function} The compare function for Array.prototype.sort()
-*/
+ * return a compare function for sort()
+ *
+ * @param {Number} col: the index of the column to sort by
+ * @param {Boolean} ascending: ascending (true) or descending (false)
+ * @return {Function} The compare function for Array.prototype.sort()
+ */
 function sort_by_col(col, ascending){
     return function (a,b){
         var ord = 0;
@@ -66,11 +192,11 @@ function sort_by_col(col, ascending){
 }
 
 /**
-* convert a number into string seperated by commas
-*
-* @param {Number} size: the size
-* @return {String} a converted string
-*/
+ * convert a number into string seperated by commas
+ *
+ * @param {Number} size: the size
+ * @return {String} a converted string
+ */
 function size_with_comma(size){
     if(size < 0) return "-"
     var s = "" + size;
@@ -85,101 +211,133 @@ function size_with_comma(size){
     return result;
 }
 
+/* id rules for tables and their parent divs */
+function div_id(col, asc){
+    return th[col] + (asc? "_asc" : "_dsc");
+}
+
+function table_id(col, asc){
+    return "t" + div_id(col, asc);
+}
+
 
 /**
-* return a html table row <tr> for the header
-*
-* @param {Number} col: the index of the column by which the table is sorted
-* @param {Boolean} ascending: ascending (true) or descending (false)
-* @return {String} string to be added to the document
-*/
+ * return a html table row <tr> for the header
+ *
+ * @param {Number} col: the index of the column by which the table is sorted
+ * @param {Boolean} ascending: ascending (true) or descending (false)
+ * @return {String} string to be added to the document
+ */
 function gen_table_header(col, asc){
-    var cur_div = "d_" + th[col] + (asc? "_a" : "_d");
     /**
-    * @param {Number} column: the index of the table column
-    * @return {String}: a <th> in the <tr>
-    */
+     * @param {Number} column: the index of the table column
+     * @return {String}: a <th> in the <tr>
+     */
     var header = function(column){
-        return "<th><a href='javascript: hide_n_show(\"" + 
-               cur_div + "\", \"d_" + th[column] +"_" + (((col === column) && asc)? 
-               "d\"" : "a\"") + ")'>" + th[column] +"</a>&nbsp;" + 
-               ((col === column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
+        return "<th><a href=\"javascript: hide_n_show('" + 
+            div_id(col, asc) + "', '" + div_id(column, !asc) + "')\">" + th[column] +"</a>&nbsp;" + 
+            ((col === column)?(asc? "&uarr;" : "&darr;") : "&nbsp;") + "</th>";
     }
 
     return "<tr>" + [0,1,2,3].map(header).join(" ") + "</tr>";
 }
 
 /**
-* return a content row in html
-*
-* @param {Array} x: an entry in the table array
-* @return {String} the string to be written to the document
-*/
+ * return a content row in html
+ *
+ * @param {Array} x: an entry in the table array
+ * @return {String} the string to be written to the document
+ */
 function gen_a_table_row(x){
-    var d = (x[0] === 'd');  // put text for directories <bold>, and keep type empty for files, size as '-'
+    // for directories: bold the text, prefix the name with "/", keep the "Size" field as '-'
+    // for files: keep the "Type" field empty
+    var d = (x[0] === 'd');  
+
     return "<tr>" + 
            "<td>" + (d? x[0] : "") + "</td>" + 
-           "<td>" + (d? "<b>":"") + "<a href='" + x[4] + "'>" + x[1] + "</a>" + (d? "</b>":"") + "</td>" +
+           "<td>" + (d? "<b>":"") + "<a href='" + x[4] + "'>" + (d? "/" : "") + x[1] + "</a>" + (d? "</b>":"") + "</td>" +
            "<td align=right>" + (d? "-": size_with_comma(x[2])) + "</td>" +  
            "<td>" + x[3] + "</td>" +
            "</tr>";
 }
 
-
-table = table.filter(function(x){return x[1] != '.'}).map(function(x){if(x[0] === 'd') x[1] = '/' + x[1]; return x});
-
-/*
-* sort() keeps the '/..' folder at the top
-*
-*@param {Function} cmp: a compare function required by sort()
-*@return {Array} the array is sorted in place
-*/
-table.sort = function (cmp){
-
-     var dotdot =  this.filter(function(x){return x[1] === '/..';});
-     var rest = this.filter(function(x){return x[1] != '/..';}).sort(cmp);
-
-     this.length = 0; // empty the array
-
-     if(dotdot.length != 0){   
-         this.push(dotdot[0]); 
-     }
-
-     for(var i = 0; i < rest.length; i ++){
-         this.push(rest[i]);
-     }
-
-     return this;
-}
-
-
 /** 
-* generate a div to be written to the document
-* 
-* @param {Number} column: the index of the column by which the table is sorted
-* @param {Boolean} is_asc: ascending (true) or descending (false)
-* @param {String} id: the DIV element id
-* @return {String} the div content
-*/
-function gen_a_div(column, is_asc, id){
-    var div = "";
-    table.sort(sort_by_col(column, is_asc));
-//    div = div + "<div id='"+ id +"' style='display:none'><table>";
-    div = div + "<div id='"+ id + "'><table>";
-    div = div + gen_table_header(column, is_asc);
+ * generate a div which encapsulates a table
+ * 
+ * @param {Number} col: the index of the column by which the table is sorted
+ * @param {Boolean} asc: ascending (true) or descending (false)
+ * @return {String} the div content
+ */
+function gen_a_div(col, asc){
+    table.sort2(sort_by_col(col, asc));
+    var div = "<div class='table' id='"+ div_id(col, asc) + "'><table id='" + table_id(col, asc) + "'>";
+    div = div + gen_table_header(col, asc);
     div = div + table.map(gen_a_table_row).join(" ");
     div = div + "</table></div>";
     return div;
 }
 
 
-// fold on the columns, each column produces two divs (ascending and descending)
-document.write([0, 1, 2, 3].reduce(function(acc, col){ return acc + gen_a_div(col, true, 'd_' + th[col] + '_a') + gen_a_div(col, false, 'd_' + th[col] + '_d');}, "")); 
+/*
+ * sort2() is to always keep the '..' entry at the top
+ *
+ * @param {Function} cmp: a compare function required by sort2()
+ * @return {Array} the array is sorted in place
+ *
+ * noted(bruin, 2013-11-03): 
+ * - it also works to add the sort() to the "table" object directly (thus masking the prototype's sort). 
+ *   the drawback is that whenever we do "table=table.filter()", the new sort() is gone from the "table". 
+ * - it will goes into a infinity recursive call if we override the Array.prototype.sort(), as in the case
+ *   here we still need to call original sort() to sort the "rest" array.
+ */
+Array.prototype.sort2 = function (cmp){
 
-// show first DIV by default
-document.getElementById("d_" + th[0] + "_d").style.display = "block";
+    var parent = '..';
+    var dotdot = this.filter(function(x){return x[1] === parent;});
+    var rest = this.filter(function(x){return x[1] != parent;}).sort(cmp);
+
+    this.length = 0; // empty the array
+
+    if(dotdot.length != 0){   
+        this.push(dotdot[0]); 
+    }
+
+    for(var i = 0; i < rest.length; i ++){
+        this.push(rest[i]);
+    }
+
+    return this;
+}
+
+
+////////////////////////////////////////////////////////////
+// table processing starts...
+////////////////////////////////////////////////////////////
+
+// 1. filter out the '.' entry, if any
+table = table.filter(function(x){return x[1] != '.'});
+
+// 2. generate and output the html content
+var html = "<div id='container'>";
+html += "<div id='flipper'>";
+// front: put descending ordered tables
+html += "<div id='front'>";
+html += [0, 1, 2, 3].reduce(function(acc, col){return acc + gen_a_div(col, false);}, ""); 
+html += "</div>";
+// back: put ascending ordered tables
+html += "<div id='back'>";
+html += [0, 1, 2, 3].reduce(function(acc, col){return acc + gen_a_div(col, true);}, ""); 
+html += "</div>";
+html += "</div>";
+
+document.write(html);
+
+
+// 3. show a div on the front pane, as the default table
+document.getElementById(div_id(0, false)).style.display = "block";
 
 </script>
+</div>
 <br><hr>
 <address>Powered by <a href='http://tstool.sourceforge.net/drops/uhttpd-0.0.2.tar.gz'>uhttpd v0.0.2</a>, &copy;&nbsp;2002-2004&nbsp;<a href='mailto:xiongyw@hotmail.com'>Yuwu (Bruin) Xiong</a></address>
 </body>
