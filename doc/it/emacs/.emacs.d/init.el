@@ -345,6 +345,9 @@
 ;; node-js-eval-region-or-buffer
 (require 'node)
 
+;; transpose-frame
+(require 'transpose-frame)
+
 ;(add-to-list 'load-path "c:/emacs/emacs-24.2/site-lisp/magit-1.2.0")
 ;(require 'magit)
 
