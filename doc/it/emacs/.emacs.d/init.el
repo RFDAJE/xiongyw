@@ -190,7 +190,7 @@
 ;; global key
 (define-key global-map "\C-cr" 'org-remember)
 ;; setup remember.el for use with org-mode
-(org-remember-insinuate)
+;(org-remember-insinuate)
 ;; default folder
 (setq org-default-notes-file
       (concat org-directory (concat (format-time-string "%Y") ".org")))
