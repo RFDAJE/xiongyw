@@ -186,19 +186,19 @@
 ;;;; org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default directory
-;(setq org-directory "~/journal")
+(setq org-directory "~/journal")
 ;; global key
-;(define-key global-map "\C-cr" 'org-remember)
+(define-key global-map "\C-cr" 'org-remember)
 ;; setup remember.el for use with org-mode
-;(org-remember-insinuate)
+(org-remember-insinuate)
 ;; default folder
-;(setq org-default-notes-file
-;      (concat org-directory (concat (format-time-string "%Y") ".org")))
-;(setq org-support-shift-select t)
-;(add-hook 'org-mode-hook
- ;         (lambda ()
- ;          ;; auto-fill mode off
- ;           (auto-fill-mode -1)))
+(setq org-default-notes-file
+      (concat org-directory (concat (format-time-string "%Y") ".org")))
+(setq org-support-shift-select t)
+(add-hook 'org-mode-hook
+          (lambda ()
+           ;; auto-fill mode off
+            (auto-fill-mode -1)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
