@@ -306,14 +306,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; aspell: http://blog.sina.com.cn/s/blog_8e8bd6b90100tgtw.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
-;(setq ispell-program-name "aspell")
-;(setq-default ispell-program-name "aspell")
-;(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
-;(require 'ispell)
-;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-;(global-set-key (kbd "<f8>") 'ispell-word)
-;(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
+(setq ispell-program-name "aspell")
+(setq-default ispell-program-name "aspell")
+(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
+(require 'ispell)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(global-set-key (kbd "<f8>") 'ispell-word)
+(global-set-key (kbd "C-<f8>") 'flyspell-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
