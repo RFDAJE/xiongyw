@@ -36,8 +36,12 @@
 - to buf tail: m>
 - page down: c-v
 - page up: m-v
+- page up other window: m-pgup
+- page down other window: m-pgdn
 - center line: c-l
 - goto line: m-x goto-line, m-g g
+- set mark: c-@
+- exchange point & mark: c-x c-x
 
 - bookmark-set: c-x r m
 - bookmark-jump: c-x r b
