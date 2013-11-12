@@ -59,3 +59,5 @@ npm install express connect-form haml underscore
 8. shell & eshell
    http://www.masteringemacs.org/articles/2010/11/01/running-shells-in-emacs-overview/
    how to open file in Emacs via eshell: "$find-file yourfile"
+
+9. w3m: http://blog.chinaunix.net/uid-20680669-id-3339757.html

@@ -23,6 +23,7 @@
                               "~/.emacs.d/haskell-mode/"
                               "~/.emacs.d/auto-complete-1.3.1/"
                               "~/.emacs.d/yasnippet/"
+                              "~/.emacs.d/w3m-lisp/"
 ;                              "~/.emacs.d/lintnode/"
                               nil) load-path))
 
@@ -221,7 +222,15 @@
 (global-set-key [C-right] 'tabbar-forward-tab)
 
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; w3m: http://blog.chinaunix.net/uid-20680669-id-3339757.html
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-to-list 'exec-path "c:/emacs/emacs-24.2/windows_emacs_w3m/w3m") 
+(require 'w3m-load)
+(setq w3m-use-favicon nil)
+(setq w3m-command-arguments '("-cookie" "-F"))
+(setq w3m-use-cookies t)
+(setq w3m-home-page "http://www.googlestable.com")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
