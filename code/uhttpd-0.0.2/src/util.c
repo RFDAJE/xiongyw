@@ -119,6 +119,9 @@ char* get_mime_type(const char* filename){
 	if(strcasecmp(dot, ".png") == 0)
 		return "image/png";
 
+	if(strcasecmp(dot, ".ico") == 0)
+		return "image/vnd.microsoft.icon";
+
 	if(strcasecmp(dot, ".au") == 0)
 		return "audio/basic";
 
