@@ -186,19 +186,19 @@
 ;;;; org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; default directory
-;(setq org-directory "~/journal")
+(setq org-directory "~/journal")
 ;; global key
-;(define-key global-map "\C-cr" 'org-remember)
+(define-key global-map "\C-cr" 'org-remember)
 ;; setup remember.el for use with org-mode
 ;(org-remember-insinuate)
 ;; default folder
-;(setq org-default-notes-file
-;      (concat org-directory (concat (format-time-string "%Y") ".org")))
-;(setq org-support-shift-select t)
-;(add-hook 'org-mode-hook
- ;         (lambda ()
- ;          ;; auto-fill mode off
- ;           (auto-fill-mode -1)))
+(setq org-default-notes-file
+      (concat org-directory (concat (format-time-string "%Y") ".org")))
+(setq org-support-shift-select t)
+(add-hook 'org-mode-hook
+          (lambda ()
+           ;; auto-fill mode off
+            (auto-fill-mode -1)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -306,14 +306,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; aspell: http://blog.sina.com.cn/s/blog_8e8bd6b90100tgtw.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
-;(setq ispell-program-name "aspell")
-;(setq-default ispell-program-name "aspell")
-;(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
-;(require 'ispell)
-;(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-;(global-set-key (kbd "<f8>") 'ispell-word)
-;(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+(add-to-list 'exec-path "C:/Program Files (x86)/Aspell/bin/")
+(setq ispell-program-name "aspell")
+(setq-default ispell-program-name "aspell")
+(setq ispell-personal-dictionary "C:/Program Files (x86)/Aspell/dict")
+(require 'ispell)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(global-set-key (kbd "<f8>") 'ispell-word)
+(global-set-key (kbd "C-<f8>") 'flyspell-mode)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -36,8 +36,12 @@
 - to buf tail: m>
 - page down: c-v
 - page up: m-v
+- page up other window: m-pgup
+- page down other window: m-pgdn
 - center line: c-l
 - goto line: m-x goto-line, m-g g
+- set mark: c-@
+- exchange point & mark: c-x c-x
 
 - bookmark-set: c-x r m
 - bookmark-jump: c-x r b
@@ -88,10 +92,8 @@ question part:
 - search: match whole word or not
 - search within the file: search the focused item, then "persistently"
   highlight all in the file or function, dismiss the highlight; move back and forth
-- jump to a specific line
 - brace match (visual display, and jump back and forth)
 - reference searches in project: list all occurance in the project (like SourceInsight)
-- shell mode
 - etags
 - moving region left/right with tab
 - tab2space
