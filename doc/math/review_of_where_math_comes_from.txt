@@ -1,0 +1,500 @@
+Book Review
+
+Where Mathematics Comes
+From: How the Embodied Mind
+Brings Mathematics into Being
+
+Reviewed by James J. Madden
+
+Where Mathematics Comes From: How the
+Embodied Mind Brings Mathematics into Being
+
+George Lakoff and Rafael E. Núñez
+
+Basic Books, 2000
+
+ISBN 0-465-03770-4
+
+$30.00, hardcover/$20.00, softcover
+
+A metaphor is an alteration of a woorde from the proper and naturall meanynge,
+to that which is not proper, and yet agreeth thereunto, by some lykenes that
+appeareth to be in it.
+
+—Thomas Wilson, The Arte of Rhetorique (1553) [Wi], page 345
+
+Conceptual metaphor is a cognitive mechanism for allowing us to reason about one
+kind of thing as if it were another. …It is a grounded, inferencepreserving
+cross-domain mapping—a neural mechanism that allows us to use the inferential
+structure of one conceptual domain (say, geometry) to reason about another (say,
+arithmetic).
+
+—Where Mathematics Comes From, page 6
+
+In his philosophical writings, Poincaré reflected on the origins of
+mathematical knowledge. His best-known remarks, translated as the essay
+“Mathematical Creation” in [P1], include speculations about the unconscious
+processes that precede discovery.
+
+This is where we read the famous story of how, while boarding a bus in
+Coutances, Poincaré suddenly realized the identity of the transformations used
+to define the Fuchsian functions with those of non-Euclidean geometry.  
+
+In his
+1905 essay “L’Intuition et la Logique en Mathématiques”, which appears in
+translation in [P1], pages 210–222, Poincaré looks at mathematical production
+from a different angle. He pictures two different kinds of mathematician. One
+kind is devoted to explicit logical precision. Ideas must be broken down into
+definitions and deductions. Even conceptions that seem clear and obvious must be
+subjected to analysis, cut apart, and examined under the microscope of
+logic. The other kind of mathematician is guided by geometric intuition,
+physical analogies, and images derived from experience.  
+
+This mathematician is
+like Klein, who proved a theorem in complex function theory by imagining a
+Riemann surface made of metal and considering how electricity must flow through
+it.
+
+Poincaré goes on to argue that logic and intuition play complementary roles in
+mathematics. Logic provides rigor and certainty by substituting precise notions
+for vague and ambiguous ones and by moving in sure, syllogistic steps. Logic,
+however, does not perceive goals and does not grasp that which motivates and
+organizes our mathematical activity. We may follow the logical trail through an
+argument yet fail to “see” the idea in it. For this we need intuition, which
+provides insight, purpose, and direction. But intuition is sometimes ambiguous,
+and sometimes it even deceives. So ultimately it is only by the combination of
+logic and intuition that mathematics advances.  
+
+Poincaré set his ideas down at a time when revolutionary advances in
+mathematical logic were just beginning. He could not have foreseen what the next
+century would achieve in foundational studies.  Today, we cannot claim to have
+the final word, but we clearly understand much more about logic and the role it
+plays in mathematics than we did one hundred years ago.  
+
+How about intuition?  What more do we know about this? A few references come to
+mind: Hilbert and Cohn-Vossen’s book [HC], Hadamard’s essay [H], and perhaps a
+couple of more recent items, particularly S. Dehaene’s work on the number sense
+[Dh] and Devlin’s book [De].  I find noteworthy the essay [T], written by a
+young Oxford mathematics student who went on to become a neuroscientist of high
+repute at the University of California Los Angeles. Overall, however, it seems
+that intuition has remained largely unanalyzed and poorly understood.
+
+A good way to approach the book of Lakoff and Núñez is to see it, as the
+authors suggest in the preface, as an empirical study of the precise nature of
+clear mathematical intuitions (page xv). Lakoff and Núñez promise in the
+introduction to give an account of how normal human cognitive mechanisms rooted
+in the brain are used to formulate mathematical concepts, reason mathematically,
+and create and understand mathematical ideas.  Logic and formal rigor do not
+figure prominently in this account. Rather, the book is about the intuitive
+side; the focus is on certain “conceptual metaphors” which, the authors
+hypothesize, are the basic building blocks of mathematical intuition.  Moving
+beyond cognitive science into philosophy, the authors even suggest that
+metaphors account for the meaning of mathematical concepts and are the basis of
+mathematical truth. “Metaphor” is the key word in this book.
+
+Much of the book is devoted to the examination of prominent topics in standard
+mathematics curricula.  These topics include grade school arithmetic, algebraic
+structures and their models, logic, set theory, limits, real numbers, and a
+little bit of nonstandard analysis. Chapters 13 and 14 have a historical
+orientation, discussing the contributions of Dedekind and Weierstrass to the
+foundations of analysis. Chapters 15 and 16 treat philosophical issues. The book
+ends with an extended discussion of the equation eπi +1 = 0 intended to
+illustrate “mathematical idea analysis”, a technique that was invented by the
+authors and that they use to uncover the metaphorical elements in mathematical
+ideas.  The arguments do not follow a direct path. The book builds on many
+fronts, elaborates subgoals, and spins off subsidiary projects. While reading
+the book, I sometimes found it difficult to keep track of what the authors were
+aiming at. For this review, therefore, I shall simplify things by picking out
+three major strands and commenting on them separately. I have mentioned them
+already. They are:
+
+• a hypothesis about the role of metaphors in mathematical cognition,
+
+• a philosophical position about mathematical truth, and
+
+• the technique of mathematical idea analysis.
+
+In many ways the three strands are interdependent— a point to be remembered,
+even though my discussion is divided into three parts. I find the metaphor
+hypothesis the most interesting, and accordingly I devote more space to this
+than to the other two items.
+
+Let me state the metaphor hypothesis as I interpret it. When people think about
+mathematics— even very deep, advanced mathematics—they somehow activate links to
+mundane experiences that occur in everyday functioning in the world and links to
+other mathematical experiences as well.  These links are not logical or
+deductive—often, they are not even conscious. They involve very complex
+pattern-matching, by means of which people transfer abilities and concepts that
+are relevant or adaptive in familiar, natural settings to new settings that are
+less familiar and more abstract. The lifting or “retooling” of cognitive
+categories and abilities in this fashion is what the authors call conceptual
+metaphor. The second quote at the beginning of this review is as close to a
+definition of this as anything that the authors give.
+
+Lakoff and Núñez present the metaphor hypothesis within the framework of a
+general theory of human cognition that Lakoff himself played an important role
+in creating; see [LJ]. In addition to the idea that most abstract concepts are
+metaphorical, this theory has two other basic tenets. One is that thought is
+mostly unconscious and mostly “involves automatic, immediate, implicit rather
+than explicit understanding” (page 28). Conceptual metaphors may be
+unconscious; they support and influence our thinking without our necessarily
+being aware of them. The other tenet is that human conceptual structures are
+deeply influenced by the particulars of our concrete, physical being. We reason
+with the same equipment we use to observe our immediate surroundings, move about
+in them, and interact with people and things. Even the most abstract concepts,
+if analyzed properly, show the marks of their origin in, and dependence on,
+basic perceptual and motor schemata. In summary, all concepts—mathematical
+concepts in particular— are metaphorical and rest upon unconscious
+understandings that originate in bodily experience.
+
+Let us look at some examples. There are various kinds of conceptual
+metaphors. Grounding metaphors transfer conceptual abilities acquired in
+concrete experiences (like putting things in piles or traveling) to abstract
+domains like arithmetic.  Linking metaphors make connections between different
+abstract domains. What struck Poincaré as he stepped aboard the bus, for
+example, was a linking metaphor at a very high level that had somehow evolved in
+his unconscious and then made its way to the surface.
+
+Basic arithmetic has several grounding metaphors, all discussed in Chapter
+3. One of these metaphors connects experiences with collections of objects on
+the one hand and the basic arithmetic operations on the other. Joining two
+collections, for example, corresponds to addition, while splitting a collection
+into many subcollections of equal size corresponds to division. The commutative
+law of addition corresponds to the fact that when two collections are thrown
+together, it does not matter which goes first. Understanding the commutative law
+presumably involves some sort of reference back to this property of collections
+and thus the activation of this metaphor.  Other aspects of arithmetic are
+associated with other grounding metaphors. Adding positive and negative numbers
+may be understood metaphorically by referring to forward and backward trips
+along a linear path.
+
+One might react to this with the feeling that it is all pretty trivial. Of
+course, once the arithmetic metaphors are internalized, using them is as easy as
+riding a bike. But the skills involved in using arithmetic, or in riding a bike,
+are cognitively quite complex. This is most obvious in the fact that learning
+them is not at all trivial. I would even suggest that evidence in favor of the
+metaphor hypothesis can be found in the fact that exposure to different
+metaphors influences the learning process. In the appendix of [MC], Robert Moses
+discusses a strategy he developed for teaching arithmetic with signed
+numbers. Moses does not mention metaphors explicitly, but in the terminology of
+Lakoff and Núñez, what he did was hypothesize that certain children were
+failing to progress because they were inappropriately bound by the collection
+metaphor. So Moses developed a teaching strategy intended to strengthen the trip
+metaphor, and this strategy succeeded quite well.
+
+Here is another example of a grounding metaphor. In Chapter 8 Lakoff and Núñez
+introduce what is the single most important metaphor in the book, the “Basic
+Metaphor of Infinity” (BMI), and illustrate its occurrence in several
+mathematical contexts. Like all conceptual metaphors, the BMI involves a
+correspondence between a “source domain”, which is familiar and often
+concrete, and a “target domain”, which is less familiar and usually more
+abstract. In the BMI, the source is the general idea of an iterative process
+that reaches a completion. Examples would be walking to a destination or picking
+all the berries off a bush. The target is any iterative process that potentially
+goes on and on, like counting “One, two, three… .” The BMI simply shifts the
+idea of a completed process from its natural context into a new context, like
+counting, in which the idea does not exactly fit but to which it bears a
+likeness or analogy. Thus, we can reason about the collection of all natural
+numbers by extending or generalizing the patterns by which we reason about
+things like the set of all steps taken on a walk somewhere. It is not claimed
+that the use of this metaphor is conscious, but just that there is a common
+pattern. We are prepared to think about infinite processes by experiencing
+finite ones, and the descriptive categories we apply in the finite case have
+analogues in the infinite. Of course, there are vast differences between the
+logic of finite and infinite processes, but the authors do not seem very
+concerned about such differences.  I suppose that the authors consider such
+details to be peripheral to the cognitive science, despite their mathematical
+importance.
+
+How do metaphors function in the mathematical activities of actual people? On
+this, Lakoff and Núñez are not very clear. When they do talk about the
+mathematical activities of real people, they describe them in generic terms:
+people entertain ideas or “use cognitive mechanisms” of one sort or another to
+“conceptualize” this or that. Presumably, when an individual is engaged in
+mathematical work, that person is guided by metaphors that are somehow
+represented in his or her own brain. The details would depend on the specific
+task or problem. Unfortunately, Lakoff and Núñez do not provide any
+illustrations of what they suppose goes on in “real time”, so this is about as
+much as I can say.
+
+This brings me to my first main criticism concerning the metaphor hypothesis:
+What is the quality of the evidence for it? If, as the authors say on page 1,
+their goal is to determine “what mechanisms of the human brain and mind allow
+human beings to formulate mathematical ideas and reason mathematically,” then
+one would expect some data about the actual thoughts and actions of people in
+the process of doing mathematics. Such data do exist; the work of Robert Moses
+provides one example.  However, essentially the only kind of evidence Lakoff and
+Núñez provide comes from the examination of the contents of texts and
+curricula.  How much can we infer about the “basic cognitive mechanisms” used
+in mathematics from what we find in texts and curricula? A study of navigation
+based on the standard manuals would tell us very little indeed about how the
+task was actually accomplished on the bridge of a large ship. How exactly do
+people use metaphors when they are learning new material, solving problems,
+proving theorems, and communicating with one another?  I would like to have seen
+direct support for the metaphor hypothesis from the observation of mathematical
+behaviors. After a demonstration that metaphors are indeed as common as the
+authors believe, I would want a detailed examination of the ways metaphors are
+used in a wide variety of settings. The authors report no such information, and
+in fact they acknowledge the lack of direct empirical support for their
+hypotheses in many places. Carefully designed studies might lead to very
+different ideas about how metaphors function in mathematics or mathematics
+learning.  For example, at the AMS meeting in New Orleans in January 2001, Eric
+Hsu and Michael Oehrtman, mathematics education research postdocs at the Dana
+Center at the University of Texas at Austin, spoke about their study of calculus
+learners. They found students making up their own, often dysfunctional,
+metaphors, and they raised the fascinating question of how it is that some
+learners shed the idiosyncratic metaphors they initially build and acquire the
+ones that are standard.
+
+My second main criticism concerns lack of precision in the concept of
+metaphor. By rough page count, more than half the text is devoted to displaying
+mathematical metaphors of one sort or another. After a while, the notion of
+metaphor seems to become a catchall. In the discussion beginning on page 384,
+for example, “metaphor” is used to refer to the following: the
+algebra/geometry dictionary in analytic geometry; the definition of function
+addition, (f + g)(x) := f (x) + g(x); the “Unit Circle Blend”, which involves
+various things one might attend to in a diagram showing the unit circle at the
+origin in a Cartesian coordinate system, together with a central angle; the
+“Trigonometry Metaphor”, i.e., thinking of the cosine and sine of θ as the x-
+and y-coordinates of the point reached after moving counterclockwise from (1, 0)
+along the unit circle through an angle of θ; the “Recurrence Is Circularity
+Metaphor”, which refers to connections between mathematical concepts and the
+language of recurrence used in nonmathematical settings to describe things like
+the seasons; and, finally, polar coordinates.  Other parts of the book add yet
+more variety. In abstract algebra the relationship of an abstract structure
+(e.g., a group) to a model of that structure (a group of rotations) is an
+example of a metaphor. Cauchy, Dedekind, and Weierstrass contributed to the
+foundations of analysis by creating the “Arithmetic Cut Metaphor”, the
+“Spaces Are Sets of Points Metaphor”, and many others. When mathematicians
+write axioms, they are using the “Essence Metaphor”. Set-theoretic foundations
+give us an instance of the “Formal Reduction Metaphor”. With examples of so
+many differing kinds serving such diverse functions, the notion of metaphor
+begins to lose its meaning. If I had been given the original definition and a
+couple of examples and then had gone looking for conceptual metaphors in
+mathematics, I would never have come back with many of the things listed in this
+paragraph. The idea that metaphors play a role in mathematical thinking is quite
+attractive, but what is needed is a notion specific and precise enough so that
+people working independently and without consulting one another can discover the
+same metaphors and agree on the functions they perform. I do not think we have
+this yet.
+
+Let me turn now to the philosophical parts of the book. The authors devote many
+pages to portraying a sort of philosophy/ideology that they call the “Romance
+of Mathematics”, which they contrast with their own philosophy. This is a good
+rhetorical strategy, since the so-called “romance” would probably be disliked
+by all readers except some superficial and self-congratulatory mathematicians.
+For the sake of brevity, I will not comment on the “romance” but just go
+directly to the authors’ philosophical ideas.
+
+According to my reading, Lakoff and Núñez want us to view mathematics as a
+natural human activity, about which their cognitive theory informs us. They
+would like us to use words like “meaning”, “existence”, and “truth” to
+describe aspects of this activity. In particular, they say that mathematical
+entities are “metaphorical entities” that exist “conceptually” only “in the
+minds of beings with [appropriate] metaphorical ideas” (pages 368–9). They also
+say that when we speak of the truth of a mathematical statement, we must speak
+only relative to a particular person, and we may mean no more than this: that
+person’s understanding of the statement accords with his or her understanding
+of the subject matter and the situation at hand; see page 366. Such a view of
+mathematical truth appears to be at odds with the reality of how mathematicians
+communicate. If my mathematics depends on the metaphors that happen to be in my
+head, and your mathematics depends on the metaphors in yours, then how is it
+that we can share mathematical ideas? And why is it that we agree on so much?
+
+Lakoff and Núñez make a couple of hypotheses that might address these
+objections. First, they claim that the metaphors on which mathematics is based
+are not arbitrary. Many grounding metaphors, in particular, are forced on us by
+our physical nature. Second, they claim that natural metaphors have a very
+elaborate and precise structure; see page 375. These, of course, are empirical
+hypotheses. Some day we might acquire good evidence for or against them. If they
+are borne out, they might support the kind of naturalistic approach to the
+philosophy of mathematics that the authors have begun to sketch. In my opinion,
+though, a naturalistic approach should certainly not dismiss the way
+mathematicians share definitions with one another, understand and criticize one
+another’s reasoning, and use a precise, if artificial, logical language to put
+their ideas in writing so that those ideas can be judged by the world. Surely we
+can acknowledge a role for intuition without ignoring the ways that logic and
+conventional rigor support the kind of knowledge that mathematicians build and
+share.
+
+Let me move now to the third and last of the three major strands on which I
+promised to comment.  The authors argue that mathematical ideas occur within
+elaborate networks of interconnected metaphors. “Mathematical idea analysis”
+is the technique of teasing apart the network to reveal the metaphorical
+parts. The reason for doing this is to “characterize in precise cognitive terms
+the mathematical ideas in the cognitive unconscious that go unformalized and
+undescribed when a formalization of conscious mathematical ideas is done” (page
+375).
+
+The appendix contains an extended discussion of the equation e^(πi) +1 = 0 that
+is intended to illustrate the method. The authors say that they want to
+characterize the meaning of the equation and provide an understanding of it
+(page 384). What a mathematician will find here is a detailed description of the
+geometric interpretation of complex exponentiation.  Building from basic
+high-school-level ideas up to college-level complex analysis, the treatment is,
+at different times, insightful, entertaining, opaque, interesting, breezy,
+ponderous, and muddled.[*] Mathematicians will find the images and metaphors
+discussed here to be very familiar, scarcely unconscious.  Many come directly
+from the pages of calculus books and are things most of us describe over and
+over to our calculus classes. To me, these mental images are certainly very
+helpful in understanding. The mystery has always been how difficult it is for
+students to absorb them and use them productively.
+
+[*]See the website http://www.unifr.ch/perso/ nunezr/errata.html for a list of
+errata. One error in the first printing (pages 416–8) was fairly serious. The
+“correction” that I found at the website and that appears in the recently
+distributed softcover edition of the book is a kind of mathematical red
+herring—a passage that appears to answer a question but in fact misleads. The
+authors preface this passage by criticizing other texts for failing to answer
+“the most basic of questions: Why should this particular limit, limn→∞(1 +
+1/n)^n , be the base of the exponential function that is its own derivative?”
+(pages 415–6). In the revised explanation (errata 416–8), the unacknowledged
+assumption that limn→∞(1 + 1/n)^n exists is used in an essential way. (There
+are situations that are analogous in all explicit details but in which the
+pattern of explanation that the authors use would “explain”a falsehood.) When
+the authors complete their proffered explanation, they make a point of saying
+that, once the meanings and metaphors are combined with some “simple algebraic
+manipulations,” there is “nothing mysterious” (errata, page 419) about the
+result. I would retort that what is really the most basic question is: How do we
+know that there is any number at all to which the values of (1 + 1/n)^n tend as
+n increases? The authors create the appearance of simplicity only by suppressing
+this issue, and in fact they create a path that can lead to error. The book
+[Do], on the other hand, contains a nice self-contained treatment of this limit,
+beginning, appropriately, with a non-mysterious demonstration of its existence;
+see page 45. The central claims of the book under review, which are in cognitive
+science and philosophy, may not be threatened by such mathematical infelicities,
+but perhaps they serve as useful reminders of the importance of logical
+discipline in mathematics.
+
+Lakoff and Núñez seem to want to open up that whatever-it-is that makes
+mathematics into a coherent, meaningful whole and expose it for all to see and
+appreciate. If only there were a way! Poincaré himself speculated about how
+best to teach mathematics, concluding finally that understanding means different
+things to different people at different times and for different purposes; see
+[P1], page 432. Surely there will always be good reasons to experiment with new
+formats for mathematical exposition, and Lakoff and Núñez are not alone in
+exploring. Zalman Usiskin, for example, has proposed something he calls
+“concept analysis”, intended for people who are learning to teach mathematics;
+see [U]. Concept analysis examines various methods of representing and defining
+mathematical ideas, as well as how those methods evolved over time, how they are
+used, the problems people have understanding them, and strategies that are
+useful in explaining them.
+
+This concludes my comments on the three strands I identified earlier. If I think
+about the portrayal of mathematics in the book as a whole, I find myself
+disappointed by the pale picture the authors have drawn. In the book, people
+formulate ideas and reason mathematically, realize things, extend ideas, infer,
+understand, symbolize, calculate, and, most frequently of all,
+conceptualize. These plain vanilla words scarcely exhaust the kinds of things
+that go on when people do mathematics. They explore, search for patterns,
+organize data, keep track of information, make and refine conjectures, monitor
+their own thinking, develop and execute strategies (or modify or abandon them),
+check their reasoning, write and rewrite proofs, look for and recognize errors,
+seek alternate descriptions, look for analogies, consult one another, share
+ideas, encourage one another, change points of view, learn new theories,
+translate problems from one language into another, become obsessed, bang their
+heads against walls, despair, and find light. Any one of these activities is
+itself enormously complex cognitively—and in social, cultural, and historical
+dimensions as well. In all this, what role do metaphors play?
+
+Moving to a different perspective, I want to note that there are areas not even
+hinted at in the book where cognitive science is prepared to contribute to our
+understanding of mathematical thought.  Consider this: Metaphorical ideas are
+frequently misleading, sometimes just plain wrong. Zariski spent most of his
+career creating a precise language and theory capable of holding the truths that
+the Italian geometers had glimpsed intuitively while avoiding the errors into
+which they fell. What cognitive mechanisms enable people to recognize that a
+metaphor is not doing the job it is supposed to do and to respond by fashioning
+better conceptual tools?
+
+From early childhood people comment on their own thinking or on the things they
+create in order to represent their thinking, and they use this commentary to
+adjust and correct themselves. In a fascinating article about her own
+first-grade classroom, Kristine Reed Woleck describes how children talk to
+themselves and to one another while drawing and revising pictures to depict
+mathematical ideas, in the process coming to “question, debate, defend,
+clarify, and refine their mathematical understandings” ([W], page 224). Isn’t
+this a miniature version of what a group of research mathematicians might be
+found doing in front of a tentative proof sketched on a blackboard? Or what you
+do alone when you draft a proof and then read, correct, and redraft it?
+
+If mathematical thinking is like other kinds of thinking in its use of
+metaphors, what distinguishes mathematical thinking may be the exquisite,
+conscious control that mathematicians exercise over how intuitive structures are
+used and interpreted. We can step back from our own thinking and critically
+examine our attempts at meaning-making. This, I would venture, is as fundamental
+a cognitive mechanism as any mentioned by Lakoff and Núñez. Mathematics is
+constantly absorbing what it learns about itself by gazing at itself. In Al
+Cuoco’s memorable phrase, “mathematics is its own mirror on the very thinking
+that creates it” ([CC], page x). In a similar vein, Schoenfeld’s classic study
+[S] showed how important self-observation is in solving mathematical
+problems. Today we can associate the ability to observe and control our own
+thought processes with certain clearly demarcated regions of the brain, and we
+understand much about how these regions function in normal brains and how they
+fail in certain diseased brains; see [M].
+
+Where does mathematics come from? Poincaré viewed mathematical intuition as
+that which invents and logic as that which proves. Perhaps in this sense
+mathematics starts with intuition. But Poincaré also said that without proof
+there is no understanding, no communication, no meaning ([P2], page 95–6). Most
+mathematicians would probably agree that mathematics is both invention and proof
+and that it comes from the cooperation of intuition and logic.
+
+What about the question I asked earlier: what do we know today about
+mathematical intuition that we did not know one hundred years ago?  Lakoff and
+Núñez have suggested that intuition is not as formless and elusive as perhaps
+we had thought. To the contrary, or so they claim, it works on the basic
+mechanism of metaphor, and it has a profound structure that is dictated by human
+nature.  These are interesting and appealing ideas, or perhaps intuitions, about
+the nature of mathematical intuition.
+
+Among the sciences, mathematics is not alone in building on intuition. Nor is it
+alone in requiring more. Every science also needs concepts that are precise
+enough to frame testable hypotheses, and every scientific theory needs proof—not
+in the mathematical sense, but at least in the sense that the theory has been
+subjected to the most rigorous trials we can devise and has survived. Lakoff and
+Núñez have shared with us their intuitions about the way the mathematical mind
+operates.  More work remains to be done. We do not know what scientists may some
+day build upon these intuitions.
+
+Acknowledgments. I would like to thank Roger Howe for sharing with me his
+reactions to this book and for reading and commenting on an earlier version of
+this review. I would also like to thank Allyn Jackson and two unknown referees
+for useful comments. Most of this review was written while I was visiting
+Wesleyan University, where I received partial support from the mathematics
+department.  I would like to thank the university and the department for their
+excellent hospitality.
+
+References
+
+[CC] ALBERT A. CUOCO and FRANCES R. CURCIO, eds., The Roles of Representation in School Mathematics, Yearbook, National Council of Teachers of Mathematics, 2001.
+
+[De] KEITH DEVLIN, The Math Gene: How Mathematical Thinking Evolved and Why Numbers Are Like Gossip, Basic Books, 2000.
+
+[Dh] STANISLAS DEHAENE, The Number Sense: How the Mind Creates Mathematics, Oxford University Press, 1997.
+
+[Do] HEINRICH DÖRRE, 100 Great Problems of Elementary Mathematics: Their History and Solutions, translated by David Antin, Dover, New York, 1965.
+
+[H] JACQUES HADAMARD, The Psychology of Invention in the Mathematical Field, Princeton University Press, 1945.
+
+[HC] DAVID HILBERT and S. COHN-VOSSEN, Anschauliche Geometrie, Julius Springer, Berlin, 1932; translated as Geometry and the Imagination, Chelsea, New York, 1952.
+
+[LJ] GEORGE LAKOFF and MARK JOHNSON, Philosophy in the Flesh: The Embodied Mind and Its Challenge to Western Thought, Basic Books, 1999.
+
+[M] EARL K. MILLER, The prefrontal cortex and cognitive control, Nature Reviews in Neuroscience 1 (2000), 59–65.
+
+[MC] ROBERT P. MOSES and CHARLES E. COBB JR., Radical Equations: Math Literacy and Civil Rights, Beacon Press, Boston, 2001.
+
+[P1] HENRI POINCARÉ, The Foundations of Science, authorized translation by G. B. Halsted, The Science Press, New York, 1913.
+
+[P2] ——— , Dernières Pensées, Flammarion, Paris, 1913; reprint 1963.
+
+[S] ALAN SCHOENFELD, Mathematical Problem Solving, Academic Press, Orlando, FL, 1985.
+
+[T] PAUL THOMPSON, The nature and role of intuition in mathematical epistemology, Philosophia: Philos.  Quart. Israel 26 (1998), 279–319.
+
+[U] ZALMAN USISKIN, Teachers’ mathematics: A collection of content deserving to be a field, UCSMP Newsletter, No. 28, Winter 2000-01, 5–10.
+
+[Wi] THOMASWILSON, Arte of Rhetorique (Thomas J. Derrick, ed.), Garland Publishing, Inc., New York and London, 1982.
+
+[W] KRISTINE REED WOLECK, Listen to their pictures: An investigation of children’s mathematical drawings, in [CC].
