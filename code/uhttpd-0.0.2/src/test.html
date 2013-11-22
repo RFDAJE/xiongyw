@@ -173,9 +173,9 @@ function hide_n_show(to_hide, to_show){
     }
 
     // to dynamically set a good width for the out-most container DIV
+    
     var table_width = window.getComputedStyle(document.getElementById("t"+to_hide), null).getPropertyCSSValue('width').getFloatValue(CSSPrimitiveValue.CSS_NUMBER) + 10;
     document.getElementById("container").style.width = table_width + "px";
-
     document.getElementById("flipper").addEventListener('webkitTransitionEnd', hook, false);
     // let it go...
     document.getElementById("flipper").className = "edge";
@@ -318,6 +318,62 @@ Array.prototype.sort2 = function (cmp){
 
     return this;
 }
+
+////////////////////////////////////////////////////////////
+// added(bruin, 2013-11-22):
+// in case some Array methods not available from IE 
+////////////////////////////////////////////////////////////
+Array.prototype.filter = Array.prototype.filter || function (f){
+    var result = [];
+    var len = this.length;
+    for(var i = 0; i < len; i ++){
+        if((i in this) && f.call(undefined, this[i])){
+            result.push(this[i]);
+        }
+    }
+    return result;
+}
+
+Array.prototype.map = Array.prototype.map || function (f){
+    var result = [];
+    var len = this.length;
+    for(var i = 0; i < len; i ++){
+        if(i in this){
+            result[i] = f.call(undefined, this[i], i, this);
+        }
+    }
+    return result;
+}
+
+Array.prototype.reduce = Array.prototype.reduce || function (f, init){
+    var len = this.length;
+    var acc = undefined;
+    var i = 0;
+
+    if(arguments.length > 1){
+        acc = init;
+    }else{ // set acc as the first "meaningful" element in a
+        for(; i < len; i ++){
+            if(i in this){
+                acc = this[i++]; // note: a[i] could be undefined or null!
+                break;
+            }
+        }
+        if(i == len){ // nothing reminded for f() to reduce/fold 
+            return acc;
+        }
+    }
+
+    // folding on the rest
+    for(;i < len; i ++){
+        if(i in this){
+            acc = f.call(undefined, acc, this[i], i, this);
+        }
+    }
+    return acc;
+}
+
+
 
 
 ////////////////////////////////////////////////////////////
