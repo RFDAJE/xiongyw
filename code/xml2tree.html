@@ -15,11 +15,19 @@ td {
     padding: 0px;
 }
 
+.boxed {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
 
 .icon {
 height: 16px;
 width: 16px;
-background-image:url('./images/sprite16.png');
+/* 
+ * background-image:url('./images/sprite16.png');
+ * online converter: http://webcodertools.com/imagetobase64converter 
+ */
+background-image: url(data:image/png;base64,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);
 }
 
 .nodeplus      { background-position:    0px    0px; }
@@ -81,14 +89,7 @@ background-image:url('./images/sprite16.png');
 .eight         { background-position:  -32px  -96px; }
 .nine          { background-position:  -48px  -96px; }
 
-</style></head><body><script language='javascript'>
-
-
-/* xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
- *
- * rewrite(bruin, 2013-11-26)
- * last updated(bruin, 2013-11-28)
- */
+</style></head><body onload="body_onload()"><script language='javascript'>
 
 /* 
  * utilities 
@@ -114,23 +115,56 @@ var uid = (function(){
     return fn;
 }());
 
+/** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
+ *
+ * rewrite(bruin, 2013-11-26)
+ * last updated(bruin, 2013-11-28)
+ */
+
 /* some constants */
 var NON_SPACE = /[^ \f\n\r\t\v]/;
 var SHARP_TEXT = "#text";
 var SHARP_CDATA = "#cdata";
 
 /* 
- * convert a xml text string into a normalized, white-removed dom object 
+ * convert a xml text string into a normalized, white-removed & comments-removed dom object 
  */
 function xml2dom(xml) {
     var MIME = "text/xml";
     var dom = null;
+
+    if(!xml) {
+        return null;
+    }
+    if(window.DOMParser) {
+        dom = (new DOMParser()).parseFromString(xml, MIME);
+    } else if(window.ActiveXObject) {
+        dom = new ActiveXObject('Microsoft.XMLDOM');
+        dom.async = false;
+        if(!dom.loadXML(xml)) {
+            window.alert(dom.parseError.reason + dom.parseError.srcText);
+            dom = null;
+        }
+    } else {
+        window.alert("Error: your browser does not support parsing XML to DOM!");
+    }
+
+    dom.normalize && dom.normalize();
+    remove_comments(dom);
+    simplify_gconf(dom);
+    return remove_white(dom);
+
+
+    /*
+     * private functions (to be hoisted) go below:
+     */
+
     /* recursively remove all pure white TEXT_NODE from the element, in place */
-    var remove_white = function (e) {
+    function remove_white(e) {
         var node, next;
         if(!e)
             return;
-        e.normalize();
+
         for(node = e.firstChild; node;) {
             if(node.nodeType == Node.TEXT_NODE) {
                 if(!node.nodeValue.match(NON_SPACE)) {
@@ -149,22 +183,80 @@ function xml2dom(xml) {
         return e;
     }
 
-    if(!xml) {
-        return null;
-    }
-    if(window.DOMParser) {
-        dom = (new DOMParser()).parseFromString(xml, MIME);
-    } else if(window.ActiveXObject) {
-        dom = new ActiveXObject('Microsoft.XMLDOM');
-        dom.async = false;
-        if(!dom.loadXML(xml)) {
-            window.alert(dom.parseError.reason + dom.parseError.srcText);
-            dom = null;
+    /* recursively remove comments */
+    function remove_comments(e){
+        var node, next;
+        if(!e)
+            return;
+
+        for(node = e.firstChild; node;) {
+            if(node.nodeType == Node.COMMENT_NODE) {
+                    next = node.nextSibling;
+                    e.removeChild(node);
+                    node = next;
+            } else if(node.nodeType == Node.ELEMENT_NODE) {
+                remove_comments(node);
+                node = node.nextSibling;
+            } else {
+                node = node.nextSibling;
+            }
         }
-    } else {
-        window.alert("Error: your browser does not support parsing XML to DOM!");
+        return e;
     }
-    return remove_white(dom);
+
+    /* simplify dom created from gconf xmls */
+    function simplify_gconf(dom){
+        var GCONF = "gconf";
+        var DIR = "dir";
+        var NAME = "name";
+        if(!(dom.nodeType === Node.DOCUMENT_NODE &&
+             dom.documentElement.nodeName === GCONF)){
+            return dom;
+        }
+        else{
+            return _simplify_gconf(dom.documentElement);
+        }
+        
+        /* 
+         * recursively change the following types of element nodes of the tree:
+         * - <dir name="xxx">...</dir> : <xxx>...</xxx>
+         */
+        function _simplify_gconf(e){
+
+            var newNode, node, nextNode;
+            /* check the node itself */
+            if(e.nodeType === Node.ELEMENT_NODE &&
+               e.nodeName === DIR &&
+               e.attributes &&
+               e.attributes[0].nodeName === NAME) {
+                /* it's not possible to createElement("0")!!! */
+                newNode = document.createElement(e.attributes[0].nodeValue);
+
+                node = e.firstChild;
+                while (node) {
+                    nextNode = node.nextSibling;
+                    newNode.appendChild(node);
+                    node = nextNode;
+                }
+
+                e.parentNode.replaceChild(newNode, e);
+            }
+            else{
+                newNode = e;
+            }
+
+            /* recursively check the kids, if any */
+            node = newNode.firstChild;
+            while (node) {
+                nextNode = node.nextSibling;
+
+                if(node.nodeType === Node.ELEMENT_NODE){
+                    _simplify_gconf(node);
+                }
+                node = nextNode;
+            }
+        }
+    }
 }
 
 
@@ -286,8 +378,12 @@ function dom2obj(dom) {
                 }
             }
         }
-    } else {
-        window.alert("unhandled node type: " + dom.nodeType);
+    } 
+    else if(dom.nodeType == Node.COMMENT_NODE){
+        o = dom.nodeValue; // should not happen: is remove_comments() called?
+    }
+    else {
+        console.log("unhandled node type: " + dom.nodeType);
     }
     return o;
 }
@@ -311,7 +407,7 @@ function xml2json(xml){
                 null,
                 "<e/>",
                 "<e>text</e>",
-                "<e name='value'/>",
+                "<e attr1='value1' attr2='value2'/>",
                 "<e name='value'>text</e>",
                 "<e><a>text</a><b>text2</b></e>",
                 "<e><a>text</a><a>text2</a></e>",
@@ -329,7 +425,7 @@ function xml2json(xml){
 /**
  * created(bruin, 2003-02-01): first creation, support MSIE only
  * updated(bruin, 2004-07-08): support mozilla, cleanup code, and add code comments
- * updated(bruin, 2013-11-29): some cosmetic changes 
+ * updated(bruin, 2013-11-30): use CSS sprites 
  *
  * notes:
  *
@@ -608,11 +704,17 @@ function build_tree(o){
 
         var desc, node, type;
 
+        /* true, if o is an array, *and* none of its element is object */
+        var simple_array_p = function(o){
+            return arrayp(val) && 
+                val.filter(function(e){ return typeof e === 'object'}).length == 0;
+        }
+
         /* description */
         if(typeof val === 'string'){
             desc = name + ": " + val;
         }
-        else if(arrayp(val)){
+        else if(simple_array_p(val)){
             desc = name + ": " + val.join(",");
         }
         else{
@@ -641,7 +743,7 @@ function build_tree(o){
         node = new MyNode(uid(), desc, type, "");
         window[node.node_name()] = node;
         
-        if(typeof val === 'object' && !arrayp(val)){ // it has kids
+        if(typeof val === 'object' && !simple_array_p(val)){ // it has kids
             for(var p in val){
                 kid = _build_tree(p, val[p]);
                 node.add_kid(kid);
@@ -662,18 +764,89 @@ function build_tree(o){
     return root;
 }
 
-function tree_init(root){
-    root.set_left_n_last(true, "");
-    
-    document.write(root.render());
-    root.onclick();    
-}
 
-var test_tree = "<network name='starhub'>text<siconfig><regionID>100</regionID><networkClass>mynetwork</networkClass></siconfig><schemas><ts><column>onid</column><column>tsid</column></ts><svl>text1<column>lcn</column><column>svc_name</column>text2</svl></schemas></network>";
-console.log(xml2json(test_tree));
 
-var root = build_tree(xml2obj(test_tree));
-document.write(root.render());
-root.onclick();
+    function body_onload(){
 
-</script></body></html>
+    $('files').addEventListener('change', handleFileSelect, false);
+/*
+        var test_tree = '<boot><config><file att1="60" att2="5" att3="/flash/prefs.xml" att4="pref"/><file att1="0" att2="0" pathname="/flash/dynamic.xml" att3="dyn"/></config></boot>';
+        console.log(xml2json(test_tree));
+        var root = build_tree(xml2obj(test_tree));
+        $("tree").innerHTML = root.render();
+        root.onclick();
+*/
+    }
+
+
+
+    /*
+     * FILE API: http://www.html5rocks.com/en/tutorials/file/dndfiles/
+     */
+
+    // Check for the various File API support.
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        // Great success! All the File APIs are supported.
+    } else {
+        alert('The File APIs are not fully supported in this browser.');
+    }
+
+
+    function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+
+        // files is a FileList of File objects. List some properties.
+        var output = [];
+        for (var i = 0, f; f = files[i]; i++) {
+            output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                        f.size, ' bytes, last modified: ',
+                        f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+                        '</li>');
+        }
+        $('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+
+        f = files[0]; // process the 1st file
+
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+
+
+            return function(e) {
+                /*
+                 * remove comments first: seems the DOMParser in chrome is not happy
+                 * with this kind of comment blocks "<!-- blahblah -- blahblah -->", which
+                 * has more than one consective '-' (dashes) inside the comment.
+                 */
+                var xml = e.target.result.replace(/<!--[\s\S]*?-->/g, "");
+                var root = build_tree(xml2obj(xml));
+                $("tree").innerHTML = root.render();
+                root.onclick();
+
+            };
+        })(f);
+
+        // Read in the xml file
+        reader.readAsText(f);
+    }
+
+
+
+
+
+
+</script>
+
+<div class="boxed" style="display:block">
+<input type="file" id="files" name="files[]" multiple />
+<output id="list"></output>
+</div>
+
+
+
+<br><br>
+
+<div id="tree" style="display:block;"></div>
+
+</body></html>
