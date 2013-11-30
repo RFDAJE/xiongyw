@@ -315,7 +315,7 @@ function xml2json(xml){
                 "<e name='value'>text</e>",
                 "<e><a>text</a><b>text2</b></e>",
                 "<e><a>text</a><a>text2</a></e>",
-                "<e>text<a>text2</a></e>",
+                "<e>text<a>text2</a>text3</e>",
                 "<?xml version='1.0'?><e><!--comments-->text</e>"
                ];
     xmls.map(function (xml) {
@@ -451,8 +451,10 @@ function MyNode(id, desc, type, href){
         // 3. type icon
         docW += this.get_type_icon();
 
-        // 4. desc text
-        docW += "<td>&nbsp;" + this.desc + "</td></tr></table>";
+        // 4. desc text, xml-escaped first
+        var desc = this.desc.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        docW += "<td>&nbsp;<code>" + desc + "</code></td></tr></table>";
+
 
 	// 5. div object: only needed for non-leaf nodes
         if(this.kids.length > 0){
@@ -667,7 +669,7 @@ function tree_init(root){
     root.onclick();    
 }
 
-var test_tree = "<network name='starhub'>text<siconfig><regionID>100</regionID><networkClass>mynetwork</networkClass></siconfig><schemas><ts><column>onid</column><column>tsid</column></ts><svl><column>lcn</column><column>svc_name</column></svl></schemas></network>";
+var test_tree = "<network name='starhub'>text<siconfig><regionID>100</regionID><networkClass>mynetwork</networkClass></siconfig><schemas><ts><column>onid</column><column>tsid</column></ts><svl>text1<column>lcn</column><column>svc_name</column>text2</svl></schemas></network>";
 console.log(xml2json(test_tree));
 
 var root = build_tree(xml2obj(test_tree));
