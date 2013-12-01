@@ -2,6 +2,10 @@
 
 body {background-color: white}
 
+iframe{
+margin:8px;
+}
+
 table {
     border-collapse: collapse;
 }
@@ -106,14 +110,14 @@ function arrayp(o){
 }
 
 /* get unique id, also has a method for reset: uid(), uid.reset() */
-var uid = (function(){
-    var _id = 0;
+var uid = (function(init){
+    var _id = init;
     var fn = function(){
         return _id ++;
     }
-    fn.reset = function(){ _id = 0};
+    fn.reset = function(){ _id = init};
     return fn;
-}());
+}(2013));
 
 /** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
  *
@@ -229,7 +233,11 @@ function xml2dom(xml) {
                e.nodeName === DIR &&
                e.attributes &&
                e.attributes[0].nodeName === NAME) {
-                /* it's not possible to createElement("0")!!! */
+
+                /* 
+                 * note that with DOM, it's not possible to createElement("0")! 
+                 * so need to do the "simplification" with JSON object instead.
+                 */
                 newNode = document.createElement(e.attributes[0].nodeValue);
 
                 node = e.firstChild;
@@ -594,7 +602,7 @@ function MyNode(id, desc, type, href){
     function _get_left_icons(){
         var left_code = this.left_code.slice(1);
         return left_code.map(function(v){ 
-            return "<td><div class='icon " + (v == 1? "vertical" : "blank") + "'/></td>";}).join('');
+            return ["<td><div class='icon ", (v == 1? "vertical" : "blank"), "'/></td>"].join("");}).join("");
     }
 
     function _get_joint_icon_class(){
@@ -637,15 +645,15 @@ function MyNode(id, desc, type, href){
 
         var href = "";
         if(this.kids.length > 0){
-            href = "<a href='javascript: N" + this.id + ".onclick()'>";
+            href = ["<a href='javascript: N", this.id, ".onclick()'>"].join("");
         }
 
-        return "<td>" + href + "<div id='" + this.joint_id() + "' class='icon " + icon + "'/></td>";
+        return ["<td>", href, "<div id='", this.joint_id(), "' class='icon ", icon, "'/></td>"].join("");
     }
 
     /* get the type icon of the node, according to its type */
     function _get_type_icon(){
-        return "<td><div class='icon " + this.type + "'/></td>";
+        return ["<td><div class='icon ", this.type, "'/></td>"].join("");
     }
 
     // tree's data structure
@@ -820,9 +828,13 @@ function build_tree(o){
                  * has more than one consective '-' (dashes) inside the comment.
                  */
                 var xml = e.target.result.replace(/<!--[\s\S]*?-->/g, "");
-                var root = build_tree(xml2obj(xml));
+                var obj = xml2obj(xml);
+                var root = build_tree(obj);
+
                 $("tree").innerHTML = root.render();
                 root.onclick();
+
+                $("json").innerHTML = ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
 
             };
         })(f);
@@ -847,6 +859,11 @@ function build_tree(o){
 
 <br><br>
 
+
 <div id="tree" style="display:block;"></div>
+
+
+<br><br>
+<div id="json" style="display:block;"></div>
 
 </body></html>
