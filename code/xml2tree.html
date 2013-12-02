@@ -119,6 +119,13 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         return fn;
     }(2013));
 
+    var escape = function (txt) {
+        return txt.replace(/[\\]/g, "\\\\")
+            .replace(/[\"]/g, '\\"')
+            .replace(/[\n]/g, '\\n')
+            .replace(/[\r]/g, '\\r');
+    };
+
     /** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
      *
      * rewrite(bruin, 2013-11-26)
@@ -269,18 +276,12 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
 
     /*
-     * convert the dom into a simpler js object
+     * convert the dom into a JSON object (i.e. using only array/object/string/number/true/false/null)
      */
     function dom2obj(dom) {
         var o = {};
         var i, n;
 
-        var escape = function (txt) {
-            return txt.replace(/[\\]/g, "\\\\")
-                .replace(/[\"]/g, '\\"')
-                .replace(/[\n]/g, '\\n')
-                .replace(/[\r]/g, '\\r');
-        };
 
         var _as_xml = function (n) {
             var i, c;
@@ -316,6 +317,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             }
             return s;
         };
+
 
         if(!dom)
             return null;
@@ -396,10 +398,60 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         return o;
     }
 
-    /* xml to obj */
+
+
+    /* simplify json object converted from gconf xmls, in place */
+    var simplify_gconf = function(json){
+        var GCONF = "gconf";
+        var DIR = "dir";
+        var NAME = "@name";
+
+        if(!json || !(json.hasOwnProperty(GCONF))) // not gconf
+            return;
+        _simplify_gconf2(json[GCONF]);
+
+        function _simplify_gconf2(obj){
+            var v, p;
+
+            console.log("out " + JSON.stringify(obj));
+
+
+            if(v = obj[DIR]){
+                
+                if(arrayp(v)){
+                    /* make sure every array element has a NAME property */
+                    if(v.filter(function(x){ return !(x.hasOwnProperty(NAME));}).length === 0){
+                        /* add each element to obj */
+                        v.forEach(function(x){ obj[x[NAME]] = x; delete x[NAME]; });
+                    }
+                    delete obj[DIR];
+                }
+                else if(typeof v === 'object'){
+                    if(v.hasOwnProperty(NAME)){
+                        obj[v[NAME]] = v;
+                        delete obj[DIR];
+                        delete v[NAME];
+                    }
+                }
+                else{
+                    // do nothing
+                }
+            }
+
+            /* recursivly loop on obj's kids */
+            for(p in obj){
+                console.log("in " + JSON.stringify(obj[p]));
+                _simplify_gconf2(obj[p]);
+            }
+        }
+    }
+ 
+   /* xml to obj */
     function xml2obj(xml){
         var dom = xml2dom(xml);
-        return dom2obj(dom);
+        var obj = dom2obj(dom);
+        simplify_gconf(obj);
+        return obj;
     }
 
     /* xml to json string */
@@ -445,11 +497,11 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      the joint icon is to represent the status of the 
      node in browser. there are 6 possible status for a node: 
      
-     |          |         |         |         |        |
+     |          |           |         |         |        |
      +---+      +---+       |       +---+     +---+      |
      | + |--    | - |--     +----   | + |--   | - |--    +----
      +---+      +---+       |       +---+     +---+
-     |          |         |         
+     |          |           |         
      
      (a)        (b)       (c)       (d)       (e)       (f)
      
