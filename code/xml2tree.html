@@ -93,697 +93,697 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 .eight         { background-position:  -32px  -96px; }
 .nine          { background-position:  -48px  -96px; }
 
-</style></head><body onload="body_onload()"><script language='javascript'>
+</style></head><script language='javascript'>
 
-/* 
- * utilities 
- */
+    /* 
+     * utilities 
+     */
 
-/* save typing */
-function $(id){
-    return window.document.getElementById(id);
-}
-
-/* is o an array? */
-function arrayp(o){
-    return typeof o === 'object' && Object.prototype.toString.call(o) === '[object Array]';
-}
-
-/* get unique id, also has a method for reset: uid(), uid.reset() */
-var uid = (function(init){
-    var _id = init;
-    var fn = function(){
-        return _id ++;
+    /* save typing */
+    function $(id){
+        return window.document.getElementById(id);
     }
-    fn.reset = function(){ _id = init};
-    return fn;
-}(2013));
 
-/** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
- *
- * rewrite(bruin, 2013-11-26)
- * last updated(bruin, 2013-11-28)
- */
-
-/* some constants */
-var NON_SPACE = /[^ \f\n\r\t\v]/;
-var SHARP_TEXT = "#text";
-var SHARP_CDATA = "#cdata";
-
-/* 
- * convert a xml text string into a normalized, white-removed & comments-removed dom object 
- */
-function xml2dom(xml) {
-    var MIME = "text/xml";
-    var dom = null;
-
-    if(!xml) {
-        return null;
+    /* is o an array? */
+    function arrayp(o){
+        return typeof o === 'object' && Object.prototype.toString.call(o) === '[object Array]';
     }
-    if(window.DOMParser) {
-        dom = (new DOMParser()).parseFromString(xml, MIME);
-    } else if(window.ActiveXObject) {
-        dom = new ActiveXObject('Microsoft.XMLDOM');
-        dom.async = false;
-        if(!dom.loadXML(xml)) {
-            window.alert(dom.parseError.reason + dom.parseError.srcText);
-            dom = null;
+
+    /* get unique id, also has a method for reset: uid(), uid.reset() */
+    var uid = (function(init){
+        var _id = init;
+        var fn = function(){
+            return _id ++;
+        };
+        fn.reset = function(){ _id = init;};
+        return fn;
+    }(2013));
+
+    /** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
+     *
+     * rewrite(bruin, 2013-11-26)
+     * last updated(bruin, 2013-11-28)
+     */
+
+    /* some constants */
+    var NON_SPACE = /[^ \f\n\r\t\v]/;
+    var SHARP_TEXT = "#text";
+    var SHARP_CDATA = "#cdata";
+
+    /* 
+     * convert a xml text string into a normalized, white-removed & comments-removed dom object 
+     */
+    function xml2dom(xml) {
+        var MIME = "text/xml";
+        var dom = null;
+
+        if(!xml) {
+            return null;
         }
-    } else {
-        window.alert("Error: your browser does not support parsing XML to DOM!");
-    }
+        if(window.DOMParser) {
+            dom = (new DOMParser()).parseFromString(xml, MIME);
+        } else if(window.ActiveXObject) {
+            dom = new ActiveXObject('Microsoft.XMLDOM');
+            dom.async = false;
+            if(!dom.loadXML(xml)) {
+                window.alert(dom.parseError.reason + dom.parseError.srcText);
+                dom = null;
+            }
+        } else {
+            window.alert("Error: your browser does not support parsing XML to DOM!");
+        }
 
-    dom.normalize && dom.normalize();
-    remove_comments(dom);
-    // simplify_gconf(dom);
-    return remove_white(dom);
+        if(dom.normalize) dom.normalize();
+        remove_comments(dom);
+        // simplify_gconf(dom);
+        return remove_white(dom);
+
+
+        /*
+         * private functions (to be hoisted) go below:
+         */
+
+        /* recursively remove all pure white TEXT_NODE from the element, in place */
+        function remove_white(e) {
+            var node, next;
+            if(!e)
+                return;
+
+            for(node = e.firstChild; node;) {
+                if(node.nodeType == Node.TEXT_NODE) {
+                    if(!node.nodeValue.match(NON_SPACE)) {
+                        next = node.nextSibling;
+                        e.removeChild(node);
+                        node = next;
+                    } else
+                        node = node.nextSibling;
+                } else if(node.nodeType == Node.ELEMENT_NODE) {
+                    remove_white(node);
+                    node = node.nextSibling;
+                } else {
+                    node = node.nextSibling;
+                }
+            }
+            return e;
+        }
+
+        /* recursively remove comments */
+        function remove_comments(e){
+            var node, next;
+            if(!e)
+                return;
+
+            for(node = e.firstChild; node;) {
+                if(node.nodeType == Node.COMMENT_NODE) {
+                    next = node.nextSibling;
+                    e.removeChild(node);
+                    node = next;
+                } else if(node.nodeType == Node.ELEMENT_NODE) {
+                    remove_comments(node);
+                    node = node.nextSibling;
+                } else {
+                    node = node.nextSibling;
+                }
+            }
+            return e;
+        }
+
+        /* simplify dom created from gconf xmls */
+        function simplify_gconf(dom){
+            var GCONF = "gconf";
+            var DIR = "dir";
+            var NAME = "name";
+            if(!(dom.nodeType === Node.DOCUMENT_NODE &&
+                 dom.documentElement.nodeName === GCONF)){
+                return dom;
+            }
+            else{
+                return _simplify_gconf(dom.documentElement);
+            }
+            
+            /* 
+             * recursively change the following types of element nodes of the tree:
+             * - <dir name="xxx">...</dir> : <xxx>...</xxx>
+             */
+            function _simplify_gconf(e){
+
+                var newNode, node, nextNode;
+                /* check the node itself */
+                if(e.nodeType === Node.ELEMENT_NODE &&
+                   e.nodeName === DIR &&
+                   e.attributes &&
+                   e.attributes[0].nodeName === NAME) {
+
+                    /* 
+                     * note that with DOM, it's not possible to createElement("0")! 
+                     * so need to do the "simplification" with JSON object instead.
+                     */
+                    newNode = document.createElement(e.attributes[0].nodeValue);
+
+                    node = e.firstChild;
+                    while (node) {
+                        nextNode = node.nextSibling;
+                        newNode.appendChild(node);
+                        node = nextNode;
+                    }
+
+                    e.parentNode.replaceChild(newNode, e);
+                }
+                else{
+                    newNode = e;
+                }
+
+                /* recursively check the kids, if any */
+                node = newNode.firstChild;
+                while (node) {
+                    nextNode = node.nextSibling;
+
+                    if(node.nodeType === Node.ELEMENT_NODE){
+                        _simplify_gconf(node);
+                    }
+                    node = nextNode;
+                }
+            }
+        }
+    }
 
 
     /*
-     * private functions (to be hoisted) go below:
+     * convert the dom into a simpler js object
      */
+    function dom2obj(dom) {
+        var o = {};
+        var i, n;
 
-    /* recursively remove all pure white TEXT_NODE from the element, in place */
-    function remove_white(e) {
-        var node, next;
-        if(!e)
-            return;
+        var escape = function (txt) {
+            return txt.replace(/[\\]/g, "\\\\")
+                .replace(/[\"]/g, '\\"')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\r]/g, '\\r');
+        };
 
-        for(node = e.firstChild; node;) {
-            if(node.nodeType == Node.TEXT_NODE) {
-                if(!node.nodeValue.match(NON_SPACE)) {
-                    next = node.nextSibling;
-                    e.removeChild(node);
-                    node = next;
-                } else
-                    node = node.nextSibling;
-            } else if(node.nodeType == Node.ELEMENT_NODE) {
-                remove_white(node);
-                node = node.nextSibling;
-            } else {
-                node = node.nextSibling;
-            }
-        }
-        return e;
-    }
-
-    /* recursively remove comments */
-    function remove_comments(e){
-        var node, next;
-        if(!e)
-            return;
-
-        for(node = e.firstChild; node;) {
-            if(node.nodeType == Node.COMMENT_NODE) {
-                    next = node.nextSibling;
-                    e.removeChild(node);
-                    node = next;
-            } else if(node.nodeType == Node.ELEMENT_NODE) {
-                remove_comments(node);
-                node = node.nextSibling;
-            } else {
-                node = node.nextSibling;
-            }
-        }
-        return e;
-    }
-
-    /* simplify dom created from gconf xmls */
-    function simplify_gconf(dom){
-        var GCONF = "gconf";
-        var DIR = "dir";
-        var NAME = "name";
-        if(!(dom.nodeType === Node.DOCUMENT_NODE &&
-             dom.documentElement.nodeName === GCONF)){
-            return dom;
-        }
-        else{
-            return _simplify_gconf(dom.documentElement);
-        }
-        
-        /* 
-         * recursively change the following types of element nodes of the tree:
-         * - <dir name="xxx">...</dir> : <xxx>...</xxx>
-         */
-        function _simplify_gconf(e){
-
-            var newNode, node, nextNode;
-            /* check the node itself */
-            if(e.nodeType === Node.ELEMENT_NODE &&
-               e.nodeName === DIR &&
-               e.attributes &&
-               e.attributes[0].nodeName === NAME) {
-
-                /* 
-                 * note that with DOM, it's not possible to createElement("0")! 
-                 * so need to do the "simplification" with JSON object instead.
-                 */
-                newNode = document.createElement(e.attributes[0].nodeValue);
-
-                node = e.firstChild;
-                while (node) {
-                    nextNode = node.nextSibling;
-                    newNode.appendChild(node);
-                    node = nextNode;
+        var _as_xml = function (n) {
+            var i, c;
+            var s = "";
+            if(n.nodeType == Node.ELEMENT_NODE) {
+                s += "<" + n.nodeName;
+                for(i = 0; i < n.attributes.length; i++) {
+                    s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
                 }
-
-                e.parentNode.replaceChild(newNode, e);
-            }
-            else{
-                newNode = e;
-            }
-
-            /* recursively check the kids, if any */
-            node = newNode.firstChild;
-            while (node) {
-                nextNode = node.nextSibling;
-
-                if(node.nodeType === Node.ELEMENT_NODE){
-                    _simplify_gconf(node);
-                }
-                node = nextNode;
-            }
-        }
-    }
-}
-
-
-/*
- * convert the dom into a simpler js object
- */
-function dom2obj(dom) {
-    var o = {};
-    var i, n;
-
-    var escape = function (txt) {
-        return txt.replace(/[\\]/g, "\\\\")
-            .replace(/[\"]/g, '\\"')
-            .replace(/[\n]/g, '\\n')
-            .replace(/[\r]/g, '\\r');
-    }
-
-    var _as_xml = function (n) {
-        var i, c;
-        var s = "";
-        if(n.nodeType == Node.ELEMENT_NODE) {
-            s += "<" + n.nodeName;
-            for(i = 0; i < n.attributes.length; i++) {
-                s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
-            }
-            if(n.firstChild) {
-                s += ">";
-                for(c = n.firstChild; c; c = c.nextSibling) {
-                    s += _as_xml(c);
-                }
-                s += "</" + n.nodeName + ">";
-            } else {
-                s += "/>";
-            }
-        } else if(n.nodeType == Node.TEXT_NODE) {
-            s += n.nodeValue;
-        } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
-            s += "<![CDATA[" + n.nodeValue + "]]>";
-        }
-        return s;
-    }
-
-    var _inner_xml = function (node) {
-        if("innerHTML" in node)
-            return node.innerHTML;
-        var s = "";
-        for(var c = node.firstChild; c; c = c.nextSibling) {
-            s += _as_xml(c);
-        }
-        return s;
-    }
-
-    if(!dom)
-        return null;
-    if(dom.nodeType == Node.DOCUMENT_NODE) {
-        var O = {};
-        O[dom.documentElement.nodeName] = dom2obj(dom.documentElement);
-        return O;
-    }
-    if(dom.nodeType == Node.ELEMENT_NODE) {
-        if(!dom.attributes.length && !dom.firstChild) {
-            return null;
-        }
-        // converts attributes[] into properties
-        if(dom.attributes.length) {
-            for(i = 0; i < dom.attributes.length; i++) {
-                o["@" + dom.attributes[i].nodeName] = (dom.attributes[i].nodeValue || "").toString();
-            }
-        }
-        if(dom.firstChild) { // element has child nodes ..
-            var textChild = 0;
-            var cdataChild = 0;
-            var hasElementChild = false;
-            for(n = dom.firstChild; n; n = n.nextSibling) {
-                if(n.nodeType == Node.ELEMENT_NODE) {
-                    hasElementChild = true;
-                } else if(n.nodeType == Node.TEXT_NODE && n.nodeValue.match(NON_SPACE)) {
-                    textChild++; // non-whitespace text
-                } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
-                    cdataChild++; // cdata section node
-                }
-            }
-            if(hasElementChild) {
-                if(textChild < 2 && cdataChild < 2) { // structured element with a single text or/and cdata node
-                    // remove_white(dom); // why remove white again?
-                    for(n = dom.firstChild; n; n = n.nextSibling) {
-                        if(n.nodeType == Node.TEXT_NODE) {
-                            o[SHARP_TEXT] = escape(n.nodeValue);
-                        } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
-                            o[SHARP_CDATA] = escape(n.nodeValue);
-                        } else if(o[n.nodeName]) { // multiple occurence of element ..
-                            if(o[n.nodeName] instanceof Array) {
-                                o[n.nodeName][o[n.nodeName].length] = dom2obj(n);
-                            } else {
-                                o[n.nodeName] = [o[n.nodeName], dom2obj(n)];
-                            }
-                        } else { // first occurence of element..
-                            o[n.nodeName] = dom2obj(n);
-                        }
+                if(n.firstChild) {
+                    s += ">";
+                    for(c = n.firstChild; c; c = c.nextSibling) {
+                        s += _as_xml(c);
                     }
-                } else { // mixed content
+                    s += "</" + n.nodeName + ">";
+                } else {
+                    s += "/>";
+                }
+            } else if(n.nodeType == Node.TEXT_NODE) {
+                s += n.nodeValue;
+            } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
+                s += "<![CDATA[" + n.nodeValue + "]]>";
+            }
+            return s;
+        };
+
+        var _inner_xml = function (node) {
+            if("innerHTML" in node)
+                return node.innerHTML;
+            var s = "";
+            for(var c = node.firstChild; c; c = c.nextSibling) {
+                s += _as_xml(c);
+            }
+            return s;
+        };
+
+        if(!dom)
+            return null;
+        if(dom.nodeType == Node.DOCUMENT_NODE) {
+            var O = {};
+            O[dom.documentElement.nodeName] = dom2obj(dom.documentElement);
+            return O;
+        }
+        if(dom.nodeType == Node.ELEMENT_NODE) {
+            if(!dom.attributes.length && !dom.firstChild) {
+                return null;
+            }
+            // converts attributes[] into properties
+            if(dom.attributes.length) {
+                for(i = 0; i < dom.attributes.length; i++) {
+                    o["@" + dom.attributes[i].nodeName] = (dom.attributes[i].nodeValue || "").toString();
+                }
+            }
+            if(dom.firstChild) { // element has child nodes ..
+                var textChild = 0;
+                var cdataChild = 0;
+                var hasElementChild = false;
+                for(n = dom.firstChild; n; n = n.nextSibling) {
+                    if(n.nodeType == Node.ELEMENT_NODE) {
+                        hasElementChild = true;
+                    } else if(n.nodeType == Node.TEXT_NODE && n.nodeValue.match(NON_SPACE)) {
+                        textChild++; // non-whitespace text
+                    } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
+                        cdataChild++; // cdata section node
+                    }
+                }
+                if(hasElementChild) {
+                    if(textChild < 2 && cdataChild < 2) { // structured element with a single text or/and cdata node
+                        // remove_white(dom); // why remove white again?
+                        for(n = dom.firstChild; n; n = n.nextSibling) {
+                            if(n.nodeType == Node.TEXT_NODE) {
+                                o[SHARP_TEXT] = escape(n.nodeValue);
+                            } else if(n.nodeType == Node.CDATA_SECTION_NODE) {
+                                o[SHARP_CDATA] = escape(n.nodeValue);
+                            } else if(o[n.nodeName]) { // multiple occurence of element ..
+                                if(o[n.nodeName] instanceof Array) {
+                                    o[n.nodeName][o[n.nodeName].length] = dom2obj(n);
+                                } else {
+                                    o[n.nodeName] = [o[n.nodeName], dom2obj(n)];
+                                }
+                            } else { // first occurence of element..
+                                o[n.nodeName] = dom2obj(n);
+                            }
+                        }
+                    } else { // mixed content
+                        if(!dom.attributes.length)
+                            o = escape(_inner_xml(dom));
+                        else
+                            o[SHARP_TEXT] = escape(_inner_xml(dom));
+                    }
+                } /* hasElementChild */
+                else if(textChild) { // pure text
                     if(!dom.attributes.length)
                         o = escape(_inner_xml(dom));
                     else
                         o[SHARP_TEXT] = escape(_inner_xml(dom));
-                }
-            } /* hasElementChild */
-            else if(textChild) { // pure text
-                if(!dom.attributes.length)
-                    o = escape(_inner_xml(dom));
-                else
-                    o[SHARP_TEXT] = escape(_inner_xml(dom));
-            } else if(cdataChild) { // cdata
-                if(cdataChild > 1)
-                    o = escape(_inner_xml(dom));
-                else {
-                    for(n = dom.firstChild; n; n = n.nextSibling)
-                        o[SHARP_CDATA] = escape(n.nodeValue);
+                } else if(cdataChild) { // cdata
+                    if(cdataChild > 1)
+                        o = escape(_inner_xml(dom));
+                    else {
+                        for(n = dom.firstChild; n; n = n.nextSibling)
+                            o[SHARP_CDATA] = escape(n.nodeValue);
+                    }
                 }
             }
+        } 
+        else if(dom.nodeType == Node.COMMENT_NODE){
+            o = dom.nodeValue; // should not happen: is remove_comments() called?
         }
-    } 
-    else if(dom.nodeType == Node.COMMENT_NODE){
-        o = dom.nodeValue; // should not happen: is remove_comments() called?
-    }
-    else {
-        console.log("unhandled node type: " + dom.nodeType);
-    }
-    return o;
-}
-
-/* xml to obj */
-function xml2obj(xml){
-    var dom = xml2dom(xml);
-    return dom2obj(dom);
-}
-
-/* xml to json string */
-function xml2json(xml){
-    var obj = xml2obj(xml);
-    return JSON.stringify(obj, null, 4);
-}
-
-
-/* sanity tests */
-(function () {
-    var xmls = [undefined,
-                null,
-                "<e/>",
-                "<e>text</e>",
-                "<e attr1='value1' attr2='value2'/>",
-                "<e name='value'>text</e>",
-                "<e><a>text</a><b>text2</b></e>",
-                "<e><a>text</a><a>text2</a></e>",
-                "<e>text<a>text2</a>text3</e>",
-                "<?xml version='1.0'?><e><!--comments-->text</e>"
-               ];
-    xmls.map(function (xml) {
-        console.log(xml);
-        console.log(xml2json(xml));
-        console.log('--------------');
-    }).join("");
-}());
-
-
-/**
- * created(bruin, 2003-02-01): first creation, support MSIE only
- * updated(bruin, 2004-07-08): support mozilla, cleanup code, and add code comments
- * updated(bruin, 2013-11-30): use CSS sprites 
- *
- * notes:
- *
- Names for other types of objects depend on the id, in the following rule:
-
- "N" + id: the node object (eg, N128 is the node object whose id is "128"
- "D" + id: the DIV object of the node (yes, each node has a corresponding DIV)
- "J" + id: the node's joint icon image object in html document. 
- the joint icon is to represent the status of the 
- node in browser. there are 6 possible status for a node: 
- 
-   |          |         |         |         |        |
- +---+      +---+       |       +---+     +---+      |
- | + |--    | - |--     +----   | + |--   | - |--    +----
- +---+      +---+       |       +---+     +---+
-   |          |         |         
- 
- (a)        (b)       (c)       (d)       (e)       (f)
- 
- (a) a closed node having kid(s)  
- (b) an opened/collapsed node having kid(s)
- (c) a leaf node having no kids
- (d) a last closed node having kid(s)
- (e) a last opened/collapsed node having kid(s)
- (f) a last leaf node having no kids
- 
- Clicking on nodes cause the node to open/close, so the joint icon should also change accordingly.
-*/   
-
-
-/* 
- * constructor of node object: MyNode(id, desc, type, href)
- *
- * @param {string) id: an unique id of the node object to be created. 
- * @param {string} desc: text description of the node
- * @param {string} type: icon class for node type, optional
- * @param {string} href: link page, optional
- */
-function MyNode(id, desc, type, href){
-
-    /* get node name */ 
-    function _node_name(){
-        return "N" + this.id;
+        else {
+            console.log("unhandled node type: " + dom.nodeType);
+        }
+        return o;
     }
 
-    /* get the id of the corresponding DIV */
-    function _div_id(){
-        return "D" + this.id;
+    /* xml to obj */
+    function xml2obj(xml){
+        var dom = xml2dom(xml);
+        return dom2obj(dom);
     }
 
-    /* get the id of the corresponding DIV for joint icon */
-    function _joint_id(){
-        return "J" + this.id;
+    /* xml to json string */
+    function xml2json(xml){
+        var obj = xml2obj(xml);
+        return JSON.stringify(obj, null, 4);
     }
 
-    function _add_kid(kid){
-        this.kids[this.kids.length] = kid;
-        kid.dad = this;
-        return kid;
-    }
+
+    /* sanity tests */
+    (function () {
+        var xmls = [undefined,
+                    null,
+                    "<e/>",
+                    "<e>text</e>",
+                    "<e attr1='value1' attr2='value2'/>",
+                    "<e name='value'>text</e>",
+                    "<e><a>text</a><b>text2</b></e>",
+                    "<e><a>text</a><a>text2</a></e>",
+                    "<e>text<a>text2</a>text3</e>",
+                    "<?xml version='1.0'?><e><!--comments-->text</e>"
+                   ];
+        xmls.map(function (xml) {
+            console.log(xml);
+            console.log(xml2json(xml));
+            console.log('--------------');
+        }).join("");
+    }());
+
 
     /**
-     * recursively set "left_code" and "lastp" properties
-     * of each node in the tree. called by the root of the tree
-     * after the tree structure been built
+     * created(bruin, 2003-02-01): first creation, support MSIE only
+     * updated(bruin, 2004-07-08): support mozilla, cleanup code, and add code comments
+     * updated(bruin, 2013-11-30): use CSS sprites 
      *
-     * @param {boolean} lastp: "false" if it's not the last child of its parent; otherwise "true";
-     * @param {array} left_code: an array of 0/1 representing the left side icons
-     * @return: nothing
+     * notes:
+     *
+     Names for other types of objects depend on the id, in the following rule:
+
+     "N" + id: the node object (eg, N128 is the node object whose id is "128"
+     "D" + id: the DIV object of the node (yes, each node has a corresponding DIV)
+     "J" + id: the node's joint icon image object in html document. 
+     the joint icon is to represent the status of the 
+     node in browser. there are 6 possible status for a node: 
+     
+     |          |         |         |         |        |
+     +---+      +---+       |       +---+     +---+      |
+     | + |--    | - |--     +----   | + |--   | - |--    +----
+     +---+      +---+       |       +---+     +---+
+     |          |         |         
+     
+     (a)        (b)       (c)       (d)       (e)       (f)
+     
+     (a) a closed node having kid(s)  
+     (b) an opened/collapsed node having kid(s)
+     (c) a leaf node having no kids
+     (d) a last closed node having kid(s)
+     (e) a last opened/collapsed node having kid(s)
+     (f) a last leaf node having no kids
+     
+     Clicking on nodes cause the node to open/close, so the joint icon should also change accordingly.
+    */   
+
+
+    /* 
+     * constructor of node object: MyNode(id, desc, type, href)
+     *
+     * @param {string) id: an unique id of the node object to be created. 
+     * @param {string} desc: text description of the node
+     * @param {string} type: icon class for node type, optional
+     * @param {string} href: link page, optional
      */
-    function _set_left_n_last(lastp, left_code){
-        var i;
-        
-        this.lastp = lastp;
-        this.left_code = left_code.slice(0); // copy the array
-        
-        if(lastp){
-            left_code.push(0);   
+    function MyNode(id, desc, type, href){
+
+        /* get node name */ 
+        function _node_name(){
+            return "N" + this.id;
         }
-        else{
-            left_code.push(1);   
+
+        /* get the id of the corresponding DIV */
+        function _div_id(){
+            return "D" + this.id;
         }
-        
-        for(i = 0; i < this.kids.length; i ++){
-    	    if(i == this.kids.length - 1){
-                this.kids[i].set_left_n_last(true, left_code.slice(0));
+
+        /* get the id of the corresponding DIV for joint icon */
+        function _joint_id(){
+            return "J" + this.id;
+        }
+
+        function _add_kid(kid){
+            this.kids[this.kids.length] = kid;
+            kid.dad = this;
+            return kid;
+        }
+
+        /**
+         * recursively set "left_code" and "lastp" properties
+         * of each node in the tree. called by the root of the tree
+         * after the tree structure been built
+         *
+         * @param {boolean} lastp: "false" if it's not the last child of its parent; otherwise "true";
+         * @param {array} left_code: an array of 0/1 representing the left side icons
+         * @return: nothing
+         */
+        function _set_left_n_last(lastp, left_code){
+            var i;
+            
+            this.lastp = lastp;
+            this.left_code = left_code.slice(0); // copy the array
+            
+            if(lastp){
+                left_code.push(0);   
             }
             else{
-                this.kids[i].set_left_n_last(false, left_code.slice(0));
+                left_code.push(1);   
             }
-        }
-    }
-
-    /* Generate html elements of the node. for each node, its corresponding html elements 
-       could be divided into 2 parts: a one row TABLE, followed by a DIV:
-
-       Node in html => TABLE + DIV
-
-       The TABLE contains the following variable number of TDs (columns):
-       1. left side icons: a series of blank and/or vertline icons each is a TD; none for root nodes;
-       2. joint icon: one of 6 icons as described above. one TD for each node;
-       3. type icon: icon representing the type of the node. one TD for each node;
-       4. description text: plain text or anchored text. one TD for each node;
-
-       The DIV element is the container of child nodes' html elements, which in turn contains a 
-       list of TABLE+DIV bundle, one for each child node. DIVs can be controlled to show or hide. 
-       Showing a node's DIV opens/collapses the node, while hiding the node's DIV closes the node.
-    */
-    function _render(){ 
-
-        var docW = "<table><tr>";
-
-        // 1. left side icons
-        docW += this.get_left_icons();
-
-        // 2. joint icon 
-        docW += this.get_joint_icon();
-
-        // 3. type icon
-        docW += this.get_type_icon();
-
-        // 4. desc text, xml-escaped first
-        var desc = this.desc.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-        docW += "<td>&nbsp;<code>" + desc + "</code></td></tr></table>";
-
-
-	// 5. div object: only needed for non-leaf nodes
-        if(this.kids.length > 0){
-            docW += "<div id='D" + this.id + "'></div>";
-        }
-        
-        return docW;
-    } 
-
-    /* toggle betw. open & close of the node
-     */
-    function _onclick(){
-        var div = $(this.div_id());
-        if(!div)  return;
-        if(!div.innerHTML){
-    	    var kids = [];
-    	    for(var i = 0; i < this.kids.length; i ++){
-    		kids[i] = this.kids[i].render();
-	    }
-	    div.innerHTML = kids.join('');
-        }
-
-        // toggle visibility of its kids
-        if(this.openp == false){
-    	    div.style.display = "block";
-    	    this.openp = true;
-        }
-        else{
-            div.style.display = "none";
-            this.openp = false;
-        }
-        
-        // update the joint icon in the joint DIV
-        var jdiv = $(this.joint_id());
-        if(jdiv){
-            jdiv.className = "icon " + this.get_joint_icon_class();    
-        }
-    }
-
-    /* get left side icons of a node (componsed by blank and vertline) */ 
-    function _get_left_icons(){
-        var left_code = this.left_code.slice(1);
-        return left_code.map(function(v){ 
-            return ["<td><div class='icon ", (v == 1? "vertical" : "blank"), "'/></td>"].join("");}).join("");
-    }
-
-    function _get_joint_icon_class(){
-        if(this.dad == null){
-            return "";  // no joint icon for root node
-        }
-        else{
-            if(this.lastp){
-                if(this.kids.length > 0){
-                    if(this.openp)
-                        return "nodeminuslast";
-                    else
-                        return "nodepluslast";
+            
+            for(i = 0; i < this.kids.length; i ++){
+                if(i == this.kids.length - 1){
+                    this.kids[i].set_left_n_last(true, left_code.slice(0));
                 }
                 else{
-                    return "nodelast";
-                }
-            }
-            else{ // not last node 
-                if(this.kids.length > 0){
-                    if(this.openp)
-                        return "nodeminus";
-                    else
-                        return "nodeplus";
-                }
-                else{
-                    return "node";
+                    this.kids[i].set_left_n_last(false, left_code.slice(0));
                 }
             }
         }
-    }
 
-    function _get_joint_icon(){
-      
-        if(this.dad == null){
-            return "";  // no joint icon for root node
-        }
+        /* Generate html elements of the node. for each node, its corresponding html elements 
+           could be divided into 2 parts: a one row TABLE, followed by a DIV:
 
-        var icon = this.get_joint_icon_class();
+           Node in html => TABLE + DIV
 
-        var href = "";
-        if(this.kids.length > 0){
-            href = ["<a href='javascript: N", this.id, ".onclick()'>"].join("");
-        }
+           The TABLE contains the following variable number of TDs (columns):
+           1. left side icons: a series of blank and/or vertline icons each is a TD; none for root nodes;
+           2. joint icon: one of 6 icons as described above. one TD for each node;
+           3. type icon: icon representing the type of the node. one TD for each node;
+           4. description text: plain text or anchored text. one TD for each node;
 
-        return ["<td>", href, "<div id='", this.joint_id(), "' class='icon ", icon, "'/></td>"].join("");
-    }
+           The DIV element is the container of child nodes' html elements, which in turn contains a 
+           list of TABLE+DIV bundle, one for each child node. DIVs can be controlled to show or hide. 
+           Showing a node's DIV opens/collapses the node, while hiding the node's DIV closes the node.
+        */
+        function _render(){ 
 
-    /* get the type icon of the node, according to its type */
-    function _get_type_icon(){
-        return ["<td><div class='icon ", this.type, "'/></td>"].join("");
-    }
+            var docW = "<table><tr>";
 
-    // tree's data structure
-    this.dad = null;
-    this.kids = [];
+            // 1. left side icons
+            docW += this.get_left_icons();
 
-    // static properties assigned
-    this.id = id;
-    this.desc = desc;
-    this.type = type || "cube1";
-    this.href = href;
+            // 2. joint icon 
+            docW += this.get_joint_icon();
 
-    // properties determined during tree_init()
-    this.left_code = [];   // array element: 0 means space, 1 means vertical bar
-    this.lastp = false;    // is the last kid of its parent?
-    
-    // dynamic properties
-    this.openp = false;  // is collapsed or not? 
-    
-    // methods
-    this.add_kid         = _add_kid;
-    this.set_left_n_last = _set_left_n_last;
-    this.node_name       = _node_name;
-    this.div_id          = _div_id;
-    this.joint_id        = _joint_id;
-    this.get_joint_icon_class = _get_joint_icon_class;
+            // 3. type icon
+            docW += this.get_type_icon();
 
-    this.get_left_icons  = _get_left_icons;  
-    this.get_joint_icon   = _get_joint_icon;   
-    this.get_type_icon   = _get_type_icon;   
-
-    this.render          = _render;          
-    this.onclick         = _onclick;
-}
+            // 4. desc text, xml-escaped first
+            var desc = this.desc.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+            docW += "<td>&nbsp;<code>" + desc + "</code></td></tr></table>";
 
 
-/**
- * build a tree from the object: 
- * - creating(new) all nodes in global space
- * - attaching nodes to form a tree
- * - initialize misc info in all nodes
- *
- * @param {object} o: the object converted from a xml
- * @return {object}: the root node
- */
-function build_tree(o){
-
-    var root = null;
-
-    /*
-     * @param {string} name: property name
-     * @parm {object or string} val: property value
-     * @return: the tree of nodes
-     */
-    var _build_tree = function(name, val){
-
-        var desc, node, type;
-
-        /* true, if o is an array, *and* none of its element is object */
-        var simple_array_p = function(o){
-            return arrayp(val) && 
-                val.filter(function(e){ return typeof e === 'object'}).length == 0;
-        }
-
-        /* description */
-        if(typeof val === 'string'){
-            desc = name + ": " + val;
-        }
-        else if(simple_array_p(val)){
-            desc = name + ": " + val.join(",");
-        }
-        else{
-            desc = name;
-        }
-
-        /* type */
-        if(typeof val === 'object'){
-            if(arrayp(val))
-                type = "brackets";
-            else
-                type = "folder";
-        }
-        else{
-            if(name[0] === '@'){
-                type = "at";
+            // 5. div object: only needed for non-leaf nodes
+            if(this.kids.length > 0){
+                docW += "<div id='D" + this.id + "'></div>";
             }
-            else if(name[0] === '#'){
-                type = "sharp";
+            
+            return docW;
+        } 
+
+        /* toggle betw. open & close of the node
+         */
+        function _onclick(){
+            var div = $(this.div_id());
+            if(!div)  return;
+            if(!div.innerHTML){
+                var kids = [];
+                for(var i = 0; i < this.kids.length; i ++){
+                    kids[i] = this.kids[i].render();
+                }
+                div.innerHTML = kids.join('');
+            }
+
+            // toggle visibility of its kids
+            if(this.openp === false){
+                div.style.display = "block";
+                this.openp = true;
             }
             else{
+                div.style.display = "none";
+                this.openp = false;
+            }
+            
+            // update the joint icon in the joint DIV
+            var jdiv = $(this.joint_id());
+            if(jdiv){
+                jdiv.className = "icon " + this.get_joint_icon_class();    
+            }
+        }
+
+        /* get left side icons of a node (componsed by blank and vertline) */ 
+        function _get_left_icons(){
+            var left_code = this.left_code.slice(1);
+            return left_code.map(function(v){ 
+                return ["<td><div class='icon ", (v == 1? "vertical" : "blank"), "'/></td>"].join("");}).join("");
+        }
+
+        function _get_joint_icon_class(){
+            if(this.dad === null){
+                return "";  // no joint icon for root node
+            }
+            else{
+                if(this.lastp){
+                    if(this.kids.length > 0){
+                        if(this.openp)
+                            return "nodeminuslast";
+                        else
+                            return "nodepluslast";
+                    }
+                    else{
+                        return "nodelast";
+                    }
+                }
+                else{ // not last node 
+                    if(this.kids.length > 0){
+                        if(this.openp)
+                            return "nodeminus";
+                        else
+                            return "nodeplus";
+                    }
+                    else{
+                        return "node";
+                    }
+                }
+            }
+        }
+
+        function _get_joint_icon(){
+            
+            if(this.dad === null){
+                return "";  // no joint icon for root node
+            }
+
+            var icon = this.get_joint_icon_class();
+
+            var href = "";
+            if(this.kids.length > 0){
+                href = ["<a href='javascript: N", this.id, ".onclick()'>"].join("");
+            }
+
+            return ["<td>", href, "<div id='", this.joint_id(), "' class='icon ", icon, "'/></td>"].join("");
+        }
+
+        /* get the type icon of the node, according to its type */
+        function _get_type_icon(){
+            return ["<td><div class='icon ", this.type, "'/></td>"].join("");
+        }
+
+        // tree's data structure
+        this.dad = null;
+        this.kids = [];
+
+        // static properties assigned
+        this.id = id;
+        this.desc = desc;
+        this.type = type || "cube1";
+        this.href = href;
+
+        // properties determined during tree_init()
+        this.left_code = [];   // array element: 0 means space, 1 means vertical bar
+        this.lastp = false;    // is the last kid of its parent?
+        
+        // dynamic properties
+        this.openp = false;  // is collapsed or not? 
+        
+        // methods
+        this.add_kid         = _add_kid;
+        this.set_left_n_last = _set_left_n_last;
+        this.node_name       = _node_name;
+        this.div_id          = _div_id;
+        this.joint_id        = _joint_id;
+        this.get_joint_icon_class = _get_joint_icon_class;
+
+        this.get_left_icons  = _get_left_icons;  
+        this.get_joint_icon   = _get_joint_icon;   
+        this.get_type_icon   = _get_type_icon;   
+
+        this.render          = _render;          
+        this.onclick         = _onclick;
+    }
+
+
+    /**
+     * build a tree from the object: 
+     * - creating(new) all nodes in global space
+     * - attaching nodes to form a tree
+     * - initialize misc info in all nodes
+     *
+     * @param {object} o: the object converted from a xml
+     * @return {object}: the root node
+     */
+    function build_tree(o){
+
+        var root = null;
+
+        /*
+         * @param {string} name: property name
+         * @parm {object or string} val: property value
+         * @return: the tree of nodes
+         */
+        var _build_tree = function(name, val){
+
+            var desc, node, type;
+
+            /* true, if o is an array, *and* none of its element is object */
+            var simple_array_p = function(o){
+                return arrayp(val) && 
+                    val.filter(function(e){ return typeof e === 'object';}).length === 0;
+            };
+
+            /* description */
+            if(typeof val === 'string'){
+                desc = name + ": " + val;
+            }
+            else if(simple_array_p(val)){
+                desc = name + ": " + val.join(",");
+            }
+            else{
+                desc = name;
+            }
+
+            /* type */
+            if(typeof val === 'object'){
+                if(arrayp(val))
+                    type = "brackets";
+                else
+                    type = "folder";
+            }
+            else{
+                if(name[0] === '@'){
+                    type = "at";
+                }
+                else if(name[0] === '#'){
+                    type = "sharp";
+                }
+                else{
                     type = "cube1";
+                }
+            }
+
+            node = new MyNode(uid(), desc, type, "");
+            window[node.node_name()] = node;
+            
+            if(typeof val === 'object' && !simple_array_p(val)){ // it has kids
+                for(var p in val){
+                    kid = _build_tree(p, val[p]);
+                    node.add_kid(kid);
+                }
+            }
+            return node;
+        };
+
+        if(o && typeof o === 'object' && !arrayp(o)){
+            for(var p in o){
+                root = _build_tree(p, o[p]);
+                /* we assume the tree has only 1 property at top level */
+                break; 
             }
         }
 
-        node = new MyNode(uid(), desc, type, "");
-        window[node.node_name()] = node;
-        
-        if(typeof val === 'object' && !simple_array_p(val)){ // it has kids
-            for(var p in val){
-                kid = _build_tree(p, val[p]);
-                node.add_kid(kid);
-            }
-        }
-        return node;
+        root.set_left_n_last(true, []);
+        return root;
     }
-
-    if(o && typeof o === 'object' && !arrayp(o)){
-        for(var p in o){
-            root = _build_tree(p, o[p]);
-            /* we assume the tree has only 1 property at top level */
-            break; 
-        }
-    }
-
-    root.set_left_n_last(true, []);
-    return root;
-}
 
 
 
     function body_onload(){
 
-    $('files').addEventListener('change', handleFileSelect, false);
-/*
-        var test_tree = '<boot><config><file att1="60" att2="5" att3="/flash/prefs.xml" att4="pref"/><file att1="0" att2="0" pathname="/flash/dynamic.xml" att3="dyn"/></config></boot>';
-        console.log(xml2json(test_tree));
-        var root = build_tree(xml2obj(test_tree));
-        $("tree").innerHTML = root.render();
-        root.onclick();
-*/
+        $('files').addEventListener('change', handleFileSelect, false);
+        /*
+          var test_tree = '<boot><config><file att1="60" att2="5" att3="/flash/prefs.xml" att4="pref"/><file att1="0" att2="0" pathname="/flash/dynamic.xml" att3="dyn"/></config></boot>';
+          console.log(xml2json(test_tree));
+          var root = build_tree(xml2obj(test_tree));
+          $("tree").innerHTML = root.render();
+          root.onclick();
+        */
     }
 
 
@@ -805,7 +805,7 @@ function build_tree(o){
 
         // files is a FileList of File objects. List some properties.
         var output = [];
-        for (var i = 0, f; f = files[i]; i++) {
+        for (var i = 0, f; !!(f = files[i]); i++) {
             output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
                         f.size, ' bytes, last modified: ',
                         f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -845,11 +845,9 @@ function build_tree(o){
 
 
 
-
-
-
 </script>
 
+<body onload="body_onload()">
 <div class="boxed" style="display:block">
 <input type="file" id="files" name="files[]" multiple />
 <output id="list"></output>
