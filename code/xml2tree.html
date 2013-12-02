@@ -1,4 +1,4 @@
-    <html><head><title>xml2tree</title><style>
+<!DOCTYPE HTML><html><head><title>xml2tree</title><style>
 
 body {background-color: white}
 
@@ -67,8 +67,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 .brackets      { background-position:  -48px  -48px; }
 .dollar        { background-position:  -64px  -48px; }
 .percent       { background-position:  -80px  -48px; }
-.and           { background-position:  -96px  -48px; }
-.star          { background-position: -112px  -48px; }
+.ampersand     { background-position:  -96px  -48px; }
+.asterisk      { background-position: -112px  -48px; }
 
 .parens        { background-position:    0px  -64px; }
 .exclaim       { background-position:  -16px  -64px; }
@@ -155,7 +155,7 @@ function xml2dom(xml) {
 
     dom.normalize && dom.normalize();
     remove_comments(dom);
-    simplify_gconf(dom);
+    // simplify_gconf(dom);
     return remove_white(dom);
 
 
