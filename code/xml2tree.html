@@ -14,7 +14,7 @@ td {
     font-size: 9pt; 
     text-decoration: none;
     text-align: left;
-    vertcal-align: middle;
+    vertical-align: middle;
     white-space:nowrap;
     padding: 0px;
 }
@@ -106,7 +106,26 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
     /* is o an array? */
     function arrayp(o){
-        return typeof o === 'object' && Object.prototype.toString.call(o) === '[object Array]';
+        if(typeof Array.isArray === 'function'){
+            return Array.isArray(o);
+        }else{
+            return typeof o === 'object' && Object.prototype.toString.call(o) === "[object Array]";
+        }
+    }
+
+    /* is the object an empty object? */
+    function emptyp(o){
+        // return JSON.stringify(o) === "{}";
+        return o != null && o != undefined && typeof o === 'object' && Object.getOwnPropertyNames(o).length === 0;
+    }
+
+    /* is the object has and only has the following exact properties? */
+    function onlyHasOwnProperties(o, props){ // props is an array of property names, could be []
+        if(props.length === 0)
+            return emptyp(o);
+
+        return props.filter(function(p){ return !(o.hasOwnProperty(p));}).length === 0 && 
+            Object.getOwnPropertyNames(o).length === props.length;
     }
 
     /* get unique id, also has a method for reset: uid(), uid.reset() */
@@ -403,45 +422,84 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
     /* simplify json object converted from gconf xmls, in place */
     var simplify_gconf = function(json){
         var GCONF = "gconf";
-        var DIR = "dir";
-        var NAME = "@name";
+        /* 
+         * note: what's to be "simplified":
+         * <tag attr="xyz" ...></tag> should be simplified to:
+         * <xyz ...></xyz>
+         *
+         * e.g.
+         * <dir name="network">...</dir> should be simplified to:
+         * <network>...</network>
+         *
+         * the following is a nested array contains all the [tag, attr] pairs to
+         * be simplified: each pair is a 2-element array inside the outer array.
+         *
+         * one issue is that the "order" of the object properties is not preserved...
+         */
+        var tag_attr = [
+            ["dir", "@name"],
+            ["entry", "@name"],
+            ["li", "@type"],
+            ["string", "stringvalue"],
+            ["int", "@value"],
+        ]
 
         if(!json || !(json.hasOwnProperty(GCONF))) // not gconf
             return;
-        _simplify_gconf2(json[GCONF]);
 
-        function _simplify_gconf2(obj){
-            var v, p;
-
-            console.log("out " + JSON.stringify(obj));
+        tag_attr.forEach(function(x){_simplify_gconf2(json[GCONF], x[0], x[1]);});
 
 
-            if(v = obj[DIR]){
+        function _simplify_gconf2(obj, tag, attr){
+
+            // no need to process JSON primitives: string/number/true/false
+            if(!(typeof obj === 'object' && obj !== null)){
+                return;
+            }
+
+            if(obj.hasOwnProperty(tag)){
+                var v = obj[tag];
                 
                 if(arrayp(v)){
-                    /* make sure every array element has a NAME property */
-                    if(v.filter(function(x){ return !(x.hasOwnProperty(NAME));}).length === 0){
+                    /* make sure every array element has such a property */
+                    if(v.filter(function(x){ return !(x.hasOwnProperty(attr));}).length === 0){
                         /* add each element to obj */
-                        v.forEach(function(x){ obj[x[NAME]] = x; delete x[NAME]; });
+                        v.forEach(function(x){ 
+                            if(obj.hasOwnProperty(x[attr])){ //  if obj already has the property, make it's value an array
+                                if(arrayp(obj[x[attr]])){
+                                    obj[x[attr]].push(x);
+                                    delete x[attr];
+                                }
+                                else{
+                                    obj[x[attr]] = [obj[x[attr]], x];
+                                    delete x[attr];
+                                }
+                            }
+                            else{
+                                obj[x[attr]] = x; 
+                                delete x[attr];
+                            }
+                        });
                     }
-                    delete obj[DIR];
+                    delete obj[tag];
                 }
-                else if(typeof v === 'object'){
-                    if(v.hasOwnProperty(NAME)){
-                        obj[v[NAME]] = v;
-                        delete obj[DIR];
-                        delete v[NAME];
+                else if(typeof v === 'object' && v !== null){ // a non-array object
+                    if(v.hasOwnProperty(attr)){
+                        obj[v[attr]] = v;
+                        delete obj[tag];
+                        delete v[attr];
                     }
                 }
                 else{
-                    // do nothing
+                    // do nothing to JSON primitives
                 }
             }
 
             /* recursivly loop on obj's kids */
-            for(p in obj){
-                console.log("in " + JSON.stringify(obj[p]));
-                _simplify_gconf2(obj[p]);
+            for(var p in obj){
+                if(obj.hasOwnProperty(p)){
+                   _simplify_gconf2(obj[p], tag, attr);
+                }
             }
         }
     }
@@ -697,6 +755,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             var href = "";
             if(this.kids.length > 0){
+                /* fixme: instead of using "javascript: url", use onclick() event handler */
                 href = ["<a href='javascript: N", this.id, ".onclick()'>"].join("");
             }
 
@@ -785,6 +844,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             if(typeof val === 'object'){
                 if(arrayp(val))
                     type = "brackets";
+                else if(val === null || emptyp(val))
+                    type = "cube1";
                 else
                     type = "folder";
             }
