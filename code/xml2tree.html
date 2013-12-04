@@ -434,7 +434,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
          * the following is a nested array contains all the [tag, attr] pairs to
          * be simplified: each pair is a 2-element array inside the outer array.
          *
-         * one issue is that the "order" of the object properties is not preserved...
+         * fixme: one issue is that the "order" of the object properties is not preserved.
+         * one possible way is to only use array to represent the xml/tree...
          */
         var tag_attr = [
             ["dir", "@name"],
@@ -555,11 +556,11 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      the joint icon is to represent the status of the 
      node in browser. there are 6 possible status for a node: 
      
-     |          |           |         |         |        |
+       |          |         |         |         |        |
      +---+      +---+       |       +---+     +---+      |
      | + |--    | - |--     +----   | + |--   | - |--    +----
      +---+      +---+       |       +---+     +---+
-     |          |           |         
+       |          |         |         
      
      (a)        (b)       (c)       (d)       (e)       (f)
      
@@ -842,12 +843,14 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             /* type */
             if(typeof val === 'object'){
-                if(arrayp(val))
+                if(arrayp(val)){
                     type = "brackets";
-                else if(val === null || emptyp(val))
-                    type = "cube1";
-                else
+                }
+                //else if(val === null || emptyp(val))
+                //    type = "cube1";
+                else{
                     type = "folder";
+                }
             }
             else{
                 if(name[0] === '@'){
