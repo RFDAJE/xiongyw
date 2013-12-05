@@ -99,21 +99,12 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      * utilities 
      */
 
-    /* save typing */
+    // save typing 
     function $(id) {
         return window.document.getElementById(id);
     }
 
-    /* is o an array? */
-    function isArray(o) {
-        if(typeof Array.isArray === 'function'){
-            return Array.isArray(o);
-        }else{
-            return typeof o === 'object' && Object.prototype.toString.call(o) === "[object Array]";
-        }
-    }
-
-    /* is the object empty, i.e.: {} */
+    // is the object empty, i.e.: {} 
     function isEmptyObj(o) {
         // return JSON.stringify(o) === "{}";
         return (o != null && 
@@ -122,17 +113,60 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                 Object.getOwnPropertyNames(o).length === 0);
     }
 
-    /* is the object has and only has exactly the specified properties? */
-    function onlyHasOwnProperties(o, props) { // props is an array of property names, could be []
+    // is v a number/string/boolean primitive?
+    function isNsb(v) {
+        return (typeof v === "number" || 
+                typeof v === "string" ||
+                typeof v === "boolean");
+    }
+
+    // is o an array? 
+    function isArray(o) {
+        if(typeof Array.isArray === 'function'){
+            return Array.isArray(o);
+        }else{
+            return typeof o === 'object' && Object.prototype.toString.call(o) === "[object Array]";
+        }
+    }
+
+    // is o a dense array (i.e., not a sparse array)? 
+    function isDenseArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function() { return true; }).length);
+    }
+
+    // is o an array without undefined/null members? 
+    function isSolidArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function(x) { return x !== null && x !== undefined; }).length);
+    }
+
+    // is o a solid array with only true primitive members (which implies its flatness)? 
+    function isSolidNsbArray(o) {
+        return (isSolidArray(o) && 
+                o.filter(function(x) { 
+                    return !isNsb(x);
+                }).length === 0);
+    }
+
+    // jsonify an object, i.e., remove undefined and functions 
+    function jsonify(o) {
+        // fixme: undefined and functions are simply removed, probably better to reassign to null?
+        return JSON.parse(JSON.stringify(o));
+    }
+
+    // is the object has and only has exactly the specified properties? 
+    function onlyHasOwnProperties(o, props) { 
+        // props is supposed to be an array of property names, could be []
         if(props.length === 0){
             return isEmptyObj(o);
         } else {
-            return (props.filter(function(p){ return !(o.hasOwnProperty(p));}).length === 0 && 
+            return (props.filter(function(p){ return !(o.hasOwnProperty(p)); }).length === 0 && 
                     Object.getOwnPropertyNames(o).length === props.length);
         }
     }
 
-    /* get unique id, also has a method for reset: uid(), uid.reset() */
+    // get unique id, also has a method for reset: uid(), uid.reset()
     var uid = (function(init) {
         var _id = init;
         var fn = function() { return _id ++; };
@@ -147,13 +181,15 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                 .replace(/[\r]/g, '\\r'));
     };
 
-    /** xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
+    
+    /** 
+     * xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
      *
      * rewrite(bruin, 2013-11-26)
      * last updated(bruin, 2013-11-28)
      */
 
-    /* some constants */
+    // some constants
     var NON_SPACE = /[^ \f\n\r\t\v]/;
     var SHARP_TEXT = "#text";
     var SHARP_CDATA = "#cdata";
@@ -168,6 +204,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         if (!xml) {
             return null;
         }
+
         if (window.DOMParser) {
             dom = (new DOMParser()).parseFromString(xml, MIME);
         } else if (window.ActiveXObject) {
@@ -189,12 +226,10 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         // simplify_gconf(dom);
         return removeWhite(dom);
 
-
         /*
          * private functions (to be hoisted) go below:
          */
-
-        /* recursively remove all pure white TEXT_NODE from the element, in place */
+        // recursively remove all pure white TEXT_NODE from the element, in place
         function removeWhite(e) {
             var node, next;
             if (!e)
@@ -220,7 +255,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             return e;
         }
 
-        /* recursively remove comments, in place */
+        // recursively remove comments, in place
         function removeComment(e) {
             var node, next;
 
@@ -243,7 +278,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             return e;
         }
 
-        /* simplify dom created from gconf xmls */
+        // simplify dom created from gconf xmls
         function slimGconf(dom) {
 
             var GCONF = "gconf";
@@ -861,21 +896,21 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             var desc, node, type;
 
             /* true, if o is an array, *and* none of its element is object */
-            var simple_array_p = function(o) {
-                return (isArray(val) && 
-                        val.filter(function(e){ return typeof e === 'object';}).length === 0);
-            };
+            //var simple_array_p = function(o) {
+            //    return (isArray(val) && 
+            //            val.filter(function(e){ return typeof e === 'object';}).length === 0);
+            //};
 
-            /* description */
-            if (typeof val === 'string') {
+            // description 
+            if (isNsb(val)) {
                 desc = name + ": " + val;
-            } else if (simple_array_p(val)) {
+            } else if (isSolidNsbArray(val)) {
                 desc = name + ": " + val.join(",");
-            } else {
+            } else { // a non-leaf node
                 desc = name;
             }
 
-            /* type */
+            // type 
             if (typeof val === 'object') {
                 if (isArray(val)) {
                     type = "brackets";
@@ -898,7 +933,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             node = new MyNode(uid(), desc, type, "");
             window[node.node_name()] = node;
             
-            if (typeof val === 'object' && !simple_array_p(val)) { // it has kids
+            if (typeof val === 'object' && val !== null && !isSolidNsbArray(val)) {
+                // val is an object or non-all_primitive_unested_array, so it has kid(s)
                 for (var p in val) {
                     kid = _build_tree(p, val[p]);
                     node.add_kid(kid);
@@ -908,7 +944,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             return node;
         };
 
-        if (o && typeof o === 'object' && !isArray(o)) {
+        if (o && typeof o === 'object' && !isArray(o)) { // fixme: isArray(o) seems unnecessary here
             for (var p in o) {
                 root = _build_tree(p, o[p]);
                 /* we assume the tree has only 1 property at top level */
