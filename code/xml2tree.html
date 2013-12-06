@@ -2,10 +2,6 @@
 
 body {background-color: white}
 
-iframe{
-margin:8px;
-}
-
 table {
     border-collapse: collapse;
 }
@@ -19,9 +15,24 @@ td {
     padding: 0px;
 }
 
+div.block{
+    display: block;
+}
+
+div.none{
+    display: none;
+}
+
 .boxed {
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 2px solid blue;
+}
+
+td.xxx{
+    width: 50%; 
+    vertical-align:top; 
+    padding: 10px;
+    border: 2px solid blue;
 }
 
 .icon {
@@ -95,9 +106,9 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
 </style></head><script type="text/javascript">
 
-    /* 
-     * utilities 
-     */
+    /*########################################################################## 
+      # some utilities 
+      #########################################################################*/
 
     // save typing 
     function $(id) {
@@ -181,14 +192,17 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                 .replace(/[\r]/g, '\\r'));
     };
 
-    
-    /** 
-     * xml2json converter based on "http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html"
-     *
-     * rewrite(bruin, 2013-11-26)
-     * last updated(bruin, 2013-11-28)
-     */
 
+
+    /*########################################################################## 
+      # xml2obj and xml2json converter
+      #
+      # http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html
+      #
+      # rewrite(bruin, 2013-11-26)
+      # last updated(bruin, 2013-11-28)
+      #########################################################################*/
+    
     // some constants
     var NON_SPACE = /[^ \f\n\r\t\v]/;
     var SHARP_TEXT = "#text";
@@ -222,9 +236,14 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             dom.normalize();
         }
 
-        removeComment(dom);
+        
         // simplify_gconf(dom);
-        return removeWhite(dom);
+        removeComment(dom);
+        removeWhite(dom);
+
+        return dom;
+
+
 
         /*
          * private functions (to be hoisted) go below:
@@ -473,8 +492,6 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         return o;
     }
 
-
-
     /* simplify json object converted from gconf xmls, in place */
     var slimGconf2 = function(json) {
         var GCONF = "gconf";
@@ -559,7 +576,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         }
     }
     
-   /* xml to obj */
+    // xml to obj 
     function xml2obj(xml) {
         var dom = xml2dom(xml);
         var obj = dom2obj(dom);
@@ -567,14 +584,13 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         return obj;
     }
 
-    /* xml to json string */
+    // xml to json string 
     function xml2json(xml) {
         var obj = xml2obj(xml);
         return JSON.stringify(obj, null, 4);
     }
 
-
-    /* sanity tests */
+    // sanity tests 
     (function () {
         var xmls = [undefined,
                     null,
@@ -594,12 +610,17 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         }).join("");
     }());
 
+    /*########################################################################## 
+      # obj2tree
+      #
+      # created(bruin, 2003-02-01): first creation, support MSIE only
+      # updated(bruin, 2004-07-08): support mozilla, cleanup code, add comments
+      # updated(bruin, 2013-11-30): use CSS sprites 
+      # updated(bruin, 2013-12-06): cosmetic changes 
+      #########################################################################*/
 
-    /**
-     * created(bruin, 2003-02-01): first creation, support MSIE only
-     * updated(bruin, 2004-07-08): support mozilla, cleanup code, and add code comments
-     * updated(bruin, 2013-11-30): use CSS sprites 
-     *
+
+    /***************************************************************************
      * General notes:
      *
      * Names for other types of objects depend on the id, in the following rule:
@@ -626,9 +647,11 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      * (e) a last opened/collapsed node having kid(s)
      * (f) a last leaf node having no kids
      *
-     * Clicking on nodes cause the node to open/close, so the joint icon should also 
-     * change accordingly.
-     */   
+     * Clicking on a non-leaf node cause it open/close, its joint icon should also 
+     * change accordingly: a <=> b; d <=> e; 
+     * No joint icon changes for leaf nodes (c, f), actually no click event hooks;
+     *
+     ***************************************************************************/   
 
 
     /** 
@@ -729,17 +752,28 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             // 5. div object: only needed for non-leaf nodes
             if (this.kids.length > 0) {
-                docW += "<div id='D" + this.id + "'></div>";
+                docW += "<div class='none' id='D" + this.id + "'></div>";
             }
             
             return docW;
         } 
 
-        /* toggle betw. open & close of the node */
+        /*
+         * open & close the node. for non-leaf nodes, when clicked:
+         * - render kids when collapsed for the 1st time
+         * - show/hide the associated div, by changing its class
+         * - toggle the joint icon
+         */
         function _onclick() {
             var div = $(this.div_id());
 
-            if (!div)  return;
+            if (!div){
+                return;
+            }
+
+            if(this.kids.length === 0){
+                return;
+            }
 
             if (!div.innerHTML) {
                 var kids = [];
@@ -753,10 +787,10 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             // toggle visibility of its kids
             if (this.openp === false) {
-                div.style.display = "block";
+                div.className = "block";
                 this.openp = true;
             } else {
-                div.style.display = "none";
+                div.className = "none";
                 this.openp = false;
             }
             
@@ -767,7 +801,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             }
         }
 
-        /* get left side icons of a node (componsed by blank and vertline) */ 
+        // <td>s for left side icons, one <td> for each
         function _get_left_icons() {
             var left_code = this.left_code.slice(1);
 
@@ -779,6 +813,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                 ].join("");}).join(""));
         }
 
+        // get joint icon class name
         function _get_joint_icon_class() {
             if(this.dad === null){
                 return "";  // no joint icon for root node
@@ -809,6 +844,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             }
         }
 
+        // get <td> for joint icom
         function _get_joint_icon() {
             
             if (this.dad === null) {
@@ -817,24 +853,17 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             var icon = this.get_joint_icon_class();
 
-            var href = "";
-            if (this.kids.length > 0) {
-                /* fixme: instead of using "javascript: url", use onclick() event handler */
-                href = ["<a href='javascript: N", this.id, ".onclick()'>"].join("");
-            }
-
-            return [
-                "<td>", 
-                href, 
-                "<div id='", 
-                this.joint_id(), 
-                "' class='icon ", 
-                icon, 
-                "'/></td>"
-            ].join("");
+            return ["<td><div onclick='N", 
+                    this.id, 
+                    ".onclick()' id='",
+                    this.joint_id(), 
+                    "' class='icon ", 
+                    icon, 
+                    "'/></td>"
+                   ].join("");
         }
 
-        /* get the type icon of the node, according to its type */
+        // get <td> for type icon
         function _get_type_icon() {
             return ["<td><div class='icon ", this.type, "'/></td>"].join("");
         }
@@ -849,11 +878,15 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         this.type = type || "cube1";
         this.href = href;
 
-        // properties determined during tree_init()
+        /* 
+         * properties determined by root.set_left_n_last(true, []); 
+         * if there is any node update (remove/add), these properties need
+         * to be updated by root.set_left_n_last(true, []) again.
+         */
         this.left_code = [];   // array element: 0 means space, 1 means vertical bar
         this.lastp = false;    // is the last kid of its parent?
         
-        // dynamic properties
+        // dynamic properties changed upon click event
         this.openp = false;  // is collapsed or not? 
         
         // methods
@@ -882,7 +915,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      * @param {object} o: the object converted from a xml
      * @return {object}: the root node
      */
-    function build_tree(o) {
+    function obj2tree(o) {
 
         var root = null;
 
@@ -932,6 +965,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
             node = new MyNode(uid(), desc, type, "");
             window[node.node_name()] = node;
+
             
             if (typeof val === 'object' && val !== null && !isSolidNsbArray(val)) {
                 // val is an object or non-all_primitive_unested_array, so it has kid(s)
@@ -944,7 +978,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             return node;
         };
 
-        if (o && typeof o === 'object' && !isArray(o)) { // fixme: isArray(o) seems unnecessary here
+        o = jsonify(o);
+        if (o && typeof o === 'object') {
             for (var p in o) {
                 root = _build_tree(p, o[p]);
                 /* we assume the tree has only 1 property at top level */
@@ -953,16 +988,18 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         }
 
         root.set_left_n_last(true, []);
+
         return root;
     }
 
 
+    /*########################################################################## 
+      # kick off ...
+      #########################################################################*/
 
     function body_onload() {
         $('files').addEventListener('change', handleFileSelect, false);
     }
-
-
 
     /*
      * FILE API: http://www.html5rocks.com/en/tutorials/file/dndfiles/
@@ -1005,7 +1042,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                  */
                 var xml = e.target.result.replace(/<!--[\s\S]*?-->/g, "");
                 var obj = xml2obj(xml);
-                var root = build_tree(obj);
+                var root = obj2tree(obj);
 
                 $("tree").innerHTML = root.render();
                 root.onclick();
@@ -1019,11 +1056,10 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         reader.readAsText(f);
     }
 
-
-
 </script>
 
 <body onload="body_onload()">
+
 <div class="boxed" style="display:block">
 <input type="file" id="files" name="files[]" multiple />
 <output id="list"></output>
@@ -1033,11 +1069,10 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
 <br><br>
 
-
-<div id="tree" style="display:block;"></div>
-
-
-<br><br>
-<div id="json" style="display:block;"></div>
-
+<table style="width: 100%;" class="boxed">
+<tr>
+<td class="xxx"><div id="tree" style="display:block;"></div></td>
+<td class="xxx"><div id="json" style="display:block;"></div></td>
+</tr>
+</table>
 </body></html>
