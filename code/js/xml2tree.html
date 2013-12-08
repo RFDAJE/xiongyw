@@ -1003,10 +1003,6 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
       # kick off ...
       #########################################################################*/
 
-    function body_onload() {
-        $('files').addEventListener('change', handleFileSelect, false);
-    }
-
     /*
      * FILE API: http://www.html5rocks.com/en/tutorials/file/dndfiles/
      */
@@ -1018,49 +1014,59 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         alert('The File APIs are not fully supported in this browser.');
     }
 
+    function body_onload() {
+        $('files').addEventListener('change', function(evt) { processFiles(evt.target.files); }, false);
+    }
 
-    function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
+    /*
+     * @para {FileList} files FileList oject
+     */
+    function processFiles(files) {
 
-        // files is a FileList of File objects. List some properties.
-        var output = [];
-        for (var i = 0, f; !!(f = files[i]); i++) {
-            output.push('<li><strong>', escapeJson(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                        f.size, ' bytes, last modified: ',
-                        f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                        '</li>');
+        var i, f, reader, output = [];
+
+	// display the files info
+        for (i = 0; !!(f = files[i]); i++) {
+            output.push("<li><strong>", escapeJson(f.name), "</strong> (", f.type || "n/a", ") - ",
+                        f.size, " bytes, last modified: ",
+                        f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : "n/a",
+                        "</li>");
         }
-        $('list').innerHTML = '<ul>' + output.join('') + '</ul>';
 
-        f = files[0]; // process the 1st file
+        $("list").innerHTML = "<ul>" + output.join("") + "</ul>";
 
-        var reader = new FileReader();
+	// read the 1st file, which will trigger the following steps
+        f = files[0];
 
-        // Closure to capture the file information.
-        reader.onload = (function(theFile) {
-
-
+        reader = new FileReader();
+	reader.onload = (function(theFile) {
+	    // a closure can capture the file oject
             return function(e) {
-                /*
-                 * remove comments first: seems the DOMParser in chrome is not happy
-                 * with this kind of comment blocks "<!-- blahblah -- blahblah -->", which
-                 * has more than one consective '-' (dashes) inside the comment.
-                 */
-                var xml = e.target.result.replace(/<!--[\s\S]*?-->/g, "");
-                var obj = xml2obj(xml);
-                var root = obj2tree(obj);
+		processXml(e.target.result);
+	    }
+	})(f);
 
-                $("tree").innerHTML = root.render();
-                root.onclick();
-
-                $("json").innerHTML = ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
-
-            };
-        })(f);
-
-        // Read in the xml file
+        // read the file
         reader.readAsText(f);
     }
+
+    function processXml(in_xml){
+        /*
+         * remove comments first: seems the DOMParser in chrome is not happy
+         * with this kind of comment blocks "<!-- blahblah -- blahblah -->", which
+         * has more than one consective '-' (dashes) inside the comment.
+         */
+        var xml = in_xml.replace(/<!--[\s\S]*?-->/g, "");
+        var obj = xml2obj(xml);
+        var root = obj2tree(obj);
+
+        $("tree").innerHTML = root.render();
+        root.onclick();
+
+        $("json").innerHTML = ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
+
+    };
+
 
 </script>
 
