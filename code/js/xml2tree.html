@@ -185,13 +185,20 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         return fn;
     }(2013));
 
-    var escape = function (txt) {
+    // get a json-escaped string
+    var escapeJson = function (txt) {
         return (txt.replace(/[\\]/g, "\\\\")
                 .replace(/[\"]/g, '\\"')
                 .replace(/[\n]/g, '\\n')
                 .replace(/[\r]/g, '\\r'));
     };
 
+    // get a xml-escaped string
+    var escapeXml = function (txt) {
+        return (txt.replace(/>/g, "&gt;")
+                .replace(/</g, "&lt;")
+                .replace(/"/g, "&quot;"));
+    };
 
 
     /*########################################################################## 
@@ -445,9 +452,9 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                         // structured element with a single text or/and cdata node
                         for (n = dom.firstChild; n; n = n.nextSibling) {
                             if (n.nodeType == Node.TEXT_NODE) {
-                                o[SHARP_TEXT] = escape(n.nodeValue);
+                                o[SHARP_TEXT] = escapeJson(n.nodeValue);
                             } else if (n.nodeType == Node.CDATA_SECTION_NODE) {
-                                o[SHARP_CDATA] = escape(n.nodeValue);
+                                o[SHARP_CDATA] = escapeJson(n.nodeValue);
                             } else if (o[n.nodeName]) { // multiple occurence of element ..
                                 if (o[n.nodeName] instanceof Array) {
                                     o[n.nodeName][o[n.nodeName].length] = dom2obj(n);
@@ -460,25 +467,25 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                         }
                     } else { // mixed content
                         if (!dom.attributes.length) {
-                            o = escape(_inner_xml(dom));
+                            o = escapeJson(_inner_xml(dom));
                         } else {
-                            o[SHARP_TEXT] = escape(_inner_xml(dom));
+                            o[SHARP_TEXT] = escapeJson(_inner_xml(dom));
                         }
                     }
                 } else if(textChild) { 
                     // pure text
                     if (!dom.attributes.length) {
-                        o = escape(_inner_xml(dom));
+                        o = escapeJson(_inner_xml(dom));
                     } else {
-                        o[SHARP_TEXT] = escape(_inner_xml(dom));
+                        o[SHARP_TEXT] = escapeJson(_inner_xml(dom));
                     }
                 } else if (cdataChild) { 
                     // cdata
                     if (cdataChild > 1) {
-                        o = escape(_inner_xml(dom));
+                        o = escapeJson(_inner_xml(dom));
                     } else {
                         for (n = dom.firstChild; n; n = n.nextSibling) {
-                            o[SHARP_CDATA] = escape(n.nodeValue);
+                            o[SHARP_CDATA] = escapeJson(n.nodeValue);
                         }
                     }
                 }
@@ -745,9 +752,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             // 3. type icon
             docW += this.get_type_icon();
 
-            // 4. desc text, xml-escaped first
-            var desc = this.desc.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-            docW += "<td>&nbsp;<code>" + desc + "</code></td></tr></table>";
+            // 4. desc text, xml-escaped 
+            docW += "<td>&nbsp;<code>" + escapeXml(desc) + "</code></td></tr></table>";
 
 
             // 5. div object: only needed for non-leaf nodes
@@ -1019,7 +1025,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         // files is a FileList of File objects. List some properties.
         var output = [];
         for (var i = 0, f; !!(f = files[i]); i++) {
-            output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+            output.push('<li><strong>', escapeJson(f.name), '</strong> (', f.type || 'n/a', ') - ',
                         f.size, ' bytes, last modified: ',
                         f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
                         '</li>');
