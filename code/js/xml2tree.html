@@ -200,6 +200,12 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
                 .replace(/"/g, "&quot;"));
     };
 
+    // customized error constructor
+    function MyError (msg) {
+	this.msg = msg;
+    }
+
+    MyError.prototype = new Error();
 
     /*########################################################################## 
       # xml2obj and xml2json converter
@@ -239,7 +245,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
             window.alert("Error: your browser does not support parsing XML to DOM!");
         }
 
-        if (dom.normalize){
+        if (dom.normalize) {
             dom.normalize();
         }
 
