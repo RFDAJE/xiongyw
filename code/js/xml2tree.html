@@ -924,89 +924,81 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
      * - attaching nodes to form a tree
      * - initialize misc info in all nodes
      *
-     * @param {object} o: the object converted from a xml
-     * @return {object}: the root node
+     * @parm {object or string} o: object value
+     * @param {string} name: object name. optional
+     * @return: the root of the tree represented by "o"
+     * 
+     * updated(bruin, 2013-12-20): remove the nested function. abstract with an optional parameter "name".
+     * todo: make it a tail-call?
      */
-    function obj2tree(o) {
+    function obj2tree(o, /* optional */ name) {
 
-        var root = null;
+        var p, desc, type;
+        var node;
 
-        /*
-         * @param {string} name: property name
-         * @parm {object or string} val: property value
-         * @return: the tree of nodes
-         */
-        var _build_tree = function(name, val) {
-
-            var desc, node, type;
-
-            /* true, if o is an array, *and* none of its element is object */
-            //var simple_array_p = function(o) {
-            //    return (isArray(val) && 
-            //            val.filter(function(e){ return typeof e === 'object';}).length === 0);
-            //};
-
-            // description 
-            if (isNsb(val)) {
-                desc = name + ": " + val;
-            } else if (isSolidNsbArray(val)) {
-                desc = name + ": " + val.join(",");
-            } else { // a non-leaf node
-                desc = name;
-            }
-
-            // type 
-            if (typeof val === 'object') {
-                if (isArray(val)) {
-                    type = "brackets";
-                }
-                //else if(val === null || isEmptyObj(val))
-                //    type = "cube1";
-                else {
-                    type = "folder";
+        if (!name) {
+            /* 
+             * it's assumed that this is the first call which just passing in the object.
+             * all the rest recursive calls will always supply the "name" parameter.
+             *
+             * we assume that the top object contains a tree (not a forest) thus it has 
+             * only 1 property. So take the first property as the root of the tree that
+             * the property name is "name", the property value is "o".
+             */
+            if (o && typeof o === 'object') {
+                for (p in o) {
+                    return obj2tree(o[p], p);
                 }
             } else {
-                if (name[0] === '@') {
-                    type = "at";
-                } else if (name[0] === '#') {
-                    type = "sharp";
-                } else {
-                    type = "cube1";
-                }
-            }
-
-            node = new MyNode(uid(), desc, type, "");
-            window[node.node_name()] = node;
-
-            
-            if (typeof val === 'object' && val !== null && !isSolidNsbArray(val)) {
-                // val is an object or non-all_primitive_unested_array, so it has kid(s)
-                for (var p in val) {
-                    kid = _build_tree(p, val[p]);
-                    node.add_kid(kid);
-                }
-            }
-
-            return node;
-        };
-
-        o = jsonify(o);
-        if (o && typeof o === 'object') {
-            for (var p in o) {
-                root = _build_tree(p, o[p]);
-                /* we assume the tree has only 1 property at top level */
-                break; 
+                return null;
             }
         }
 
-        root.set_left_n_last(true, []);
+        // description 
+        if (isNsb(o)) {
+            desc = name + ": " + o;
+        } else if (isSolidNsbArray(o)) {
+            desc = name + ": " + o.join(",");
+        } else { // a non-leaf node
+            desc = name;
+        }
 
-        return root;
+        // type 
+        if (typeof o === 'object') {
+            if (isArray(o)) {
+                type = "brackets";
+            }
+            //else if(o === null || isEmptyObj(o))
+            //    type = "cube1";
+            else {
+                type = "folder";
+            }
+        } else {
+            if (name[0] === '@') {
+                type = "at";
+            } else if (name[0] === '#') {
+                type = "sharp";
+            } else {
+                type = "cube1";
+            }
+        }
+
+        node = new MyNode(uid(), desc, type, "");
+        window[node.node_name()] = node;
+        
+        if (typeof o === 'object' && o !== null && !isSolidNsbArray(o)) {
+            // o is an object or non-all_primitive_unested_array, so it has kid(s)
+            for (p in o) {
+                kid = obj2tree(o[p], p);
+                node.add_kid(kid);
+            }
+        }
+
+        return node;
     }
 
-
     /*########################################################################## 
-      # kick off ...
+      # kick it off ...
       #########################################################################*/
 
     /*
@@ -1064,7 +1056,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
          */
         var xml = in_xml.replace(/<!--[\s\S]*?-->/g, "");
         var obj = xml2obj(xml);
-        var root = obj2tree(obj);
+        var root = obj2tree(jsonify(obj));
+        root.set_left_n_last(true, []);
 
         $("tree").innerHTML = root.render();
         root.onclick();
