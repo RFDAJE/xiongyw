@@ -739,7 +739,7 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 		/* output format: [type, name, size, time] */
 		strftime(timebuf, sizeof(timebuf), "%Y-%m-%d %H:%M", localtime(&st.st_mtime));
 		
-		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "['%s', '%s', %llu, '%s', '%s%s'],\n",
+		entry_len = snprintf(entry, MAX_ENTRY_SIZE, "[\"%s\", \"%s\", %llu, \"%s\", \"%s%s\"],\n",
 									S_ISDIR(st.st_mode)? "d" : "-",
 									list[i]->d_name,
                                      S_ISDIR(st.st_mode)? - 1 : st.st_size,
