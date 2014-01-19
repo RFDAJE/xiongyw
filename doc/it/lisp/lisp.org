@@ -1,0 +1,30 @@
+é è ê ë   î ï    ù û ü    à â ä   ô ö   ç  œ
+
+É È Ê Ë   Î Ï    Ù Û Ü    À Â Ä   Ô Ö   Ç  Œ
+
+| French <80>                                                                     | Notes <40>                             |
+|---------------------------------------------------------------------------------+----------------------------------------|
+| Avis au lecteur                                                                 | avis: nm, notice, advice               |
+|                                                                                 | au: à le                               |
+|                                                                                 | lecteur:  reader                       |
+|---------------------------------------------------------------------------------+----------------------------------------|
+| Quoique la littèrature sur Lisp soit abondante et déjà largement accessible     | quoique: although                      |
+| au public français, un ouvrage pourtant manquait que vous tenez les mains!      | largement: adv, -ment                  |
+|                                                                                 | pourtant: yet, however                 |
+|                                                                                 | manquer: vi, lack/miss; Tu je manques  |
+|                                                                                 | tenir: vt. hold                        |
+|                                                                                 |                                        |
+| Le substrat mathématico-logique sur lequel est fondé Lisp/Scheme exige que      | lequel: le+quel; exiger: require;      |
+| ses utilisateurs modernes ne répugnent point à lire des programmes usant, voire | ses: its (son/sa/ses/leur/leurs)       |
+| abusant, de haute technologie, c'est-à-dire de fonctionnelles d'ordre très      | utilisateur: user; modernes: -s        |
+| largement supérieur et/ou de continuations.                                     | répugner: disgust/reluctant            |
+|                                                                                 | ne répugnent point: must?              |
+|                                                                                 | user: vt, use; using: usant            |
+|                                                                                 | voire: adv, even; haute: high          |
+|                                                                                 |                                        |
+| Les concepts de demain sont élaborés sur ces base; les méconnaître rendrait     | élaborer: élaboré (elaborated)         |
+| l'avenir plus inquiétant.                                                       | méconnaître: vt, not recognize, ignore |
+|                                                                                 | rendrait:                              |
+|                                                                                 | avenir: nm, future                     |
+|                                                                                 | inquiétant: disquieting, worrying      |
+|                                                                                 |                                        |
