@@ -2,29 +2,70 @@
 
 É È Ê Ë   Î Ï    Ù Û Ü    À Â Ä   Ô Ö   Ç  Œ
 
-| French <80>                                                                     | Notes <40>                             |
-|---------------------------------------------------------------------------------+----------------------------------------|
-| Avis au lecteur                                                                 | avis: nm, notice, advice               |
-|                                                                                 | au: à le                               |
-|                                                                                 | lecteur:  reader                       |
-|---------------------------------------------------------------------------------+----------------------------------------|
-| Quoique la littèrature sur Lisp soit abondante et déjà largement accessible     | quoique: although                      |
-| au public français, un ouvrage pourtant manquait que vous tenez les mains!      | largement: adv, -ment                  |
-|                                                                                 | pourtant: yet, however                 |
-|                                                                                 | manquer: vi, lack/miss; Tu je manques  |
-|                                                                                 | tenir: vt. hold                        |
-|                                                                                 |                                        |
-| Le substrat mathématico-logique sur lequel est fondé Lisp/Scheme exige que      | lequel: le+quel; exiger: require;      |
-| ses utilisateurs modernes ne répugnent point à lire des programmes usant, voire | ses: its (son/sa/ses/leur/leurs)       |
-| abusant, de haute technologie, c'est-à-dire de fonctionnelles d'ordre très      | utilisateur: user; modernes: -s        |
-| largement supérieur et/ou de continuations.                                     | répugner: disgust/reluctant            |
-|                                                                                 | ne répugnent point: must?              |
-|                                                                                 | user: vt, use; using: usant            |
-|                                                                                 | voire: adv, even; haute: high          |
-|                                                                                 |                                        |
-| Les concepts de demain sont élaborés sur ces base; les méconnaître rendrait     | élaborer: élaboré (elaborated)         |
-| l'avenir plus inquiétant.                                                       | méconnaître: vt, not recognize, ignore |
-|                                                                                 | rendrait:                              |
-|                                                                                 | avenir: nm, future                     |
-|                                                                                 | inquiétant: disquieting, worrying      |
-|                                                                                 |                                        |
+|------------------------------------------------------------------------------------+-------------------------------------------|
+| French <80>                                                                        | Notes <40>                                |
+|------------------------------------------------------------------------------------+-------------------------------------------|
+| Cours/LiSP/4                                                                       |                                           |
+| Principes d'implantation de Scheme et Lisp                                         |                                           |
+|                                                                                    |                                           |
+| Christian Queinnec                                                                 | computer science professor @ UPMC         |
+| Paracamplus                                                                        |                                           |
+|------------------------------------------------------------------------------------+-------------------------------------------|
+| Du même éditeur:                                                                   | of the same publisher:                    |
+|                                                                                    |                                           |
+| UPMC/LI101: annales corrigées                                                      | LI: Licence Informatique                  |
+| UPMC/LI102 (épuisé): éléments de cours                                             | en épiusé: sold out; en stock: in stock   |
+| UPMC/LI362: annales corrigées                                                      |                                           |
+|                                                                                    |                                           |
+| Missions de Paracamplus:                                                           |                                           |
+|                                                                                    |                                           |
+| Paracamplus a pour vocation de procurer, à tous les étudiants en université,       | pour vocation de procurer: has a mission  |
+| des ouvrages (annles corrigées, compléments de cours) et des environments          | to provide. FIXME                         |
+| informatiques de travail, bref, des ressources pédagogiques propres à permettre,   | propres à + v-inf: suitable to (enable,   |
+| accélérer et entretenir l'apprentissage des connaissances enseignées.              | accelerate, maintain)                     |
+|                                                                                    | enseigner: teach                          |
+|                                                                                    |                                           |
+| Les ouvrages des éditions Paracamplus bénéficient d'une conception nous permettant | permettre à qqn de faire qqch: qqn is COI |
+| de vous les proposer à des coûts très abordables.                                  | proposer qqch à qqn: qqn is COI           |
+|                                                                                    | les: les ouvrages                         |
+|                                                                                    | > the books have a design allowing us to  |
+|                                                                                    | provide them to you at low cost.          |
+|                                                                                    |                                           |
+| Decouvrez-nous plus avant sur notre site www.paracamplus.com                       | plus avant: further                       |
+|                                                                                    | découvrir: discover, find out             |
+|                                                                                    | decouvrez-nous: formation de l'impératif  |
+|                                                                                    |                                           |
+| Il est interdit de reproduire intégralement ou partiellement la présente           |                                           |
+| publication sans autorisation du Centre Français d'exploitation du droit de Copie  |                                           |
+| (CFC) - 20 rue des Grands-Augustins - 75006 PARIS - T l phone: 01 44 07 47 70,     |                                           |
+| Fax: 01 46 34 67 19                                                                |                                           |
+| (C)2007 Copyright retenu par l'auteur.                                             |                                           |
+| SARL Paracamplus                                                                   |                                           |
+| 7, rue Viollet-le-Duc, 75009 Paris - France                                        |                                           |
+| ISBN 978-2-916466-03-3                                                             |                                           |
+|------------------------------------------------------------------------------------+-------------------------------------------|
+|  Avis au lecteur                                                                   | avis: nm, advice                          |
+|                                                                                    | au: à le                                  |
+|                                                                                    | lecteur:  reader                          |
+|                                                                                    |                                           |
+| Quoique la littèrature sur Lisp soit abondante et déjà largement accessible        | quoique: although                         |
+| au public français, un ouvrage pourtant manquait que vous tenez les mains!         | largement: adv, -ment                     |
+|                                                                                    | pourtant: yet, however                    |
+|                                                                                    | manquer: vi, lack/miss; Tu je manques     |
+|                                                                                    | tenir: vt. hold                           |
+|                                                                                    |                                           |
+| Le substrat mathématico-logique sur lequel est fondé Lisp/Scheme exige que         | lequel: le+quel; exiger: require;         |
+| ses utilisateurs modernes ne répugnent point à lire des programmes usant, voire    | ses: its (son/sa/ses/leur/leurs)          |
+| abusant, de haute technologie, c'est-à-dire de fonctionnelles d'ordre très         | utilisateur: user; modernes: -s           |
+| largement supérieur et/ou de continuations.                                        | répugner: disgust/reluctant               |
+|                                                                                    | ne répugnent point: must?                 |
+|                                                                                    | user: vt, use; using: usant               |
+|                                                                                    | voire: adv, even; haute: high             |
+|                                                                                    |                                           |
+| Les concepts de demain sont élaborés sur ces base; les méconnaître rendrait        | élaborer: élaboré (elaborated)            |
+| l'avenir plus inquiétant.                                                          | méconnaître: vt, not recognize, ignore    |
+|                                                                                    | rendrait:                                 |
+|                                                                                    | avenir: nm, future                        |
+|                                                                                    | inquiétant: disquieting, worrying         |
+|                                                                                    |                                           |
+
