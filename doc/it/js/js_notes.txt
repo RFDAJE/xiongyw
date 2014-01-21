@@ -265,3 +265,140 @@ true
 
 + self-modifying code: toString(), new Function(), and eval()
   - http://www.i-programmer.info/programming/javascript/989-javascript-jems-self-modifying-code.html
+
+
+
+
+
+
+It's difficult to write some thing satisfactory or really meaningful...but somehow I still decided to start writing something.
+
+It's difficult because I don't exactly know what to write, although I felt that I have a lot to say (particularly when on bed with eyes closed). And for the same reason I decided to write something, hoping that the writing process can force me to clarify the fuzzy thoughts a little bit...in certain sense, languagization of thoughts is pretty much the same as visualization of data: you need to sort out the data first before mapping it into one of its representations.
+
+Of course, it will be even better if the notes are interesting to others, and of some relevance to our daily work. I will add/update it when applicable...and I am afraid that it will probably never reach its "finished" state, as it's *wild*.
+
+...Content, content, and content. Give the audience a reason to care...Do you want to be interesting? Then forget the graphics and the glitz. First and foremost, have something to say.
+-- Eric S. Raymond, http://catb.org/~esr/html-hell.html
+
+1. Tensions
+
+By "tension" I meant a *conflict* of interests or approaches, which is usually visualized (and simplified at the same time) as a tug-of-war, or a balance with a fulcrum, etc. Or, tension can be explained better by its counterpart, trade off.
+
+The relevance of the concept of "tension" with the a programming language can be probably appreciated when we put the language in the perspective of its evolution history: what it strives for, what were/are the contenders, how and why it evolves, etc. 
+
+The idea here is that, besides of knowing and mastering the features/constructs/paradigms of a language (JavaScript), we'd better to appreciate the reasons behind the design decisions of the language, in the perspectives of the groups of tensions: what were/are the tensions, and where the decisions stands (in the spectrum or space of the "tensions"), and to what extend the design decision applies to practical projects, etc.
+
+It would be ideal to group tensions into *pairs* and then analysis the groups one by one with regard to a particular language in question. But it seems it's not easy, or probably impossible, as the conflicts turn out neither to be simple one-to-one pairs nor always exhibit a linear spectrum of choices. They are somewhat inter-tangled, or worse, recursively tangled.
+
+The first thing we can do is to list some of the elements of tensions we are aware of, e.g.,:
+
+performance, footprint, portability, memory consumption, expressiveness, procedural, imperative, declarative, functional, object oriented, academic, engineering, hybrid, pure, statically typed, dynamically typed, lazy, garbage collection, pointer...
+
+and then pick up some of them to discuss the relevance with JavaScript language design.
+
+2. Type
+
+At the surface, JavaScript looks familiar to C programmers, except one "small" nuisance: the dynamic variable type. This is the most uncomfortable thing I felt about JavaScript at the begining. Without a fixed grasp on the types of the variables, how serious a program can be?...I lost the "anchor point" where the ideas connect to programs as I did in C, pretty much like a slave who losts his direction once been told that he is free.
+
+One lesson I learnt was that, whenever these is a _single_ thing looks difficult to comprehend or appreciate, most likely it indicates that there is an _area_ of stuff I am not aware of or not good at (yet). As I digged more, it turns out that, there was, is, and will be a fierce tension between two schools in terms of types: typed or untyped, is a question.
+
+2.1 Antidotes for C Programmers
+
+The followings are quotes I collected so far, which may serve as an antidote for those who are accustomed to "thinking in C".
+
+The fundamental problem addressed by a type theory is to ensure that programs have meaning. The fundamental problem caused by a type theory is that meaningful programs may not have meanings ascribed to them. The quest for richer type systems results from this tension.
+
+-- Mark Manasse, http://en.wikipedia.org/wiki/Type_system
+
+
+The fashion in most programminglanguages today demands strong typing. The theory is that strong typing allows a compiler to detect a large class of errors at compile time. The sooner we can detect and repair errors, the less they cost us. JavaScript is a loosely typed language, so JavaScript compilers are unable to detect type errors. This can be alarming to people who are coming to JavaScript from strongly typed languages. But it turns out that strong typing does not eliminate the need for careful testing. And I have found in my work that the sorts of errors that strong type checking finds are not the errors I worry about. On the other hand, I find loose typing to be liberating. I don't need to form complex class hierarchies. And I never have to cast or wrestle with the type system to get the behavior that I want.
+
+-- Douglas Crockford, JavaScript: The Good Parts, 2008, p3.
+
+Some people are completely religious about type systems and as a mathematician I love the idea of type systems, but nobody has ever come up with one that has enough scope. If you combine Simula and Lisp—Lisp didn’t have data structures, it had instances of objects—you would have a dynamic type system that would give you the range of expression you need.
+
+It would allow you to think the kinds of thoughts you need to think without worrying about what type something is, because you have a much, much wider range of things. What you’re paying for is some of the checks that can be done at runtime, and, especially in the old days, you paid for it in some efficiencies. Now we get around the efficiency stuff the same way Barton did on the B5000: by just saying, “Screw it, we’re going to execute this important stuff as directly as we possibly can.” We’re not going to worry about whether we can compile it into a von Neumann computer or not, and we will make the microcode do whatever we need to get around these inefficiencies because a lot of the inefficiencies are just putting stuff on obsolete hardware architectures.
+
+-- Alan Kay, A Conversation with Alan Kay, http://queue.acm.org/detail.cfm?id=1039523
+
+2.2 Types in JavaScript
+
+"Dynamically typed" means the variables do not have fixed type, i.e., its type can change over time. The type of a variable is the type of the value (to which the variable refers at the time). Or put it in short: variables have no type, values have types.
+
+JavaScript defines 8 value types, which can be classified into two categories: primitive types and object types. The following diagram summarizes the types and their characteristics.
+
+The following page talks about the differences between "by value" or "by reference" in JavaScript: http://docstore.mik.ua/orelly/webprog/jscript/ch11_02.htm
+For more details, the latest edition (6th ed) of the book "JavaScript: the definitve guide" has a whole chapter for this: "Chapter 3: Types, Values, and Variables".
+
+However, before jumping into the links mentioned above, I would recommend to take a look of the following first, as, if there is anything could still be fuzzy, it would be the quirks about "undefined", which should be settled down first:
+http://martinrinehart.com/frontend-engineering/engineers/javascript/other/undefined.html
+
+Among other things, it explains the logic why "undefined" is both a type and a value: as each value carries its own type info stored somewhere (which is implementation depedent), so if a value is undefined, its type has to be undefined too. 
+
+But the "undefined" quirks do not stop here...as in JavaScript, "undefined" also means "non-exist" when you access a non-exist property of an object or non-exist element in a sparse array. To distinguish "undefined" between a value (or type) and a (non-exist) state, you have to use the "in" operator.
+
+Probably because of these quirks, JSON does not include "undefined" as one of its six value types (the other type dropped by JSON is "function" as JSON is meant to represent data only).
+
+2.3 Reflection
+
+To tell the type of a value, JavaScript provides a "typeof" operator, a "type introspection" http://en.wikipedia.org/wiki/Type_introspection facility, which can be regarded as a limited (i.e., read-only) "reflection" capability. http://en.wikipedia.org/wiki/Reflection_(computer_programming)
+
+ The limitation with "typeof" operator is that, although it's good at distinguish primitive types (except "null" whose typeof is "objecct"), it can not distinguish different kinds of objects, as it always returns "object" for all kinds of objects, including array, function, null, and customized types; Another "feature" (or a quirk, depends on your PoV) of "typeof" is that it happily operates on undeclared variable without throwing an error, it returns "undefined", the same for the value "undefined"...Btw, it's a bit fuzzy in JavaScript about the states of variables (which are clear in C): declared, defined, initialized, and/or assigned.
+
+One day, Juriy Zaytsev came with a neat solution (which becomes the de facto standard today) for detecting JSE built-in and browser-host built-in types, i.e., using Object.prototype.toString.call() by utilizing the "class" attribute string of an object. The limitation is that it can not distinguish customized objects, as there is no way for customized types to set the "class" attribute, it will be "Object" by default. This method has an important practical merit that it can be used for checking types from different HTML frames...
+
+There is another operator "instanceof" which also addresses the limitation of "typeof". "instanceof" can distinguish all object/reference types including the custom types...but...again...with one practical limitation, in distinguish same type of objects from different HTML frames.... 
+
+Another way is to use the "constructor" property as its a public interface. But it has the same limitation of "instanceof" (in multiple frames, or multiple execution contexts scenarios), and not all JavaScript objects have such a property.
+
+Later ECMAScript5 formally provided Array.isArry() for detecting array types...
+
+The reality is that, checking value types in JavaScript is a mess: http://tobyho.com/2011/01/28/checking-types-in-javascript/
+
+As there is no problem-free approach, the trade off is to take one step back, and we end up at the position called "duck-typing":
+
+When I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck.
+
+-- James Whitcomb Riley
+
+Why is that? My perception is that, it reflects a failure when struggling with the "web" of tensions. You want to satisfy everyone? You will probably end up with satisfying none.
+
+2.4 TypeScript etc
+
+Still, some people strongly outweight the merit of a typed system over the liberty of a untyped one, and they cann't get rid of JavaScript (yet) in the web domain as of today. One approach, as TypeScript took, is to extend the JavaScript language to support strictly typed variables, and provides facilities to do static analysis and converting from TypeScript programs into JavaScript programs. Check http://en.wikipedia.org/wiki/Typescript for more.
+
+You felt the type tension, no?
+
+3. Abstraction
+
+3.1 Does it matter?
+
+Under the cover of the faimilar C syntax, JavaScript is a very different language. The most significant difference is the *functional* programming paradigm it offers, hybrided with the imperative one as available in C.
+
+JavaScript's functions are first class objects with (mostly) lexical scoping. JavaScript is the first lambda language to go mainsteam. Deep down, JavaScript has more in common with Lisp and Scheme than with Java. It is Lisp in C's clothing. This makes JavaScript a remarkably powerful language.
+
+-- Douglas Crockford, JavaScript: The Good Parts, 2008, p3
+
+In the citation above, it's worth to note an interesting "contradition": JavaScript is the first ... to go mainstream...This makes javaScript a remarkably powerful language. The question is, if functional laungages (Lisp/Scheme/Erlang/Haskell/etc) are so powerful, why these do not go mainstream (yet)? Also note that, JavaScript went mainstream dose not necessarily mean that its functional style is in mainstream, or, probably the main reason of its prevalence has more to do with the bloom of web rather than its functional style.
+
+To me, again, the main reasons can be appreciated in the perspective of tensions: 
+- performance vs. elegance/expressivness
+- intuitive vs. abstract
+- engineering vs. academic
+
+This section focus on the intuitive vs. abstract tension, discussing the concept of abstraction (in functional programming), for setting up the context for the following may-come sections. 
+
+For programmers, functional stuff is abstract, counter-intuitive, thus difficult to learn and master; as a consequence, for empolyeers, in general, it's difficult to hire and maintain a group of good "functional" (pun not intended:)) engineers. This "vicious circle" may partially explain the "why not go mainstream (yet)" question. In this case, as a programmer, one may rightfully ask, why should I bother? I don't know. It depends on personal choice, taste, and PoV. After all, the first version of the well-known functional-advocating article "Why Functional Programming Matters" http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf was drafted 30 years ago (in 1984), and it seems do not matter so much today yet!
+
+The logical substratum where Lisp and Scheme are founded demand that modern users must read programs that use (and even abuse) advanced technology, that is, higher-order functions, objects, continuations, and so forth. Tomorrow's concepts will be built on these bases, so not knowing them blocks your path to the future.
+
+-- Christian Queinnec, Lisp in Small Pieces (English version), 1994.
+
+In its second edition, Principes d'implantation de Scheme et Lisp (in French, 2007), Christian added a footnote to the statement above, as below:
+
+La première édition de ce livre date de 1994 et les adjonctions à cette préface apparaissent dans ces notes de bas de page. Depuis 1994, Perl, Python, C# se sont mis à proposer des fermetures, les classes internes de Java sont également des sortes de fermetures. Le terme de continuation est apparu dans le contexte des systèmes d’exploitation [DBRD91]. Le moteur Rhino implantant JavaScript procure également des continuations. 
+
+3.2 Separation
+
+
+
