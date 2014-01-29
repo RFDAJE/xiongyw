@@ -400,5 +400,50 @@ La première édition de ce livre date de 1994 et les adjonctions à cette préf
 
 3.2 Separation
 
+I always felt that it's hard to get a "firm grasp" of the meaning of the word "abstraction" (or "generalization"). Yes the words are familiar, but whenever I challenge myself on what does it really mean (in the contexts where it appears), I had to pause and think for a while. It indicates that these concepts have not become as a part of my body (yet), and/or I simply don't have the kind of talent for dealing abstract stuff. 
+
+This situation does not improve...until one day (2013-07-02) when I stumbled across a paper which briefly mentioned the etymology of "abstraction".
+
+This issue has been with us, of course, forever: the general question of abstraction, as separating what we want from what we are presented with. It is neatly packaged in the Greek verb aphairein , as interpreted by Aristotle in the later books
+of the Metaphysics to mean simply separation: if it is whiteness we want to think about, we must somehow separate it from white horse, white house, white hose, and all the other white things that it invariably must come along with, in order for us to experience it at all.
+
+-- Barry Mazur, When is one thing equal to some other things? [http://www.math.harvard.edu/~mazur/preprints/when_is_one.pdf], 2007
+
+This "revelation", particularly the mention of "whiteness" & "horse", immediately reminded me an ancient Chinese philosopher "Gongsun Long" who remarkably claimed, among other things, "a white horse is not a horse" and "separating the whiteness from the hardness (of a white hard stone)" [http://en.wikipedia.org/wiki/Gongsun_Long]. The sad thing, or the tragety, is that his way of thinking was not compatible with the then established and thus been stifled for more than 2000 years... 
+
+Just at the time of this writing, I also realized that the Chinese translation for "abstraction", 抽象, literally and exactly reflects the meaning of "separation (from) the reprentation". Why I did not realize this before? Probably the word is too familiar to understand...
+
+In short, for me, the transitive verb "separate" is more tangible than "abstract" and "generalize", and I now interprete abstraction as "separating the physically-inseparables". This gives me a whole lot of confidence when encountering "abstraction" or "generation". 
+
+YMMV, I don't know.
 
 
+3.3 Open-Texture
+
+I encountered the term "Open Texture" for the first time when browsing a review of (or criticism [http://www.logicmatters.net/resources/pdfs/CTT.pdf] on) the symposium "Church's Thesis After 70 Years" [http://www.amazon.com/Churchs-Thesis-After-Years-Mathematical/dp/3938793090]. In its section 14 of the review, it recommended a paper by Steward Shapiro: "Computability, Proof, and Open-Texture". I did not find the online version of this paper but only a sketch of it [https://www.dpmms.cam.ac.uk/~tf/Shapiro-Church-Lakatoshandout.pdf] 
+
+I don't really understand most of the stuff the paper was talking about...what impressed me most is the concept of Open-Texture and its possible connection to the understanding of one aspect of abstraction (or separation): the concept of open-texture suggests that the "separation" can be carried on forever (as you wish or as you are required), because there will be always an open-texture --whether you are aware of it or not--to the topic under discussion.
+
+In engineering project practices, open-texture (of a project) is pretty much like those what we want to capture by "assumptions", "prerequisites", or "dependencies", and we know that we can never capture all of them, even at the end of the project; In programming, we have the concept of "environment" or "context", which can also be regarded as a sort of open-texture to the program or process...
+
+With the understanding that a function is an abstraction (and a function call is an application), I have a vague metaphoric analogy (in a pejorative sense here) of open-texture into the context of functional programming for explaining the possibility of unlimited orders of high-order functions and/or unlimited parameters of functions...
+
+Probably the analogy can go further beyond the programing languages. In natural languages, according to Otto Jespersen [http://en.wikipedia.org/wiki/Otto_Jespersen], a Danish linguist, the boundary between nouns and adjectives is vague (or not essential). In the lights of open-texture or abstraction/application, probably nouns and adjectives can be seen as applications of varargs functions. With a presumably fixed open-texture, the difference between nous and adjectives is just the number of arguments/parameters supplied in the applications: less parameters yield adjectives, and more parameters yield nouns; Take open-texture into consideration, a noun is still a varargs function as there is no limitation for "apply"ing more attributes to it. Probably those who speak French can appreciate this better, as I heard that, in French, a "noun phrase", theoretically, can contain unlimited number of words, as you can always apply attributes to the main noun by appending adjectives to the phrase, e.g.:
+
+un tricot
+un tricot noir
+un tricot noir en mohair
+un tricot noir en mohair feutré
+......
+
+
+
+
+
+the distinction betw values and functions;
+
+tools shape thinking.
+
+functional on top of xxx lanugage.
+
+joke football player: left leg and right leg.
