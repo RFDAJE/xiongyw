@@ -51,7 +51,10 @@ http://v.youku.com/v_show/id_XNTUxNDg0Njc2.html
 |                                                                                        |                                  |
 | . hahaha, j'ai volé un ordinateur! hahaha                                              |                                  |
 | . alors, le bon coin...                                                                | then, a good place...            |
-| . bien, nickel, ok, bonne soirée, à plus tard                                          | soirée: evening (soir + ée)      |
+| . bien, nickel                                                                         | soirée: evening (soir + ée)      |
+| - ok                                                                                   |                                  |
+| . bonne soirée                                                                         |                                  |
+| - à plus                                                                               |                                  |
 |                                                                                        |                                  |
 | au bout d'une heure d'attente, c'est à mon tour, et là:                                | au bout de: after the            |
 | - et donc voilà, toute histoire.                                                       | attendre: wait                   |
@@ -76,7 +79,7 @@ http://v.youku.com/v_show/id_XNTUxNDg0Njc2.html
 | . il a une chaîne youtube! supprimer.                                                  | supprimer: remove, cancel        |
 | . il faut bien un petit café, moi.                                                     |                                  |
 |                                                                                        |                                  |
-| sois je peut verrouiller l'ordinateur, MAIS je ne sais pas où il est.                  | verrouiller: lock (up), latch    |
+| soit, je peut verrouiller l'ordinateur, MAIS je ne sais pas où il est.                 | verrouiller: lock (up), latch    |
 | j'ai pris la deuxième option par sécurité.                                             |                                  |
 |                                                                                        |                                  |
 | . il a une page facebook aussi.                                                        |                                  |
