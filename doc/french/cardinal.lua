@@ -18,6 +18,10 @@ local cardinals = {
 -- remove spaces
 pi = string.gsub(pi, " ", "")
 
+local delay = "4" -- delay for 4 seconds by default
+if #arg > 0 then
+  delay = arg[1]
+end
 
 local pre = "-", cur;
 
@@ -26,6 +30,6 @@ for i = 1, string.len(pi) do
   if (cur ~= pre) then
     print("    "..cur.."   "..cardinals[tonumber(cur)])
     pre =  cur;
-    os.execute("sleep 4")
+    os.execute("sleep "..delay)
   end
 end
