@@ -436,6 +436,12 @@ un tricot noir en mohair
 un tricot noir en mohair feutré
 ......
 
+la structure (the structure)
+la structure de donnée (the data structure)
+la structure de donnée traditionnelle (the traditional data structure)
+la structure de donnée traditionnelle de Lisp (the traditional Lisp data structure)
+la structure de donnée traditionnelle de Lisp pour représenter des associations (the traditional Lisp data structure to represent associations)
+...
 
 4. Closure
 
