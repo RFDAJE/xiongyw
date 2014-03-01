@@ -1,0 +1,352 @@
+李宝树：法语动词的时、体与式，商务印书馆，2007
+«Temps, aspect et mode du verbe français»
+
+* 第一章
+
+** p47 状态动词（avoir，être）使用简单过去时就能起到动作动词的作用
+
+Une fois la lettre lue, la délibération de la famille fut courte.
+
+Ce fut un coup terrible, il tomba par terre, et elle le laissa sangloter, assis contre le mur.
+
+Il y eut un rire éclatant des écoliers qui décontenança le pauvre garçon, si bien qu'il ne savait s'il fallait garder sa casquette à la main, la laisser par terre ou la mettre sur sa tête.
+
+Pour cette fois du moins, elle (la parole de ma mère) eut son effet et je m'atendris sur le sort de l'enfant maudit.
+
+Ce remède eut un effet salutaire.
+
+** p48 状态动词用在进行体会造成病句
+
+- Il est en train d'avoir beaucoup d'argent.
+
+- Elle est en train d'être heureuse.
+
+- Cette fille est en train de ressembler à Marie.
+
+- Ma valise est en train de contenir des vêtements de voyage.
+
+- Ce travail est en train de me convenir.
+
+- Pierre est en train d'aimer Marie.
+
+- Elle est en train de haïr Robert.
+
+- Il est en train de craindre la mort.
+
+- Il est en train de croire à sa sincérité.
+
+- Il est en train de savoir cette nouvelle.
+
+- Elle est en train de me connaître.
+
+** p48 有些状态动词(如aimer, croire等)如果用副词短语 à  nouveau, de plus en plus 或 de mieux en mieux 来修饰则可以用在进行体
+
+Pierre aime vite (=tombe vite amoureux) et il est en train d'aimer à nouveau.
+
+Robert croit aux soucoupes volantes et il est en train d'y croire de plus en plus.
+
+Il est en train de lire.
+
+Elle est en train de travailler.
+
+Elle est en train de chanter.
+
+Le boulanger est en train de faire le pain.
+
+Il est en train de sortir.
+
+** p50 状态动词一般不能和 venir de [+infinitif] (表示刚刚)连用
+
+- Elle vient de chérir également tous ses enfants.
+
+- Ma femme vient d'apprécier beaucoup le confort de notre apartement.
+
+- Elle vient de jalouser Françoise.
+
+- Il vient de respecter ses supérieurs.
+
+- Il vient de s'appeler Pierre.
+
+- Cette bouteille vient de contenir de l'eau.
+
+Il vient d'être professeur.
+
+Elle vient d'être malade.
+
+Je viens de lui parler.
+
+Il vient de pleuvoir.
+
+Le train vient de partir.
+
+Il vient de terminer son travail.
+
+** p51 并列复合句中，如果第一句的谓语动词是状态动词（être, avoir, ressembler, aimer, adorer, préférer, haïr, jalouser, douter, craindre, respecter, connaïtre等）则第二句中不能用动词短语（faire de même, le faire aussi, en faire autant等）
+
+- Pierre est riche et Robert fait de même. 应该是...est le même.
+
+- Pierre avait faim et Robert le faisait aussi.
+
+- Pierre ressemble beaucoup à son père et Robert en fait autant.
+
+- Pierre aime Marie et Robert fait de même.
+
+- Pierre hait l'hypocrisie et Robert fait de même.
+
+- Pierre jalouse Michel et Robert le fait aussi.
+
+- Pierre craint la mort et Robert le fait aussi.
+
+- Pierre respecte ses parents et Robert en fait autant.
+
+- Pierre connaît M. Durand et Robert fait de même.
+
+Pierre chante et Robert fait de même.
+
+Pierre lit le journal et Robert le fait aussi.
+
+Pierre a acheté une voiture et Robert en a fait autant.
+
+Pierre est parti en vacances et Robert l'a fait aussi.
+
+
+** p52 状态动词（avoir faim, se trouver dans l'embarras, haïr, admirer, jalouser, craindre, adorer, aimer, préférer等）不能和完成体动词（forcer, contraindre  ou obliger qn à faire qch, inciter, pousser, encourager ou exhorter qn à faire qch, convaincre ou persuader qn de faire qch 等）连用
+
+- Il force Pierre à avoir faim.
+
+- Il contraint Pierre à haïr Robert.
+
+- Il oblige Pierre à se trouver dans l'embarras.
+
+- Il incite Marie à jalouser (à haïr) Charlotte.
+
+- Il a poussé Pierre à craindre les chiens.
+
+- Il encourage Pierre à adorer sa femme.
+
+- Il exhorte Pierre à admirer le coucher du soleil derrière la montagne.
+
+- Il a convaincu Marie d'aimer Pierre.
+
+- Il a persuadé Pierre de préférer le café au thé.
+
+L'agent de police a forcé ce cycliste à s'arrêter.
+
+Pierre voulait rester, mais Robert l'a contraint à partir.
+
+Ses parents l'ont obligé à vous écrire.
+
+Ce premier succès l'incita à persévérer.
+
+Le besoin d'argent l'a poussé à voler cette montre d'or.
+
+Je l'ai encouragé à continuer ses études.
+
+Nous l'avons exhorté à bien travailler.
+
+Nous l'avons enfin convaincu d'abandonner son projet.
+
+On l'a persuadé de prendre du repos pour ménager sa santé.
+
+Je l'ai persuadé de venir.
+** p54 状态动词不能和 délibérément, volontiers, intentionnellement, consciemment, expès, sciemment, volontairement, à dessein 等类似的副词或副词短语连用
+
+- Il avait faim délibérément.
+
+- Pierre aime Marie volontiers.
+
+- Il adore volontiers le chocolat.
+
+- Il est riche intentionnellement.
+
+- Il ressemble à son frère consciemment.
+
+- Elle hait Pierre exprès.
+
+- Il craint sciemment les chiens.
+
+- Elle respecte volontairement ses parents.
+
+- Il s'appelle intentionnellement Pierre.
+
+- Il connaît à dessein monsieur Dubois.
+
+J'ai refusé délibérément sa proposition.
+
+Il a délibérément choisi ce métier.
+
+Il a délibérément abandonné ce travail.
+
+Le coupable a agi de props délibéré (délibérément ou à dessein).
+
+Je vous accompagnerai volontiers au cinéma.
+
+Il m'a heurté intentionnellement.
+
+Il a fait cela consciemment.
+
+Je suis venu exprès pour parler de cette question.
+
+Excusez-moi, je vous ai bousculé, mais je n'ai pas fait exprès.
+
+Elle n'a pas commis cette faute volontairement (sciemment), mais par mégarde.
+
+C'est à dessein que j'ai agi ainsi.
+
+Il a dit cela exprès pour blesser son interlocuteur.
+
+Ne me dites pas que c'était involontaire, vous l'avez fait exprès.
+
+** p55 状态动词 等用来描写人或事物以及说明人或十五所处的状态时不能使用简单过去时
+
+- Louis XIV eut un nez aquilin.
+
+- Sa propriété consista en herbages, cultures et forêts.
+
+- Son ouvrage philosophique consista en quatre volumes.
+
+- Cette bouteille contint de l'essence.
+
+- Cet autocar contint trente-cinq personnes.
+
+- Cette fenêtre donna sur un jardin.
+
+- Son bureau donna sur la mer.
+
+Louis XIV avait (ou a) un nez aquilin (crochu ou busqué).
+
+Sa propriété consistait (consiste) en herbages, cultures et forêts.
+
+Son ouvrage philsophique consistait (consiste) en quatre volumes.
+
+Cette bouteille contenait (contient) de l'essence.
+
+Cet autocar contenait (contient) trente-cinq personnes.
+
+Cette fenêtre donnait (donne) sur un jardin.
+
+Son bureau donnait (donne) sur la mer.
+
+** pp57-66 区别完成体和非完成体时要注意的几种情况
+
+- Elle a trouvé sa clef pendant deux heures.
+
+Elle a cherché sa clef pendant deux heures.
+
+- Le chasseur a tué le lièvre pendant deux heures.
+
+Le chasseur a poursuivi le lièvre pendant deux heures.
+
+- Il est entré (ou sorti) pendant deux heures.
+
+- Il a fermé (ou ouvert) la porte pendant deux heures.
+
+- Elle a cassé le vase pendant trois heures.
+
+- L'enfant est tombé pendant trois heures.
+
+- Le ballon a crevé pendant deux heures.
+
+- La bombe a explosé pendant trois heures.
+
+Nous avons conru pendant deux heures.
+
+Il a lu le journal pendant une heure.
+
+Nous avons travaillé pendant quatre heures.
+
+Ils ont dansé pendant trois heures.
+
+Ils ont joué au tennis toute la matinée.
+
+Il a toussé toute la nuit.
+
+Le vent a soufflé toute la journée.
+
+Pierre est sorti du labyrinthe en trois heures.
+
+Les grenades (les bombes) ont éclaté pendant deux heures.
+
+Pour creuser le tunner, on a posé des mines qui ont explosé pendant deux heures.
+
+- Le chasseur continue à blesser le lièvre.
+
+- Le chasseur commence à blesser le lièvre.
+
+Le chasseur continue à poursuivre le lièvre.
+
+Le chasseur commence à poursuivre le lièvre.
+
+- Elle continue à ouvrir (ou fermer) la porte.
+
+- Elle commence à ouvrir (ou fermer) la porte.
+
+- Il continue à casser la bouteille.
+
+- Il commence à casser la bouteille.
+
+- Cet enfant continue à tomber.
+
+- Cet enfant commence à tomber.
+
+- Le ballon continue à crever.
+
+- Le ballon commence à crever.
+
+Il commence à lire le journal.
+
+Il continue à lire le journal.
+
+Elle commenc à chanter (ou danser).
+
+Elle continue à chanter (ou danser).
+
+Ils commencent à jouer au tennis.
+
+Ils continuent à jouer au tennis.
+
+Elle commence à travailler (écrire, parler).
+
+Le vent commence à souffler.
+
+Le vent continue à souffler.
+
+- Ce stylo commence à tomber par terre.
+
+- Ce livre continue à tomber par terre.
+
+La pluie (la neige) commence à tomber.
+
+La pluie (la neige) continue à tomber.
+
+Il commence à faire son travail.
+
+Il continue à faire son travail.
+
+Elle commence à laver (ou faire) la vaisselle dans l'évier.
+
+Elle continue à laver du linge.
+
+Cette usine commence à produire (ou fabriquer) des appareils de télévision.
+
+Cette usine continue à produire des machines à laver.
+
+- Il commence à accomplir sa tâche.
+
+- Il continue à accomplir sa tâche.
+
+- Il commence à achever ce travail.
+
+- Il continue à achever ce travail.
+
+- Il commence à finir son devoir.
+
+- Il continue à finir son devoir.
+
+- Il commence à terminer sa lettre.
+
+- Il continue à terminer sa lettre.
+
+
+
+
