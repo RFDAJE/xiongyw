@@ -109,7 +109,6 @@ Pierre a acheté une voiture et Robert en a fait autant.
 
 Pierre est parti en vacances et Robert l'a fait aussi.
 
-
 ** p52 状态动词（avoir faim, se trouver dans l'embarras, haïr, admirer, jalouser, craindre, adorer, aimer, préférer等）不能和完成体动词（forcer, contraindre  ou obliger qn à faire qch, inciter, pousser, encourager ou exhorter qn à faire qch, convaincre ou persuader qn de faire qch 等）连用
 
 - Il force Pierre à avoir faim.
@@ -346,6 +345,460 @@ Cette usine continue à produire des machines à laver.
 - Il commence à terminer sa lettre.
 
 - Il continue à terminer sa lettre.
+
+** pp67-83 体的转化
+
+La réunion a duré pendant deux heures.
+
+Le ministre des Affaires étrangères a parlé à la radio pendant une heure.
+
+Il a travaillé pendant trois heures.
+
+Pierre a dormi pendant quatre heures.
+
+Il a plu toute la matinée.
+
+Cet ouvrier a travaillé quatrante heures, cette semaine.
+
+Il a beaucoup travaillé hier.
+
+J'ai lu un roman policier pendant mon voyage.
+
+Nous avons chanté pendant deux heures.
+
+J'ai écrit toute la soirée.
+
+Il a écrit trois lettres.
+
+J'ai marché une heure ce matin.
+
+Nous avons beaucoup marché hier.
+
+Hier, je me suis baladé sur le boulevard Saint-Michel.
+
+Cet aprés-midi, nous nous sommes promenés trois heures dans le parc de Versailles.
+
+Elle avait travaillé pendant vingt ans dans cette usine.
+
+Il aura lu le journal pendant une heure.
+
+Pierre sortait souvent le soir.
+
+Tous les matins Pierre se levait de bonne heure pandant son enfance.
+
+La pluie tombait.
+
+Toutes les nuits, elle venait au vieux cabaret...Elle entrait en coup de vent.
+
+Une voiture a reneversé un enfant qui traversait la rue.
+
+Pendant que je montais, Pierre descendait.
+
+Le neige tombe à gros flocons.
+
+Robert rentre (ou retourne) chez lui tous les jours pour déjeuner.
+
+Quand il part en vacances, c'est moi que le remplace dans son travail.
+
+Dans une discussion, il sort toujours du sujet (ou il sort toujours de la question).
+
+Il se levait souvent très tard.
+
+Ils sortaient souvent ensemble.
+
+Il venait nous voir tous les jours.
+
+Robert rentrait tous les soirs chez lui très fatigué de sa journée.
+
+Cela me revient souvent à l'esprit.
+
+Ce marchand élève sans cesse ses prix.
+
+Il tombe souvent dans l'erreur.
+
+Je fais (prends) de la gymnastique (de l'exercice) tous les matins pour ne pas grossir.
+
+Je remonte ma montre tous les soirs avant de me coucher.
+
+Nous allons au cinéma tous les dimanches.
+
+Il retourne tous les ans dans son pays natal.
+
+Elle répète sans cesse des paroles inutiles.
+
+Elle répète toujours les même griefs.
+
+Les feuilles jaunes tombaient.
+
+Les idées m'arrivaient en foule.
+
+De longs applaudissements partaient à l'adresse de l'orateur.
+
+Les flammes montaient de l'immeuble en feu.
+
+Les voyageurs descendent du train.
+
+Les mots lui arrivent aisément.
+
+- Ce élève commence à entrer dans la salle de classe.
+
+Les élèves conmmencent à entrer dans la salle de classe.
+
+- Il commence à descendre du train.
+
+Quand le train s'arrête, les voyageurs commencent à descendre.
+
+L'avion commence à descendre.
+
+L'avion commence à monter.
+
+La maison en construction commence à monter (la maison en construction gagne en hauteur).
+
+- Le livre commence à tomber.
+
+Les feuilles commencent à tomber.
+
+- La bomber commence à exploser.
+
+Les bombes commencent à exploser.
+
+- Cet élève commence à sortir de l'école.
+
+Les élèves commencent à sortir de l'école.
+
+Les fleurs commencent à sortir.
+
+Les blés commencent à sortir de terre.
+
+- Il commence à partir.
+
+Ils commencent à partir.
+
+En mars, les bourgeons commencent à partir.
+
+- L'invité commence à arriver.
+
+Les invités commencent à arriver (des invités sont arrivés, tous les invités ne sont pas encore arrivés).
+
+- L'enfant commence à naître.
+
+Les herbes commencent à naître.
+
+- Le ballon commence à éclater.
+
+Les ballons commencent à éclater.
+
+- La bulle de savon commence à crever.
+
+Les bulles de savon commencent à crever.
+
+Il (ou ils) commence (ou commencent) à faire ses (ou leurs) devoirs.
+
+Elle (ou elles) commence (ou commencent) à laver la vaisselle.
+
+Une épaisse fumée sortait de la cheminée.
+
+Le pétrole jaillissait des puits de forage.
+
+Un doux parfum sort de ces roses.
+
+Une odeur de friture sortait de la cuisine.
+
+Le sang lui sortait de la bouche.
+
+Une pluie fine tombe.
+
+La neige tombait.
+
+Le brouillant tombe.
+
+Une brume légère monte du fleuve.
+
+La marée (la rivière) monte.
+
+La marée descendait.
+
+La pluie (la neige) commence à tomber.
+
+La grêle commence à tomber.
+
+La vent commence à tomber.
+
+La mer est basse, mais elle commence à monter.
+
+L'eau commence à descendre.
+
+Le sang commence à sortir de sa bouche.
+
+Une épaisse fumée commence à sortir de la cheminée.
+
+Le pétrole commence à jaillir des puits de forage.
+
+Une odeur de friture commence à sortir de la cuisine.
+
+** p85 双体动词 porter/se porter
+
+Il porte un manteau gris.
+
+Il porte des lunettes de soleil.
+
+Elle porte au doigt une bague garnie de diamants (une bague de fiançailles).
+
+Elle porte le deuil de son père.
+
+Il porte des favoris.
+
+Le chameau porte deux bosses, le dromadaire une.
+
+Il porte la tristesse peinte sur son visage.
+
+Cette lettre porte la date du 10 septembre.
+
+Ce monument porte une inscription en caractéres grecs.
+
+La maman porte son bébé dans ses bras.
+
+Il porte une valise (un bouquet de roses) à la main.
+
+Il porte toujours son stylo dans sa poche.
+
+Ces colonnes portent une galerie.
+
+Ce vaisseau porte trois cents hommes d'équipage et des vivres pour six mois.
+
+Cette riviére porte bateau.
+
+Il porte toute la responsabilité de cette affaire.
+
+Elle a cinquante ans mais ne porte pas cet âge.
+
+Il porte quarante ans (= il paraît avoir quarante ans).
+
+Il porte bien son vin.
+
+Il m'a porté (= aporté) ce livre.
+
+La camionnette a porté des légumes au marché.
+
+Il a porté la paix et la prospérité dans ce pays.
+
+Il a porté le trouble dans cette famille.
+
+Sa négligence m'a porté un grand préjudice.
+
+Il nous a porté assistance.
+
+Cette affaire a porté atteinte à sa réputation.
+
+Ce chagrin porta coup à sa santé.
+
+Il s'est disputé avec son voisin et lui a porté des coups.
+
+Cet échec le portera à plus de prudence.
+
+Cette réponse porta sa colère à son paroxysme.
+
+Maintenant le bleu se porte moins.
+
+Cette année, les robes se portent plus longues.
+
+Cela ne se porte plus.
+
+Il se porte garant (ou caution) pour Pierre.
+
+Comment vous portez-vous?
+
+Je me porte à merveille.
+
+Il se porte comme le Pont-Neuf, malgré son grand âge.
+
+Elle se porte mal.
+
+La foule se porte vers le stade.
+
+Il se porte à la rencontre de son ami.
+
+Ils se portent à la gare pour l'acueillir.
+
+Le sang s'est porté à la tête.
+
+Il s'est porté à la dernière extrémité contre Pierre.
+
+
+
+
+
+
+
+
+
+
+** p91 双体动词 aller/se aller
+
+Nous allons en voiture à Fontainebleau.
+
+Il va à son travail (à son bureau).
+
+Ces soldats vont à la guerre.
+
+Nous allons à la pêche (à la chasse).
+
+Quand y est-il allé?
+
+Ils vont au théâtre (au cinéma).
+
+Il est allé jusqu'au bout de cette rue.
+
+Il va à la rencontre de son ami.
+
+Je vais chez le coiffeur.
+
+Ils vont aux urnes (aux voix).
+
+L'autoroute va de Paris à Orléans.
+
+Cette montagne va jusqu'aux nues.
+
+Cette affaire est allée à l'échec.
+
+Ses espoirs sont allé en fumée.
+
+Elle est allée jusqu'à l'interrompre dans son exposé.
+
+Ce cheval va au galop.
+
+Il allait à grands pas.
+
+Elle va à petits pas.
+
+Vous allez comme le vent.
+
+Cette voiture va vite.
+
+Il va à pas de tortue.
+
+L'ivrogne va en zigzaguant.
+
+À cette heure-ci, on va plus vite en métro qu'en voiture.
+
+J'irai par le train.
+
+Tout va à merveille.
+
+Ça va de mal en pis.
+
+Les affaires vont bien.
+
+Cette machine va (mache) bien.
+
+Ma montre va mal.
+
+Cette cravate va avec son complet.
+
+Ça vous va bien.
+
+Cette robe lui va bien.
+
+Ces bottines ne me vont pas.
+
+Ces deux couleurs vont bien ensemble.
+
+Ça me va.
+
+Est-ce que ça va?
+
+Ça va comme ça.
+
+Comment va votre père?
+
+Je vais très bien.
+
+Ce malade va de mieux en mieux (de mal en pis).
+
+Les conditions d'existence (ou les conditions de vie) du peuple chinois vont en s'améliorant.
+
+Le bruit va croissant.
+
+Notre travail allait s'améliorant.
+
+Je m'en vais (= je pars).
+
+Je m'en vais au marché (à la pêche, à la chasse).
+
+Je m'en suis allé dès que j'ai vu que je le gênais.
+
+Il s'en est allé furieux.
+
+Les taches d'encre (les taches d'huile) s'en sont allées avec ce détachant.
+
+Tous ses projets s'en étaient allés en fumée.
+
+Ce malade s'en va.
+
+** p96 双体动词 avancer/s'avancer
+
+Il avança la main vers une chaise.
+
+Il avança le bras et saisit une lampe de poche.
+
+Elle a avancé la table vers moi.
+
+Il a avancé la tête hors de la voiture.
+
+Nous avons bien avancé notre travail en peu de temps.
+
+Le voyageur a avancé l'heure de son départ, parce qu'il était pressé.
+
+Les chagrins ont avacé sa mort.
+
+Elle fit une chute qui avança ses couches.
+
+J'ai avancé ma montre de dix minutes.
+
+Son employeur lui a avancé 3000 francs.
+
+Je lui ai avancé (prêté) de l'argent.
+
+Il a avancé une proposition raisonnable.
+
+Notre travail avance très vite.
+
+Ils avancent (s'avancent) rapidement dans la forêt.
+
+Ne restez pas à cet endroit, avancez.
+
+La nuit avance.
+
+Il avance en âge.
+
+Ma montre avance.
+
+Il s'avança (ou avança) à toute vitesse vers moi.
+
+Il s'est avancé vers la porte.
+
+Je me suis avancé jusqu'à la sortie.
+
+Notre voiture s'avança jusqu'à la gare.
+
+Il s'avançait (ou avançait) lentment.
+
+Notre voiture s'avance à toute vitesse sur une route large et bordée d'arbres.
+
+La Chine s'avance à pas de géant.
+
+Il s'avance vite dans ses études.
+
+Le cygne s'avance sur l'eau.
+
+
+
+
+
+
+
+
+
 
 
 
