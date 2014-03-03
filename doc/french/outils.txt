@@ -1,0 +1,7 @@
+yum -y install verbiste
+
+$ french-conjugator
+$ french-deconjugator
+
+yum -y install stardict
+
