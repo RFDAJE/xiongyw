@@ -1,3 +1,5 @@
+1. verbiste
+
 yum -y install verbiste
 
 $ french-conjugator
@@ -5,3 +7,11 @@ $ french-deconjugator
 
 yum -y install stardict
 
+2. sdcv
+
+http://askubuntu.com/questions/191125/is-there-an-offline-command-line-dictionary
+
+#yum -y install sdcv
+
+About dictionaries: http://irising.me/2011/07/9021/
+About stardict: http://en.wikipedia.org/wiki/StarDict
