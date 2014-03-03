@@ -1014,15 +1014,17 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
     function body_onload() {
 //        $('files').addEventListener('change', function(evt) { processFiles(evt.target.files); }, false);
-        var xhr = new XMLHttpRequest();
+/*
         xhr.onreadystatechange = function(){
             if (xhr.readyState == 4 && xhr.status == 200) {
                 processXml(xhr.responseText);
             }
         }
-
-        xhr.open("GET", "configdb.xml", true);
+*/
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "configdb.xml", false);
         xhr.send();
+        processXml(xhr.responseText);
     }
 
     /*
