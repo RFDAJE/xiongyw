@@ -858,7 +858,7 @@ Il a marché en quatre jours de Strasbourg à Paris.
 
 ** p101 se déplace
 
-Ce vieillard rhumatisant se déplace diffcilement.
+Ce vieillard rhumatisant se déplace difficilement.
 
 La tortue se déplace lentement.
 
@@ -958,7 +958,7 @@ Ce commerçant a volé ses clients.
 
 Il a été volé cette nuit.
 
-** p 107 mener
+** p107 mener
 
 Le vieux général mène cette campagne.
 
