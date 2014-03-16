@@ -631,7 +631,6 @@ Il s'est porté à la dernière extrémité contre Pierre.
 
 
 
-
 ** p91 双体动词 aller/se aller
 
 Nous allons en voiture à Fontainebleau.
@@ -789,7 +788,6 @@ La Chine s'avance à pas de géant.
 Il s'avance vite dans ses études.
 
 Le cygne s'avance sur l'eau.
-
 
 
 
@@ -1197,6 +1195,192 @@ Des soldats blessés se traînèrent vers le poste de secours.
 Il s'est traîné dans la salle `manger à l'aide d'une canne.
 
 ** p119 sauter
+Cet enfant saute comme un cabri.
+
+Il saute en longueur (en hauteur).
+
+Il saute à la perche.
+
+Il saute haut.
+
+Elle saute à la corde.
+
+Il saute à cloche-pied.
+
+Elle saute à pieds joints.
+
+Elle saute de joie.
+
+Il suate de colère.
+
+Cet oiseau saute de branche en branche.
+
+Il sauta à bas de son lit.
+
+Elle a sauté dans l'eau du haut d'un plongeoir.
+
+Il sauta sur un cheval.
+
+Il sauta en selle.
+
+Il sauta de haut en bas (de bas en haut).
+
+Cet élève a sauté de troisième en première.
+
+Il a sauté d'un bateau dans un autre.
+
+Elle sauta dans la rivière.
+
+Il a suaté à terre.
+
+Ill a suaté sur sa femme pour la frapper.
+
+Il sauta au cou de son ami.
+
+Le chien policier sauta à la gorge du bandit.
+
+Il lui sauta au collet.
+
+Ce bateau a sauté sur une mine.
+
+La bombe à retardement a sauté.
+
+Un court-circuit s'est produit: les plombs de sécurité (les fusibles) ont sauté.
+
+Le bouchon de la bouteille a sauté.
+
+Le vent a sauté du nord au sud.
+
+Cette banque a sauté.
+
+Il a sauté un fossé.
+
+Son cheval sauta la haie (les obstacles) sans effort.
+
+En imprimant ce livre, on a sauté un ligne.
+
+Ce copiste a sauté un paragraphe (un mot, une phrase, deux pages).
+
+Elle a sauté un phrase (un mot) en lisant.
+
+Cet élève a sauté une classe.
+
+** p121 tourner
+
+La terre tourne autour du soleil, el la lune tourne autour de la terre.
+
+Quand la voiture marche, les roues tournent.
+
+Cette machine tourne rond.
+
+Le moteur de ma voiture tourne trop vite, il faudra le faire régler.
+
+Les mouches tournent sans cesse autour de nous.
+
+Cet enfant tourne sans arrêt autour de moi.
+
+Il tourne autour de sa chambre.
+
+Il tourne autour de cette fille.
+
+Avec lui, la discussion tourne toujours autour des filles, rien d'autre ne l'intéresse.
+
+Notre usine tourne toute l'année sans interruption.
+
+Vous tournez autour de la question.
+
+J'ai trop bu, j'ai la tête qui tourne.
+
+Quand on a trp bu, il semble que tout tourne.
+
+Qaund il est arrivé au premier feu rouge, il a tourné à gauche.
+
+L'autobus a tourné à droite.
+
+Le chauffeur a tourné trop court.
+
+Le vent a trouné au nord.
+
+Ce garçon a mal tourné, il est en prison pour vol.
+
+Cette jeune fille a bien tourné.
+
+Cette affaire a bien (mal) tourné.
+
+Sa maladie a bien (mal) tourné.
+
+L'affaire a tourné à son avantage (à son désavantage).
+
+L'opinion publique a tourné du côté de l'accusé.
+
+Son amour a tourné en haine.
+
+Ses projets ont tourné court (= ont avorté).
+
+Le dénouement de la pièce a tourné trop court.
+
+Le temps a tourné au froid.
+
+Leur discussion amicale tourna à l'aigre quand il fut question d'argent.
+
+Leurs relations ont tourné à l'aigre.
+
+Le lait (la crème) a tourné à l'aigre.
+
+Le vin (le lait) a tourné.
+
+Elle tourna le bouton électrique pour éclairer la pièce.
+
+Il tourna la tête pour voir derrière lui.
+
+Pierre n'a même pas tourné la tête quand je l'ai appelé.
+
+Elle tourna ses yeux sur (ou vers) son mari.
+
+Elle tourna sa tête à droite (à gauche).
+
+Il tourna les talons.
+
+Le navire a tourné le cap.
+
+Il sait tourner la difficulté.
+
+Il sait tourner tout à son avantage.
+
+Ce cinéaste a tourné de nombreux films.
+
+Il s'est tourné vers moi et m'a dit quelque chose à l'orielle.
+
+Son regard se tourna vers moi.
+
+Tous les yeux se tournèrent vers cette fille.
+
+Ce marchand se tourna vers un autre client.
+
+Elle s'est tournée du côte de (ou vers) la fenêtre pour mieux voir.
+
+Ils se tournèrent vers ce problème.
+
+L'affaire s'est trounée à votre profit (à leur profit).
+
+Il se tourna vers l'étude du grec et du sanskrit.
+
+Il s'est tourné vers la profession d'avocat (de médecin).
+
+Ils se sont tournés contre nous.
+
+Leur première antipathie s'est tournée en amitié.
+
+Son amour se tourna en haine.
+
+Son pessimisme s'est tourné en optimisme.
+
+Sa grippe s'est tournée en pneumonie.
+
+** p127 fumer
+
+
+
 
 
 * 第四章
