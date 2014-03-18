@@ -1288,6 +1288,72 @@ Sa grippe s'est tournée en pneumonie.
 
 ** p127 fumer
 
+Les cheminées des usines fument.
+Les décombres de la meule incendiée fument encore.
+L'encens fumait sur les autels.
+La soupière fume sur la table.
+Les prés fument au printemps.
+Il a fumé trois cigarettes ce matin.
+J'ai fumé mon mégot jusqu'au filtre.
+Dans certaines régions, on fume le jambon.
+
+** p128 savoir
+
+Je sais (connais) son nom.
+Il sait (connaît) le chemin.
+Il sait parler l'allemand et il sait l'anglais aussi.
+Elle ne sait pas faire la cuisine.
+Cet enfant sait lire, écrire et compter.
+C'est un homme qui sait vivre.
+Cet homme croit tout savoir, en réalité il sait peu de chose.
+Il ne sait rien de rien (il ne sait ni A ni B).
+C'est un homme qui sait parler aux foules.
+C'est une femme qui sait plaire.
+Je ne sais flatter.
+C'est un malin qui sait se tirer d'affaire.
+Elle sait persuader.
+J'ai su (appris) que Catherine s'était mariée avec un ingénieur.
+J'ai su cela de bonne source.
+Nous avons su la nouvelle de sa mort.
+Demain, il saura pourquoi je suis parti pour New York, je lui laisserai une lettre.
+
+** p130 connaître
+
+Je connais (sais) son nom et son adresse.
+Je connais le nom de cet écrivain, mais je n'ai jamais rien lu de lui.
+Je le connais de nom, mais je ne l'ai jamais vu.
+Je la connais de vue, mais je ne lui ai jamais parlé.
+Je connais cet homme (ce mot).
+J'ai beaucoup entendu parler de votre père, mais je ne le connais pas, car je ne l'ai jamais vu.
+Je ne le connais ni d'Ève ni d'Adam.
+Il connaît cette rue.
+Ce vieux cheval connaît le chemin.
+Il connaît (sait) l'arabe (trois langues étrangères).
+C'est un ouvrier qui connaît (sait) bien métier.
+Il connaît ce texte par cœur.
+J'achète tous les jours un journal pour connaître les nouvelles.
+Elle connut cette nouvelle.
+Nous connûmes les tenants et les aboutissants de cette affaire.
+Il connut qu'elle avait pleuré, et il en fut tracassé dans son esprit.
+
+** p132 apprendre
+
+Il apprend (étudie) l'algèbre (la géométrie analytique, la trigonométrie).
+Nous apprenous l'anglais aux États-Unis.
+J'apprends à nager (à conduire, à peindre).
+Julien apprenait les usages de la bonne société.
+Quelle nouvelle avez-vous apprise?
+Nous avons appris cette nouvelle par (ou à) la radio.
+Il l'a appris de son collègue.
+J'ai appris par hasard ses secrets.
+Nous avons appris que vous étiez marié.
+J'ai appris que vous étiez reçu à votre examen, c'est votre mère qui me l'a dit.
+Il a appris à Jeanne que son mari était parti avec une autre femme.
+Il m'a appris une bonne (une triste) nouvelle.
+On m'a appris que vous deviez partir pour Genève.
+Le professeur apprend aux élèves la physique atomique.
+
+** recevoir
 
 
 
