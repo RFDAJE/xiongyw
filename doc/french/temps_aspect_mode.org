@@ -1,7 +1,7 @@
 李宝树：法语动词的时、体与式，商务印书馆，2007
 «Temps, aspect et mode du verbe français»
 
-* 第一章
+* chapitre un
 
 ** p47 状态动词（avoir，être）使用简单过去时就能起到动作动词的作用
 
@@ -536,7 +536,7 @@ Le pétrole commence à jaillir des puits de forage.
 
 Une odeur de friture commence à sortir de la cuisine.
 
-** p85 双体动词 porter/se porter
+** p85 porter
 
 Il porte un manteau gris.
 
@@ -630,8 +630,7 @@ Il s'est porté à la dernière extrémité contre Pierre.
 
 
 
-
-** p91 双体动词 aller/se aller
+** p91 aller
 
 Nous allons en voiture à Fontainebleau.
 
@@ -733,7 +732,7 @@ Tous ses projets s'en étaient allés en fumée.
 
 Ce malade s'en va.
 
-** p96 双体动词 avancer/s'avancer
+** p96 avancer
 
 Il avança la main vers une chaise.
 
@@ -797,8 +796,7 @@ Le cygne s'avance sur l'eau.
 
 
 
-
-** 98 Marcher
+** p98 marcher
 
 Il marche en avant.
 
@@ -870,7 +868,7 @@ Cet enfant se déplace rapidement vers sa mère.
 
 Ils se déplacent en voiture vers la ville.
 
-** p102 conduire, se conduire
+** p102 conduire
 
 Il conduit très prudemment.
 
@@ -1383,7 +1381,7 @@ Sa grippe s'est tournée en pneumonie.
 
 
 
-* 第四章
+* chapitre quatre
 
 La marmaille jouait dans le jardin public.
 
