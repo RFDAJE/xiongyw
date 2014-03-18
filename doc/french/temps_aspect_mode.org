@@ -629,7 +629,6 @@ Il s'est porté à la dernière extrémité contre Pierre.
 
 
 
-
 ** p91 aller
 
 Nous allons en voiture à Fontainebleau.
@@ -787,7 +786,6 @@ La Chine s'avance à pas de géant.
 Il s'avance vite dans ses études.
 
 Le cygne s'avance sur l'eau.
-
 
 
 
@@ -1221,19 +1219,12 @@ La bombe à retardement a sauté.
 Un court-circuit s'est produit: les plombs de sécurité (les fusibles) ont sauté.
 Le bouchon de la bouteille a sauté.
 Le vent a sauté du nord au sud.
-
 Cette banque a sauté.
-
 Il a sauté un fossé.
-
 Son cheval sauta la haie (les obstacles) sans effort.
-
 En imprimant ce livre, on a sauté un ligne.
-
 Ce copiste a sauté un paragraphe (un mot, une phrase, deux pages).
-
 Elle a sauté un phrase (un mot) en lisant.
-
 Cet élève a sauté une classe.
 
 ** p121 tourner
