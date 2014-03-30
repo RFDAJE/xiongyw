@@ -1,0 +1,592 @@
+high-level steps:
+
+- usb iso install
+- apt-get update/upgrade
+- omv-extras install
+- gparted iso
+- ghost
+- zfs
+- kvm
+- ghost
+- X & miscs
+- zpool create
+
+
+
+
+
+basics: dpkg/apt/apt-cache/apt-file/aptitue
+
+- update apt db: apt-get update
+- upgrade: apt-get upgrade
+- distro upgrade: apt-get dist-upgrade
+
+- list all pkgs: dpkg -l apt
+- list pkg files: dpkg -L apt
+- search pkg by keyword: apt-cache search linux-sources-`uname -r`
+- check pkg deps: apt-cache depends debian-zfs
+- check pkg rdeps: apt-cache rdepends debian-zfs
+- show pkg info: apt-cache show debian-zfs
+- find file belongs to which pkg: apt-file search `which apt-cache` 
+- aptitude/synaptic
+
+
+
+
+omv-extras: http://omv-extras.org/simple/index.php?id=how-to-install-omv-extras-plugin
+- wget http://omv-extras.org/debian/pool/main/o/openmediavault-omvextrasorg/openmediavault-omvextrasorg_0.5.39_all.deb
+- dpkg -i openmediavault-omvextrasorg_0.5.39_all.deb
+- apt-get update
+
+
+
+
+omv plugins: http://songming.me/openmediavault-plexmediaserver-setup.html
+uuid: https://wiki.debian.org/Part-UUID
+
+
+
+
+
+* First install via USB ISO
+
+** (Optional) Disable serial port to boot: http://www.overclock.net/t/1423729/cant-get-openmediavault-debian-installer-to-boot
+** Do a default/normal install and reboot
+** Log into the webui by "admin/openmediavault" for the 1st time, to change passwd, adduser, config ip@ and enable ssh from within webui:
+  - change passwd for web "admin": system->general settings->web administrator passwd
+  - config ip@: system->network
+  - add user: access right mgmt->users
+  - enable sshd: services->ssh
+** Login via ssh to check the initial status
+[code]
+bruin@u1310:~$ ssh 192.168.122.143
+bruin@192.168.122.143's password: 
+Linux ovm32 2.6.32-5-486 #1 Fri May 10 08:01:28 UTC 2013 i686
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Mar 30 20:03:10 2014 from 192.168.122.1
+Could not chdir to home directory /home/bruin: No such file or directory
+bruin@ovm32:/$ 
+bruin@ovm32:/$ sudo mkdir /home/bruin
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for bruin: 
+bruin@ovm32:/$ sudo chown -R bruin /home/bruin
+bruin@ovm32:/$ 
+bruin@ovm32:/$ uname -a
+Linux ovm32 2.6.32-5-486 #1 Fri May 10 08:01:28 UTC 2013 i686 GNU/Linux
+bruin@ovm32:/$ df -ha
+文件系统	      容量  已用  可用 已用%% 挂载点
+/dev/vda1             7.6G  738M  6.5G  11% /
+tmpfs                1013M     0 1013M   0% /lib/init/rw
+proc                     0     0     0   -  /proc
+sysfs                    0     0     0   -  /sys
+udev                 1008M  132K 1008M   1% /dev
+tmpfs                1013M     0 1013M   0% /dev/shm
+devpts                   0     0     0   -  /dev/pts
+tmpfs                1013M   12K 1013M   1% /tmp
+bruin@ovm32:/$ 
+bruin@ovm32:~$ dpkg -l >pkg.list.0
+bruin@ovm32:~$ wc -l pkg.list.0
+300 pkg.list.0
+bruin@ovm32:~$
+bruin@ovm32:~$ sudo cp -a /etc/apt apt.0
+bruin@ovm32:~$ find apt.0
+apt.0
+apt.0/trusted.gpg.d
+apt.0/preferences.d
+apt.0/preferences.d/99openmediavault-local
+apt.0/apt
+apt.0/apt/trusted.gpg.d
+apt.0/apt/preferences.d
+apt.0/apt/preferences.d/99openmediavault-local
+apt.0/apt/trusted.gpg
+apt.0/apt/trustdb.gpg
+apt.0/apt/apt.conf
+apt.0/apt/sources.list
+apt.0/apt/sources.list.d
+apt.0/apt/sources.list.d/openmediavault-local.list
+apt.0/apt/sources.list.d/openmediavault.list
+apt.0/apt/sources.list~
+apt.0/apt/apt.conf.d
+apt.0/apt/apt.conf.d/00recommends
+apt.0/apt/apt.conf.d/00trustcdrom
+apt.0/apt/apt.conf.d/70debconf
+apt.0/apt/apt.conf.d/01autoremove
+apt.0/apt/apt.conf.d/00CDMountPoint
+apt.0/apt/secring.gpg
+apt.0/apt/preferences
+apt.0/apt.conf
+apt.0/sources.list
+apt.0/sources.list.d
+apt.0/sources.list.d/openmediavault-local.list
+apt.0/sources.list.d/openmediavault.list
+apt.0/sources.list~
+apt.0/apt.conf.d
+apt.0/apt.conf.d/00recommends
+apt.0/apt.conf.d/00trustcdrom
+apt.0/apt.conf.d/70debconf
+apt.0/apt.conf.d/01autoremove
+apt.0/apt.conf.d/00CDMountPoint
+apt.0/preferences
+bruin@ovm32:~$ cat /etc/apt/sources.list
+# 
+
+# deb cdrom:[Debian GNU/Linux 6.0.0 _Squeeze_ - Official Snapshot i386 LIVE/INSTALL Binary 20130824-12:51]/ squeeze main non-free
+
+#deb cdrom:[Debian GNU/Linux 6.0.0 _Squeeze_ - Official Snapshot i386 LIVE/INSTALL Binary 20130824-12:51]/ squeeze main non-free
+
+deb http://mirrors.163.com/debian/ squeeze main
+deb-src http://mirrors.163.com/debian/ squeeze main
+
+deb http://security.debian.org/ squeeze/updates main non-free
+deb-src http://security.debian.org/ squeeze/updates main non-free
+
+# squeeze-updates, previously known as 'volatile'
+deb http://mirrors.163.com/debian/ squeeze-updates main non-free
+deb-src http://mirrors.163.com/debian/ squeeze-updates main non-free
+bruin@ovm32:~$ 
+[/code]
+
+
+
+
+
+* Upgrade to backports kernel
+** Install omv-extras-plugin via ssh: http://omv-extras.org/simple/index.php?id=how-to-install-omv-extras-plugin
+[code]
+[b]bruin@ovm32:~$ wget http://omv-extras.org/debian/pool/main/o/openmediavault-omvextrasorg/openmediavault-omvextrasorg_0.5.39_all.deb[/b]
+--2014-03-30 20:13:25--  http://omv-extras.org/debian/pool/main/o/openmediavault-omvextrasorg/openmediavault-omvextrasorg_0.5.39_all.deb
+正在解析主机 omv-extras.org... 75.100.121.227
+正在连接 omv-extras.org|75.100.121.227|:80... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度：148726 (145K) [application/x-debian-package]
+正在保存至: “openmediavault-omvextrasorg_0.5.39_all.deb”
+
+100%[============================================================================================>] 148,726     28.3K/s 花时 5.1s    
+
+2014-03-30 20:13:32 (28.3 KB/s) - 已保存 “openmediavault-omvextrasorg_0.5.39_all.deb” [148726/148726])
+
+[b]bruin@ovm32:~$ sudo dpkg -i openmediavault-omvextrasorg_0.5.39_all.deb [/b]
+选中了曾被取消选择的软件包 openmediavault-omvextrasorg。
+(正在读取数据库 ... 系统当前共安装有 23601 个文件和目录。)
+正在解压缩 openmediavault-omvextrasorg (从 openmediavault-omvextrasorg_0.5.39_all.deb) ...
+正在设置 openmediavault-omvextrasorg (0.5.39) ...
+Initialize configuration
+OK
+OK
+OK
+OK
+OK
+OK
+gpg: 警告：不建议使用散列算法 MD5
+gpg: 请参见 http://www.gnupg.org/faq/weak-digest-algos.html 以得到更多信息。
+OK
+OK
+正在处理用于 openmediavault 的触发器...
+Restarting engine daemon ...
+Updating file permissions ...
+Updating locale files ...
+[b]bruin@ovm32:~$ sudo apt-get update[/b]
+...
+[/code]
+What's changed in pkgs db:
+[code]
+bruin@ovm32:~$ dpkg -l > pkg.list.1
+bruin@ovm32:~$ diff pkg.list.1 pkg.list.0
+239d238
+< ii  openmediavault-omvextrasorg        0.5.39                       OMV-Extras.org Package Repositories for OpenMediaVault
+bruin@ovm32:~$ 
+bruin@ovm32:~$ sudo cp -a /etc/apt apt.1
+bruin@ovm32:~$ diff -r apt.1 apt
+只在 apt 存在：apt
+只在 apt.1/preferences.d 存在：99omv-extras-org
+只在 apt.1 存在：secring.gpg
+只在 apt.1/sources.list.d 存在：omv-extras-org-sardaukar.list
+只在 apt.1 存在：trustdb.gpg
+只在 apt.1 存在：trusted.gpg
+只在 apt.1 存在：trusted.gpg~
+bruin@ovm32:~$ cat /etc/apt/preferences.d/99omv-extras-org 
+Package: *
+Pin: release n=sardaukar, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-dotdeb, origin packages.omv-extras.org
+Pin-Priority: 996
+
+Package: *
+Pin: release n=sardaukar-greyhole, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-plex, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-testing, origin packages.omv-extras.org
+Pin-Priority: 996
+
+Package: *
+Pin: release n=sardaukar-backports, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-vb, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-miller, origin dh2k.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-miller-testing, origin dh2k.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-beta, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-btsync, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-vdr, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=squeeze, origin debian.yeasoft.net
+Pin-Priority: 995
+
+Package: *
+Pin: release o=e-tobi.net
+Pin-Priority: 995
+bruin@ovm32:~$ cat /etc/apt/sources.list.d/o
+omv-extras-org-sardaukar.list  openmediavault.list            openmediavault-local.list      
+bruin@ovm32:~$ cat /etc/apt/sources.list.d/omv-extras-org-sardaukar.list 
+deb http://packages.omv-extras.org/debian/ sardaukar main
+bruin@ovm32:~$ 
+[/code]
+Also, by logging into the webui again (as webgui has restarted), check that "System->OMV-Extras.org" exists now.
+** upgrade kernel from webui, by clicking "system->omv-extras.org->install backports 3.2 kernel" and then clicking "start" button.
+the webui output:
+[code]
+Updating...
+Install backports 3.2 kernel and headers
+Reading package lists...
+Building dependency tree...
+Reading state information...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following extra packages will be installed:
+  binutils cpp-4.4 firmware-linux-nonfree gcc-4.4 initramfs-tools libgmp3c2
+  libgomp1 libmpfr4 linux-base linux-headers-3.2.0-0.bpo.4-486
+  linux-headers-3.2.0-0.bpo.4-686-pae linux-headers-3.2.0-0.bpo.4-all-i386
+  linux-headers-3.2.0-0.bpo.4-amd64 linux-headers-3.2.0-0.bpo.4-common
+  linux-headers-3.2.0-0.bpo.4-common-rt linux-headers-3.2.0-0.bpo.4-rt-686-pae
+  linux-kbuild-3.2
+Suggested packages:
+  binutils-doc gcc-4.4-locales gcc-4.4-multilib libmudflap0-4.4-dev
+  gcc-4.4-doc libgcc1-dbg libgomp1-dbg libmudflap0-dbg libcloog-ppl0 libppl-c2
+  libppl7 bash-completion linux-doc-3.2 debian-kernel-handbook
+Recommended packages:
+  intel-microcode amd64-microcode libc6-dev
+The following NEW packages will be installed:
+  binutils cpp-4.4 firmware-linux firmware-linux-free firmware-linux-nonfree
+  gcc-4.4 libgmp3c2 libgomp1 libmpfr4 linux-headers-3.2.0-0.bpo.4-486
+  linux-headers-3.2.0-0.bpo.4-686-pae linux-headers-3.2.0-0.bpo.4-all
+  linux-headers-3.2.0-0.bpo.4-all-i386 linux-headers-3.2.0-0.bpo.4-amd64
+  linux-headers-3.2.0-0.bpo.4-common linux-headers-3.2.0-0.bpo.4-common-rt
+  linux-headers-3.2.0-0.bpo.4-rt-686-pae linux-image-3.2.0-0.bpo.4-486
+  linux-kbuild-3.2
+The following packages will be upgraded:
+  initramfs-tools linux-base
+2 upgraded, 19 newly installed, 0 to remove and 36 not upgraded.
+Need to get 44.6 MB of archives.
+After this operation, 174 MB of additional disk space will be used.
+Get:1 http://mirrors.163.com/debian/ squeeze/main binutils i386 2.20.1-16 [3811 kB]
+Get:2 http://packages.omv-extras.org/debian/ sardaukar-backports/main initramfs-tools all 0.99~bpo60+1 [89.2 kB]
+Get:3 http://mirrors.163.com/debian/ squeeze/main libgmp3c2 i386 2:4.3.2+dfsg-1 [325 kB]
+Get:4 http://mirrors.163.com/debian/ squeeze/main libmpfr4 i386 3.0.0-2 [464 kB]
+Get:5 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-base all 3.4~bpo60+1 [34.1 kB]
+Get:6 http://mirrors.163.com/debian/ squeeze/main cpp-4.4 i386 4.4.5-8 [3525 kB]
+Get:7 http://mirrors.163.com/debian/ squeeze/main firmware-linux-free all 2.6.32-48squeeze4 [162 kB]
+Get:8 http://mirrors.163.com/debian/ squeeze/main libgomp1 i386 4.4.5-8 [24.1 kB]
+Get:9 http://mirrors.163.com/debian/ squeeze/main gcc-4.4 i386 4.4.5-8 [2802 kB]
+Get:10 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-image-3.2.0-0.bpo.4-486 i386 3.2.54-2~bpo60+1 [22.5 MB]
+Get:11 http://backports.debian.org/debian-backports/ squeeze-backports/non-free firmware-linux-nonfree all 0.36+wheezy.1~bpo60+1 [707 kB]
+Get:12 http://backports.debian.org/debian-backports/ squeeze-backports/non-free firmware-linux all 0.36+wheezy.1~bpo60+1 [7828 B]
+Get:13 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-common i386 3.2.54-2~bpo60+1 [3562 kB]
+Get:14 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-kbuild-3.2 i386 3.2.17-1~bpo60+1 [223 kB]
+Get:15 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-486 i386 3.2.54-2~bpo60+1 [576 kB]
+Get:16 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-686-pae i386 3.2.54-2~bpo60+1 [605 kB]
+Get:17 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-amd64 i386 3.2.54-2~bpo60+1 [572 kB]
+Get:18 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-common-rt i386 3.2.54-2~bpo60+1 [3569 kB]
+Get:19 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-rt-686-pae i386 3.2.54-2~bpo60+1 [603 kB]
+Get:20 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-all-i386 i386 3.2.54-2~bpo60+1 [211 kB]
+Get:21 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-all i386 3.2.54-2~bpo60+1 [211 kB]
+Get:22 http://backports.debian.org/debian-backports/ squeeze-backports/main linux-headers-3.2.0-0.bpo.4-all i386 3.2.54-2~bpo60+1 [211 kB]
+Fetched 44.6 MB in 23min 18s (31.9 kB/s)
+(Reading database ... 23645 files and directories currently installed.)
+Preparing to replace initramfs-tools 0.98.8 (using .../initramfs-tools_0.99~bpo60+1_all.deb) ...
+Unpacking replacement initramfs-tools ...
+Preparing to replace linux-base 2.6.32-48squeeze3 (using .../linux-base_3.4~bpo60+1_all.deb) ...
+Unpacking replacement linux-base ...
+Selecting previously deselected package linux-image-3.2.0-0.bpo.4-486.
+Unpacking linux-image-3.2.0-0.bpo.4-486 (from .../linux-image-3.2.0-0.bpo.4-486_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package binutils.
+Unpacking binutils (from .../binutils_2.20.1-16_i386.deb) ...
+Selecting previously deselected package libgmp3c2.
+Unpacking libgmp3c2 (from .../libgmp3c2_2%3a4.3.2+dfsg-1_i386.deb) ...
+Selecting previously deselected package libmpfr4.
+Unpacking libmpfr4 (from .../libmpfr4_3.0.0-2_i386.deb) ...
+Selecting previously deselected package cpp-4.4.
+Unpacking cpp-4.4 (from .../cpp-4.4_4.4.5-8_i386.deb) ...
+Selecting previously deselected package firmware-linux-free.
+Unpacking firmware-linux-free (from .../firmware-linux-free_2.6.32-48squeeze4_all.deb) ...
+Selecting previously deselected package firmware-linux-nonfree.
+Unpacking firmware-linux-nonfree (from .../firmware-linux-nonfree_0.36+wheezy.1~bpo60+1_all.deb) ...
+Selecting previously deselected package firmware-linux.
+Unpacking firmware-linux (from .../firmware-linux_0.36+wheezy.1~bpo60+1_all.deb) ...
+Selecting previously deselected package libgomp1.
+Unpacking libgomp1 (from .../libgomp1_4.4.5-8_i386.deb) ...
+Selecting previously deselected package gcc-4.4.
+Unpacking gcc-4.4 (from .../gcc-4.4_4.4.5-8_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-common.
+Unpacking linux-headers-3.2.0-0.bpo.4-common (from .../linux-headers-3.2.0-0.bpo.4-common_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-kbuild-3.2.
+Unpacking linux-kbuild-3.2 (from .../linux-kbuild-3.2_3.2.17-1~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-486.
+Unpacking linux-headers-3.2.0-0.bpo.4-486 (from .../linux-headers-3.2.0-0.bpo.4-486_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-686-pae.
+Unpacking linux-headers-3.2.0-0.bpo.4-686-pae (from .../linux-headers-3.2.0-0.bpo.4-686-pae_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-amd64.
+Unpacking linux-headers-3.2.0-0.bpo.4-amd64 (from .../linux-headers-3.2.0-0.bpo.4-amd64_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-common-rt.
+Unpacking linux-headers-3.2.0-0.bpo.4-common-rt (from .../linux-headers-3.2.0-0.bpo.4-common-rt_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-rt-686-pae.
+Unpacking linux-headers-3.2.0-0.bpo.4-rt-686-pae (from .../linux-headers-3.2.0-0.bpo.4-rt-686-pae_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-all-i386.
+Unpacking linux-headers-3.2.0-0.bpo.4-all-i386 (from .../linux-headers-3.2.0-0.bpo.4-all-i386_3.2.54-2~bpo60+1_i386.deb) ...
+Selecting previously deselected package linux-headers-3.2.0-0.bpo.4-all.
+Unpacking linux-headers-3.2.0-0.bpo.4-all (from .../linux-headers-3.2.0-0.bpo.4-all_3.2.54-2~bpo60+1_i386.deb) ...
+Setting up initramfs-tools (0.99~bpo60+1) ...
+Installing new version of config file /etc/kernel/postrm.d/initramfs-tools ...
+Installing new version of config file /etc/kernel/postinst.d/initramfs-tools ...
+Installing new version of config file /etc/initramfs-tools/initramfs.conf ...
+update-initramfs: deferring update (trigger activated)
+Setting up linux-base (3.4~bpo60+1) ...
+Setting up linux-image-3.2.0-0.bpo.4-486 (3.2.54-2~bpo60+1) ...
+Setting up binutils (2.20.1-16) ...
+Setting up libgmp3c2 (2:4.3.2+dfsg-1) ...
+Setting up libmpfr4 (3.0.0-2) ...
+Setting up cpp-4.4 (4.4.5-8) ...
+Setting up firmware-linux-free (2.6.32-48squeeze4) ...
+Setting up firmware-linux-nonfree (0.36+wheezy.1~bpo60+1) ...
+update-initramfs: deferring update (trigger activated)
+Setting up firmware-linux (0.36+wheezy.1~bpo60+1) ...
+Setting up libgomp1 (4.4.5-8) ...
+Setting up gcc-4.4 (4.4.5-8) ...
+Setting up linux-headers-3.2.0-0.bpo.4-common (3.2.54-2~bpo60+1) ...
+Setting up linux-kbuild-3.2 (3.2.17-1~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-486 (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-686-pae (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-amd64 (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-common-rt (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-rt-686-pae (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-all-i386 (3.2.54-2~bpo60+1) ...
+Setting up linux-headers-3.2.0-0.bpo.4-all (3.2.54-2~bpo60+1) ...
+Processing triggers for initramfs-tools ...
+update-initramfs: Generating /boot/initrd.img-3.2.0-0.bpo.4-486
+...
+Please reboot to use new kernel
+[/code]
+Reboot the box via webui.
+what's changed in pkgs db:
+bruin@ovm32:~$ sudo cp -a /etc/apt apt.2
+bruin@ovm32:~$ sudo diff -r apt.2 apt.1
+只在 apt.2/sources.list.d 存在：backports.list
+bruin@ovm32:~$ cat /etc/apt/sources.list.d/backports.list
+deb http://backports.debian.org/debian-backports squeeze-backports main non-free
+deb http://packages.omv-extras.org/debian/ sardaukar-backports main
+bruin@ovm32:~$ 
+
+
+
+** Upgrading backport kernel  can also be done manually
+     - /etc/apt/sources.list: http://forums.openmediavault.org/viewtopic.php?f=14&t=578
+      . add: deb http://backports.debian.org/debian-backports squeeze-backports main non-free
+      . update db: apt-get update
+      . check kernel version: apt-cache search linux-image-3
+      . install new kernel: apt-get -t squeeze-backports install linux-image-3.2.0-0.bpo.4-amd64 firmware-linux-free firmware-linux-nonfree
+
+* Install ZFS: http://zfsonlinux.org/debian.html
+http://bernaerts.dyndns.org/linux/75-debian/279-debian-wheezy-zfs-raidz-pool
+[code]
+[b]root@ovm32:~# wget http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux/zfsonlinux_2%7Ewheezy_all.deb[/b]
+--2014-03-30 21:18:15--  http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux/zfsonlinux_2%7Ewheezy_all.deb
+正在解析主机 archive.zfsonlinux.org... 205.251.242.180
+正在连接 archive.zfsonlinux.org|205.251.242.180|:80... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度：50552 (49K) [application/x-debian-package]
+正在保存至: “zfsonlinux_2~wheezy_all.deb”
+
+100%[============================================================================================>] 50,552      38.2K/s 花时 1.3s    
+
+2014-03-30 21:18:20 (38.2 KB/s) - 已保存 “zfsonlinux_2~wheezy_all.deb” [50552/50552])
+
+[b]root@ovm32:~# dpkg -i zfsonlinux_2~wheezy_all.deb [/b]
+选中了曾被取消选择的软件包 zfsonlinux。
+(正在读取数据库 ... 系统当前共安装有 57384 个文件和目录。)
+正在解压缩 zfsonlinux (从 zfsonlinux_2~wheezy_all.deb) ...
+正在设置 zfsonlinux (2~wheezy) ...
+[b]root@ovm32:~# apt-get update[/b]
+...
+root@ovm32:~# apt-get install debian-zfs
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+将会安装下列额外的软件包：
+  cpp dkms gcc libnvpair1 libuutil1 libzfs1 libzpool1 lsb-release make patch python python-minimal python-support python2.6
+  python2.6-minimal spl spl-dkms zfs-dkms zfsutils
+建议安装的软件包：
+  cpp-doc zfs-auto-snapshot gcc-multilib manpages-dev autoconf automake1.9 libtool flex bison gdb gcc-doc lsb make-doc ed
+  diffutils-doc python-doc python-tk python-profiler python2.6-doc python2.6-profiler binfmt-support zfs-initramfs
+推荐安装的软件包：
+  build-essential fakeroot libc6-dev libc-dev
+下列【新】软件包将被安装：
+  cpp debian-zfs dkms gcc libnvpair1 libuutil1 libzfs1 libzpool1 lsb-release make patch python python-minimal python-support
+  python2.6 python2.6-minimal spl spl-dkms zfs-dkms zfsutils
+升级了 0 个软件包，新安装了 20 个软件包，要卸载 0 个软件包，有 38 个软件包未被升级。
+需要下载 7,786 kB 的软件包。
+解压缩后会消耗掉 30.4 MB 的额外空间。
+您希望继续执行吗？[Y/n]
+获取：1 http://mirrors.163.com/debian/ squeeze/main cpp i386 4:4.4.5-1 [14.9 kB]
+获取：2 http://mirrors.163.com/debian/ squeeze/main gcc i386 4:4.4.5-1 [4,974 B] 
+获取：3 http://mirrors.163.com/debian/ squeeze/main make i386 3.81-8 [392 kB]    
+获取：4 http://mirrors.163.com/debian/ squeeze/main patch i386 2.6-2 [122 kB]    
+获取：5 http://mirrors.163.com/debian/ squeeze/main python2.6-minimal i386 2.6.6-8+b1 [1,423 kB]
+获取：6 http://mirrors.163.com/debian/ squeeze/main python2.6 i386 2.6.6-8+b1 [2,388 kB]
+获取：7 http://archive.zfsonlinux.org/debian/ wheezy/main dkms all 2.2.0.3-1.2+zfs6 [78.8 kB]
+获取：8 http://mirrors.163.com/debian/ squeeze/main python-minimal all 2.6.6-3+squeeze7 [33.8 kB]
+获取：9 http://mirrors.163.com/debian/ squeeze/main python all 2.6.6-3+squeeze7 [169 kB]
+获取：10 http://mirrors.163.com/debian/ squeeze/main python-support all 1.0.10 [33.0 kB]
+获取：11 http://mirrors.163.com/debian/ squeeze/main lsb-release all 3.2-23.2squeeze1 [21.5 kB]
+获取：12 http://archive.zfsonlinux.org/debian/ wheezy/main spl-dkms all 0.6.2-3~wheezy [552 kB]
+获取：13 http://archive.zfsonlinux.org/debian/ wheezy/main zfs-dkms all 0.6.2-4~wheezy [1,418 kB]                                    
+获取：14 http://archive.zfsonlinux.org/debian/ wheezy/main spl i386 0.6.2-3~wheezy [15.0 kB]                                         
+获取：15 http://archive.zfsonlinux.org/debian/ wheezy/main libuutil1 i386 0.6.2-4~wheezy [53.6 kB]                                   
+获取：16 http://archive.zfsonlinux.org/debian/ wheezy/main libnvpair1 i386 0.6.2-4~wheezy [49.7 kB]                                  
+获取：17 http://archive.zfsonlinux.org/debian/ wheezy/main libzpool1 i386 0.6.2-4~wheezy [506 kB]                                    
+获取：18 http://archive.zfsonlinux.org/debian/ wheezy/main libzfs1 i386 0.6.2-4~wheezy [155 kB]                                      
+获取：19 http://archive.zfsonlinux.org/debian/ wheezy/main zfsutils i386 0.6.2-4~wheezy [349 kB]                                     
+获取：20 http://archive.zfsonlinux.org/debian/ wheezy/main debian-zfs i386 7~wheezy [7,054 B]                                        
+下载 7,786 kB，耗时 2分 10秒 (59.6 kB/s)                                                                                             
+正在预设定软件包 ...
+选中了曾被取消选择的软件包 cpp。
+(正在读取数据库 ... 系统当前共安装有 57390 个文件和目录。)
+正在解压缩 cpp (从 .../cpp_4%3a4.4.5-1_i386.deb) ...
+选中了曾被取消选择的软件包 gcc。
+正在解压缩 gcc (从 .../gcc_4%3a4.4.5-1_i386.deb) ...
+...
+[/code]
+
+* KVM
+
+     - kvm: https://wiki.debian.org/KVM
+      . apt-get install qemu-kvm libvirt-bin: after that, verify:
+            bruin@omv:/$ lsmod|grep kvm
+            kvm_intel             120947  0 
+            kvm                   292670  1 kvm_intel
+            bruin@omv:/$ ls /dev/kvm
+            /dev/kvm
+            bruin@omv:/$ 
+       . add user into libvirt group:
+            bruin@omv:/$ sudo adduser bruin libvirt
+            Adding user `bruin' to group `libvirt' ...
+            Adding user bruin to group libvirt
+            Done.
+            bruin@omv:/$ 
+       . setup bridge networking: already installed.
+            bruin@omv:/$ dpkg --list|grep bridge-utils
+            ii  bridge-utils                        1.4-5                        Utilities for configuring the Linux Ethernet bridge
+            bruin@omv:/$ 
+       . change /etc/network/interfaces:
+
+* X
+
+      . apt-get install xorg gnome gdm
+      . /etc/inittab: change run level from 2 to 5
+      . reboot and login
+
+* Misc pkgs:
+
+vim less htop manpages man-db apt-file util-linux aptitude synaptic gparted
+
+
+
+* gparted:
+  apt-get install gparted: for review the partitions, not able to make changes online.
+  gparted-live-0.16.2-11-i686-pae.iso
+  apt-file search blkid
+bruin@omv:~$ /sbin/blkid
+/dev/sda1: LABEL="root" UUID="5cac462c-6692-45bf-9de2-3f7e425104a4" TYPE="ext4" 
+/dev/sda3: LABEL="backup" UUID="81a55061-e905-4fd5-9076-f13488cafd47" TYPE="ext4" 
+/dev/sda4: LABEL="tank" UUID="8b5026ab-5a79-40e2-b328-58cee27187f8" TYPE="ext2" 
+/dev/sda5: LABEL="swap" UUID="a76cea18-fb07-4f68-b36e-4f5ba78aa7f9" TYPE="swap" 
+bruin@omv:~$ df -mh
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda1              49G  3.1G   43G   7% /
+tmpfs                 3.9G     0  3.9G   0% /lib/init/rw
+udev                   10M  208K  9.8M   3% /dev
+tmpfs                 3.9G     0  3.9G   0% /dev/shm
+tmpfs                 3.9G  8.0K  3.9G   1% /tmp
+bruin@omv:~$ cat /etc/fstab
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+proc            /proc           proc    defaults        0       0
+# / was on /dev/sda1 during installation
+UUID=5cac462c-6692-45bf-9de2-3f7e425104a4 /               ext4    errors=remount-ro 0       1
+# swap was on /dev/sda5 during installation
+UUID=a76cea18-fb07-4f68-b36e-4f5ba78aa7f9 none            swap    sw              0       0
+/dev/sdb1       /media/usb0     auto    rw,user,noauto  0       0
+tmpfs           /tmp            tmpfs   defaults        0       0
+bruin@omv:~$ 
+bruin@omv:~$ sudo fdisk -l
+
+Disk /dev/sda: 320.1 GB, 320072933376 bytes
+255 heads, 63 sectors/track, 38913 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x000c72ad
+
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sda1   *           1        6374    51198131   83  Linux
+/dev/sda2           37335       38914    12683265    5  Extended
+/dev/sda3            6375       36970   245762370   83  Linux
+/dev/sda4           36971       37335     2924544   83  Linux
+/dev/sda5           37335       38914    12683264   82  Linux swap / Solaris
+
+Partition table entries are not in disk order
+bruin@omv:~$ 
+
+
