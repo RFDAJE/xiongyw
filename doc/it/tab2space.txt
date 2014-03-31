@@ -1,3 +1,8 @@
 pr -t -e4 xxx.c
 sed -e "s/\t/    /g" xxx.c
 find . -name "*.[ch]" -exec sed -i "s/\t/    /g" {} \;
+
+
+btw: remove whitespaces at the end of lines:
+
+sed -e "s/[ \t]*$//g" xxx.txt
