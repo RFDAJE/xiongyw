@@ -373,7 +373,7 @@
 ;(setq shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
 (setq explicit-shell-file-name "C:/Program Files (x86)/Git/bin/sh.exe")
 
-(setenv "PATH" "C:/Program Files (x86)/Git/bin")
+(setenv "PATH" (getenv "PATH"))
 
 
 
