@@ -1,0 +1,21 @@
+
+
+- iso: debian-live-7.4-amd64-standard.iso
+- x: apt-get install xorg gnome xfonts-wqy
+- zfs: http://zfsonlinux.org/debian.html
+    $ su -
+    # wget http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux/zfsonlinux_2%7Ewheezy_all.deb
+    # dpkg -i zfsonlinux_2~wheezy_all.deb
+    # apt-get update
+    # apt-get install debian-zfs
+- kvm: http://www.server-world.info/en/note?os=Debian_7.0&p=kvm&f=1
+    # apt-get install virt-manager
+    note: "su -" to run virt-manager, not "su"
+- chrome: http://www.itworld.com/software/358509/install-google-chrome-browser-debian-7
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    sudo dpkg -i google-chrome-*.deb
+    sudo apt-get install -f
+- ibus/fcitx
+- omv
+
+
