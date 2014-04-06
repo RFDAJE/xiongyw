@@ -1,7 +1,8 @@
 
 
 - iso: debian-live-7.4-amd64-standard.iso
-- x: apt-get install xorg gnome xfonts-wqy
+- x: apt-get install xorg gnome xfonts-wqy ttf-wqy-zenhei
+- locale: dpkg reconfigure locales
 - zfs: http://zfsonlinux.org/debian.html
     $ su -
     # wget http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux/zfsonlinux_2%7Ewheezy_all.deb
@@ -15,7 +16,8 @@
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i google-chrome-*.deb
     sudo apt-get install -f
-- ibus/fcitx
+- fcitx
+    apt-get install fcitx fcitx-pinyin im-switch
 - omv
 
 
