@@ -16,6 +16,45 @@
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i google-chrome-*.deb
     sudo apt-get install -f
+
+    fonts: http://blog.csdn.net/neosmith/article/details/17366595
+$ cat ~/.fonts.conf
+<?xml version='1.0'?>
+<!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+<fontconfig>
+ <match target="font">
+  <edit mode="assign" name="rgba">
+   <const>rgb</const>
+  </edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="hinting">
+   <bool>true</bool>
+  </edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="hintstyle">
+   <const>hintmedium</const>
+  </edit>
+ </match>
+ <match target="font">
+  <edit mode="assign" name="antialias">
+   <bool>true</bool>
+  </edit>
+ </match>
+<!--
+***** 
+***** The following section was missing.
+***** Adding it fixed web page fonts in Chrome.
+*****
+-->
+ <match target="font">
+  <edit name="autohint" mode="assign">
+   <bool>true</bool>
+  </edit>
+ </match>
+</fontconfig>
+
 - fcitx
     apt-get install fcitx fcitx-pinyin im-switch
 - omv
