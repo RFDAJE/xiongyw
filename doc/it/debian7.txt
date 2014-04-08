@@ -1,5 +1,3 @@
-
-
 - iso: debian-live-7.4-amd64-standard.iso
 - update /etc/apt/sources.list: use local mirrors for all, remove cdrom source
 - initial conf: http://www.server-world.info/en/note?os=Debian_7.0&p=initial_conf&f=1
@@ -52,6 +50,12 @@
 - sublime text3: http://simonewebdesign.it/blog/how-to-install-sublime-text-3-on-debian/
     $ wget http://c758482.r82.cf2.rackcdn.com/sublime-text_build-3047_amd64.deb
     $ sudo dpkg -i sublime-text_build-3047_amd64.deb
+
+- build otv5:
+    sudo mkdir /nfs
+    mount 10.12.2.225:/nfs /nfs
+gettext->msgfmt
+
 
 $ cat ~/.fonts.conf
 <?xml version='1.0'?>
