@@ -33,6 +33,22 @@
     sudo apt-get install -f
 
     fonts: http://blog.csdn.net/neosmith/article/details/17366595
+
+- p4: http://package.perforce.com/
+
+    $ wget http://package.perforce.com/perforce.pubkey
+    $ sudo apt-key add perforce.pubkey
+
+    $ cat /etc/apt/sources.list.d/p4.list 
+    deb http://package.perforce.com/apt/ubuntu precise release
+
+    $ sudo apt-get update
+    $ apt-cache search perforce
+    $ sudo apt-get install perforce-cli-base
+    $ /opt/perforce/usr/bin/p4 -h
+
+
+
 $ cat ~/.fonts.conf
 <?xml version='1.0'?>
 <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
