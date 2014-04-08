@@ -34,6 +34,8 @@
 
     fonts: http://blog.csdn.net/neosmith/article/details/17366595
 
+- 32 bit apps: http://www.debian-administration.org/articles/531
+    $ sudo apt-get install ia32-libs
 - p4: http://package.perforce.com/
 
     $ wget http://package.perforce.com/perforce.pubkey
@@ -47,7 +49,9 @@
     $ sudo apt-get install perforce-cli-base
     $ /opt/perforce/usr/bin/p4 -h
 
-
+- sublime text3: http://simonewebdesign.it/blog/how-to-install-sublime-text-3-on-debian/
+    $ wget http://c758482.r82.cf2.rackcdn.com/sublime-text_build-3047_amd64.deb
+    $ sudo dpkg -i sublime-text_build-3047_amd64.deb
 
 $ cat ~/.fonts.conf
 <?xml version='1.0'?>
