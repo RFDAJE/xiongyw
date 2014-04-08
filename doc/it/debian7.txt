@@ -1,14 +1,29 @@
 
 
 - iso: debian-live-7.4-amd64-standard.iso
+- update /etc/apt/sources.list: use local mirrors for all, remove cdrom source
+- initial conf: http://www.server-world.info/en/note?os=Debian_7.0&p=initial_conf&f=1
 - x: apt-get install xorg gnome xfonts-wqy ttf-wqy-zenhei
-- locale: dpkg reconfigure locales
+- locale: dpkg-reconfigure locales
 - zfs: http://zfsonlinux.org/debian.html
     $ su -
     # wget http://archive.zfsonlinux.org/debian/pool/main/z/zfsonlinux/zfsonlinux_2%7Ewheezy_all.deb
     # dpkg -i zfsonlinux_2~wheezy_all.deb
     # apt-get update
     # apt-get install debian-zfs
+
+    home pc: 
+    root@localhost:~# sudo zpool create -f -o ashift=12 tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092
+    root@localhost:~# zfs set atime=off tank
+
+    work pc:
+    bruin@d7:~$ sudo zpool history
+    History for 'tank':
+    2014-04-08.20:59:49 zpool create -f -o ashift=12 tank ata-ST1000DM003-1CH162_S1DCDRHH
+    2014-04-08.21:00:13 zfs set atime=off tank
+
+    update "/etc/default/zfs" for auto mount at startup
+
 - kvm: http://www.server-world.info/en/note?os=Debian_7.0&p=kvm&f=1
     # apt-get install virt-manager
     note: "su -" to run virt-manager, not "su"
