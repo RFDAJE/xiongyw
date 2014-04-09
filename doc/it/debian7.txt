@@ -11,10 +11,36 @@
     # apt-get install debian-zfs
 
     home pc: 
-    root@localhost:~# sudo zpool create -f -o ashift=12 tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092
-    root@localhost:~# zfs set atime=off tank
+    # sudo zpool create -f -o ashift=12 tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092
+    # zfs set atime=off tank
+    # zpool attach -f tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092 ata-WDC_WD5000AVDS-63U7B1_WD-WCAV9EM28882
 
-    work pc:
+bruin@localhost:/dev/disk/by-id$ sudo zpool status
+  pool: tank
+ state: ONLINE
+status: One or more devices is currently being resilvered.  The pool will
+	continue to function, possibly in a degraded state.
+action: Wait for the resilver to complete.
+  scan: resilver in progress since Wed Apr  9 19:28:45 2014
+    476M scanned out of 157G at 59.4M/s, 0h44m to go
+    472M resilvered, 0.30% done
+config:
+
+	NAME                                           STATE     READ WRITE CKSUM
+	tank                                           ONLINE       0     0     0
+	  mirror-0                                     ONLINE       0     0     0
+	    ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092  ONLINE       0     0     0
+	    ata-WDC_WD5000AVDS-63U7B1_WD-WCAV9EM28882  ONLINE       0     0     0  (resilvering)
+
+errors: No known data errors
+bruin@localhost:/dev/disk/by-id$ sudo zpool history
+History for 'tank':
+2014-04-07.18:38:10 zpool create -f -o ashift=12 tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092
+2014-04-07.18:39:15 zfs set atime=off tank
+2014-04-09.19:28:55 zpool attach -f tank ata-WDC_WD5000AADS-00L4B1_WD-WCAUH0002092 ata-WDC_WD5000AVDS-63U7B1_WD-WCAV9EM28882
+
+
+   work pc:
     bruin@d7:~$ sudo zpool history
     History for 'tank':
     2014-04-08.20:59:49 zpool create -f -o ashift=12 tank ata-ST1000DM003-1CH162_S1DCDRHH
