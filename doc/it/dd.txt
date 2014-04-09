@@ -1,0 +1,36 @@
+backup/restore gpt and partitions
+=================================
+
+partition table: using gdisk
+
+- backup: b
+- restore: r,l,w
+
+partition: using dd and gzip/gunzip
+
+- backup: dd if=/dev/sda1 | gzip - > sda1.img.gz
+- restore: gunzip -c sda1.img.gz | dd of=/dev/sda1
+
+
+
+user@debian:/mnt/bruin/work/backup/ubuntu$ sudo parted /dev/sda
+GNU Parted 2.3
+Using /dev/sda
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+(parted) p                                                                
+Model: ATA KING SHARE 20003 (scsi)
+Disk /dev/sda: 31.7GB
+Sector size (logical/physical): 512B/512B
+Partition Table: gpt
+
+Number  Start   End     Size    File system     Name  Flags
+ 1      1049kB  512MB   511MB   fat32                 boot
+ 2      512MB   23.1GB  22.6GB  ext4
+ 3      23.1GB  31.7GB  8529MB  linux-swap(v1)
+
+(parted)                                                                  
+
+
+
+
+
