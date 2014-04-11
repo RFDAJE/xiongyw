@@ -1,0 +1,37 @@
+X11 forwarding using ssh client on windows 
+
+
+- install XMING as the x server, which by default listening on port 6000 (aka, the ":0.0" display)
+- ssh -R 6010:localhost:6000 user@server
+  once log in, set DISPLAY environment first by: export DISPLAY=:10
+  the run the x apps.
+
+  notice that the port number 6000 and 6010 and the "display" part of [host]:<display>[.screen]
+
+  e.g.:
+
+
+C:\Users\ywxiong>ssh -R 6010:localhost:6000 bruin@10.12.2.174
+bruin@10.12.2.174's password:
+Linux d7 3.2.0-4-amd64 #1 SMP Debian 3.2.54-2 x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Fri Apr 11 15:20:50 2014 from mob70065.hq.k.grp
+bruin@d7:~$ echo $DISPLAY
+
+bruin@d7:~$ export DISPLAY=:10.0
+bruin@d7:~$ xclock&
+[1] 19262
+bruin@d7:~$ Warning: Missing charsets in String to FontSet conversion
+
+[1]+  Fini                    xclock
+bruin@d7:~$
+
+
+- Don't know why -X does not work? seems once login, no new listening port is created on the ssh server...
+- Question: how to execute the "export DISPLAY=:10.0" togehter with the ssh command, without disconnecting? how Putty GUI does this?
