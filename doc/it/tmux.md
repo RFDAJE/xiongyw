@@ -8,11 +8,10 @@
   - signal: to be *avoided* for daemon, especially the SIGHUP signal which is sent to a process when the connection of its controlling terminal is broken.
 
 [An Introduction to Terminal Multiplexing with GNU Screen](http://omniti.com/seeds/an-introduction-to-terminal-multiplexing-with-gnu-screen)
-One of the problems the terminal multiplexer addresses is the "connection broken":
+One of the problems the terminal multiplexer addresses is the "connection broken" situation:
 - modem connection broken between the user and the terminal driver (plus line decipline), or
-- tcp/ip connection broken between ssh/telnet client and the pty driver (plus line deciplien)
+- tcp/ip connection broken between ssh/telnet client and the sshd/telnetd (which are terminal emulator process).
 
-  
 
 
 
@@ -57,8 +56,8 @@ two tmux processes are created:
 
 
            1     init
-?      14245       \_ tmux
-pts/1  14246            \_ -bash
+?       14245      \_ tmux
+pts/1  14246           \_ -bash
 
 pts/0  13246          \_ bash
 pts/0  14243               \_ tmux
