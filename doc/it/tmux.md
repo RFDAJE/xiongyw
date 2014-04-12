@@ -1,3 +1,21 @@
+# How it works?
+
+## Controlling terminal, daemon, SIGHUP
+[How to daemonize a process](http://world.std.com/~swmcd/steven/tech/daemon.html)
++ A daemon does not need the following 3 things provided from a controlling terminal:
+  - input: no need for daemon
+  - output: no need for daemon
+  - signal: to be *avoided* for daemon, especially the SIGHUP signal which is sent to a process when the connection of its controlling terminal is broken.
+
+[An Introduction to Terminal Multiplexing with GNU Screen](http://omniti.com/seeds/an-introduction-to-terminal-multiplexing-with-gnu-screen)
+One of the problems the terminal multiplexer addresses is the "connection broken":
+- modem connection broken between the user and the terminal driver (plus line decipline), or
+- tcp/ip connection broken between ssh/telnet client and the pty driver (plus line deciplien)
+
+  
+
+
+
 # the current shell and its pty
 
 bruin@localhost:~$ echo $$
@@ -44,3 +62,5 @@ pts/1  14246            \_ -bash
 
 pts/0  13246          \_ bash
 pts/0  14243               \_ tmux
+
+
