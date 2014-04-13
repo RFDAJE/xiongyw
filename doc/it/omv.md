@@ -46,9 +46,250 @@ uuid: https://wiki.debian.org/Part-UUID
 
 
 
-   + omv
-     - disable serial port to boot: http://www.overclock.net/t/1423729/cant-get-openmediavault-debian-installer-to-boot
-     - config ip/user via webgui
+
+1. first install via usb iso
+[list]
+[*] (optional) disable serial port to boot: http://www.overclock.net/t/1423729/cant-get-openmediavault-debian-installer-to-boot
+[*] default install and reboot
+[*] log into webgui by "admin/openmediavault" 
+[*] do the following in webgui:
+	[list]
+	[*] change passwd for web "admin": system->general settings->web administrator passwd
+	[*] config ip@: system->network
+	[*]	add user: access right mgmt->users
+	[*]	enable sshd: services->ssh
+	[/list]	 
+[*] login via ssh
+[code]
+bruin@u1310:~$ ssh 192.168.122.143
+bruin@192.168.122.143's password: 
+Linux ovm32 2.6.32-5-486 #1 Fri May 10 08:01:28 UTC 2013 i686
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Sun Mar 30 20:03:10 2014 from 192.168.122.1
+Could not chdir to home directory /home/bruin: No such file or directory
+bruin@ovm32:/$ 
+bruin@ovm32:/$ sudo mkdir /home/bruin
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for bruin: 
+bruin@ovm32:/$ sudo chown -R bruin /home/bruin
+bruin@ovm32:/$ 
+bruin@ovm32:/$ uname -a
+Linux ovm32 2.6.32-5-486 #1 Fri May 10 08:01:28 UTC 2013 i686 GNU/Linux
+bruin@ovm32:/$ df -ha
+文件系统	      容量  已用  可用 已用%% 挂载点
+/dev/vda1             7.6G  738M  6.5G  11% /
+tmpfs                1013M     0 1013M   0% /lib/init/rw
+proc                     0     0     0   -  /proc
+sysfs                    0     0     0   -  /sys
+udev                 1008M  132K 1008M   1% /dev
+tmpfs                1013M     0 1013M   0% /dev/shm
+devpts                   0     0     0   -  /dev/pts
+tmpfs                1013M   12K 1013M   1% /tmp
+bruin@ovm32:/$ 
+bruin@ovm32:~$ dpkg -l >pkg.list.0
+bruin@ovm32:~$ wc -l pkg.list.0
+300 pkg.list.0
+bruin@ovm32:~$
+bruin@ovm32:~$ sudo cp -a /etc/apt apt.0
+bruin@ovm32:~$ find apt.0
+apt.0
+apt.0/trusted.gpg.d
+apt.0/preferences.d
+apt.0/preferences.d/99openmediavault-local
+apt.0/apt
+apt.0/apt/trusted.gpg.d
+apt.0/apt/preferences.d
+apt.0/apt/preferences.d/99openmediavault-local
+apt.0/apt/trusted.gpg
+apt.0/apt/trustdb.gpg
+apt.0/apt/apt.conf
+apt.0/apt/sources.list
+apt.0/apt/sources.list.d
+apt.0/apt/sources.list.d/openmediavault-local.list
+apt.0/apt/sources.list.d/openmediavault.list
+apt.0/apt/sources.list~
+apt.0/apt/apt.conf.d
+apt.0/apt/apt.conf.d/00recommends
+apt.0/apt/apt.conf.d/00trustcdrom
+apt.0/apt/apt.conf.d/70debconf
+apt.0/apt/apt.conf.d/01autoremove
+apt.0/apt/apt.conf.d/00CDMountPoint
+apt.0/apt/secring.gpg
+apt.0/apt/preferences
+apt.0/apt.conf
+apt.0/sources.list
+apt.0/sources.list.d
+apt.0/sources.list.d/openmediavault-local.list
+apt.0/sources.list.d/openmediavault.list
+apt.0/sources.list~
+apt.0/apt.conf.d
+apt.0/apt.conf.d/00recommends
+apt.0/apt.conf.d/00trustcdrom
+apt.0/apt.conf.d/70debconf
+apt.0/apt.conf.d/01autoremove
+apt.0/apt.conf.d/00CDMountPoint
+apt.0/preferences
+bruin@ovm32:~$ cat /etc/apt/sources.list
+# 
+
+# deb cdrom:[Debian GNU/Linux 6.0.0 _Squeeze_ - Official Snapshot i386 LIVE/INSTALL Binary 20130824-12:51]/ squeeze main non-free
+
+#deb cdrom:[Debian GNU/Linux 6.0.0 _Squeeze_ - Official Snapshot i386 LIVE/INSTALL Binary 20130824-12:51]/ squeeze main non-free
+
+deb http://mirrors.163.com/debian/ squeeze main
+deb-src http://mirrors.163.com/debian/ squeeze main
+
+deb http://security.debian.org/ squeeze/updates main non-free
+deb-src http://security.debian.org/ squeeze/updates main non-free
+
+# squeeze-updates, previously known as 'volatile'
+deb http://mirrors.163.com/debian/ squeeze-updates main non-free
+deb-src http://mirrors.163.com/debian/ squeeze-updates main non-free
+bruin@ovm32:~$ 
+[/code]
+[/list]	 
+
+2. upgrade to backport kernel
+[list]
+[*] install omv-extras-plugin via ssh: http://omv-extras.org/simple/index.php?id=how-to-install-omv-extras-plugin
+[code]
+[b]bruin@ovm32:~$ wget http://omv-extras.org/debian/pool/main/o/openmediavault-omvextrasorg/openmediavault-omvextrasorg_0.5.39_all.deb[/b]
+--2014-03-30 20:13:25--  http://omv-extras.org/debian/pool/main/o/openmediavault-omvextrasorg/openmediavault-omvextrasorg_0.5.39_all.deb
+正在解析主机 omv-extras.org... 75.100.121.227
+正在连接 omv-extras.org|75.100.121.227|:80... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度：148726 (145K) [application/x-debian-package]
+正在保存至: “openmediavault-omvextrasorg_0.5.39_all.deb”
+
+100%[============================================================================================>] 148,726     28.3K/s 花时 5.1s    
+
+2014-03-30 20:13:32 (28.3 KB/s) - 已保存 “openmediavault-omvextrasorg_0.5.39_all.deb” [148726/148726])
+
+[b]bruin@ovm32:~$ sudo dpkg -i openmediavault-omvextrasorg_0.5.39_all.deb [/b]
+选中了曾被取消选择的软件包 openmediavault-omvextrasorg。
+(正在读取数据库 ... 系统当前共安装有 23601 个文件和目录。)
+正在解压缩 openmediavault-omvextrasorg (从 openmediavault-omvextrasorg_0.5.39_all.deb) ...
+正在设置 openmediavault-omvextrasorg (0.5.39) ...
+Initialize configuration
+OK
+OK
+OK
+OK
+OK
+OK
+gpg: 警告：不建议使用散列算法 MD5
+gpg: 请参见 http://www.gnupg.org/faq/weak-digest-algos.html 以得到更多信息。
+OK
+OK
+正在处理用于 openmediavault 的触发器...
+Restarting engine daemon ...
+Updating file permissions ...
+Updating locale files ...
+[b]bruin@ovm32:~$ sudo apt-get update[/b]
+...
+[/code]
+What's changed in pkgs db:
+[code]
+bruin@ovm32:~$ dpkg -l > pkg.list.1
+bruin@ovm32:~$ diff pkg.list.1 pkg.list.0
+239d238
+< ii  openmediavault-omvextrasorg        0.5.39                       OMV-Extras.org Package Repositories for OpenMediaVault
+bruin@ovm32:~$ 
+bruin@ovm32:~$ sudo cp -a /etc/apt apt.1
+bruin@ovm32:~$ diff -r apt.1 apt
+只在 apt 存在：apt
+只在 apt.1/preferences.d 存在：99omv-extras-org
+只在 apt.1 存在：secring.gpg
+只在 apt.1/sources.list.d 存在：omv-extras-org-sardaukar.list
+只在 apt.1 存在：trustdb.gpg
+只在 apt.1 存在：trusted.gpg
+只在 apt.1 存在：trusted.gpg~
+bruin@ovm32:~$ cat /etc/apt/preferences.d/99omv-extras-org 
+Package: *
+Pin: release n=sardaukar, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-dotdeb, origin packages.omv-extras.org
+Pin-Priority: 996
+
+Package: *
+Pin: release n=sardaukar-greyhole, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-plex, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-testing, origin packages.omv-extras.org
+Pin-Priority: 996
+
+Package: *
+Pin: release n=sardaukar-backports, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-vb, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-miller, origin dh2k.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-miller-testing, origin dh2k.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-beta, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-btsync, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=sardaukar-vdr, origin packages.omv-extras.org
+Pin-Priority: 995
+
+Package: *
+Pin: release n=squeeze, origin debian.yeasoft.net
+Pin-Priority: 995
+
+Package: *
+Pin: release o=e-tobi.net
+Pin-Priority: 995
+bruin@ovm32:~$ cat /etc/apt/sources.list.d/o
+omv-extras-org-sardaukar.list  openmediavault.list            openmediavault-local.list      
+bruin@ovm32:~$ cat /etc/apt/sources.list.d/omv-extras-org-sardaukar.list 
+deb http://packages.omv-extras.org/debian/ sardaukar main
+bruin@ovm32:~$ 
+[/code]
+also, by logging into the webui again (as webgui has restarted), check that "System->OMV-Extras.org" exists now.
+[*] upgrade kernel from webui, by clicking "system->omv-extras.org->install backports 3.2 kernel" and then clicking "start" button.
+the webui output:
+[code]
+
+[/code]
+[*] reboot the box via webui.
+what's changed in pkgs db:
+
+[/list]
+
      - apt-get install vim less htop manpages man-db build-essential apt-file util-linux aptitude
      - apt-file update
      - apt-get update
@@ -228,3 +469,6 @@ root@omv:/usr/src# apt-get install aptitude
 
 
 
+
+
+	

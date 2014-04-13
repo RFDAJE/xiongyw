@@ -1,6 +1,8 @@
 {
 	"installed_packages":
 	[
-		"42 Headers"
+		"42 Headers",
+		"ConvertToUTF8",
+		"SmartMarkdown"
 	]
 }
