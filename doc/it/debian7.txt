@@ -60,6 +60,8 @@ History for 'tank':
 
 - 32 bit apps: http://www.debian-administration.org/articles/531
     $ sudo apt-get install ia32-libs
+    
+    http://stackoverflow.com/questions/20032019/to-install-ia32-libs-on-debian-wheezy-amd64
 - p4: http://package.perforce.com/
 
     $ wget http://package.perforce.com/perforce.pubkey
