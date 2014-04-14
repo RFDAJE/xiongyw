@@ -24,7 +24,7 @@ permitted by applicable law.
 Last login: Fri Apr 11 15:20:50 2014 from mob70065.hq.k.grp
 bruin@d7:~$ echo $DISPLAY
 
-bruin@d7:~$ export DISPLAY=:10.0
+bruin@d7:~$ export DISPLAY=localhost:10.0
 bruin@d7:~$ xclock&
 [1] 19262
 bruin@d7:~$ Warning: Missing charsets in String to FontSet conversion
