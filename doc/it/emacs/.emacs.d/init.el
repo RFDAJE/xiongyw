@@ -17,7 +17,9 @@
 ;; it's assumed that the HOME "~" is pointing to "git/xiongyw/doc/it/emacs/"
 ;; now we want the "default-directory" points to "git/xiongyw/"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq default-directory "~/../../../")
+;(setq default-directory "~/../../../")
+(setq default-directory "~/")
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; set load path
@@ -220,26 +222,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; tabbar
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'tabbar)
-(tabbar-mode t)
+;(require 'tabbar)
+;(tabbar-mode t)
 ;; just put all tabs in one group
-(setq tabbar-buffer-groups-function
-          (lambda ()
-            (list "All")))
+;(setq tabbar-buffer-groups-function
+;          (lambda ()
+;            (list "All")))
 ;; navigate among tabs
-(global-set-key [C-left] 'tabbar-backward-tab)
-(global-set-key [C-right] 'tabbar-forward-tab)
+;(global-set-key [C-left] 'tabbar-backward-tab)
+;(global-set-key [C-right] 'tabbar-forward-tab)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; w3m: http://blog.chinaunix.net/uid-20680669-id-3339757.html
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'exec-path "c:/emacs/emacs-24.2/windows_emacs_w3m/w3m") 
-(require 'w3m-load)
-(setq w3m-use-favicon nil)
-(setq w3m-command-arguments '("-cookie" "-F"))
-(setq w3m-use-cookies t)
-(setq w3m-home-page "http://www.googlestable.com")
+;(add-to-list 'exec-path "c:/emacs/emacs-24.2/windows_emacs_w3m/w3m") 
+;(require 'w3m-load)
+;(setq w3m-use-favicon nil)
+;(setq w3m-command-arguments '("-cookie" "-F"))
+;(setq w3m-use-cookies t)
+;(setq w3m-home-page "http://www.googlestable.com")
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
