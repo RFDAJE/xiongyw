@@ -15,6 +15,7 @@
 
 - goto a directory desired
 - do: git clone https://xiongyw@github.com/xiongyw/xiongyw.git
+  or using ssh: git clone git@github.com:xiongyw/xiongyw.git
 
 3. Config
 
@@ -26,3 +27,11 @@ git config --local alias.co checkout
 git config --local alias.br branch
 git config --local color.ui true
 
+
+4. Changing from HTTPS to SSH access:
+
+- generate ssh key, upload pub key into github and test it
+https://help.github.com/articles/generating-ssh-keys
+
+- change the remote url
+https://help.github.com/articles/changing-a-remote-s-url
