@@ -16,3 +16,13 @@
 - goto a directory desired
 - do: git clone https://xiongyw@github.com/xiongyw/xiongyw.git
 
+3. Config
+
+git config --local user.name "Yuwu Xiong"
+git config --local user.email "xiongyw@hotmail.com"
+git config --local alias.st status
+git config --local alias.ci commit
+git config --local alias.co checkout
+git config --local alias.br branch
+git config --local color.ui true
+
