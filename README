@@ -33,5 +33,11 @@ git config --local color.ui true
 - generate ssh key, upload pub key into github and test it
 https://help.github.com/articles/generating-ssh-keys
 
+ssh -T git@github.com
+
 - change the remote url
 https://help.github.com/articles/changing-a-remote-s-url
+
+git remote -v
+git remote set-url origin git@github.com:xiongyw/xiongyw.git
+
