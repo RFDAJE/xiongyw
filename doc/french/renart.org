@@ -1,5 +1,6 @@
 http://www.academie-en-ligne.fr/Ressources/4/FR51/AL4FR51TEWB0111-Sequence-09.pdf
 
+-------------------------------------------------------------------------
 Ce cours est la propriété du Cned. Les images et textes intégrés à ce
 cours sont la propriété de leurs auteurs et/ou ayants droit
 respectifs. Tous ces éléments font l’ojet d’une protection par les
@@ -10,6 +11,7 @@ reproduction, utilisation collective à quelque titre que ce soit, tout
 usage commercial, ou toute mise à disposition de tiers d’un cours ou
 d’une œuvre intégrée à ceux-ci sont strictement interdits.  
                                                             ©Cned-2009
+-------------------------------------------------------------------------
 
 
 * Sommaire de la séquence 9
@@ -49,7 +51,7 @@ de cette séquence.
 
 * Séance 1
 
-Découvrir Le roman de Renart
+** Découvrir Le roman de Renart
 
 Dans cette séquence, tu vas étudier des épisodes d’une œuvre très
 célèbre du Moyen Âge : le Roman de Renart. Parallèlement, en lecture
@@ -107,8 +109,7 @@ quelques mots de vocabulaire que tu vas rencontrer :
 - un « écot » : ce que chacun paie pour un repas pris en commun.
 - « aller à l’amble » : allure des quadrupèdes entre le pas et le trot
 
-
-Vengeance!
+** Vengeance!
 
 Renart et Primaut vivent de nombreuses aventures et mésaventures.
 Dans celles qui précèdent, Primaut, le loup, accompagné de Renart, a
@@ -133,15 +134,14 @@ s’effrayer de leur approche, se vautre dans la terre humide, s’étend
 en travers du chemin, la queue raide, la pelisse toute blanchie de
 fange. Il se place jambes en l’air, dents serrées, balèvres rentrées,
 langue tirée et les yeux fermés. Les marchands en passant ne manquent
-pas de l’apercevoir. « Oh ! regardez, dit le premier, par ma foi c’est
-un goupil.  Belle occasion de payer avec sa peau l’écot de la nuit!
-Elle est vraiment belle, on en ferait une bonne garniture de surcot;
-je ne la donnerais pas pour quatre livres.
-
-- Mais, dit un autre, elle les vaut, et mieux encore ; il ne faut que
-regarder la gorge. Voyez comme elle est blanche ! Or, mettons-le dans
-la voiture, et dès que nous serons arrivés, nous lui ôterons ce manteau
-qui doit lui tenir trop chaud. »
+pas de l’apercevoir. « Oh ! regardez, » dit le premier, « par ma foi
+c’est un goupil.  Belle occasion de payer avec sa peau l’écot de la
+nuit!  Elle est vraiment belle, on en ferait une bonne garniture de
+surcot; je ne la donnerais pas pour quatre livres. -- Mais, » dit un
+autre, « elle les vaut, et mieux encore ; il ne faut que regarder la
+gorge. Voyez comme elle est blanche ! Or, mettons-le dans la voiture,
+et dès que nous serons arrivés, nous lui ôterons ce manteau qui doit
+lui tenir trop chaud. »
 
 Cela dit, on le lève, on le jette sur la charrette, on l’étend
 au-dessus d’un grand panier, on le recouvre de la banne, puis on se
@@ -181,55 +181,73 @@ Notes :
 7- expédient : moyen provisoire de se sortir d’embarras
 8- gaber : se moquer
 9- ébaudi : stupéfait
-A
+
+** A: Le personnage de Renart
+
+As-tu bien lu ? Pour vérifier ta lecture, réponds aux questions
+suivantes, sur ton cahier, en rédigeant des phrases complètes.
+
+1- a) Dans un dictionnaire, cherche l’étymologie du nom commun «renard».
+   b) En t’aidant de ta précédente réponse, explique l’orthographe du
+      nom « Renart ».
+
+2- a) Par quel nom commun les marchands désignent-ils Renart dans le
+      premier paragraphe?
+   b) À ton avis, que veut dire ce mot ?
+   c) Ce nom est-il encore utilisé aujourd’hui ?
+   d) En t’aidant d’un dictionnaire, trouve un verbe utilisé aujourd’hui 
+      et dont le radical est le nom commun que tu as relevé à la question 2a.
+
+3- Renart agit-il comme un animal ou comme un être humain ? Justifie 
+   ta réponse en donnant une ou plusieurs raisons à ton choix.
+
+Compare tes réponses avec celles du corrigé. Lis maintenant le « Je
+retiens » et mémorise-le.
+
+je retiens
+
 Le personnage de Renart
-As-tu bien lu ? Pour vérifier ta lecture, réponds aux questions suivantes, sur ton cahier, en
-rédigeant des phrases complètes.
-1-	 a)	 Dans un dictionnaire, cherche l’étymologie du nom commun « renard ».
-b)	En t’aidant de ta précédente réponse, explique l’orthographe du nom « Renart ».
-2-	 a)	 Par quel nom commun les marchands désignent-ils Renart dans le premier
-paragraphe ?
-b)	À ton avis, que veut dire ce mot ?
-c)	 Ce nom est-il encore utilisé aujourd’hui ?
-d)	En t’aidant d’un dictionnaire, trouve un verbe utilisé aujourd’hui et dont le radical est
-le nom commun que tu as relevé à la question 2a.
-3-	 Renart agit-il comme un animal ou comme un être humain ? Justifie ta réponse en
-donnant une ou plusieurs raisons à ton choix.
-© Cned, Français 5e —
-97
-Séquence 9 — séance 1
-Compare tes réponses avec celles du corrigé. Lis maintenant le « Je retiens » et mémorise-le.
-j e retiens
-Le personnage de Renart
-Le héros du Roman de Renart est un animal que l’on appelait un goupil, en ancien
-français (la langue du Moyen Âge). Le Roman de Renart a connu une telle célébrité que
-le nom propre « Renart » est devenu le nom commun « renard », qui a remplacé le mot
-« goupil » du Moyen Âge.
-Les autres personnages du Roman de Renart sont aussi des animaux (loup, lion...) mais
-ils agissent comme des êtres humains. On dit qu’ils sont personnifiés.
-B
-La ruse de Renart
-1-	 Relis les lignes 1 à 6.
-a) Résume en une ou deux phrases la situation initiale de ce récit.
-b) Relève les indications de lieu dans la situation initiale.
-c) Parmi les indications de lieu, retrouve en quel endroit Renart choisit de s’arrêter et dis
-pourquoi.
-2-	 Quelle ruse utilise Renart pour tromper les harengers (marchands de harengs) ?
-3-	 Sur quel vice (défaut) des marchands, Renart compte-t-il pour réussir ?
+
+Le héros du Roman de Renart est un animal que l’on appelait un goupil,
+en ancien français (la langue du Moyen Âge). Le Roman de Renart a
+connu une telle célébrité que le nom propre « Renart » est devenu le
+nom commun « renard », qui a remplacé le mot « goupil » du Moyen Âge.
+
+Les autres personnages du Roman de Renart sont aussi des animaux
+(loup, lion...) mais ils agissent comme des êtres humains. On dit
+qu’ils sont personnifiés.
+
+** B: La ruse de Renart
+
+1- Relis les lignes 1 à 6.
+   a) Résume en une ou deux phrases la situation initiale de ce récit.
+   b) Relève les indications de lieu dans la situation initiale.
+   c) Parmi les indications de lieu, retrouve en quel endroit Renart 
+      choisit de s’arrêter et dis pourquoi.
+2- Quelle ruse utilise Renart pour tromper les harengers (marchands de harengs)?
+3- Sur quel vice (défaut) des marchands, Renart compte-t-il pour réussir?
+
 Vérifie tes réponses dans le corrigé.
-La séance est terminée. Si tu t’es déjà procuré le roman d’Odile Weulersse intitulé Le Chevalier
-au bouclier vert, tu peux en commencer la lecture.
-98
+
+La séance est terminée. Si tu t’es déjà procuré le roman d’Odile
+Weulersse intitulé Le Chevalier au bouclier vert, tu peux en commencer
+la lecture.
+
 
 * Séance 2
-Étudier les formes en -ant
-Dans cette séance, tu vas travailler à nouveau sur le texte racontant l’aventure de Renart et
-des harengers (le texte reproduit au début de la séance 1). Tu travailleras sur une notion de
-grammaire : les formes verbales qui se terminent par le suffixe –ant.
-Avant de commencer, prends ton cahier. Écris en rouge le numéro et le titre de la séance. Souligne-
-les.
-A
-Repérer et identifier les formes verbales en -ant
+
+** Étudier les formes en -ant
+
+Dans cette séance, tu vas travailler à nouveau sur le texte racontant
+l’aventure de Renart et des harengers (le texte reproduit au début de
+la séance 1). Tu travailleras sur une notion de grammaire : les formes
+verbales qui se terminent par le suffixe –ant.
+
+Avant de commencer, prends ton cahier. Écris en rouge le numéro et le
+titre de la séance. Souligne-les.
+
+** A: Repérer et identifier les formes verbales en -ant
+
 Fais les exercices suivants sur ton cahier, en rédigeant des phrases complètes pour répondre.
 Attention, certains exercices sont à faire directement sur le cours.
 1-	 Relis la phrase suivante, extraite du texte 1 (lignes 3-6) puis fais les exercices demandés.
