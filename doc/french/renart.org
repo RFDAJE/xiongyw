@@ -1,7 +1,15 @@
-PDF: http://www.academie-en-ligne.fr/Ressources/4/FR51/AL4FR51TEWB0111-Sequence-09.pdf
+http://www.academie-en-ligne.fr/Ressources/4/FR51/AL4FR51TEWB0111-Sequence-09.pdf
 
-Ce cours est la propriété du Cned. Les images et textes intégrés à ce cours sont la propriété de leurs auteurs et/ou ayants droit respectifs. Tous ces éléments font l’o jet d’une protection par les dispositions du code français de la propriété intellectuelle ainsi que par les conventions internationales en vigueur. Ces contenus ne peuvent être utilisés qu’à des fins strictement personnelles. Toute reproduction, utilisation collective à quelque titre que ce soit, tout usage commercial, ou toute mise à disposition de tiers d’un cours ou d’une œuvre intégrée à ceux-ci sont strictement interdits.
-©Cned-2009
+Ce cours est la propriété du Cned. Les images et textes intégrés à ce
+cours sont la propriété de leurs auteurs et/ou ayants droit
+respectifs. Tous ces éléments font l’ojet d’une protection par les
+dispositions du code français de la propriété intellectuelle ainsi que
+par les conventions internationales en vigueur. Ces contenus ne
+peuvent être utilisés qu’à des fins strictement personnelles. Toute
+reproduction, utilisation collective à quelque titre que ce soit, tout
+usage commercial, ou toute mise à disposition de tiers d’un cours ou
+d’une œuvre intégrée à ceux-ci sont strictement interdits.  
+                                                            ©Cned-2009
 
 
 * Sommaire de la séquence 9
@@ -15,129 +23,154 @@ Séance 4: Distinguer les homonymes
 Séance 5: Étudier la satire
 Séance 6: Distinguer et utiliser les voix active et passive
 Séance 7: Découvrir le personnage du Renard dans la littérature
-Séance 8: Préparer l’évaluation de la lecture cursive du Chevalier au bouclier vert d’Odile Weulersse
+Séance 8: Préparer l’évaluation de la lecture cursive du Chevalier au 
+          bouclier vert d’Odile Weulersse
 Séance 9: Je m’évalue
 
-Compétences du socle commun évaluées dans cette séquence:
-On ne te demandera pas d’évaluer la mobilisation de tous ces items, mais ce sont néanmoins des compétences que tu vas mettre en pratique au cours de cette séquence.
+Compétences du socle commun évaluées dans cette séquence: On ne te
+demandera pas d’évaluer la mobilisation de tous ces items, mais ce
+sont néanmoins des compétences que tu vas mettre en pratique au cours
+de cette séquence.
+
 - écrire lisiblement un texte [COMPÉTENCE 1]
 - Copier un texte sans erreurs [COMPÉTENCE 1]
 - respecter les consignes d’écriture [COMPÉTENCE 1]
 - rédiger un texte bref [COMPÉTENCE 1]
 - utiliser les principales règles orthographiques [COMPÉTENCE 1]
 - mémoriser des textes patrimoniaux [COMPÉTENCE 1]
-- s’appuyer sur des méthodes de travail (organiser son temps, planifier son travail, consulter spontanément un dictionnaire, une encyclopédie ..., se concentrer, mémoriser) [COMPÉTENCE 7]
-- rechercher l’information utile, l’analyser, la trier, la hiérachiser, l’organiser, la synthétiser [COMPÉTENCE 7]
+- s’appuyer sur des méthodes de travail (organiser son temps, planifier 
+  son travail, consulter spontanément un dictionnaire, une encyclopédie ..., 
+  se concentrer, mémoriser) [COMPÉTENCE 7]
+- rechercher l’information utile, l’analyser, la trier, la hiérachiser, 
+  l’organiser, la synthétiser [COMPÉTENCE 7]
 - identifier, expliquer, rectifier une erreur [COMPÉTENCE 7]
 - savoir s’auto-évaluer [COMPÉTENCE 7]
 
 
-séance 1 —
-Séquence 9
-Séance 1
+* Séance 1
+
 Découvrir Le roman de Renart
-Dans cette séquence, tu vas étudier des épisodes d’une œuvre très célèbre du Moyen Âge : le
-Roman de Renart. Parallèlement, en lecture cursive, tu devras lire un roman de littérature de
-jeunesse dont l’histoire se passe aussi au Moyen Âge. Il s’agit du Chevalier au bouclier vert
-d’Odile Weulersse. Pense à te procurer ce livre et à le lire avant l’évaluation de la séquence 9.
-Pour ton étude du Roman de Renart, voici quelques précisions :
-Tout d’abord, contrairement à ce que le titre pourrait laisser croire, le Roman de Renart n’est
-pas un roman ! le « roman » était la langue que l’on parlait entre le latin et l’ancien français. Les
-textes de l’époque étaient écrits soit en latin, soit en roman. Ces derniers étaient d’abord appelés
-« romans » en références à la langue utilisée. Puis le nom « roman » a désigné les fictions racontées
-en langue romane. Comme la langue a beaucoup changé depuis le moyen âge, tu vas lire une
-traduction du texte original.
-Ensuite, il ne s’agit pas d’un roman comme ceux que tu peux lire aujourd’hui : Le Roman de
-Renart a été écrit en vers, le plus souvent en octosyllabes (des vers de huit syllabes) et avec des
-rimes.
-Autre particularité, Le Roman de Renart a plusieurs auteurs : une trentaine ! L’un des premiers
-est connu : il s’appelle Pierre de Saint-Cloud, surnommé Pierrot, et il commence, de 1170 à 1178,
-à raconter les aventures d’un personnage appelé « Renart ». Il est le premier à le faire par écrit,
-mais il n’a pas inventé ces aventures : il reprend ce que d’autres racontaient avant lui. Après lui, au
-XIIIe siècle, d’autres auteurs poursuivront ces récits. La plupart de ces auteurs sont anonymes.
-Enfin, chaque épisode du Roman de Renart forme une histoire indépendante. L’unité est
-donnée par des personnages que l’on rencontre sans cesse : Renart, le héros, Ysengrin, le loup
-qui est l’oncle et l’adversaire du héros, Tiécelin, le corbeau, Chantecler, le coq, Noble, le lion,
-Hermeline, la renarde...
-Dans l’épisode que tu vas lire au cours de la première séance, Renart cherche seul de la nourriture,
-après avoir volé une jeune oie à son cousin, le loup Primaut. La faim est très présente dans le
-Roman de Renart, comme dans la vie des hommes du Moyen Âge.
-Avant de commencer, prends ton cahier. En haut d’une nouvelle page, recopie en rouge le numéro
-et le titre de la séquence. Encadre-les.
-Recopie ensuite en rouge le numéro et le titre de la séance. Souligne-les.
-À présent, lis le texte reproduit ci-dessous. Pour t’aider, voici quelques mots de vocabulaire que tu
-vas rencontrer :
--	 les « tanches » et les « harengs » : poissons.
--	 les « harangers » : poissonniers.
--	 un « écot » : ce que chacun paie pour un repas pris en commun.
--	 « aller à l’amble » : allure des quadrupèdes entre le pas et le trot
-© Cned, Français 5e —
-95
-Séquence 9 — séance 1
-Vengeance !
+
+Dans cette séquence, tu vas étudier des épisodes d’une œuvre très
+célèbre du Moyen Âge : le Roman de Renart. Parallèlement, en lecture
+cursive, tu devras lire un roman de littérature de jeunesse dont
+l’histoire se passe aussi au Moyen Âge. Il s’agit du Chevalier au
+bouclier vert d’Odile Weulersse. Pense à te procurer ce livre et à le
+lire avant l’évaluation de la séquence 9.
+
+Pour ton étude du Roman de Renart, voici quelques précisions:
+
+Tout d’abord, contrairement à ce que le titre pourrait laisser croire,
+le Roman de Renart n’est pas un roman ! le « roman » était la langue
+que l’on parlait entre le latin et l’ancien français. Les textes de
+l’époque étaient écrits soit en latin, soit en roman. Ces derniers
+étaient d’abord appelés « romans » en références à la langue
+utilisée. Puis le nom « roman » a désigné les fictions racontées en
+langue romane. Comme la langue a beaucoup changé depuis le moyen âge,
+tu vas lire une traduction du texte original.
+
+Ensuite, il ne s’agit pas d’un roman comme ceux que tu peux lire
+aujourd’hui : Le Roman de Renart a été écrit en vers, le plus souvent
+en octosyllabes (des vers de huit syllabes) et avec des rimes.
+
+Autre particularité, Le Roman de Renart a plusieurs auteurs: une
+trentaine! L’un des premiers est connu: il s’appelle Pierre de
+Saint-Cloud, surnommé Pierrot, et il commence, de 1170 à 1178, à
+raconter les aventures d’un personnage appelé « Renart ». Il est le
+premier à le faire par écrit, mais il n’a pas inventé ces aventures:
+il reprend ce que d’autres racontaient avant lui. Après lui, au XIIIe
+siècle, d’autres auteurs poursuivront ces récits. La plupart de ces
+auteurs sont anonymes.
+
+Enfin, chaque épisode du Roman de Renart forme une histoire
+indépendante. L’unité est donnée par des personnages que l’on
+rencontre sans cesse : Renart, le héros, Ysengrin, le loup qui est
+l’oncle et l’adversaire du héros, Tiécelin, le corbeau, Chantecler, le
+coq, Noble, le lion, Hermeline, la renarde...
+
+Dans l’épisode que tu vas lire au cours de la première séance, Renart
+cherche seul de la nourriture, après avoir volé une jeune oie à son
+cousin, le loup Primaut. La faim est très présente dans le Roman de
+Renart, comme dans la vie des hommes du Moyen Âge.
+
+Avant de commencer, prends ton cahier. En haut d’une nouvelle page,
+recopie en rouge le numéro et le titre de la séquence. Encadre-les.
+
+Recopie ensuite en rouge le numéro et le titre de la
+séance. Souligne-les. 
+
+À présent, lis le texte reproduit ci-dessous. Pour t’aider, voici
+quelques mots de vocabulaire que tu vas rencontrer :
+
+- les « tanches » et les « harengs » : poissons.
+- les « harangers » : poissonniers.
+- un « écot » : ce que chacun paie pour un repas pris en commun.
+- « aller à l’amble » : allure des quadrupèdes entre le pas et le trot
+
+
+Vengeance!
+
 Renart et Primaut vivent de nombreuses aventures et mésaventures.
 Dans celles qui précèdent, Primaut, le loup, accompagné de Renart, a
-dérobé, dans une église, des vêtements qu’il a ensuite échangés contre un
-oison1 bien gras ; mais il a refusé de partager avec Renart.
-L’aventure que vous allez lire s’intitule :
-Comment Renart eut vengeance de Primaut,
-et comment il le fit battre par les harengers.
-1
-5
-10
-15
-20
-25
-30
-35
-96
-Laissons là Primaut, pour revenir à Renart, qui cherche à se
-consoler de la perte de l’oison1, et se bat les flancs2 pour trou-
-ver autre chose à se mettre sous la dent. Mais, quand après avoir
-assez couru, il vit que le bois ne lui offrait pas grande chance de butin,
-il reprit le sentier qui conduisait au chemin de la foire, et regagnant les
-abords de la route, il résolut d’y attendre quelque aventure. Il
-n’était pas au guet depuis longtemps, quand il entendit venir une
-lourde charrette. C’était des marchands de poisson qui conduisaient à
-la foire une provision de tanches et de harengs. Renart, loin de s’ef-
-frayer de leur approche, se vautre dans la terre humide, s’étend en tra-
-vers du chemin, la queue raide, la pelisse3 toute blanchie de fange. Il
-se place jambes en l’air, dents serrées, balèvres4 rentrées, langue tirée
-et les yeux fermés. Les marchands en passant ne manquent pas de
-l’apercevoir. « Oh ! regardez, dit le premier, par ma foi c’est un goupil.
-Belle occasion de payer avec sa peau l’écot de la nuit ! Elle est vraiment
-belle, on en ferait une bonne garniture de surcot5 ; je ne la donnerais
-pas pour quatre livres.
+dérobé, dans une église, des vêtements qu’il a ensuite échangés contre
+un oison bien gras; mais il a refusé de partager avec Renart.
+
+L’aventure que vous allez lire s’intitule:
+
+Comment Renart eut vengeance de Primaut, et comment il le fit battre
+par les harengers.
+
+Laissons là Primaut, pour revenir à Renart, qui cherche à se consoler
+de la perte de l’oison, et se bat les flancs pour trouver autre chose
+à se mettre sous la dent. Mais, quand après avoir assez couru, il vit
+que le bois ne lui offrait pas grande chance de butin, il reprit le
+sentier qui conduisait au chemin de la foire, et regagnant les abords
+de la route, il résolut d’y attendre quelque aventure. Il n’était pas
+au guet depuis longtemps, quand il entendit venir une lourde
+charrette. C’était des marchands de poisson qui conduisaient à la
+foire une provision de tanches et de harengs. Renart, loin de
+s’effrayer de leur approche, se vautre dans la terre humide, s’étend
+en travers du chemin, la queue raide, la pelisse toute blanchie de
+fange. Il se place jambes en l’air, dents serrées, balèvres rentrées,
+langue tirée et les yeux fermés. Les marchands en passant ne manquent
+pas de l’apercevoir. « Oh ! regardez, dit le premier, par ma foi c’est
+un goupil.  Belle occasion de payer avec sa peau l’écot de la nuit!
+Elle est vraiment belle, on en ferait une bonne garniture de surcot;
+je ne la donnerais pas pour quatre livres.
+
 - Mais, dit un autre, elle les vaut, et mieux encore ; il ne faut que
 regarder la gorge. Voyez comme elle est blanche ! Or, mettons-le dans
 la voiture, et dès que nous serons arrivés, nous lui ôterons ce manteau
 qui doit lui tenir trop chaud. »
-Cela dit, on le lève, on le jette sur la charrette, on l’étend au-dessus
-d’un grand panier, on le recouvre de la banne6, puis on se remet en
-route. Ce panier contenait pour le moins un millier de harengs frais.
-Renart, que les marchands ne surveillaient guère, commence par en
-savourer une douzaine ; puis la faim cesse et la satiété arrive.
-C’est le moment de penser à s’échapper ; et comme,
-tout en dévorant, il n’oubliait pas la félonie de Primaut, il avise un
-expédient7 qui va lui fournir un excellent moyen de vengeance. Il
-prend entre ses dents un des plus beaux harengs, joint les pieds, fait un
-saut et le voilà sur le pré. Mais avant de s’éloigner, il ne peut se tenir
-de gaber8 un peu les marchands : « Bon voyage, les vilains ! je n’ai plus
-affaire de vous et je vous engage à ne pas compter sur ma peau pour
-votre écot. Vos harengs sont très bons ; je n’en regrette pas le prix. À
-vous le reste, sauf celui-ci que j’emporte pour la faim prochaine. Dieu
-vous garde, les vilains ! »
-— © Cned, Français 5e
-séance 1 —
-40
-Séquence 9
+
+Cela dit, on le lève, on le jette sur la charrette, on l’étend
+au-dessus d’un grand panier, on le recouvre de la banne, puis on se
+remet en route. Ce panier contenait pour le moins un millier de
+harengs frais.  Renart, que les marchands ne surveillaient guère,
+commence par en savourer une douzaine ; puis la faim cesse et la
+satiété arrive.
+
+C’est le moment de penser à s’échapper; et comme, tout en dévorant, il
+n’oubliait pas la félonie de Primaut, il avise un expédient qui va lui
+fournir un excellent moyen de vengeance. Il prend entre ses dents un
+des plus beaux harengs, joint les pieds, fait un saut et le voilà sur
+le pré. Mais avant de s’éloigner, il ne peut se tenir de gaber un peu
+les marchands : « Bon voyage, les vilains ! je n’ai plus affaire de
+vous et je vous engage à ne pas compter sur ma peau pour votre
+écot. Vos harengs sont très bons; je n’en regrette pas le prix. À vous
+le reste, sauf celui-ci que j’emporte pour la faim prochaine. Dieu
+vous garde, les vilains! »
+
 Cela dit, Renart joue des jambes, et les harengers de se regarder
-confus et ébaubis9. Ils le huent, ils le menacent ; peines perdues, il
-n’en presse pas d’un brin son allure. Il va le trot, le pas, l’amble ; à tra-
-vers monts, bosquets, plaines et vallées, jusqu’à ce qu’il ait enfin rega-
-gné l’endroit où il avait laissé Primaut.
-(à suivre...)
+confus et ébaubis. Ils le huent, ils le menacent; peines perdues, il
+n’en presse pas d’un brin son allure. Il va le trot, le pas, l’amble;
+à travers monts, bosquets, plaines et vallées, jusqu’à ce qu’il ait
+enfin regagné l’endroit où il avait laissé Primaut.  
+
+                                                     (à suivre...)
+
 Le roman de Renart, © éditions Gallimard, coll. « Folio »
+
 Notes :
 1- oison : jeune oie
 2- se battre les flancs : se donner du mal inutilement
@@ -187,10 +220,8 @@ Vérifie tes réponses dans le corrigé.
 La séance est terminée. Si tu t’es déjà procuré le roman d’Odile Weulersse intitulé Le Chevalier
 au bouclier vert, tu peux en commencer la lecture.
 98
-— © Cned, Français 5e
-séance 2 —
-Séquence 9
-Séance 2
+
+* Séance 2
 Étudier les formes en -ant
 Dans cette séance, tu vas travailler à nouveau sur le texte racontant l’aventure de Renart et
 des harengers (le texte reproduit au début de la séance 1). Tu travailleras sur une notion de
@@ -400,7 +431,8 @@ Lis le texte reproduit ci-dessous :
 Le Roman de Renart, I © Folio junior, Gallimard
 104
 — © Cned, Français 5e
-séance 3 —
+
+* séance 3 —
 A
 Séquence 9
 Les personnages
