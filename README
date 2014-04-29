@@ -26,6 +26,7 @@ git config --local alias.ci commit
 git config --local alias.co checkout
 git config --local alias.br branch
 git config --local color.ui true
+git config --local fileMode false
 
 
 4. Changing from HTTPS to SSH access:
