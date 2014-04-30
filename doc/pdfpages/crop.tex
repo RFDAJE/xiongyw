@@ -1,0 +1,18 @@
+%% http://tex.stackexchange.com/questions/25806/how-can-i-crop-included-pdf-documents
+
+\documentclass[a4paper]{minimal}
+\usepackage[pdftex,a4paper]{geometry}
+\usepackage{pdfpages}
+\usepackage{ifthen}
+
+\newcounter{pg}
+\begin{document}
+\setcounter{pg}{1}
+%% my pdf file has 30 pages:
+%% my pdf file has size 210 x 297 mm: (0,0) at the lower-left corner.
+\whiledo{\value{pg}<30}{%
+\includepdf[pages=\thepg,viewport=0 0 105mm 150mm]{scan.pdf}
+\includepdf[pages=\thepg,viewport= 105mm 150mm 210mm 297mm]{scan.pdf}
+\addtocounter{pg}{1}
+}%
+\end{document}
