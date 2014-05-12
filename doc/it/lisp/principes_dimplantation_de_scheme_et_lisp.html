@@ -197,6 +197,24 @@ de contrôle associées), les <a href="" title="assignment, allocation,
 appointment">affectations</a> et les écritures dans les structures de
 données.
 
+<pre>
+Chapitre   Signature
+-------------------------------------------------------------------
+ 1         (eval exp env)
+ 2         (eval exp env fenv)
+           (eval exp env fenv denv)
+ 3         (eval exp env cont)
+ 4         (eval e r s k)
+ 5         ((meaning e) r s k)
+ 6         ((meaning e sr) r k)
+           ((meaning e sr tail?) k)
+           ((meaning e sr tail?))
+ 7         (run (meaning e sr tail?))
+10         (->C (meaning e sr))
+</pre>
+
+<p>Fig. 1 - Signatures (approximatives) des interprètes et compilateurs
+
 <p>Cette lente augmentation du langage défini s’accompagne d’une
 régression du langage de définition qui <a href="" title="grow
 poorer, impoverished">s’appauvrit</a> jusqu’à <a href="" title=
