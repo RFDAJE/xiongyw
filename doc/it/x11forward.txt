@@ -3,12 +3,16 @@ X11 forwarding using ssh client on windows
 
 - install XMING as the x server, which by default listening on port 6000 (aka, the ":0.0" display)
 - ssh -R 6010:localhost:6000 user@server
-  once log in, set DISPLAY environment first by: export DISPLAY=:10
-  the run the x apps.
+- once log in, set DISPLAY environment first by: 
+  export DISPLAY=localhost:10
+- run the desired x apps.
 
   notice that the port number 6000 and 6010 and the "display" part of [host]:<display>[.screen]
 
-  e.g.:
+
+
+--------------------------------------------------------------------------
+ e.g.:
 
 
 C:\Users\ywxiong>ssh -R 6010:localhost:6000 bruin@10.12.2.174
@@ -31,6 +35,7 @@ bruin@d7:~$ Warning: Missing charsets in String to FontSet conversion
 
 [1]+  Fini                    xclock
 bruin@d7:~$
+--------------------------------------------------------------------------
 
 
 - Don't know why -X does not work? seems once login, no new listening port is created on the ssh server...
