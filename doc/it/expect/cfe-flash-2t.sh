@@ -19,7 +19,7 @@ set initrd_kernel "humax7430/vmlinuz-initrd-humax-7430"
 # cfe commands
 set cfe_startup "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M mtdparts=spi0.0:64K@2304K(mfr)ro,64K(mbox);brcmnand.0:0xDA00000@0x2600000(rootfs)'\"\r"
 set cfe_ifconfig "ifconfig eth0 -auto\r"
-set cfe_flash_kernel "flash -noheader ${tftp}:${images_path}/${kernel_name} nandflash0.opentv\r"
+set cfe_flash_kernel "flash -noheader ${tftp}:${images_path}\/${kernel_name} nandflash0.opentv\r"
 set cfe_boot_initrd "boot -elf ${tftp}:${initrd_kernel} 'bmem=192M@64M mtdparts=brcmnand.0:0xDA00000@0x2600000(rootfs)'\r"
 # stbutil cmd
 set stbutil "stbutil -a 2 ${tftp}:${images_path}\r"
@@ -96,6 +96,7 @@ reboot_into_cfe
 
 my_send_user "Set STARTUP for normal boot..."
 send $cfe_startup
+expect $CFE_SUCCESS
 
 my_send_user "Flashing the kernel..."
 send $cfe_ifconfig
@@ -135,7 +136,7 @@ send "diff /etc/dhcp/dhclient.conf.orig /etc/dhcp/dhclient.conf\r"
 expect $LNX_PROMPT
 sleep 3
 my_send_user "Reboot..."
-send "Reboot\r"
+send "reboot\r"
 
 #
 # enfin
