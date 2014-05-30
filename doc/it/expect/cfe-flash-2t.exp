@@ -1,0 +1,184 @@
+#!/usr/bin/expect 
+
+# created(bruin, 2014-05-29)
+# last updated: 2014-05-20
+#
+# run it as root, e.g.
+# sudo ./cfe-flash-2t.exp 2>&1|tee flash.log
+#
+
+########################################################
+# customize the following to fit your stb/environment!!!
+########################################################
+# first boot trace for the chipset 
+set REBOOT_LOG "BCM97430B0 CFE v.*"
+set CFE_PROMPT "CFE> "
+set LNX_PROMPT "# "
+set CTRL_C     \x03       ;# http://wiki.tcl.tk/3038
+set CTRL_C_ACCEPTED "Automatic startup canceled via Ctrl-C"
+set CFE_SUCCESS "*** command status = 0"
+
+# IP@ of the tftp serer
+set tftp  192.168.1.2
+# files' path/name on the tftp server 
+set images_path "humax7430/hnb100/p2/BLD_2_1"
+set kernel_name "vmlinuz-main"
+set initrd_kernel "humax7430/vmlinuz-initrd-humax-7430" 
+set initrd_kernel_linkup "eth0: link up,"
+# cfe commands for Humax7430 2T (HNB100)
+set cfe_startup "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M mtdparts=spi0.0:64K@2304K(mfr)ro,64K(mbox);brcmnand.0:0xDA00000@0x2600000(rootfs)'\"\r"
+set cfe_ifconfig "ifconfig eth0 -auto\r"
+set cfe_flash_kernel "flash -noheader ${tftp}:${images_path}\/${kernel_name} nandflash0.opentv\r"
+set cfe_boot_initrd "boot -elf ${tftp}:${initrd_kernel} 'bmem=192M@64M mtdparts=brcmnand.0:0xDA00000@0x2600000(rootfs)'\r"
+# stbutil cmd
+set stbutil "stbutil -a 2 ${tftp}:${images_path}\r"
+set flash_boot_time    60   ;# 60 seconds, on the safe side
+
+
+
+########################################################################
+# define some procedures
+########################################################################
+proc my_send_user { msg } {
+    send_user "\r\n"
+    send_user "######################################\r\n"
+    send_user "# $msg \r\n" 
+    send_user "######################################\r\n"
+}
+
+proc wait { seconds } {
+    set jamais "SoMeThInG wIlL nEvEr HaPpEn!"
+    expect -timeout $seconds {
+        $jamais { close }
+#        timeout {}
+    }
+}
+
+proc reboot_into_cfe {} {
+
+    # press return several times 
+    send "\r\r\r\r"
+
+    # reboot
+    expect {
+        $::CFE_PROMPT  { send "reboot\r" }
+        $::LNX_PROMPT  { send "reboot\r" }
+    }
+
+    # entering the CFE mode by sending CTRL-C
+    expect -re $::REBOOT_LOG
+    my_send_user "Sending ^C"
+    send $::CTRL_C
+    expect -timeout 10 {
+        $::CTRL_C_ACCEPTED { 
+            my_send_user "Entering CFE..." 
+        }
+        timeout { 
+            my_send_user "Failure: timeout!" 
+            exit 1
+        } 
+    }
+
+    expect $::CFE_PROMPT
+    send "\r\r\r"
+    expect $::CFE_PROMPT
+}
+
+proc cfe_set_startup {} {
+    my_send_user "Set STARTUP for booting from flash..."
+    send $::cfe_startup
+    expect $::CFE_SUCCESS
+    send "\r\r"
+}
+
+proc flash_kernel {} {
+    my_send_user "Flashing the kernel..."
+    send $::cfe_ifconfig
+    expect $::CFE_SUCCESS
+    send $::cfe_flash_kernel
+    expect $::CFE_SUCCESS
+    send "\r\r"
+}
+
+proc boot_from_tftp_kernel_with_initrd {} {
+    my_send_user "Booting into a kernel with initrd..."
+    send $::cfe_ifconfig
+    expect $::CFE_SUCCESS
+    send $::cfe_boot_initrd
+    expect $::initrd_kernel_linkup
+    send "\r\r\r"
+    expect $::LNX_PROMPT
+}
+
+proc flash_rootfs_by_stbutil {} {
+    my_send_user "Run stbutil for flashing the rootfs..."
+    send $::stbutil
+    expect "Finished writing rootfs to flash."
+    send "\r\r\r"
+}
+
+proc boot_from_flash { estimated_boot_time } {
+    my_send_user "Reboot to the new kernel/rootfs..."
+    send "reboot\r"
+    wait $estimated_boot_time
+    send "\r\r\runame -a\r"
+    expect "Linux "
+    expect $::LNX_PROMPT
+}
+
+proc boot_from_tftp_kernel_and_nfs_rootfs {} {
+}
+
+proc update_dhclient_config {} {
+    my_send_user "Update /etc/dhcp/dhclient.conf..."
+    send "cp /etc/dhcp/dhclient.conf /etc/dhcp/dhclient.conf.orig\r"
+    expect $::LNX_PROMPT
+    send "sed -i \"s/domain-name/routers,domain-name/g\" /etc/dhcp/dhclient.conf\r"
+    expect $::LNX_PROMPT
+    send "diff /etc/dhcp/dhclient.conf.orig /etc/dhcp/dhclient.conf\r"
+    expect $::LNX_PROMPT
+    wait 3
+}
+
+
+########################################################################
+# starting...
+########################################################################
+
+#
+# some set
+#
+#exp_internal 1             ;# for debug purpose
+set timeout -1              ;# wait forever by default
+set send_slow { 1  0.05 }   ;# send each character at 50ms
+
+#
+# get connected to the serial port...
+#
+spawn killall screen
+expect eof
+spawn screen /dev/ttyS0 115200
+set screen_pid [exp_pid]     ;# kill this process at the end
+
+#
+# do it now in sequence...disable the steps not needed
+#
+reboot_into_cfe
+cfe_set_startup
+flash_kernel
+boot_from_tftp_kernel_with_initrd
+flash_rootfs_by_stbutil
+boot_from_flash $flash_boot_time
+update_dhclient_config
+boot_from_flash $flash_boot_time
+
+#
+# tear down...
+#
+#spawn kill -9 $screen_pid
+spawn killall screen
+#expect eof
+sleep 2
+#interact
+close
+
