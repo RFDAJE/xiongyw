@@ -1,7 +1,7 @@
 #!/usr/bin/expect 
 
 # created(bruin, 2014-05-30)
-# last updated: 2014-05-30
+# last updated: 2014-06-03
 #
 # run it as root, e.g.
 # sudo ./cfe-flash-3p.exp 2>&1|tee flash.log
@@ -50,7 +50,7 @@ proc my_send_user { msg } {
     send_user "######################################\r\n"
 }
 
-proc wait { seconds } {
+proc my_wait { seconds } {
     set jamais "SoMeThInG wIlL nEvEr HaPpEn!"
     expect -timeout $seconds {
         $jamais { close }
@@ -125,7 +125,7 @@ proc flash_rootfs_by_stbutil {} {
 proc boot_from_flash { estimated_boot_time } {
     my_send_user "Reboot to the new kernel/rootfs..."
     send "reboot\r"
-    wait $estimated_boot_time
+    my_wait $estimated_boot_time
     send "\r\r\runame -a\r"
     expect "Linux "
     expect $::LNX_PROMPT
@@ -136,24 +136,60 @@ proc boot_from_tftp_kernel_and_nfs_rootfs {} {
 
 proc update_dhclient_config {} {
     my_send_user "Update /etc/dhcp/dhclient.conf..."
-    send "cp /etc/dhcp/dhclient.conf /etc/dhcp/dhclient.conf.orig\r"
+    set filename "/etc/dhcp/dhclient.conf"
+    set backup [set filename].orig
+    send "ls $backup\r"
+    expect {
+        "No such file or directory" {
+            send "cp $filename $backup\r"
+            expect $::LNX_PROMPT
+        }
+    }
+    send "dos2unix $filename\r"   ;# just in case...
     expect $::LNX_PROMPT
-    send "sed -i \"s/domain-name/routers,domain-name/g\" /etc/dhcp/dhclient.conf\r"
+    send "sed -i \"s/domain-name/routers,domain-name/g\" $filename\r"
     expect $::LNX_PROMPT
-    send "diff /etc/dhcp/dhclient.conf.orig /etc/dhcp/dhclient.conf\r"
+    send "diff $backup $filename\r"
     expect $::LNX_PROMPT
-    wait 3
+    my_wait 3
 }
 
 proc update_load_driver_sh_3p {} {
-    my_send_user "Update /usr/lib/modules/load_driver.sh..."
-    send "cp /usr/lib/modules/load_driver.sh /usr/lib/modules/load_driver.sh.orig\r"
+    set filename "/usr/lib/modules/load_driver.sh"
+    set backup [set filename].orig
+    append sed_cmd "sed"
+    append sed_cmd " -e 's/^ifconfig/#ifconfig/g'" 
+    append sed_cmd " -e 's/^vconfig/#vconfig/g'"
+    append sed_cmd " -e 's/^ip link/#ip link/g'"
+    append sed_cmd " -e '/^#!/{n;s|$|\\n"
+    append sed_cmd "ip link set dev eth0 name eth9\\n"
+    append sed_cmd "ip link set dev eth2 name eth0\\n"
+    append sed_cmd "ifconfig eth9 up\\n"
+    append sed_cmd "vconfig add eth9 3\\n"
+    append sed_cmd "ifconfig eth9.3 hw ether dc:d3:21:14:06:b4 up\\n"
+    append sed_cmd "ifconfig eth9.3:0 192.168.17.10\\n"
+    append sed_cmd "ifconfig eth9:0 192.168.17.10\\n"
+    append sed_cmd "udhcpc -i eth9.3 -V \\\"OpenTV\\\" \\&\\n"
+    append sed_cmd "ifconfig eth0 up\\n|}' "
+    append sed_cmd $backup
+    append sed_cmd >
+    append sed_cmd $filename
+    my_send_user "Update $filename ..."
+    send "ls $backup\r"
+    expect {
+        "No such file or directory" {
+            send "cp $filename $backup\r"
+            expect $::LNX_PROMPT
+        }
+        $::LNX_PROMPT {}
+    }
+    # send the sed command
+    send $sed_cmd\r
+    send $::CTRL_C
     expect $::LNX_PROMPT
-    send "sed -i \"s/domain-name/routers,domain-name/g\" /etc/dhcp/dhclient.conf\r"
+    send "diff $backup $filename\r"
     expect $::LNX_PROMPT
-    send "diff /etc/dhcp/dhclient.conf.orig /etc/dhcp/dhclient.conf\r"
-    expect $::LNX_PROMPT
-    wait 3
+    my_wait 3
 }
 
 ########################################################################
@@ -184,8 +220,10 @@ flash_kernel
 boot_from_tftp_kernel_with_initrd
 flash_rootfs_by_stbutil
 boot_from_flash $flash_boot_time
-#update_dhclient_config
-#boot_from_flash $flash_boot_time
+update_dhclient_config
+boot_from_flash $flash_boot_time
+update_load_driver_sh_3p
+boot_from_flash $flash_boot_time
 
 #
 # tear down...
