@@ -1,0 +1,6 @@
+- expect abstract itself above various interactive programs (which may communicate with serial ports in different ways)
+- everything (file, process, pipe) is treated as a file, represented as either a fd (int) or a stream (FILE*)
+- expect communicates with its spawned processes via pty (opened/duped as fd and converted to streams)
+- "expect" is fread() or read() or similar
+- "send" is fprintf() or write() or similar
+- "spawn" is fork() + pty + exec()
