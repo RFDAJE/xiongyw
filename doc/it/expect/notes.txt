@@ -4,3 +4,4 @@
 - "expect" is fread() or read() or similar
 - "send" is fprintf() or write() or similar
 - "spawn" is fork() + pty + exec()
+- system vs exec: "exec cp -a * /tmp" does not work but "system..." works, as system uses shell while exec does not, for handling the glob wildcard '*' here.
