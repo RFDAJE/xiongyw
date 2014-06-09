@@ -4,17 +4,33 @@
 # build_type
 set build_type sdk
 
-# determine the config_type: 2t or 3p
-set argc [llength $argv]
-switch -- $argc \
-  0 {
-      set config_type netbrazil_2t  ;# default is for 2t
-  } 1 {
-      set config_type netbrazil_[lindex $argv 0]
-  } default {
-      puts "Usage: humax-build.exp \[2t|3p]"
-      exit 1
-  }
+proc parse_argv {$argv} {
+    # determine the config_type: 2t or 3p
+    set usage "Usage: $::argv0 \[2t|3p]"
+    set valid_args [list 2t 3p]
+    set argc [llength $::argv]
+    set argv_0 [lindex $::argv 0]
+
+    if { $argc != 1 } {
+        puts $usage
+        exit 1
+    }
+
+    set hit  0
+    foreach ele $valid_args {
+        if { [string compare $ele $argv_0] == 0 } {
+            set hit 1
+            break
+        }
+    }
+    
+    if { $hit != 1 } {
+        puts $usage
+        exit 1
+    }
+
+    return $argv_0
+}
 
 
 set p4pass "Sorry12345"
@@ -105,8 +121,10 @@ proc copy {target_root build_type config_type datetime} {
 
 
 # start...
-
 log_file -a $logfile
+
+set config_type netbrazil_[parse_argv $argv]
+
 send_user "\n\nNew build session ($build_type $config_type): [exec date]\n\n"
 
 p4_sync
