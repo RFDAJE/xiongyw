@@ -1,6 +1,12 @@
 #!/usr/bin/expect --
 
 
+# note:  patches in source tree before build
+#  - sdp_client.c: prefix "net/" in urls
+#  - make ... menuconfig: DVL26_CSO_TEST
+#  - buildroot/fs/ubifs.mk: add delay for du
+#  - buildroot/package/opentv_net.../ca/net_ca.mk: use debug lib when non-release
+
 # build_type
 set build_type sdk
 
