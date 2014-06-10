@@ -8,6 +8,7 @@
 ########################################################
 # customize the following to fit your stb/environment!!!
 ########################################################
+
 set REBOOT_LOG "BCM97430B0 CFE v.*"   ;# first boot trace
 set CFE_PROMPT "CFE> "
 set LNX_PROMPT "# "
@@ -16,6 +17,8 @@ set CTRL_C_ACCEPTED "Automatic startup canceled via Ctrl-C"
 set CFE_SUCCESS "*** command status = 0"
 
 set tftp  192.168.1.2      ;# assume using the same tftp server
+
+set supported_models [list 2t 3p]
 
 set images_path(2t) "humax7430/hnb100/p2/2t20140610-17"
 set images_path(3p) "humax7430/hnb200/p2/BLD_2_1"
@@ -50,9 +53,8 @@ set logfile ~/humax-flash.log
 ########################################################################
 # this proc returns the model of the box: "2t" or "3p"
 proc parse_argv {$argv} {
-    # determine the config_type: 2t or 3p
-    set usage "Usage: $::argv0 \[2t|3p]"
-    set valid_args [list 2t 3p]
+    global supported_models
+    set usage "Usage: $::argv0 <[join $supported_models |]>"
     set argc [llength $::argv]
     set argv_0 [lindex $::argv 0]
 
@@ -62,8 +64,8 @@ proc parse_argv {$argv} {
     }
 
     set hit  0
-    foreach ele $valid_args {
-        if { [string compare $ele $argv_0] == 0 } {
+    foreach elem $supported_models {
+        if { [string compare $elem $argv_0] == 0 } {
             set hit 1
             break
         }
@@ -92,7 +94,8 @@ proc standby { timeout } {
 # return 1 for true
 proc is_in_cfe {} {
     send "\r"
-    expect -timeout 5 {
+    set timeout 5
+    expect {
         default { return 0 }
         $::CFE_PROMPT { return 1 }
     }
@@ -101,7 +104,8 @@ proc is_in_cfe {} {
 # return 1 for true
 proc is_in_shell {} {
     send "uname\r"
-    expect -timeout 2 {
+    set timeout 2
+    expect {
         default { return 0 }
         "Linux" { return 1 }
     }
@@ -128,7 +132,8 @@ proc reboot_into_cfe {} {
     expect -re $::REBOOT_LOG
     my_send_user "Sending ^C"
     send $::CTRL_C
-    expect -timeout 10 {
+    set timeout 10
+    expect {
         $::CTRL_C_ACCEPTED { 
             my_send_user "Entering CFE..." 
         }
@@ -323,10 +328,10 @@ proc update_load_driver_sh_3p {} {
 
 # get connected to the serial port...
 proc open_ttyS0 {} {
+    global spawn_id         ;# put the spawn_id in global space
     spawn killall screen
     expect eof
     spawn screen /dev/ttyS0 115200
-    return $spawn_id
 }
 
 proc close_ttyS0 {} {
@@ -347,7 +352,7 @@ proc flash { model } {
     # apply some workarounds
     allow_disk_sharing $model
     update_dhclient_config $model
-    if { $model == 3p } {
+    if { [string compare $model 3p] == 0 } {
         update_load_driver_sh_3p
     }
     boot_from_flash $model
@@ -358,13 +363,14 @@ proc flash { model } {
 ########################################################################
 
 #exp_internal 1             ;# for debug purpose
-set timeout -1              ;# wait forever by default
+set timeout -1              ;# wait forever, by default (in global space)
 
 log_file -a $logfile
 set model [parse_argv $argv]
 
-set spawn_id [open_ttyS0]
+open_ttyS0
 flash $model
 close_ttyS0
+
 
 
