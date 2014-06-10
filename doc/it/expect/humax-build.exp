@@ -4,6 +4,7 @@
 # build_type
 set build_type sdk
 
+# return the model: 2t or 3p
 proc parse_argv {$argv} {
     # determine the config_type: 2t or 3p
     set usage "Usage: $::argv0 \[2t|3p]"
@@ -49,7 +50,7 @@ set otvtarg "otvtarg/..."
 set target_root "~/work/p4$p2path/otvtarg/$target"
 
 set datetime [exec date +%Y%m%d-%H]
-set logfile ~/build2t.log
+set logfile ~/humax-build.log
 
 proc p4_login {} {
     spawn p4 login
@@ -88,7 +89,7 @@ proc build {target_root build_type config_type} {
     expect "password for $::user: "
     send $::supass\r
     expect eof
-    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_sdp_client clean_nagraca clean_medialib
+    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_nagraca clean_drm clean_netcfg_ca
     spawn make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type LOG_LEVEL=O_TRACE
     expect "password for $::user: "
     send $::supass\r
@@ -100,7 +101,7 @@ proc build {target_root build_type config_type} {
 proc copy {target_root build_type config_type datetime} {
     cd $target_root
     # target file system
-    exec rsync -av ${build_type}_$config_type/target /nfs/romfs/humax7430/${build_type}_$config_type
+    #exec rsync -av ${build_type}_$config_type/target /nfs/romfs/humax7430/${build_type}_$config_type
 
     # tftp
     if {[string match "*_2t" $config_type]} {
@@ -114,16 +115,17 @@ proc copy {target_root build_type config_type datetime} {
     exec cp ${build_type}_$config_type/images/ubifs-128k-2048-7429b0.img  $tftp_dir
     exec cp ${build_type}_$config_type/images/vmlinuz-main $tftp_dir
 
-    exec mkdir -p $nfs_dir
-    exec cp ${build_type}_$config_type/images/ubifs-128k-2048-7429b0.img  $nfs_dir
-    exec cp ${build_type}_$config_type/images/vmlinuz-main  $nfs_dir
+    #exec mkdir -p $nfs_dir
+    #exec cp ${build_type}_$config_type/images/ubifs-128k-2048-7429b0.img  $nfs_dir
+    #exec cp ${build_type}_$config_type/images/vmlinuz-main  $nfs_dir
 }
 
 
 # start...
 log_file -a $logfile
+set model [parse_argv $argv]
 
-set config_type netbrazil_[parse_argv $argv]
+set config_type netbrazil_$model
 
 send_user "\n\nNew build session ($build_type $config_type): [exec date]\n\n"
 
