@@ -40,7 +40,7 @@ set cfe_boot_initrd(2t) "boot -elf ${tftp}:${initrd_kernel(2t)} 'bmem=192M@64M m
 set cfe_boot_initrd(3p) "boot -elf ${tftp}:${initrd_kernel(3p)} bmem=192M@64M"
 # stbutil cmd
 set stbutil(2t) "stbutil -a 2 ${tftp}:${images_path(2t)}"
-set stbutil(2p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
+set stbutil(3p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
 set stbutil_done "Finished writing rootfs to flash."
 set flash_boot_time(2t)   60   ;# in seconds, boot from flash into linux shell
 set flash_boot_time(3p)   $flash_boot_time(2t)
@@ -80,10 +80,13 @@ proc parse_argv {$argv} {
 }
 
 proc my_send_user { msg } {
-    send_user "\r\n"
-    send_user "######################################\r\n"
+    send_user "\r\n\r\n"
+    send_user "#############################################################\r\n"
+    send_user "#\r\n"
     send_user "# $msg \r\n" 
-    send_user "######################################\r\n"
+    send_user "#\r\n"
+    send_user "#############################################################\r\n"
+    send_user "\r\n\r\n"
 }
 
 # da-jiang-you for a while...
@@ -189,7 +192,7 @@ proc cfe_boot_initrd { model } {
         return 1
     }
 
-    send $::cfe_boot_initrd($model)  ;# leaving CFE...
+    send $::cfe_boot_initrd($model)\r  ;# leaving CFE, so not call exec_cfe_cmd
     expect $::initrd_kernel_linkup($model)
     send "\r\r\r"
     expect $::LNX_PROMPT
@@ -212,6 +215,7 @@ proc run_stbutil { model } {
 }
 
 proc boot_from_flash { model } {
+
     if { ![is_in_cfe] && ![is_in_shell] } {
         puts "Please make sure the box is either in CFE or in Linux console."
         return 1
@@ -223,7 +227,7 @@ proc boot_from_flash { model } {
         standby 3  
     }
     send "reboot\r"
-    standby $flash_boot_time($model)
+    standby $::flash_boot_time($model)
     is_in_shell
 }
 
@@ -239,6 +243,7 @@ proc backup_file { file backup } {
 
     my_send_user "Backup $file..."
 
+    set timeout 1   ;# timeout below means the file already exists
     send "ls $file\r"
     expect {
         "No such file or directory" {
@@ -254,7 +259,6 @@ proc backup_file { file backup } {
             expect $::LNX_PROMPT
         }
     }
-
     return 0
 }
 
@@ -291,6 +295,10 @@ proc update_dhclient_config { model } {
     expect $::LNX_PROMPT
     send "diff $backup $filename\r"
     expect $::LNX_PROMPT
+    send "sync\r"
+    expect $::LNX_PROMPT
+
+    standby 3
 }
 
 proc update_load_driver_sh_3p {} {
@@ -339,12 +347,11 @@ proc close_ttyS0 {} {
     expect eof
 }
 
+# flash kernel and rootfs
 proc flash { model } {
-
-    # flash kernel and rootfs
     reboot_into_cfe
     cfe_set_startup $model
-    flash_kernel $model
+    cfe_flash_kernel $model
     cfe_boot_initrd $model
     run_stbutil $model
     boot_from_flash $model
