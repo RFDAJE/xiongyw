@@ -1,0 +1,12 @@
+% run: pdflatex mao.tex
+
+
+\documentclass[a4paper]{book}
+\usepackage[paper=a4paper]{geometry}
+\usepackage[final]{pdfpages}
+\usepackage{verbatim}
+\begin{document}
+% trim=left bottom right top, in bp
+\includepdf[nup=1x1,pages=-,offset=0mm 0mm, trim=0 0 0 0, scale=1.22,angle=0,turn=false,frame=false]{tmux.pdf}
+\end{document} 
+
