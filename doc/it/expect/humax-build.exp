@@ -2,7 +2,8 @@
 
 
 # note:  patches in source tree before build
-#  - sdp_client.c: prefix "net/" in urls
+#  - sdp_client.c: prefix "net/" in urls, fwu/434771
+#  - dvlglue.c: if 0 => if 1   
 #  - make ... menuconfig: DVL26_CSO_TEST
 #  - buildroot/fs/ubifs.mk: add delay for du
 #  - buildroot/package/opentv_net.../ca/net_ca.mk: use debug lib when non-release
@@ -95,7 +96,7 @@ proc build {target_root build_type config_type} {
     expect "password for $::user: "
     send $::supass\r
     expect eof
-    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_nagraca clean_drm clean_netcfg_ca
+    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_nagraca clean_drm clean_netcfg_ca clean_sdp_client
     spawn make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type LOG_LEVEL=O_TRACE
     expect "password for $::user: "
     send $::supass\r

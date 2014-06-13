@@ -20,7 +20,7 @@ set tftp  192.168.1.2      ;# assume using the same tftp server
 
 set supported_models [list 2t 3p]
 
-set images_path(2t) "humax7430/hnb100/p2/2t20140610-17"
+set images_path(2t) "humax7430/hnb100/p2/2t20140612-13"
 set images_path(3p) "humax7430/hnb200/p2/BLD_2_1"
 set kernel_name(2t) "vmlinuz-main"
 set kernel_name(3p) $kernel_name(2t)
@@ -184,7 +184,7 @@ proc cfe_flash_kernel { model } {
 }
 
 # boot a kernel with initrd from tftp
-proc cfe_boot_initrd { model } {
+proc cfe_boot_from_initrd { model } {
     my_send_user "Booting into a kernel with initrd..."
 
     if { 0 != [exec_cfe_cmd $::cfe_ifconfig($model) 5] } {
@@ -352,7 +352,7 @@ proc flash { model } {
     reboot_into_cfe
     cfe_set_startup $model
     cfe_flash_kernel $model
-    cfe_boot_initrd $model
+    cfe_boot_from_initrd $model
     run_stbutil $model
     boot_from_flash $model
 
