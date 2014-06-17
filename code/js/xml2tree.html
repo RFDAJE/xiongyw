@@ -1014,6 +1014,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
     function body_onload() {
         $('files').addEventListener('change', function(evt) { processFiles(evt.target.files); }, false);
+        $('jsonbutton').addEventListener('click', function(evt) { processJsonText($("jsontext").value); }, false);
 
 /*
         var xhr = new XMLHttpRequest();
@@ -1073,6 +1074,15 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
     };
 
+    function processJsonText(text){
+        // alert(text);
+        var obj = JSON.parse(text);
+        var root = obj2tree(obj);
+        root.set_left_n_last(true, []);
+
+        $("tree").innerHTML = root.render();
+        root.onclick();
+    }
 
 </script>
 
@@ -1083,6 +1093,13 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 <output id="list"></output>
 </div>
 
+
+<div class="boxed" style="display:block">
+<form name="jsonform" method="post" action="">
+<textarea id="jsontext" rows="12" cols="100">{"person": {"name": "Jim", "age": 12}}</textarea>
+<input type="button" id="jsonbutton" value="JSON2Tree"/>
+</form>
+</div>
 
 
 <br><br>
