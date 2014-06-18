@@ -1075,7 +1075,13 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
     };
 
     function processJsonText(text){
-        // alert(text);
+        //alert(text);
+        //console.log(text);
+        // remove "\r" & "\n"
+        text = Array.prototype.filter.call(text, function(x) {
+            return x.match(/[^\r\n]/);
+        }).join("");
+        //console.log(text);
         var obj = JSON.parse(text);
         var root = obj2tree(obj);
         root.set_left_n_last(true, []);
