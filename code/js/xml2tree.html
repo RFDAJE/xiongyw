@@ -1088,6 +1088,8 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
         $("tree").innerHTML = root.render();
         root.onclick();
+
+        $("json").innerHTML = ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
     }
 
 </script>
