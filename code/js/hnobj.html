@@ -1,0 +1,764 @@
+<!DOCTYPE HTML><html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<head><title></title><style>
+
+body, html{
+	background-color: white;
+        font-size:11px;
+        height: 100%;
+}
+
+
+    #my_tab {
+        margin:0 auto;
+        border:1px solid blue;
+        height:100%;
+    } 
+    .tab-menu {
+        height:24px;
+        border-bottom:1px solid blue;
+        background:#cacaca;
+    } 
+    .tab-menu ul {
+        list-style:none;
+        margin:3px 3px;
+        padding:0;
+        position:absolute;
+    } 
+    .tab-menu ul li {
+        float:left;
+        padding-left:5;
+        padding-right:5;
+        background:blue;
+        line-height:20px;
+        display:block;
+        cursor:pointer;
+        text-align:center;
+        color:white;
+        font-weight:bold;
+        border-top:1px solid blue;
+        border-left:1px solid blue;
+        border-right:1px solid #cacaca;
+    } 
+    .tab-menu ul li.focused {
+        background:white;
+        border-bottom:1px solid white;
+        color:blue;
+    } 
+    .tab-content {
+        clear:both;
+        margin-top:0px;
+        border-top:none;
+        width:100%;
+        padding:8px;
+        height:90%;
+    }
+        
+table {
+    border-collapse: collapse;
+}
+
+td {
+    font-size: 9pt; 
+    text-decoration: none;
+    text-align: left;
+    vertical-align: middle;
+    white-space:nowrap;
+    padding: 0px;
+}
+
+div.block{
+    display: block;
+}
+
+div.none{
+    display: none;
+}
+
+.boxed {
+  padding: 10px;
+  border: 2px solid blue;
+}
+
+td.xxx{
+    width: 50%; 
+    vertical-align:top; 
+    padding: 10px;
+    border: 2px solid blue;
+}
+
+
+.icon {
+height: 16px;
+width: 16px;
+/* 
+ * background-image:url('./images/sprite16.png');
+ * online converter: http://webcodertools.com/imagetobase64converter 
+ */
+background-image: url(data:image/png;base64,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);
+}
+
+.nodeplus      { background-position:    0px    0px; }
+.nodeminus     { background-position:  -16px    0px; }
+.node          { background-position:  -32px    0px; }
+.nodepluslast  { background-position:  -48px    0px; }
+.nodeminuslast { background-position:  -64px    0px; }
+.nodelast      { background-position:  -80px    0px; }
+.vertical      { background-position:  -96px    0px; }
+.blank         { background-position: -112px    0px; }
+
+.folder        { background-position:    0px  -16px; }
+.file1         { background-position:  -16px  -16px; }
+.file2         { background-position:  -32px  -16px; }
+.cube1         { background-position:  -48px  -16px; }
+.cube2         { background-position:  -64px  -16px; }
+.packets       { background-position:  -80px  -16px; }
+.packet        { background-position:  -96px  -16px; }
+.private       { background-position: -112px  -16px; }
+
+.numbers       { background-position:    0px  -32px; }
+.number        { background-position:  -16px  -32px; }
+.otv           { background-position:  -32px  -32px; }
+.dvb           { background-position:  -48px  -32px; }
+.table         { background-position:  -64px  -32px; }
+.program       { background-position:  -80px  -32px; }
+.audio         { background-position:  -96px  -32px; }
+.video         { background-position: -112px  -32px; }
+
+.at            { background-position:    0px  -48px; }
+.sharp         { background-position:  -16px  -48px; }
+.braces        { background-position:  -32px  -48px; }
+.brackets      { background-position:  -48px  -48px; }
+.dollar        { background-position:  -64px  -48px; }
+.percent       { background-position:  -80px  -48px; }
+.ampersand     { background-position:  -96px  -48px; }
+.asterisk      { background-position: -112px  -48px; }
+
+.parens        { background-position:    0px  -64px; }
+.exclaim       { background-position:  -16px  -64px; }
+.plus          { background-position:  -32px  -64px; }
+.minus         { background-position:  -48px  -64px; }
+.bar           { background-position:  -64px  -64px; }
+.slash         { background-position:  -80px  -64px; }
+.backslash     { background-position:  -96px  -64px; }
+.question      { background-position: -112px  -64px; }
+
+.lt            { background-position:    0px  -80px; }
+.gt            { background-position:  -16px  -80px; }
+.zero          { background-position:  -32px  -80px; }
+.one           { background-position:  -48px  -80px; }
+.two           { background-position:  -64px  -80px; }
+.three         { background-position:  -80px  -80px; }
+.four          { background-position:  -96px  -80px; }
+.five          { background-position: -112px  -80px; }
+
+.six           { background-position:    0px  -96px; }
+.seven         { background-position:  -16px  -96px; }
+.eight         { background-position:  -32px  -96px; }
+.nine          { background-position:  -48px  -96px; }
+
+</style></head><script type="text/javascript">
+
+    /*########################################################################## 
+      # some utilities 
+      #########################################################################*/
+
+    // save typing 
+    function $(id) {
+        return window.document.getElementById(id);
+    }
+
+    // is the object empty, i.e.: {} 
+    function isEmptyObj(o) {
+        // return JSON.stringify(o) === "{}";
+        return (o != null && 
+                o != undefined && 
+                typeof o === 'object' && 
+                Object.getOwnPropertyNames(o).length === 0);
+    }
+
+    // is v a number/string/boolean primitive?
+    function isNsb(v) {
+        return (typeof v === "number" || 
+                typeof v === "string" ||
+                typeof v === "boolean");
+    }
+
+    // is o an array? 
+    function isArray(o) {
+        if(typeof Array.isArray === 'function'){
+            return Array.isArray(o);
+        }else{
+            return typeof o === 'object' && Object.prototype.toString.call(o) === "[object Array]";
+        }
+    }
+
+    // is o a dense array (i.e., not a sparse array)? 
+    function isDenseArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function() { return true; }).length);
+    }
+
+    // is o an array without undefined/null members? 
+    function isSolidArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function(x) { return x !== null && x !== undefined; }).length);
+    }
+
+    // is o a solid array with only true primitive members (which implies its flatness)? 
+    function isSolidNsbArray(o) {
+        return (isSolidArray(o) && 
+                o.filter(function(x) { 
+                    return !isNsb(x);
+                }).length === 0);
+    }
+
+    // jsonify an object, i.e., remove undefined and functions 
+    function jsonify(o) {
+        // fixme: undefined and functions are simply removed, probably better to reassign to null?
+        return JSON.parse(JSON.stringify(o));
+    }
+
+    // is the object has and only has exactly the specified properties? 
+    function onlyHasOwnProperties(o, props) { 
+        // props is supposed to be an array of property names, could be []
+        if(props.length === 0){
+            return isEmptyObj(o);
+        } else {
+            return (props.filter(function(p){ return !(o.hasOwnProperty(p)); }).length === 0 && 
+                    Object.getOwnPropertyNames(o).length === props.length);
+        }
+    }
+
+    // get unique id, also has a method for reset: uid(), uid.reset()
+    var uid = (function(init) {
+        var _id = init;
+        var fn = function() { return _id ++; };
+        fn.reset = function() { _id = init; };
+        return fn;
+    }(2013));
+
+    // get a json-escaped string
+    var escapeJson = function (txt) {
+        return (txt.replace(/[\\]/g, "\\\\")
+                .replace(/[\"]/g, '\\"')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\r]/g, '\\r'));
+    };
+
+    // get a xml-escaped string
+    var escapeXml = function (txt) {
+        return (txt.replace(/>/g, "&gt;")
+                .replace(/</g, "&lt;")
+                .replace(/"/g, "&quot;"));
+    };
+
+    // customized error constructor
+    function MyError (msg) {
+	this.msg = msg;
+    }
+
+    MyError.prototype = new Error();
+
+    
+    // some constants
+    var NON_SPACE = /[^ \f\n\r\t\v]/;
+    var SHARP_TEXT = "#text";
+    var SHARP_CDATA = "#cdata";
+
+
+    /*########################################################################## 
+      # obj2tree
+      #
+      # created(bruin, 2003-02-01): first creation, support MSIE only
+      # updated(bruin, 2004-07-08): support mozilla, cleanup code, add comments
+      # updated(bruin, 2013-11-30): use CSS sprites 
+      # updated(bruin, 2013-12-06): cosmetic changes 
+      #########################################################################*/
+
+
+    /***************************************************************************
+     * General notes:
+     *
+     * Names for other types of objects depend on the id, in the following rule:
+     *
+     * "N" + id: the node object (eg, N128 is the node object whose id is "128"
+     * "D" + id: the DIV object of the node (yes, each node has a corresponding DIV)
+     * "J" + id: the node's joint icon image object in html document. 
+     *
+     * The joint icon is to represent the status of the 
+     * node in browser. there are 6 possible status for a node: 
+     *
+     *    |          |         |         |         |        |
+     *  +---+      +---+       |       +---+     +---+      |
+     *  | + |--    | - |--     +----   | + |--   | - |--    +----
+     *  +---+      +---+       |       +---+     +---+
+     *    |          |         |         
+     * 
+     *   (a)        (b)       (c)       (d)       (e)      (f)
+     *
+     * (a) a closed node having kid(s)  
+     * (b) an opened/collapsed node having kid(s)
+     * (c) a leaf node having no kids
+     * (d) a last closed node having kid(s)
+     * (e) a last opened/collapsed node having kid(s)
+     * (f) a last leaf node having no kids
+     *
+     * Clicking on a non-leaf node cause it open/close, its joint icon should also 
+     * change accordingly: a <=> b; d <=> e; 
+     * No joint icon changes for leaf nodes (c, f), actually no click event hooks;
+     *
+     ***************************************************************************/   
+
+
+    /** 
+     * Create a MyNode object.
+     *
+     * @constructor
+     * @param {string) id An unique id of the node object to be created. 
+     * @param {string} desc The text description of the node
+     * @param {string} type The icon class for node type, optional
+     * @param {string} href Hyper link of the node, optional
+     */
+    function MyNode(id, desc, type, href) {
+
+        /* get node name */ 
+        function _node_name() {
+            return "N" + this.id;
+        }
+
+        /* get the id of the corresponding DIV */
+        function _div_id() {
+            return "D" + this.id;
+        }
+
+        /* get the id of the corresponding DIV for joint icon */
+        function _joint_id() {
+            return "J" + this.id;
+        }
+
+        function _add_kid(kid) {
+            this.kids[this.kids.length] = kid;
+            kid.dad = this;
+            return kid;
+        }
+
+        /**
+         * Recursively set "left_code" and "lastp" properties
+         * of each node in the tree. called by the root of the tree
+         * after the tree structure been built
+         *
+         * @param {boolean} lastp Be "false" if it's not the last child of its parent; otherwise "true";
+         * @param {array} left_code An array of 0/1 representing the left side icons
+         * @return: nothing
+         */
+        function _set_left_n_last(lastp, left_code) {
+            var i;
+            
+            this.lastp = lastp;
+            this.left_code = left_code.slice(0); // copy the array
+            
+            if (lastp) {
+                left_code.push(0);   
+            } else {
+                left_code.push(1);   
+            }
+            
+            for (i = 0; i < this.kids.length; i ++) {
+                if (i == this.kids.length - 1) {
+                    this.kids[i].set_left_n_last(true, left_code.slice(0));
+                } else {
+                    this.kids[i].set_left_n_last(false, left_code.slice(0));
+                }
+            }
+        }
+
+        /**
+         * Generate html elements of the node. for each node, its corresponding html elements 
+         * could be divided into 2 parts: a one row TABLE, followed by a DIV:
+         *
+         * Node in html => TABLE + DIV
+         *
+         * The TABLE contains the following variable number of TDs (columns):
+         * 1. left side icons: a series of blank and/or vertline icons each is a TD; none for root nodes;
+         * 2. joint icon: one of 6 icons as described above. one TD for each node;
+         * 3. type icon: icon representing the type of the node. one TD for each node;
+         * 4. description text: plain text or anchored text. one TD for each node;
+         *
+         * The DIV element is the container of child nodes' html elements, which in turn contains a 
+         * list of TABLE+DIV bundle, one for each child node. DIVs can be controlled to show or hide. 
+         * Showing a node's DIV opens/collapses the node, while hiding the node's DIV closes the node.
+         */
+        function _render() { 
+
+            var docW = "<table><tr>";
+
+            // 1. left side icons
+            docW += this.get_left_icons();
+
+            // 2. joint icon 
+            docW += this.get_joint_icon();
+
+            // 3. type icon
+            docW += this.get_type_icon();
+
+            // 4. desc text, xml-escaped 
+            docW += "<td>&nbsp;<code>" + escapeXml(desc) + "</code></td></tr></table>";
+
+
+            // 5. div object: only needed for non-leaf nodes
+            if (this.kids.length > 0) {
+                docW += "<div class='none' id='D" + this.id + "'></div>";
+            }
+            
+            return docW;
+        } 
+
+        /*
+         * open & close the node. for non-leaf nodes, when clicked:
+         * - render kids when collapsed for the 1st time
+         * - show/hide the associated div, by changing its class
+         * - toggle the joint icon
+         */
+        function _onclick() {
+            var div = $(this.div_id());
+
+            if (!div){
+                return;
+            }
+
+            if(this.kids.length === 0){
+                return;
+            }
+
+            if (!div.innerHTML) {
+                var kids = [];
+
+                for (var i = 0; i < this.kids.length; i ++) {
+                    kids[i] = this.kids[i].render();
+                }
+
+                div.innerHTML = kids.join('');
+            }
+
+            // toggle visibility of its kids
+            if (this.openp === false) {
+                div.className = "block";
+                this.openp = true;
+            } else {
+                div.className = "none";
+                this.openp = false;
+            }
+            
+            // update the joint icon in the joint DIV
+            var jdiv = $(this.joint_id());
+            if (jdiv) {
+                jdiv.className = "icon " + this.get_joint_icon_class();    
+            }
+        }
+
+        // <td>s for left side icons, one <td> for each
+        function _get_left_icons() {
+            var left_code = this.left_code.slice(1);
+
+            return (left_code.map(function(v){ 
+                return [
+                    "<td><div class='icon ", 
+                    (v == 1? "vertical" : "blank"), 
+                    "'/></td>"
+                ].join("");}).join(""));
+        }
+
+        // get joint icon class name
+        function _get_joint_icon_class() {
+            if(this.dad === null){
+                return "";  // no joint icon for root node
+            } else {
+                if (this.lastp) {
+                    if (this.kids.length > 0) {
+                        if (this.openp){
+                            return "nodeminuslast";
+                        } else {
+                            return "nodepluslast";
+                        }
+                    } else {
+                        return "nodelast";
+                    }
+                } else { 
+                    // not last node 
+                    if (this.kids.length > 0) {
+                        if (this.openp) {
+                            return "nodeminus";
+                        } else {
+                            return "nodeplus";
+                        }
+                    }
+                    else{
+                        return "node";
+                    }
+                }
+            }
+        }
+
+        // get <td> for joint icom
+        function _get_joint_icon() {
+            
+            if (this.dad === null) {
+                return "";  // no joint icon for root node
+            }
+
+            var icon = this.get_joint_icon_class();
+
+            return ["<td><div onclick='N", 
+                    this.id, 
+                    ".onclick()' id='",
+                    this.joint_id(), 
+                    "' class='icon ", 
+                    icon, 
+                    "'/></td>"
+                   ].join("");
+        }
+
+        // get <td> for type icon
+        function _get_type_icon() {
+            return ["<td><div class='icon ", this.type, "'/></td>"].join("");
+        }
+
+        // tree's data structure
+        this.dad = null;
+        this.kids = [];
+
+        // static properties assigned
+        this.id = id;
+        this.desc = desc;
+        this.type = type || "cube1";
+        this.href = href;
+
+        /* 
+         * properties determined by root.set_left_n_last(true, []); 
+         * if there is any node update (remove/add), these properties need
+         * to be updated by root.set_left_n_last(true, []) again.
+         */
+        this.left_code = [];   // array element: 0 means space, 1 means vertical bar
+        this.lastp = false;    // is the last kid of its parent?
+        
+        // dynamic properties changed upon click event
+        this.openp = false;  // is collapsed or not? 
+        
+        // methods
+        this.add_kid         = _add_kid;
+        this.set_left_n_last = _set_left_n_last;
+        this.node_name       = _node_name;
+        this.div_id          = _div_id;
+        this.joint_id        = _joint_id;
+        this.get_joint_icon_class = _get_joint_icon_class;
+
+        this.get_left_icons  = _get_left_icons;  
+        this.get_joint_icon   = _get_joint_icon;   
+        this.get_type_icon   = _get_type_icon;   
+
+        this.render          = _render;          
+        this.onclick         = _onclick;
+    }
+
+
+    /**
+     * build a tree from the object: 
+     * - creating(new) all nodes in global space
+     * - attaching nodes to form a tree
+     * - initialize misc info in all nodes
+     *
+     * @parm {object or string} o: object value
+     * @param {string} name: object name. optional
+     * @return: the root of the tree represented by "o"
+     * 
+     * updated(bruin, 2013-12-20): remove the nested function. abstract with an optional parameter "name".
+     * todo: make it a tail-call?
+     */
+    function obj2tree(o, /* optional */ name) {
+
+        var p, desc, type;
+        var node;
+
+        if (!name) {
+            /* 
+             * it's assumed that this is the first call which just passing in the object.
+             * all the rest recursive calls will always supply the "name" parameter.
+             *
+             * we assume that the top object contains a tree (not a forest) thus it has 
+             * only 1 property. So take the first property as the root of the tree that
+             * the property name is "name", the property value is "o".
+             */
+            if (o && typeof o === 'object') {
+                for (p in o) {
+                    return obj2tree(o[p], p);
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // description 
+        if (isNsb(o)) {
+            desc = name + ": " + o;
+        } else if (isSolidNsbArray(o)) {
+            desc = name + ": " + o.join(",");
+        } else { // a non-leaf node
+            desc = name;
+        }
+
+        // type 
+        if (typeof o === 'object') {
+            if (isArray(o)) {
+                type = "brackets";
+            }
+            //else if(o === null || isEmptyObj(o))
+            //    type = "cube1";
+            else {
+                type = "braces";
+            }
+        } else {
+            if (name[0] === '@') {
+                type = "at";
+            } else if (name[0] === '#') {
+                type = "sharp";
+            } else {
+                type = "cube1";
+            }
+        }
+
+        node = new MyNode(uid(), desc, type, "");
+        window[node.node_name()] = node;
+        
+        if (typeof o === 'object' && o !== null && !isSolidNsbArray(o)) {
+            // o is an object or non-all_primitive_unested_array, so it has kid(s)
+            for (p in o) {
+                kid = obj2tree(o[p], p);
+                node.add_kid(kid);
+            }
+        }
+
+        return node;
+    }
+
+    /*########################################################################## 
+      # selecting tab
+      #########################################################################*/
+    function setTab(cursel,n){ 
+        for(i=0;i<n;i++){ 
+            var menu=document.getElementById("tab_menu_" + i); 
+            var con=document.getElementById("tab_cont_" + i); 
+            menu.className = (i == cursel)? "focused" : " "; 
+            con.style.display= (i==cursel)?"block":"none"; 
+        } 
+    } 
+
+    function json2obj(text){
+        // remove "\r" & "\n"
+        text = Array.prototype.filter.call(text, function(x) {
+            return x.match(/[^\r\n]/);
+        }).join("");
+
+        //text = escapeJson(text);  
+        return JSON.parse(text);
+    }
+    
+
+    function formatJson(text){
+        text = Array.prototype.filter.call(text, function(x) {
+            return x.match(/[^\r\n]/);
+        }).join("");
+        //text = escapeJson(text);  
+        var obj = JSON.parse(text);
+
+		return ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
+    }
+    
+    
+    function gen_tab_view (x, idx, array) {
+    	var size = array.length;
+    	/*
+    	 * the tab itself
+    	 */
+  		$("tab_menu_ul").innerHTML += '<li id="tab_menu_' + idx + '"onclick="setTab(' + idx + ', ' + size +')">' + x[0] + '</li> ';
+  		
+  		/*
+  		 * the content of the tab
+  		 */
+   		$("tab_cont").innerHTML += [ 
+   									'<div id="tab_cont_' + idx +'">', x[1], 
+									'<table style="width: 100%;" class="boxed">',
+									'<tr>',
+									'<td class="xxx"><div id="tree_' + idx + '"style="display:block;"></div></td>',
+									'<td class="xxx"><div id="json_' + idx + '" style="display:block;">',
+									formatJson(x[2]),
+									'</div></td>',
+									'</tr>',
+									'</table>',
+									'<table></table>',
+   									'</div>'
+   									].join("");
+
+   	// tree
+        var root = obj2tree(json2obj(x[2]), " ");
+        root.set_left_n_last(true, []);
+        $("tree_" + idx).innerHTML = root.render();  // question: why this text can not be inserted in the step above? innerHTML behavior += vs =?
+        root.onclick();
+    }
+      
+    function body_onload() {
+    	var size = data.length;
+    	
+    	// skeleton
+    	if (size > 0) {
+    		$("my_body").innerHTML += '<div id="my_tab"><div class="tab-menu"><ul id="tab_menu_ul"></ul></div><div id="tab_cont" class="tab-content"></div></div>';
+     	}
+     	
+     	// gen html elements for tabs & contents
+    	data.forEach(gen_tab_view);
+    	
+    	setTab(0, size);
+    	
+    }
+
+    /*########################################################################## 
+      # the data: an array of array
+      #########################################################################*/
+      
+    var data = [
+      	["Devices", 
+         'Method: hdl = CCOM.HomeNetworking.getDevices()<br>' +
+         'Event: "getDeviceOK" hook gets an event object as input, which is illustrated below.<br>' +
+         'Sample code: function getDeviceOKHook(e) {console.log(JSON.stringify(e));...}<br><br>',
+         '{"devices":[{"modelDescription":"OpenTV 5 Gateway","upc":"012345678901","type":"urn:schemas-upnp-org:device:MediaServer:1","manufacturer":"Nagra","friendlyName":"OpenTV 5 DMS 192.168.1.101","presentationUrl":"http://192.168.1.101:8080/","serialNumber":"0","dlnaUploadProfile":"","modelUrl":"http://www.nagra.com/","iconCount":4,"modelNumber":"OpenTV 5","modelName":"Gateway","udn":"uuid:00000022-0000-EF4B-67C6-08EB74BC0A11","iconData":[{"width":120,"depth":8,"mimeType":"image/png","url":"http://192.168.1.101:8080/home/otv_system/hn/icons/Nagra120.png","height":120},{"width":48,"depth":8,"mimeType":"image/png","url":"http://192.168.1.101:8080/home/otv_system/hn/icons/Nagra48.png","height":48},{"width":120,"depth":24,"mimeType":"image/jpeg","url":"http://192.168.1.101:8080/home/otv_system/hn/icons/Nagra120.jpg","height":120},{"width":48,"depth":24,"mimeType":"image/jpeg","url":"http://192.168.1.101:8080/home/otv_system/hn/icons/Nagra48.jpg","height":48}],"manufacturerUrl":"http://www.nagra.com","dlnaCapabilities":""},{"modelDescription":"OpenTV 5 Gateway","upc":"012345678901","type":"urn:schemas-upnp-org:device:MediaServer:1","manufacturer":"Nagra","friendlyName":"GGG","presentationUrl":"http://192.168.1.100:8080/","serialNumber":"0","dlnaUploadProfile":"","modelUrl":"http://www.nagra.com/","iconCount":4,"modelNumber":"OpenTV 5","modelName":"Gateway","udn":"uuid:00000023-0006-0909-67C6-08EB74BC0A65","iconData":[{"width":120,"depth":8,"mimeType":"image/png","url":"http://192.168.1.100:8080/home/otv_system/hn/icons/Nagra120.png","height":120},{"width":48,"depth":8,"mimeType":"image/png","url":"http://192.168.1.100:8080/home/otv_system/hn/icons/Nagra48.png","height":48},{"width":120,"depth":24,"mimeType":"image/jpeg","url":"http://192.168.1.100:8080/home/otv_system/hn/icons/Nagra120.jpg","height":120},{"width":48,"depth":24,"mimeType":"image/jpeg","url":"http://192.168.1.100:8080/home/otv_system/hn/icons/Nagra48.jpg","height":48}],"manufacturerUrl":"http://www.nagra.com","dlnaCapabilities":""}],"handle":1}'
+        ],
+        
+		["Root container",
+		 'Method: hdl = CCOM.HomeNetworking.browseContainer(udn,"0", "", "*"...)<br>' +
+		 'Event: "browseContainerOK" hook gets an event object as input, which is illustrated below (for root container). <br><br>',
+		 '{"content":[{"resource":[],"childCount":5,"durationSecs":0,"type":1,"className":"","refId":"","restricted":true,"id":"Audio","title":"Audio","objectType":1,"parentId":"0","searchable":false,"class":"object.container"},{"resource":[],"childCount":0,"durationSecs":0,"type":1,"className":"Bookmarks Container","refId":"","restricted":false,"id":"bookmarks","title":"Bookmarks","objectType":1,"parentId":"0","searchable":false,"class":"object.container.bookmarkFolder"},{"resource":[],"childCount":3,"durationSecs":0,"type":1,"className":"","refId":"","restricted":true,"id":"Image","title":"Image","objectType":1,"parentId":"0","searchable":false,"class":"object.container"},{"resource":[],"childCount":279,"durationSecs":0,"type":1,"className":"Live Tuner Container","refId":"","restricted":true,"id":"live","title":"Live TV Channels","objectType":1,"parentId":"0","searchable":true,"class":"object.container"},{"resource":[],"childCount":1,"durationSecs":0,"type":1,"className":"Now Playing Container","refId":"","restricted":true,"id":"nowPlaying","title":"Now Playing","objectType":1,"parentId":"0","searchable":false,"class":"object.container"},{"resource":[],"childCount":2,"durationSecs":0,"type":1,"className":"PVR Container","refId":"","restricted":false,"id":"pvr","title":"PVR Recordings","objectType":1,"parentId":"0","searchable":true,"class":"object.container"},{"resource":[],"childCount":17971,"durationSecs":0,"type":1,"className":"EPG Container","refId":"","restricted":true,"id":"epg","title":"TV EPG","objectType":1,"parentId":"0","searchable":true,"class":"object.container"},{"resource":[],"childCount":4,"durationSecs":0,"type":1,"className":"","refId":"","restricted":true,"id":"Video","title":"Video","objectType":1,"parentId":"0","searchable":false,"class":"object.container"}],"totalMatches":8,"handle":4}'
+		],
+		
+        ['PVR container (1)',
+         'Method:  hdl = CCOM.HomeNetworking.browseContainer(udn,"pvr", "", "*"...)<br>' + 
+		 'Event: "browseContainerOK" hook gets an event object as input, which is illustrated below (for pvr container). <br><br>',
+         '{"content":[{"srsRecordTaskID":["10"],"childCount":0,"durationSecs":0,"scheduledEndTime":["2013-10-14T19:00:00Z"],"recordedStartDateTime":["2013-10-14T18:16:44Z"],"programID":[{"value":"0001000100012504","type":"SI_PROGRAMID"},{"value":"0001000100012504","type":"SI_PROGRAMID"}],"type":2,"className":"PVR Recording","refId":"","restricted":false,"id":"pvr.10","rating":[{"value":"5","type":"dvb.org"},{"value":"5","type":"dvb.org"}],"recordedDuration":["P0:43:15"],"title":"NOW. NET do seu jeito. No seu tempo","objectType":2,"resource":[{"bitrate":0,"nrAudioChannels":0,"sizeBytes":4013393,"bitsPerSample":0,"resolution":"","colorDepth":0,"importUri":"tLX7+G5oispvRVVIr29cUpRHE01g81xHMcKWust06KNY/rmF6To+L7G//0UNFfrbNdmTMovPuZy2wFdInZvB2OiuN95NKrXihkCfu7G6v+yxFWeFjNDhdhsX5sbwZOgpDzrgxPZLoQqDCgjXYaxyPWJq+RC93IHQbvmtlxuSd1oAhAlpetWZRDfl1dTIqEOFd/6yhzwHwyTYNhIuJNcNSi7n/AyqhYFJm1syRP17w9GC+DHPwpkcOscaMtJuls6xEJp2/WHhJdsJi6vql3xB9ILMjdmYqtDU2iUPkPSqrWoSbgkp9eSZXMpW0OgcclBcG/wT/5/j8Vf90QbM7mfYjRNls/mutdxjvCfg5sOEmol6l8UH4exLprAtsEPJLWNSeqx1akSDS8Jhysf+UCCBD9PCZOUzry3aJSXI1iYwz/iV7NAljOEJJ8lgfB7OEMfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ==","uri":"dlna://192.168.1.101:8080/MF/pvr/prm/10?size=800966856&duration=0:43:15&con…MfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ==","protocolInfo":"http-get:*:application/vnd.nagra.prm;CONTENTFORMAT=video/mpeg:DLNA.ORG_PN=DRM_MPEG_TS_SD_NA_ISO;DLNA.ORG_OP=10;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4021;prm.nagra.com_license=EKECAQB0/PEAAQAfswINDQgBAA4IBQAHoXYRWrGTBMZhmmOUHcQQaJqoS/BUOv5Tlazu4F06uWmlwc83SVhyZv6sTRV/Ju70BuHcSiqHTFsdd6e0ErvuHKDDYUHh8PvnokANRrV9+U0epQ10tWdSAUe3f6Z+ZrXq/mJD+jsv17y6wkgWOtLX7+G5oispvRVVIr29cUpRHE01g81xHMcKWust06KNY/rmF6To+L7G//0UNFfrbNdmTMovPuZy2wFdInZvB2OiuN95NKrXihkCfu7G6v+yxFWeFjNDhdhsX5sbwZOgpDzrgxPZLoQqDCgjXYaxyPWJq+RC93IHQbvmtlxuSd1oAhAlpetWZRDfl1dTIqEOFd/6yhzwHwyTYNhIuJNcNSi7n/AyqhYFJm1syRP17w9GC+DHPwpkcOscaMtJuls6xEJp2/WHhJdsJi6vql3xB9ILMjdmYqtDU2iUPkPSqrWoSbgkp9eSZXMpW0OgcclBcG/wT/5/j8Vf90QbM7mfYjRNls/mutdxjvCfg5sOEmol6l8UH4exLprAtsEPJLWNSeqx1akSDS8Jhysf+UCCBD9PCZOUzry3aJSXI1iYwz/iV7NAljOEJJ8lgfB7OEMfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ==","sampleFrequency":0,"duration":"0:43:15"}],"date":["2013-10-14T18:16:44Z"],"programTitle":["NOW. NET do seu jeito. No seu tempo"],"albumArtUri":[{"value":"\\u0001","type":"XihkCfu7G6v+yxFWeFjNDhdhsX5sbwZOgpDzrgxPZLoQqDCgjXYaxyPWJq+RC93IHQbvmtlxuSd1oAhAlpetWZRDfl1dTIqEOFd/6yhzwHwyTYNhIuJNcNSi7n/AyqhYFJm1syRP17w9GC+DHPwpkcOscaMtJuls6xEJp2/WHhJdsJi6vql3xB9ILMjdmYqtDU2iUPkPSqrWoSbgkp9eSZXMpW0OgcclBcG/wT/5/j8Vf90QbM7mfYjRNls/mutdxjvCfg5sOEmol6l8UH4exLprAtsEPJLWNSeqx1akSDS8Jhysf+UCCBD9PCZOUzry3aJSXI1iYwz/iV7NAljOEJJ8lgfB7OEMfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ=="},{"value":"://192.168.1.101:8080/MF/pvr/prm/10?size=800966856&duration=0:43:15&container=TS&protocolInfo=http-get:*:application/vnd.nagra.prm;CONTENTFORMAT=video/mpeg:DLNA.ORG_PN=DRM_MPEG_TS_SD_NA_ISO;DLNA.ORG_OP=10;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4021;prm.nagra.com_license=EKECAQB0/PEAAQAfswINDQgBAA4IBQAHoXYRWrGTBMZhmmOUHcQQaJqoS/BUOv5Tlazu4F06uWmlwc83SVhyZv6sTRV/Ju70BuHcSiqHTFsdd6e0ErvuHKDDYUHh8PvnokANRrV9+U0epQ10tWdSAUe3f6Z+ZrXq/mJD+jsv17y6wkgWOtLX7+G5oispvRVVIr29cUpRHE01g81xHMcKWust06KNY/rmF6To+L7G//0UNFfrbNdmTMovPuZy2wFdInZvB2OiuN95NKrXihkCfu7G6v+yxFWeFjNDhdhsX5sbwZOgpDzrgxPZLoQqDCgjXYaxyPWJq+RC93IHQbvmtlxuSd1oAhAlpetWZRDfl1dTIqEOFd/6yhzwHwyTYNhIuJNcNSi7n/AyqhYFJm1syRP17w9GC+DHPwpkcOscaMtJuls6xEJp2/WHhJdsJi6vql3xB9ILMjdmYqtDU2iUPkPSqrWoSbgkp9eSZXMpW0OgcclBcG/wT/5/j8Vf90QbM7mfYjRNls/mutdxjvCfg5sOEmol6l8UH4exLprAtsEPJLWNSeqx1akSDS8Jhysf+UCCBD9PCZOUzry3aJSXI1iYwz/iV7NAljOEJJ8lgfB7OEMfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ==","type":"+G5oispvRVVIr29cUpRHE01g81xHMcKWust06KNY/rmF6To+L7G//0UNFfrbNdmTMovPuZy2wFdInZvB2OiuN95NKrXihkCfu7G6v+yxFWeFjNDhdhsX5sbwZOgpDzrgxPZLoQqDCgjXYaxyPWJq+RC93IHQbvmtlxuSd1oAhAlpetWZRDfl1dTIqEOFd/6yhzwHwyTYNhIuJNcNSi7n/AyqhYFJm1syRP17w9GC+DHPwpkcOscaMtJuls6xEJp2/WHhJdsJi6vql3xB9ILMjdmYqtDU2iUPkPSqrWoSbgkp9eSZXMpW0OgcclBcG/wT/5/j8Vf90QbM7mfYjRNls/mutdxjvCfg5sOEmol6l8UH4exLprAtsEPJLWNSeqx1akSDS8Jhysf+UCCBD9PCZOUzry3aJSXI1iYwz/iV7NAljOEJJ8lgfB7OEMfZODAkET0b3sXElDfPaO1KxOe3+hNSWmMeHwG2BFG/Y8qNPrX8X059YmQI7qqtHd8SyXzKQ=="}],"scheduledStartTime":["2013-10-14T17:00:00Z"],"upnpLongDescription":"No NOW você encontra milhares de conteúdos para assistir quando quiser, basta escolher o programa e ele comeU+00E7a imediatamente só para você. Consulte disponibilidade em sua cidade e endereU+00E7o. Exclusivo para NET HD e HD ...","parentId":"pvr","srsRecordScheduleID":["0"],"searchable":false,"class":"object.item.videoItem","recordedDayOfWeek":["MON"],"description":[""],"channelID":[{"value":"1,1,1","type":"SI"},{"value":"1,1,1","type":"SI"}]}],"totalMatches":1,"handle":3}'
+        ],
+        
+        ["PVR container (2)",
+         "A sample element in the pvr container array. This element supports HLS.",
+         '{"srsRecordTaskID":["10"],"childCount":0,"durationSecs":0,"scheduledEndTime":["2009-08-03T15:17:20Z"],"recordedStartDateTime":["2009-08-03T15:14:01Z"],"type":2,"className":"PVR Recording","refId":"","restricted":false,"id":"pvr.10","writeStatus":["PROTECTED"],"recordedDuration":["P0:04:20"],"title":"092141514000000.0","objectType":2,"storageMedium":["4b6ba11a46ae"],"date":["2009-08-03T15:14:01Z"],"scheduledStartTime":["2009-08-03T15:14:00Z"],"lastPlaybackPosition":["P0:03:17"],"resource":[{"bitrate":0,"nrAudioChannels":0,"sizeBytes":131186688,"bitsPerSample":0,"resolution":"","colorDepth":0,"importUri":"","uri":"dlna://10.12.6.145:8080/MF/pvr/clear/10?size=131186688&duration=0:04:20&con…S_SD_NA_ISO;DLNA.ORG_OP=10;DLNA.ORG_FLAGS=01100000000000000000000000000000","protocolInfo":"http-get:*:video/mpeg:DLNA.ORG_PN=MPEG_TS_SD_NA_ISO;DLNA.ORG_OP=10;DLNA.ORG_FLAGS=01100000000000000000000000000000","sampleFrequency":0,"duration":"0:04:20"},{"bitrate":160000,"nrAudioChannels":0,"sizeBytes":131186688,"bitsPerSample":48,"resolution":"640x480","colorDepth":0,"importUri":"","uri":"dlna://10.12.6.145:8081/MF/pvr/10/2/master.m3u8?size=131186688&duration=0:0…000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","protocolInfo":"http-get:*:vnd.apple.mpegurl:DLNA.ORG_PN=DRM_HLS_PLAYLIST;DLNA.ORG_OP=10;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","sampleFrequency":0,"duration":"0:04:20"},{"bitrate":160000,"nrAudioChannels":0,"sizeBytes":131186688,"bitsPerSample":48,"resolution":"640x480","colorDepth":0,"importUri":"","uri":"dlna://10.12.6.145:8081/MF/pvr/10/3/master.m3u8?size=131186688&duration=0:0…000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","protocolInfo":"http-get:*:vnd.apple.mpegurl:DLNA.ORG_PN=DRM_HLS_PLAYLIST;DLNA.ORG_OP=10;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","sampleFrequency":0,"duration":"0:04:20"},{"bitrate":160000,"nrAudioChannels":0,"sizeBytes":131186688,"bitsPerSample":48,"resolution":"1280x720","colorDepth":0,"importUri":"","uri":"dlna://10.12.6.145:8081/MF/pvr/10/4/master.m3u8?size=131186688&duration=0:0…000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","protocolInfo":"http-get:*:vnd.apple.mpegurl:DLNA.ORG_PN=DRM_HLS_PLAYLIST;DLNA.ORG_OP=10;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","sampleFrequency":0,"duration":"0:04:20"},{"bitrate":160000,"nrAudioChannels":0,"sizeBytes":131186688,"bitsPerSample":48,"resolution":"416x224","colorDepth":0,"importUri":"","uri":"dlna://10.12.6.145:8081/MF/pvr/10/1/master.m3u8?size=131186688&duration=0:0…000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","protocolInfo":"http-get:*:vnd.apple.mpegurl:DLNA.ORG_PN=DRM_HLS_PLAYLIST;DLNA.ORG_OP=10;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=01110000000000000000000000000000;upnp.org_DRMInfo=prm.nagra.com;prm.nagra.com_emi=0x4023","sampleFrequency":0,"duration":"0:04:20"}],"parentId":"pvr","srsRecordScheduleID":["0"],"relativeTimePosition":197,"searchable":false,"class":"object.item.videoItem","recordedDayOfWeek":["MON"],"channelID":[{"value":"0,0,0","type":"SI"},{"value":"0,0,0","type":"SI"}],"rating":[{"value":"0","type":"dvb.org"},{"value":"0","type":"dvb.org"}],"fileType":3,"resourceUrl":"dlna://10.12.6.145:8080/MF/pvr/clear/10?size=131186688&duration=0:04:20&con…S_SD_NA_ISO;DLNA.ORG_OP=10;DLNA.ORG_FLAGS=01100000000000000000000000000000"}'
+        ],
+        ['Schedules',
+        'getScheduleOK event',
+        '{"resultList":[{"taskCount":4,"scheduleId":"51","priority":2,"activePeriodEnd":0,"userAnnotation":"Galera do Surf","type":5,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"activePeriodBegin":1381774962000,"state":1,"matchingId":"00000000033563","matchingIdType":2},{"taskCount":6,"scheduleId":"67","priority":2,"activePeriodEnd":0,"userAnnotation":"iCarly","type":5,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"activePeriodBegin":1381775074000,"state":1,"matchingId":"00000000055053","matchingIdType":2},{"taskCount":1,"scheduleId":"83","priority":1,"activePeriodEnd":1381820400000,"userAnnotation":"My Recording Highlights","type":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"startDateTime":1381806000000,"activePeriodBegin":1381775089000,"state":1,"cdsEventObjectId":"epg.0001001901f4323c","duration":14400000}],"totalMatches":3,"updateId":968,"handle":2}'
+        ],
+        ['Tasks',
+        'getTasksFromScheduleOK event',
+        '{"resultList":[{"cdsServiceObjectId":"epg.0001001901f4323c","scheduleId":"83","priority":1,"channelIds":"1,25,500","softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"Confira as estreias no NOW","startDateTime":1381806000000,"taskId":"286","conflictLoser":false,"state":1,"duration":14400000},{"channelIds":"1,15,505","scheduleId":"67","priority":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"iCarly","startDateTime":1381843500000,"taskId":"266","conflictLoser":false,"state":1,"duration":1500000},{"channelIds":"1,13,4","scheduleId":"51","priority":2,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"Galera do Surf","startDateTime":1381860000000,"taskId":"54","conflictLoser":false,"state":1,"duration":1800000},{"channelIds":"1,15,505","scheduleId":"67","priority":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"iCarly","startDateTime":1381860000000,"taskId":"270","conflictLoser":false,"state":1,"duration":1500000},{"channelIds":"1,15,505","scheduleId":"67","priority":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"iCarly","startDateTime":1381929900000,"taskId":"274","conflictLoser":false,"state":1,"duration":1500000},{"channelIds":"1,13,4","scheduleId":"51","priority":2,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"Galera do Surf","startDateTime":1381946400000,"taskId":"58","conflictLoser":false,"state":1,"duration":1800000},{"channelIds":"1,15,505","scheduleId":"67","priority":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"iCarly","startDateTime":1381946400000,"taskId":"278","conflictLoser":false,"state":1,"duration":1500000},{"channelIds":"1,13,4","scheduleId":"51","priority":2,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"Galera do Surf","startDateTime":1382032800000,"taskId":"62","conflictLoser":false,"state":1,"duration":1800000},{"channelIds":"1,15,505","scheduleId":"67","priority":3,"softPostpaddingDuration":0,"softPrepaddingDuration":0,"title":"iCarly","startDateTime":1382032800000,"taskId":"282","conflictLoser":false,"state":1,"duration":1500000}],"totalMatches":9,"updateId":968,"handle":3}'
+        ]
+    ];
+
+
+
+</script><body id="my_body" onload="body_onload()"></body></html>
