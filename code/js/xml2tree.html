@@ -1083,10 +1083,10 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
         }).join("");
         //console.log(text);
         var obj = JSON.parse(text);
+        var text2= JSON.stringify(obj);
         var root = obj2tree(obj);
         root.set_left_n_last(true, []);
-
-        $("tree").innerHTML = root.render();
+        $("tree").innerHTML = root.render();;
         root.onclick();
 
         $("json").innerHTML = ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
