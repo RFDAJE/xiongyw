@@ -226,7 +226,7 @@ proc put {infile outfile} {
     set outfile_gz  "$outfile_.gz" 
     set outfile_gz_uu "$outfile_gz.uu" 
 
-    set out [open $outfile_encoded w]
+    set out [open $outfile_gz_uu w]
 
     send_verbose  "compressing\n" 
     exec gzip -fc  $infile > $infile_gz 
@@ -254,7 +254,7 @@ proc put {infile outfile} {
     send  "\004"               ;# eof
     close  $fp 
                  
-    send verbose "deleting local temporary files\n" 
+    send_verbose "deleting local temporary files\n" 
     exec rm -f $infile_gz $infile_gz_uu
     send_verbose "switching attention to remote  system\n" 
     expect -re $prompt  ;# wait for prompt from cat 
