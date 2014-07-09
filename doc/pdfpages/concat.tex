@@ -1,0 +1,12 @@
+% run: pdflatex concat.tex
+
+
+\documentclass[a4paper]{book}
+\usepackage[paper=a4paper]{geometry}
+\usepackage[final]{pdfpages}
+\usepackage{verbatim}
+\begin{document}
+\includepdf[nup=1x1,pages={1,5,7-12,25-76},offset=0mm 0mm, trim=0 0 0 0, noautoscale, scale=1.25,angle=0,turn=false,frame=false]{j1.pdf}
+\includepdf[nup=1x1,pages={1,5,9,13,541-604,{}},offset=0mm 0mm, trim=0 0 0 0, noautoscale, scale=1.25,angle=0,turn=false,frame=false]{j2.pdf}
+\end{document} 
+
