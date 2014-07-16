@@ -1,7 +1,7 @@
 #!/usr/bin/expect --
 
 # created(bruin, 2014-05-30)
-# last updated: 2014-06-10
+# last updated: 2014-07-03
 #
 #
 
@@ -9,7 +9,11 @@
 # customize the following to fit your stb/environment!!!
 ########################################################
 
-set REBOOT_LOG "BCM97430B0 CFE v.*"   ;# first boot trace
+# first boot trace from CFE
+set REBOOT_LOG(2t) "BCM97430B0 CFE v.*"      ;# net 2t, humax 7430
+set REBOOT_LOG(3p) $REBOOT_LOG(2t)            ;# net 3p, humax 7430
+set REBOOT_LOG(tch7356) "BCM97356B2 CFE v.*"  ;# movistar black box (w/ internal 500G HDD and 2 sat tuners)
+
 set CFE_PROMPT "CFE> "
 set LNX_PROMPT "# "
 set CTRL_C     \x03       ;# "$ ascii ^C"
@@ -18,35 +22,58 @@ set CFE_SUCCESS "*** command status = 0"
 
 set tftp  192.168.1.2      ;# assume using the same tftp server
 
-set supported_models [list 2t 3p]
+set supported_models [list 2t 3p tch7356]
 
 set images_path(2t) "humax7430/hnb100/p2/BLD_2_2"
 set images_path(3p) "humax7430/hnb200/p2/BLD_2_1"
+set images_path(tch7356) "tch7356/released"
+set images_path(tch7356) "tch7356/20140704-qa"
+
 set kernel_name(2t) "vmlinuz-main"
 set kernel_name(3p) $kernel_name(2t)
-set initrd_kernel(2t) "humax7430/vmlinuz-initrd-humax-7430" 
-set initrd_kernel(3p) initrd_kernel(2t)
+set kernel_name(tch7356) "vmlinuz.bin"
+
+set initrd_kernel(2t) "humax7430/vmlinuz-initrd-humax-7430"
+set initrd_kernel(3p) $initrd_kernel(2t)
+set initrd_kernel(tch7356) "tch7356/vmlinuz-initrd-7346b0"
 
 set initrd_kernel_linkup(2t) "eth0: link up,"
 set initrd_kernel_linkup(3p) "eth2: link up,"
+set initrd_kernel_linkup(tch7356) "eth0: Link is up,"
+ 
 
 # cfe commands
 set cfe_startup(2t) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M mtdparts=spi0.0:64K@2304K(mfr)ro,64K(mbox);brcmnand.0:0xDA00000@0x2600000(rootfs)'\""
 set cfe_startup(3p) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M'\""
+#set cfe_startup(tch7356) "setenv -p STARTUP \"load -raw -z nandflash0.slot1: -addr=80001000 -max=16777216 'ubiroot rw bmem=110M@146M bmem=122M@512M';go 0x80001400\""
+set cfe_startup(tch7356) "setenv -p STARTUP \"load -raw -z nandflash0.slot1: -addr=80001000 -max=16777216 'ubiroot rw bmem=110M@146M bmem=128M@512M';go 0x80001400\""
+
+
 set cfe_ifconfig(2t) "ifconfig eth0 -auto"   ;# "MULTITV" port on rear panel
 set cfe_ifconfig(3p) "ifconfig eth1 -auto"   ;# usb2rj45 port on front panel
+set cfe_ifconfig(tch7356) $cfe_ifconfig(2t)
+
 set cfe_flash_kernel(2t) "flash -noheader ${tftp}:${images_path(2t)}\/${kernel_name(2t)} nandflash0.opentv"
 set cfe_flash_kernel(3p) "flash -noheader ${tftp}:${images_path(3p)}\/${kernel_name(3p)} nandflash0.opentv"
+set cfe_flash_kernel(tch7356) "flash -noheader ${tftp}:${images_path(tch7356)}\/${kernel_name(tch7356)} nandflash0.slot1"
+
 set cfe_boot_initrd(2t) "boot -elf ${tftp}:${initrd_kernel(2t)} 'bmem=192M@64M mtdparts=brcmnand.0:0xDA00000@0x2600000(rootfs)'"
-set cfe_boot_initrd(3p) "boot -elf ${tftp}:${initrd_kernel(3p)} bmem=192M@64M"
+set cfe_boot_initrd(3p) "boot -elf ${tftp}:${initrd_kernel(3p)} 'bmem=192M@64M'"
+set cfe_boot_initrd(tch7356) "boot -elf -z ${tftp}:${initrd_kernel(tch7356)} 'bmem=10M@512M'"
+
+
 # stbutil cmd
 set stbutil(2t) "stbutil -a 2 ${tftp}:${images_path(2t)}"
 set stbutil(3p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
-set stbutil_done "Finished writing rootfs to flash."
-set flash_boot_time(2t)   60   ;# in seconds, boot from flash into linux shell
-set flash_boot_time(3p)   $flash_boot_time(2t)
+set stbutil(tch7356) "stbutil -a 2 ${tftp}:${images_path(tch7356)}"
 
-set logfile ~/humax-flash.log
+set stbutil_done "Finished writing rootfs to flash."
+
+set flash_boot_time(2t)      60   ;# in seconds, boot from flash into linux shell
+set flash_boot_time(3p)      $flash_boot_time(2t)
+set flash_boot_time(tch7356) $flash_boot_time(2t)
+
+set logfile ~/otv5-flash.log
 
 
 ########################################################################
@@ -116,7 +143,7 @@ proc is_in_shell {} {
 }
 
 
-proc reboot_into_cfe {} {
+proc reboot_into_cfe {model} {
 
     # press return 
     send "\r\r\r"
@@ -133,7 +160,7 @@ proc reboot_into_cfe {} {
     }
 
     # entering the CFE mode by sending CTRL-C
-    expect -re $::REBOOT_LOG
+    expect -re $::REBOOT_LOG($model)
     my_send_user "Sending ^C"
     send $::CTRL_C
     set timeout 10
@@ -153,7 +180,7 @@ proc reboot_into_cfe {} {
 }
 
 # execute a cmd and return status: 
-# 0: success, 1: failure
+# 0: success, 1: failure (exit)
 proc exec_cfe_cmd { cmd timeout } {
     if { ![is_in_cfe] } {
         puts "Please make sure the box is in CFE mode before calling me."
@@ -163,7 +190,7 @@ proc exec_cfe_cmd { cmd timeout } {
     my_send_user "Run CFE command: $cmd"
     send $cmd\r
     expect {
-        default { return 1 }
+        default { exit 1 }
         $::CFE_SUCCESS { return 0 }
     }
 }
@@ -206,6 +233,8 @@ proc run_stbutil { model } {
         puts "Please make sure the box booted into linux console."
         return 1
     }
+
+    standby 5
 
     my_send_user "Run stbutil for flashing the rootfs..."
     send $::stbutil($model)\r
@@ -348,22 +377,29 @@ proc close_ttyS0 {} {
     expect eof
 }
 
+#
 # flash kernel and rootfs
+#
 proc flash { model } {
-    reboot_into_cfe
+    reboot_into_cfe $model
+    standby 5
     cfe_set_startup $model
+    standby 5
     cfe_flash_kernel $model
+    standby 5
     cfe_boot_from_initrd $model
+    standby 5
     run_stbutil $model
+    standby 5
     boot_from_flash $model
 
     # apply some workarounds
 #    allow_disk_sharing $model
 #    update_dhclient_config $model
-    if { [string compare $model 3p] == 0 } {
-        update_load_driver_sh_3p
-    }
-    boot_from_flash $model
+#    if { [string compare $model 3p] == 0 } {
+#        update_load_driver_sh_3p
+#    }
+#    boot_from_flash $model
 }
 
 ########################################################################
@@ -379,6 +415,3 @@ set model [parse_argv $argv]
 open_ttyS0
 flash $model
 close_ttyS0
-
-
-
