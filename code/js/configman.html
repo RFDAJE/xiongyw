@@ -1,0 +1,1131 @@
+<!DOCTYPE HTML><html><head><title>xml2tree</title><style>
+
+body {background-color: white}
+
+    #my_tab {
+        margin:2px auto;
+        border:2px solid blue;
+    } 
+    .tab-menu {
+        height:24px;
+        border-bottom:1px solid blue;
+        background:#cacaca;
+    } 
+    .tab-menu ul {
+        list-style:none;
+        margin:3px 3px;
+        padding:0px;
+        position:absolute;
+    } 
+    .tab-menu ul li {
+        float:left;
+        padding-left:5px;
+        padding-right:5px;
+        background:blue;
+        line-height:20px;
+        display:block;
+        cursor:pointer;
+        text-align:center;
+        color:white;
+        font-weight:bold;
+        border-top:1px solid blue;
+        border-left:1px solid blue;
+        border-right:1px solid #cacaca;
+    } 
+    .tab-menu ul li.focused {
+        background:white;
+        border-bottom:1px solid white;
+        color:blue;
+    } 
+    .tab-content {
+        clear:both;
+        margin-top:0px;
+        border-top:none;
+        padding:8px;
+        overflow:auto;
+    }
+
+table {
+    border-collapse: collapse;
+}
+
+td {
+    font-size: 9pt; 
+    text-decoration: none;
+    text-align: left;
+    vertical-align: middle;
+    white-space:nowrap;
+    padding: 0px;
+}
+
+div.block{
+    display: block;
+}
+
+div.none{
+    display: none;
+}
+
+.boxed {
+  padding: 10px;
+  border: 2px solid blue;
+}
+
+td.xxx{
+    width: 50%; 
+    vertical-align:top; 
+    padding: 10px;
+    border: 2px solid blue;
+}
+
+.icon {
+height: 16px;
+width: 16px;
+/* 
+ * background-image:url('./images/sprite16.png');
+ * online converter: http://webcodertools.com/imagetobase64converter 
+ */
+background-image: url(data:image/png;base64,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);
+}
+
+.nodeplus      { background-position:    0px    0px; }
+.nodeminus     { background-position:  -16px    0px; }
+.node          { background-position:  -32px    0px; }
+.nodepluslast  { background-position:  -48px    0px; }
+.nodeminuslast { background-position:  -64px    0px; }
+.nodelast      { background-position:  -80px    0px; }
+.vertical      { background-position:  -96px    0px; }
+.blank         { background-position: -112px    0px; }
+
+.folder        { background-position:    0px  -16px; }
+.file1         { background-position:  -16px  -16px; }
+.file2         { background-position:  -32px  -16px; }
+.cube1         { background-position:  -48px  -16px; }
+.cube2         { background-position:  -64px  -16px; }
+.packets       { background-position:  -80px  -16px; }
+.packet        { background-position:  -96px  -16px; }
+.private       { background-position: -112px  -16px; }
+
+.numbers       { background-position:    0px  -32px; }
+.number        { background-position:  -16px  -32px; }
+.otv           { background-position:  -32px  -32px; }
+.dvb           { background-position:  -48px  -32px; }
+.table         { background-position:  -64px  -32px; }
+.program       { background-position:  -80px  -32px; }
+.audio         { background-position:  -96px  -32px; }
+.video         { background-position: -112px  -32px; }
+
+.at            { background-position:    0px  -48px; }
+.sharp         { background-position:  -16px  -48px; }
+.braces        { background-position:  -32px  -48px; }
+.brackets      { background-position:  -48px  -48px; }
+.dollar        { background-position:  -64px  -48px; }
+.percent       { background-position:  -80px  -48px; }
+.ampersand     { background-position:  -96px  -48px; }
+.asterisk      { background-position: -112px  -48px; }
+
+.parens        { background-position:    0px  -64px; }
+.exclaim       { background-position:  -16px  -64px; }
+.plus          { background-position:  -32px  -64px; }
+.minus         { background-position:  -48px  -64px; }
+.bar           { background-position:  -64px  -64px; }
+.slash         { background-position:  -80px  -64px; }
+.backslash     { background-position:  -96px  -64px; }
+.question      { background-position: -112px  -64px; }
+
+.lt            { background-position:    0px  -80px; }
+.gt            { background-position:  -16px  -80px; }
+.zero          { background-position:  -32px  -80px; }
+.one           { background-position:  -48px  -80px; }
+.two           { background-position:  -64px  -80px; }
+.three         { background-position:  -80px  -80px; }
+.four          { background-position:  -96px  -80px; }
+.five          { background-position: -112px  -80px; }
+
+.six           { background-position:    0px  -96px; }
+.seven         { background-position:  -16px  -96px; }
+.eight         { background-position:  -32px  -96px; }
+.nine          { background-position:  -48px  -96px; }
+
+</style></head><script type="text/javascript">
+
+    /*########################################################################## 
+      # some utilities 
+      #########################################################################*/
+
+    // save typing 
+    function $(id) {
+        return window.document.getElementById(id);
+    }
+
+    // is the object empty, i.e.: {} 
+    function isEmptyObj(o) {
+        // return JSON.stringify(o) === "{}";
+        return (o != null && 
+                o != undefined && 
+                typeof o === 'object' && 
+                Object.getOwnPropertyNames(o).length === 0);
+    }
+
+    // is v a number/string/boolean primitive?
+    function isNsb(v) {
+        return (typeof v === "number" || 
+                typeof v === "string" ||
+                typeof v === "boolean");
+    }
+
+    // is o an array? 
+    function isArray(o) {
+        if(typeof Array.isArray === 'function'){
+            return Array.isArray(o);
+        }else{
+            return typeof o === 'object' && Object.prototype.toString.call(o) === "[object Array]";
+        }
+    }
+
+    // is o a dense array (i.e., not a sparse array)? 
+    function isDenseArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function() { return true; }).length);
+    }
+
+    // is o an array without undefined/null members? 
+    function isSolidArray(o) {
+        return (isArray(o) && 
+                o.length === o.filter(function(x) { return x !== null && x !== undefined; }).length);
+    }
+
+    // is o a solid array with only true primitive members (which implies its flatness)? 
+    function isSolidNsbArray(o) {
+        return (isSolidArray(o) && 
+                o.filter(function(x) { 
+                    return !isNsb(x);
+                }).length === 0);
+    }
+
+    // jsonify an object, i.e., remove undefined and functions 
+    function jsonify(o) {
+        // fixme: undefined and functions are simply removed, probably better to reassign to null?
+        return JSON.parse(JSON.stringify(o));
+    }
+
+    // is the object has and only has exactly the specified properties? 
+    function onlyHasOwnProperties(o, props) { 
+        // props is supposed to be an array of property names, could be []
+        if(props.length === 0){
+            return isEmptyObj(o);
+        } else {
+            return (props.filter(function(p){ return !(o.hasOwnProperty(p)); }).length === 0 && 
+                    Object.getOwnPropertyNames(o).length === props.length);
+        }
+    }
+
+    // get unique id, also has a method for reset: uid(), uid.reset()
+    var uid = (function(init) {
+        var _id = init;
+        var fn = function() { return _id ++; };
+        fn.reset = function() { _id = init; };
+        return fn;
+    }(2013));
+
+    // get a json-escaped string
+    var escapeJson = function (txt) {
+        return (txt.replace(/[\\]/g, "\\\\")
+                .replace(/[\"]/g, '\\"')
+                .replace(/[\n]/g, '\\n')
+                .replace(/[\r]/g, '\\r'));
+    };
+
+    // get a xml-escaped string
+    var escapeXml = function (txt) {
+        return (txt.replace(/>/g, "&gt;")
+                .replace(/</g, "&lt;")
+                .replace(/"/g, "&quot;"));
+    };
+
+    // customized error constructor
+    function MyError (msg) {
+	this.msg = msg;
+    }
+
+    MyError.prototype = new Error();
+
+    /*########################################################################## 
+      # xml2obj and xml2json converter
+      #
+      # http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html
+      #
+      # rewrite(bruin, 2013-11-26)
+      # last updated(bruin, 2013-11-28)
+      #########################################################################*/
+    
+    // some constants
+    var NON_SPACE = /[^ \f\n\r\t\v]/;
+    var SHARP_TEXT = "#text";
+    var SHARP_CDATA = "#cdata";
+
+    /* 
+     * convert a xml text string into a normalized, white-removed & comments-removed dom object 
+     */
+    function xml2dom(xml) {
+        var MIME = "text/xml";
+        var dom = null;
+
+        if (!xml) {
+            return null;
+        }
+
+        if (window.DOMParser) {
+            dom = (new DOMParser()).parseFromString(xml, MIME);
+        } else if (window.ActiveXObject) {
+            dom = new ActiveXObject('Microsoft.XMLDOM');
+            dom.async = false;
+            if (!dom.loadXML(xml)) {
+                window.alert(dom.parseError.reason + dom.parseError.srcText);
+                dom = null;
+            }
+        } else {
+            window.alert("Error: your browser does not support parsing XML to DOM!");
+        }
+
+        if (dom.normalize) {
+            dom.normalize();
+        }
+
+        
+        // simplify_gconf(dom);
+        removeComment(dom);
+        removeWhite(dom);
+
+        return dom;
+
+
+
+        /*
+         * private functions (to be hoisted) go below:
+         */
+        // recursively remove all pure white TEXT_NODE from the element, in place
+        function removeWhite(e) {
+            var node, next;
+            if (!e)
+                return;
+
+            for (node = e.firstChild; node;) {
+                if (node.nodeType == Node.TEXT_NODE) {
+                    if (!node.nodeValue.match(NON_SPACE)) {
+                        next = node.nextSibling;
+                        e.removeChild(node);
+                        node = next;
+                    } else {
+                        node = node.nextSibling;
+                    }
+                } else if (node.nodeType == Node.ELEMENT_NODE) {
+                    removeWhite(node);
+                    node = node.nextSibling;
+                } else {
+                    node = node.nextSibling;
+                }
+            }
+
+            return e;
+        }
+
+        // recursively remove comments, in place
+        function removeComment(e) {
+            var node, next;
+
+            if (!e)
+                return;
+
+            for (node = e.firstChild; node; ) {
+                if (node.nodeType == Node.COMMENT_NODE) {
+                    next = node.nextSibling;
+                    e.removeChild(node);
+                    node = next;
+                } else if (node.nodeType == Node.ELEMENT_NODE) {
+                    removeComment(node);
+                    node = node.nextSibling;
+                } else {
+                    node = node.nextSibling;
+                }
+            }
+
+            return e;
+        }
+
+        // simplify dom created from gconf xmls
+        function slimGconf(dom) {
+
+            var GCONF = "gconf";
+            var DIR = "dir";
+            var NAME = "name";
+
+            if(!(dom.nodeType === Node.DOCUMENT_NODE &&
+                 dom.documentElement.nodeName === GCONF)){
+                return dom;
+            } else {
+                return _slimGconf(dom.documentElement);
+            }
+            
+            /* 
+             * recursively change the following types of element nodes of the tree:
+             * - <dir name="xxx">...</dir> : <xxx>...</xxx>
+             */
+            function _slimGconf(e) {
+
+                var newNode, node, nextNode;
+
+                /* check the node itself */
+                if (e.nodeType === Node.ELEMENT_NODE &&
+                    e.nodeName === DIR &&
+                    e.attributes &&
+                    e.attributes[0].nodeName === NAME) {
+
+                    /* 
+                     * note that with DOM, it's not possible to createElement("0")! 
+                     * so need to do the "simplification" with JSON object instead.
+                     */
+                    newNode = document.createElement(e.attributes[0].nodeValue);
+
+                    node = e.firstChild;
+                    while (node) {
+                        nextNode = node.nextSibling;
+                        newNode.appendChild(node);
+                        node = nextNode;
+                    }
+
+                    e.parentNode.replaceChild(newNode, e);
+                } else {
+                    newNode = e;
+                }
+
+                /* recursively check the kids, if any */
+                node = newNode.firstChild;
+                while (node) {
+                    nextNode = node.nextSibling;
+
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        _slimGconf(node);
+                    }
+
+                    node = nextNode;
+                }
+            }
+        }
+    }
+
+
+    /*
+     * convert the dom into a JSON object (i.e. using only array/object/string/number/true/false/null)
+     */
+    function dom2obj(dom) {
+        var o = {};
+        var i, n;
+
+        var _as_xml = function (n) {
+            var i, c;
+            var s = "";
+            if (n.nodeType == Node.ELEMENT_NODE) {
+                s += "<" + n.nodeName;
+                for (i = 0; i < n.attributes.length; i++) {
+                    s += " " + n.attributes[i].nodeName + "=\"" + (n.attributes[i].nodeValue || "").toString() + "\"";
+                }
+                if (n.firstChild) {
+                    s += ">";
+                    for (c = n.firstChild; c; c = c.nextSibling) {
+                        s += _as_xml(c);
+                    }
+                    s += "</" + n.nodeName + ">";
+                } else {
+                    s += "/>";
+                }
+            } else if (n.nodeType == Node.TEXT_NODE) {
+                s += n.nodeValue;
+            } else if (n.nodeType == Node.CDATA_SECTION_NODE) {
+                s += "<![CDATA[" + n.nodeValue + "]]>";
+            }
+            return s;
+        };
+
+        var _inner_xml = function (node) {
+            if ("innerHTML" in node)
+                return node.innerHTML;
+            var s = "";
+            for (var c = node.firstChild; c; c = c.nextSibling) {
+                s += _as_xml(c);
+            }
+            return s;
+        };
+
+
+        if (!dom)
+            return null;
+
+        if (dom.nodeType == Node.DOCUMENT_NODE) {
+            var O = {};
+            O[dom.documentElement.nodeName] = dom2obj(dom.documentElement);
+            return O;
+        }
+
+        if (dom.nodeType == Node.ELEMENT_NODE) {
+
+            if (!dom.attributes.length && !dom.firstChild) {
+                return null;
+            }
+
+            // converts attributes[] into properties
+            if (dom.attributes.length) {
+                for (i = 0; i < dom.attributes.length; i++) {
+                    o["@" + dom.attributes[i].nodeName] = 
+                        (dom.attributes[i].nodeValue || "").toString();
+                }
+            }
+
+            if (dom.firstChild) { // element has child nodes ..
+                var textChild = 0;
+                var cdataChild = 0;
+                var hasElementChild = false;
+
+                for (n = dom.firstChild; n; n = n.nextSibling) {
+                    if (n.nodeType == Node.ELEMENT_NODE) {
+                        hasElementChild = true;
+                    } else if (n.nodeType == Node.TEXT_NODE && n.nodeValue.match(NON_SPACE)) {
+                        textChild++; // non-whitespace text
+                    } else if (n.nodeType == Node.CDATA_SECTION_NODE) {
+                        cdataChild++; // cdata section node
+                    }
+                }
+
+                if (hasElementChild) {
+                    if (textChild < 2 && cdataChild < 2) { 
+                        // structured element with a single text or/and cdata node
+                        for (n = dom.firstChild; n; n = n.nextSibling) {
+                            if (n.nodeType == Node.TEXT_NODE) {
+                                o[SHARP_TEXT] = escapeJson(n.nodeValue);
+                            } else if (n.nodeType == Node.CDATA_SECTION_NODE) {
+                                o[SHARP_CDATA] = escapeJson(n.nodeValue);
+                            } else if (o[n.nodeName]) { // multiple occurence of element ..
+                                if (o[n.nodeName] instanceof Array) {
+                                    o[n.nodeName][o[n.nodeName].length] = dom2obj(n);
+                                } else {
+                                    o[n.nodeName] = [o[n.nodeName], dom2obj(n)];
+                                }
+                            } else { // first occurence of element..
+                                o[n.nodeName] = dom2obj(n);
+                            }
+                        }
+                    } else { // mixed content
+                        if (!dom.attributes.length) {
+                            o = escapeJson(_inner_xml(dom));
+                        } else {
+                            o[SHARP_TEXT] = escapeJson(_inner_xml(dom));
+                        }
+                    }
+                } else if(textChild) { 
+                    // pure text
+                    if (!dom.attributes.length) {
+                        o = escapeJson(_inner_xml(dom));
+                    } else {
+                        o[SHARP_TEXT] = escapeJson(_inner_xml(dom));
+                    }
+                } else if (cdataChild) { 
+                    // cdata
+                    if (cdataChild > 1) {
+                        o = escapeJson(_inner_xml(dom));
+                    } else {
+                        for (n = dom.firstChild; n; n = n.nextSibling) {
+                            o[SHARP_CDATA] = escapeJson(n.nodeValue);
+                        }
+                    }
+                }
+            }
+        } else if (dom.nodeType == Node.COMMENT_NODE){
+            o = dom.nodeValue; // should not happen: is removeComment() called?
+        } else {
+            console.log("unhandled node type: " + dom.nodeType);
+        }
+
+        return o;
+    }
+
+    /* simplify json object converted from gconf xmls, in place */
+    var slimGconf2 = function(json) {
+        var GCONF = "gconf";
+        /* 
+         * note: what's to be "simplified":
+         * <tag attr="xyz" ...></tag> should be simplified to:
+         * <xyz ...></xyz>
+         *
+         * e.g.
+         * <dir name="network">...</dir> should be simplified to:
+         * <network>...</network>
+         *
+         * the following is a nested array contains all the [tag, attr] pairs to
+         * be simplified: each pair is a 2-element array inside the outer array.
+         *
+         * fixme: one issue is that the "order" of the object properties is not preserved.
+         * one possible way is to only use array to represent the xml/tree...
+         */
+        var tag_attr = [
+            ["dir", "@name"],
+            ["entry", "@name"],
+            ["li", "@type"],
+            ["string", "stringvalue"],
+            ["int", "@value"],
+        ];
+
+        if (!json || !(json.hasOwnProperty(GCONF))) // not gconf
+            return;
+
+        tag_attr.forEach(function(x){_slimGconf2(json[GCONF], x[0], x[1]);});
+
+
+        function _slimGconf2(obj, tag, attr) {
+
+            // no need to process JSON primitives: string/number/true/false
+            if (!(typeof obj === 'object' && obj !== null)) {
+                return;
+            }
+
+            if (obj.hasOwnProperty(tag)) {
+                var v = obj[tag];
+                
+                if (isArray(v)) {
+                    /* make sure every array element has such a property */
+                    if (v.filter(function(x){ return !(x.hasOwnProperty(attr));}).length === 0) {
+                        /* add each element to obj */
+                        v.forEach(function(x) { 
+                            if (obj.hasOwnProperty(x[attr])) { 
+                                //  obj already has the property, make it's value an array
+                                if (isArray(obj[x[attr]])) {
+                                    obj[x[attr]].push(x);
+                                    delete x[attr];
+                                } else {
+                                    obj[x[attr]] = [obj[x[attr]], x];
+                                    delete x[attr];
+                                }
+                            } else {
+                                obj[x[attr]] = x; 
+                                delete x[attr];
+                            }
+                        });
+                    }
+                    delete obj[tag];
+                } else if (typeof v === 'object' && v !== null){ 
+                    // a non-array object
+                    if (v.hasOwnProperty(attr)) {
+                        obj[v[attr]] = v;
+                        delete obj[tag];
+                        delete v[attr];
+                    }
+                } else {
+                    // do nothing to JSON primitives
+                }
+            }
+
+            /* recursivly loop on obj's kids */
+            for (var p in obj) {
+                if (obj.hasOwnProperty(p)) {
+                    _slimGconf2(obj[p], tag, attr);
+                }
+            }
+        }
+    }
+    
+    // xml to obj 
+    function xml2obj(xml) {
+        var dom = xml2dom(xml);
+        var obj = dom2obj(dom);
+        slimGconf2(obj);
+        return obj;
+    }
+
+    // xml to json string 
+    function xml2json(xml) {
+        var obj = xml2obj(xml);
+        return JSON.stringify(obj, null, 4);
+    }
+
+    // sanity tests 
+    (function () {
+        var xmls = [undefined,
+                    null,
+                    "<e/>",
+                    "<e>text</e>",
+                    "<e attr1='value1' attr2='value2'/>",
+                    "<e name='value'>text</e>",
+                    "<e><a>text</a><b>text2</b></e>",
+                    "<e><a>text</a><a>text2</a></e>",
+                    "<e>text<a>text2</a>text3</e>",
+                    "<?xml version='1.0'?><e><!--comments-->text</e>"
+                   ];
+        xmls.map(function (xml) {
+            console.log(xml);
+            console.log(xml2json(xml));
+            console.log('--------------');
+        }).join("");
+    }());
+
+    /*########################################################################## 
+      # obj2tree
+      #
+      # created(bruin, 2003-02-01): first creation, support MSIE only
+      # updated(bruin, 2004-07-08): support mozilla, cleanup code, add comments
+      # updated(bruin, 2013-11-30): use CSS sprites 
+      # updated(bruin, 2013-12-06): cosmetic changes 
+      #########################################################################*/
+
+
+    /***************************************************************************
+     * General notes:
+     *
+     * Names for other types of objects depend on the id, in the following rule:
+     *
+     * "N" + id: the node object (eg, N128 is the node object whose id is "128"
+     * "D" + id: the DIV object of the node (yes, each node has a corresponding DIV)
+     * "J" + id: the node's joint icon image object in html document. 
+     *
+     * The joint icon is to represent the status of the 
+     * node in browser. there are 6 possible status for a node: 
+     *
+     *    |          |         |         |         |        |
+     *  +---+      +---+       |       +---+     +---+      |
+     *  | + |--    | - |--     +----   | + |--   | - |--    +----
+     *  +---+      +---+       |       +---+     +---+
+     *    |          |         |         
+     * 
+     *   (a)        (b)       (c)       (d)       (e)      (f)
+     *
+     * (a) a closed node having kid(s)  
+     * (b) an opened/collapsed node having kid(s)
+     * (c) a leaf node having no kids
+     * (d) a last closed node having kid(s)
+     * (e) a last opened/collapsed node having kid(s)
+     * (f) a last leaf node having no kids
+     *
+     * Clicking on a non-leaf node cause it open/close, its joint icon should also 
+     * change accordingly: a <=> b; d <=> e; 
+     * No joint icon changes for leaf nodes (c, f), actually no click event hooks;
+     *
+     ***************************************************************************/   
+
+
+    /** 
+     * Create a MyNode object.
+     *
+     * @constructor
+     * @param {string) id An unique id of the node object to be created. 
+     * @param {string} desc The text description of the node
+     * @param {string} type The icon class for node type, optional
+     * @param {string} href Hyper link of the node, optional
+     */
+    function MyNode(id, desc, type, href) {
+
+        /* get node name */ 
+        function _node_name() {
+            return "N" + this.id;
+        }
+
+        /* get the id of the corresponding DIV */
+        function _div_id() {
+            return "D" + this.id;
+        }
+
+        /* get the id of the corresponding DIV for joint icon */
+        function _joint_id() {
+            return "J" + this.id;
+        }
+
+        function _add_kid(kid) {
+            this.kids[this.kids.length] = kid;
+            kid.dad = this;
+            return kid;
+        }
+
+        /**
+         * Recursively set "left_code" and "lastp" properties
+         * of each node in the tree. called by the root of the tree
+         * after the tree structure been built
+         *
+         * @param {boolean} lastp Be "false" if it's not the last child of its parent; otherwise "true";
+         * @param {array} left_code An array of 0/1 representing the left side icons
+         * @return: nothing
+         */
+        function _set_left_n_last(lastp, left_code) {
+            var i;
+            
+            this.lastp = lastp;
+            this.left_code = left_code.slice(0); // copy the array
+            
+            if (lastp) {
+                left_code.push(0);   
+            } else {
+                left_code.push(1);   
+            }
+            
+            for (i = 0; i < this.kids.length; i ++) {
+                if (i == this.kids.length - 1) {
+                    this.kids[i].set_left_n_last(true, left_code.slice(0));
+                } else {
+                    this.kids[i].set_left_n_last(false, left_code.slice(0));
+                }
+            }
+        }
+
+        /**
+         * Generate html elements of the node. for each node, its corresponding html elements 
+         * could be divided into 2 parts: a one row TABLE, followed by a DIV:
+         *
+         * Node in html => TABLE + DIV
+         *
+         * The TABLE contains the following variable number of TDs (columns):
+         * 1. left side icons: a series of blank and/or vertline icons each is a TD; none for root nodes;
+         * 2. joint icon: one of 6 icons as described above. one TD for each node;
+         * 3. type icon: icon representing the type of the node. one TD for each node;
+         * 4. description text: plain text or anchored text. one TD for each node;
+         *
+         * The DIV element is the container of child nodes' html elements, which in turn contains a 
+         * list of TABLE+DIV bundle, one for each child node. DIVs can be controlled to show or hide. 
+         * Showing a node's DIV opens/collapses the node, while hiding the node's DIV closes the node.
+         */
+        function _render() { 
+
+            var docW = "<table><tr>";
+
+            // 1. left side icons
+            docW += this.get_left_icons();
+
+            // 2. joint icon 
+            docW += this.get_joint_icon();
+
+            // 3. type icon
+            docW += this.get_type_icon();
+
+            // 4. desc text, xml-escaped 
+            docW += "<td>&nbsp;<code>" + escapeXml(desc) + "</code></td></tr></table>";
+
+
+            // 5. div object: only needed for non-leaf nodes
+            if (this.kids.length > 0) {
+                docW += "<div class='none' id='D" + this.id + "'></div>";
+            }
+            
+            return docW;
+        } 
+
+        /*
+         * open & close the node. for non-leaf nodes, when clicked:
+         * - render kids when collapsed for the 1st time
+         * - show/hide the associated div, by changing its class
+         * - toggle the joint icon
+         */
+        function _onclick() {
+            var div = $(this.div_id());
+
+            if (!div){
+                return;
+            }
+
+            if(this.kids.length === 0){
+                return;
+            }
+
+            if (!div.innerHTML) {
+                var kids = [];
+
+                for (var i = 0; i < this.kids.length; i ++) {
+                    kids[i] = this.kids[i].render();
+                }
+
+                div.innerHTML = kids.join('');
+            }
+
+            // toggle visibility of its kids
+            if (this.openp === false) {
+                div.className = "block";
+                this.openp = true;
+            } else {
+                div.className = "none";
+                this.openp = false;
+            }
+            
+            // update the joint icon in the joint DIV
+            var jdiv = $(this.joint_id());
+            if (jdiv) {
+                jdiv.className = "icon " + this.get_joint_icon_class();    
+            }
+        }
+
+        // <td>s for left side icons, one <td> for each
+        function _get_left_icons() {
+            var left_code = this.left_code.slice(1);
+
+            return (left_code.map(function(v){ 
+                return [
+                    "<td><div class='icon ", 
+                    (v == 1? "vertical" : "blank"), 
+                    "'/></td>"
+                ].join("");}).join(""));
+        }
+
+        // get joint icon class name
+        function _get_joint_icon_class() {
+            if(this.dad === null){
+                return "";  // no joint icon for root node
+            } else {
+                if (this.lastp) {
+                    if (this.kids.length > 0) {
+                        if (this.openp){
+                            return "nodeminuslast";
+                        } else {
+                            return "nodepluslast";
+                        }
+                    } else {
+                        return "nodelast";
+                    }
+                } else { 
+                    // not last node 
+                    if (this.kids.length > 0) {
+                        if (this.openp) {
+                            return "nodeminus";
+                        } else {
+                            return "nodeplus";
+                        }
+                    }
+                    else{
+                        return "node";
+                    }
+                }
+            }
+        }
+
+        // get <td> for joint icom
+        function _get_joint_icon() {
+            
+            if (this.dad === null) {
+                return "";  // no joint icon for root node
+            }
+
+            var icon = this.get_joint_icon_class();
+
+            return ["<td><div onclick='N", 
+                    this.id, 
+                    ".onclick()' id='",
+                    this.joint_id(), 
+                    "' class='icon ", 
+                    icon, 
+                    "'/></td>"
+                   ].join("");
+        }
+
+        // get <td> for type icon
+        function _get_type_icon() {
+            return ["<td><div class='icon ", this.type, "'/></td>"].join("");
+        }
+
+        // tree's data structure
+        this.dad = null;
+        this.kids = [];
+
+        // static properties assigned
+        this.id = id;
+        this.desc = desc;
+        this.type = type || "cube1";
+        this.href = href;
+
+        /* 
+         * properties determined by root.set_left_n_last(true, []); 
+         * if there is any node update (remove/add), these properties need
+         * to be updated by root.set_left_n_last(true, []) again.
+         */
+        this.left_code = [];   // array element: 0 means space, 1 means vertical bar
+        this.lastp = false;    // is the last kid of its parent?
+        
+        // dynamic properties changed upon click event
+        this.openp = false;  // is collapsed or not? 
+        
+        // methods
+        this.add_kid         = _add_kid;
+        this.set_left_n_last = _set_left_n_last;
+        this.node_name       = _node_name;
+        this.div_id          = _div_id;
+        this.joint_id        = _joint_id;
+        this.get_joint_icon_class = _get_joint_icon_class;
+
+        this.get_left_icons  = _get_left_icons;  
+        this.get_joint_icon   = _get_joint_icon;   
+        this.get_type_icon   = _get_type_icon;   
+
+        this.render          = _render;          
+        this.onclick         = _onclick;
+    }
+
+
+    /**
+     * build a tree from the object: 
+     * - creating(new) all nodes in global space
+     * - attaching nodes to form a tree
+     * - initialize misc info in all nodes
+     *
+     * @parm {object or string} o: object value
+     * @param {string} name: object name. optional
+     * @return: the root of the tree represented by "o"
+     * 
+     * updated(bruin, 2013-12-20): remove the nested function. abstract with an optional parameter "name".
+     * todo: make it a tail-call?
+     */
+    function obj2tree(o, /* optional */ name) {
+
+        var p, desc, type;
+        var node;
+
+        if (!name) {
+            /* 
+             * it's assumed that this is the first call which just passing in the object.
+             * all the rest recursive calls will always supply the "name" parameter.
+             *
+             * we assume that the top object contains a tree (not a forest) thus it has 
+             * only 1 property. So take the first property as the root of the tree that
+             * the property name is "name", the property value is "o".
+             */
+            if (o && typeof o === 'object') {
+                for (p in o) {
+                    return obj2tree(o[p], p);
+                }
+            } else {
+                return null;
+            }
+        }
+
+        // description 
+        if (isNsb(o)) {
+            desc = name + ": " + o;
+        } else if (isSolidNsbArray(o)) {
+            desc = name + ": " + o.join(",");
+        } else { // a non-leaf node
+            desc = name;
+        }
+
+        // type 
+        if (typeof o === 'object') {
+            if (isArray(o)) {
+                type = "brackets";
+            }
+            //else if(o === null || isEmptyObj(o))
+            //    type = "cube1";
+            else {
+                type = "folder";
+            }
+        } else {
+            if (name[0] === '@') {
+                type = "at";
+            } else if (name[0] === '#') {
+                type = "sharp";
+            } else {
+                type = "cube1";
+            }
+        }
+
+        node = new MyNode(uid(), desc, type, "");
+        window[node.node_name()] = node;
+        
+        if (typeof o === 'object' && o !== null && !isSolidNsbArray(o)) {
+            // o is an object or non-all_primitive_unested_array, so it has kid(s)
+            for (p in o) {
+                kid = obj2tree(o[p], p);
+                node.add_kid(kid);
+            }
+        }
+
+        return node;
+    }
+
+    /*########################################################################## 
+      # kick it off ...
+      #########################################################################*/
+    function setTab(cursel,n){ 
+        for(i=0;i<n;i++){ 
+            var menu=document.getElementById("tab_menu_" + i); 
+            var con=document.getElementById("tab_cont_" + i); 
+            menu.className = (i == cursel)? "focused" : " "; 
+            con.style.display= (i==cursel)?"block":"none"; 
+        } 
+    } 
+
+
+    function gen_tab_view (x, idx, array) {
+    	var size = array.length;
+        var xml = get_xml(x[1]);
+        var obj = xml2obj(xml);
+        var json = jsonify(obj);
+
+
+    	/*
+    	 * the tab itself
+    	 */
+  	$("tab_menu_ul").innerHTML += '<li id="tab_menu_' + idx + '"onclick="setTab(' + idx + ', ' + size +')">' + x[0] + '</li> ';
+  	
+  	/*
+  	 * the content of the tab
+  	 */
+   	$("tab_cont").innerHTML += [ 
+   	    '<div id="tab_cont_' + idx +'">',  
+	    '<table style="width: 100%;" class="boxed">',
+	    '<tr>',
+	    '<td class="xxx"><div id="tree_' + idx + '"style="display:block;"></div></td>',
+	    '<td class="xxx"><div id="json_' + idx + '" style="display:block;">',
+	    formatJson(obj),
+	    '</div></td>',
+	    '</tr>',
+	    '</table>',
+	    '<table></table>',
+   	    '</div>'
+   	].join("");
+
+   	// tree
+        var root = obj2tree(json);
+        // var root = obj2tree(json2obj(json), " ");
+        root.set_left_n_last(true, []);
+        $("tree_" + idx).innerHTML = root.render();  // question: why this text can not be inserted in the step above? innerHTML behavior += vs =?
+        root.onclick();
+    }
+
+      
+    function body_onload() {
+    	var size = data.length;
+    	
+    	// skeleton
+    	if (size > 0) {
+    		$("my_body").innerHTML += '<div id="my_tab"><div class="tab-menu"><ul id="tab_menu_ul"></ul></div><div id="tab_cont" class="tab-content"></div></div>';
+     	}
+     	
+     	// gen html elements for tabs & contents
+    	data.forEach(gen_tab_view);
+    	
+    	setTab(0, size);
+    	
+    }
+
+    function get_xml(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, false);
+        xhr.send();
+        return xhr.responseText;
+    }
+
+    function formatJson(obj){
+	return ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
+    }
+
+    var data = [
+      	["mandatory", "configman/configman.xml.mandatory/gconf-tree.xml"],
+      	["fixed", "configman/configman.xml.fixed/gconf-tree.xml"],
+      	["local", "configman/configman.xml.local/gconf-tree.xml"],
+      	["network", "configman/configman.xml.network/gconf-tree.xml"],
+      	["default", "configman/configman.xml.default/gconf-tree.xml"]
+        ];
+
+
+</script>
+
+<body id="my_body" onload="body_onload()"></body></html>
