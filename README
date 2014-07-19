@@ -45,5 +45,6 @@ git remote set-url origin git@github.com:xiongyw/xiongyw.git
 5. tag
 
 - create: git tag <yyyymmdd>
+- delete: git tag -d <yyyymmdd>
 - list all: git tag #
 - push: git push origin --tags
