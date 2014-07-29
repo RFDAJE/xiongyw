@@ -250,9 +250,10 @@ int decode_hex_chars(char *url){
 }	
 
 
-int   log_debug_msg(int priority, char *fmt, ...){
 
 #ifdef DEBUG
+int   log_debug_msg(int priority, char *fmt, ...){
+
 
 	char buf[1024];
 
@@ -263,11 +264,11 @@ int   log_debug_msg(int priority, char *fmt, ...){
 
 	syslog(priority, buf);
 
-#else
-	;
-#endif
 	return 0;
 }
+#else
+int log_debug_msg(int a,char* b,...){return 0;}
+#endif
 
 void itoa_k(char *buf, int buf_size, int num){
 
