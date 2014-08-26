@@ -79,7 +79,7 @@ guide fish(int n, real gui_interp(real))
 		roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
 	}
 	
-	// make it starts from winter soltice and in CCW order, by indexing an array by an array
+	// make it starts from winter soltice and in CW order, by indexing an array by an array
 	//int[] index24 = {6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7};
 	int[] index = reverse(n + 1);
 	index.append(reverse(n * 4));
