@@ -1,6 +1,6 @@
 /*
  * created(bruin, 2014-08-25)
- * last updated(bruin, 2014-08-25)
+ * last updated(bruin, 2014-08-27)
  *
  * 据《周髀算经》，八尺表杆正午晷长:
  * - 冬至 (winter solstice): 1.35丈
@@ -20,8 +20,10 @@
 
  
 import math;
+import labelpath;
 
-size(1000,0);
+unitsize(0.5cm);  // make yingyang circle size about 1x1cm
+defaultpen(linewidth(0.25));  // in bp (1/72 inch); 0.1 mm is about 0.283 bp
 
 int n5 = 5, n8 = 8, n12 = 12, n24 = 24, n64 = 64;
 pair O=0, S=(0,-1), N=(0,1), W=(-1,0), E=(1,0);
@@ -78,14 +80,23 @@ guide fish(int n, real gui_interp(real))
 	for(i = 0; i < n * 4; ++ i){
 		roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
 	}
-	
+
 	// make it starts from winter soltice and in CW order, by indexing an array by an array
+/*
 	//int[] index24 = {6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7};
 	int[] index = reverse(n + 1);
 	index.append(reverse(n * 4));
 	index = index[:n * 4];
 	roots = roots[index];  
 	
+	for(i = 0; i < n * 4; ++ i){
+		dot(" ", roots[i], red);
+		dot(roots2[i], green);
+	}
+*/	
+
+	roots = reflect(S, N) * (rotate(90) * roots);  // rotate followed by vertical reflect/mirror
+
 	// make it cyclic
 	//roots.cyclic = true;
 
@@ -117,17 +128,80 @@ guide fish(int n, real gui_interp(real))
 	return fish;
 }
 
+void draw_yingyang(){
+
+	// circle
+	draw(unitcircle);
+
+	// fish
+	filldraw(fish(6, gui_sine));
+	//draw(fish(6, gui_arithmetic), grey);
+	
+	// eyes
+	fill(circle((-0.35, 0), 1/12.));
+	unfill(circle((0.35, 0), 1/12.));
+}
+
+
+/*
+ * 
+ */
+void circular_annotate(real r1, real r2, string[] texts)
+{
+	int i, n = texts.length;
+	pair[] roots, delimits;
+	for(i = 0; i < n; ++ i){
+		roots[i] = unityroot(n, i);
+	}
+	roots = reflect(S, N) * (rotate(90) * roots);
+	//roots = rotate(90) * reflect(S, N) * roots;
+	//roots = reflect(O, roots[0]) * roots;
+	delimits = rotate(360. / n / 2) * roots;
+	delimits.cyclic = true;
+
+	path[] label_path;
+	for(i = 0; i < n; ++ i){
+		label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits[i], delimits[i + 1], CW);
+	}
+	
+	draw(scale(r1)*unitcircle);
+	draw(scale(r2)*unitcircle);
+	
+	
+	for(i = 0; i < n; ++ i){
+		draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
+		draw(scale(r1)*delimits[i]--scale(r2)*delimits[i]);
+		labelpath(texts[i], label_path[i]);
+	}
+
+	draw(label_path[0], Arrow);
+	
+}
+
+
+
+
+
 
 /*
  * draw stuff now 
  */
- 
-draw(unitcircle);
+
+draw_yingyang();
+circular_annotate(1, 2, new string[]{"11", "22", "33"});
+circular_annotate(2, 3, new string[]{"11", "22", "33", "44"});
+circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
+circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
+circular_annotate(5, 6, new string[]{"11", "22", "33", "44", "55", "66", "77"});
+circular_annotate(6, 7, new string[]{"11", "22", "33", "44", "55", "66", "77", "88"});
+
+//draw(unitsquare);
+//draw(scale(2)*unitcircle);
+
+//draw(unitcircle);
 //draw(W--E, grey+linewidth(0.2));
 //draw(N--S, grey+linewidth(0.2));
 
-filldraw(fish(6, gui_sine));
-//draw(fish(6, gui_arithmetic), grey);
 
 
 
