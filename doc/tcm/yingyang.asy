@@ -18,13 +18,45 @@
  * 这里分别定义两种计算晷长序列。
  */
 
+settings.tex = "latex";
  
+texpreamble("\usepackage{CJK}");
+//texpreamble("\setCJKmainfont{SimSun}");
+
+
 import math;
 import labelpath;
+import fontsize;
 
-unitsize(0.5cm);  // make yingyang circle size about 1x1cm
-defaultpen(linewidth(0.25));  // in bp (1/72 inch); 0.1 mm is about 0.283 bp
+/*
+ * about sizes
+ */
+real pt2cm = 1 / 72.27 * 2.54; // 1 pt = 1/72.27 inch; 
+real bp2cm = 1 / 72 * 2.54;    // 1 bp = 1/72 inch
+real cm2pt = 1 / pt2cm;
+real cm2bp = 1 / bp2cm;
 
+real unit_size_in_cm = 0.5;   // make yingyang circle size about 1x1cm
+real unit_size_in_pt = unit_size_in_cm * cm2pt;
+real line_width_in_cm = 0.01;
+real line_width_in_bp = line_width_in_cm * cm2bp;
+real font_size_in_cm = 0.4;
+real font_size_in_pt = font_size_in_cm * cm2pt; 
+real font_size_in_user = font_size_in_cm / unit_size_in_cm;
+
+unitsize(unit_size_in_pt);
+defaultpen(linewidth(line_width_in_bp));
+defaultpen(fontsize(font_size_in_pt));
+//defaultpen(basealign(0));
+
+//label("1", (0, 0), invisible);
+//real font_height = (max(currentpicture).y - min(currentpicture).y) * bp2cm / unit_size_in_cm;
+
+
+
+/*
+ *
+ */
 int n5 = 5, n8 = 8, n12 = 12, n24 = 24, n64 = 64;
 pair O=0, S=(0,-1), N=(0,1), W=(-1,0), E=(1,0);
 int i;
@@ -169,13 +201,21 @@ void circular_annotate(real r1, real r2, string[] texts)
 	
 	
 	for(i = 0; i < n; ++ i){
+		
 		draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
 		draw(scale(r1)*delimits[i]--scale(r2)*delimits[i]);
-		labelpath(texts[i], label_path[i]);
+		
+		path p = label_path[i];
+		pair md = midpoint(p);
+		real len = arclength(p);
+		real time = arctime(p, len / 2);
+		pair tang = dir(p, time);
+		pair norm = rotate(90) * tang;
+		//draw(p, Arrow);
+		//draw(md--(md + tang), Arrow);
+		//draw(md--(md - norm), Arrow);
+		labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
 	}
-
-	draw(label_path[0], Arrow);
-	
 }
 
 
@@ -188,12 +228,12 @@ void circular_annotate(real r1, real r2, string[] texts)
  */
 
 draw_yingyang();
-circular_annotate(1, 2, new string[]{"11", "22", "33"});
-circular_annotate(2, 3, new string[]{"11", "22", "33", "44"});
-circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
-circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
-circular_annotate(5, 6, new string[]{"11", "22", "33", "44", "55", "66", "77"});
-circular_annotate(6, 7, new string[]{"11", "22", "33", "44", "55", "66", "77", "88"});
+circular_annotate(1, 1.8, new string[]{"11", "22", "33"});
+//circular_annotate(2, 3, new string[]{"北", "东", "南", "西"});
+//circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
+//circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
+//circular_annotate(5, 6, new string[]{"11", "22", "33", "44", "55", "66", "77"});
+//circular_annotate(6, 7, new string[]{"11", "22", "33", "44", "55", "66", "77", "88"});
 
 //draw(unitsquare);
 //draw(scale(2)*unitcircle);
