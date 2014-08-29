@@ -1,6 +1,6 @@
 1. Windows Install:
  
-- install TexLive 2014, which already integrated asymtote
+- install TexLive 2014, which already integrated asymptote
  
 Config:
 
@@ -14,10 +14,17 @@ pdfviewer="c:\Program Files\FoxitReader\FoxitReader.exe";
  
 - A test asy file (must be in UTF-8 format):
  
-/* the file must be utf8-encoded.
- * emacs: c-x RET f utf-8
- * vi: :set fileencoding=utf-8
+/* 
+ * note that the source file must be utf8-encoded.
+ * emacs: 
+ *   c-x RET f utf-8
+ * vim: 
+ *   :setlocal nobomb
+ *   :set encoding=utf-8
+ *   :set fileencoding=utf-8
+ *   :w
  */
+
 settings.tex = "xelatex";
  
 texpreamble("\usepackage{xeCJK}");
