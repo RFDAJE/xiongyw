@@ -1,13 +1,10 @@
 1. Windows Install:
  
--          Suppose TexLive 2010 or 2011 is already installed.
--          Download Asymptote Windows binary “asymptote-2.13-setup.exe” from http://asymptote.sf.net, and install it;
--          Download ghostscript windows bnary “gs902w32.exe” from http://ghostscript.com, and install it
- 
+- install TexLive 2014, which already integrated asymtote
  
 Config:
- 
--          Add “config.asy” under asymptote root “c:\program files\asymptote\config.asy”, with the following content:
+
+- Add "config.asy" under asymptote root "c:\program files\asymptote\config.asy", with the following content:
  
 import settings;
  
@@ -15,16 +12,21 @@ gs="c:\Program Files\gs\gs9.02\bin\gswin32.exe";
 psviewer="c:\texlive\2011\bin\win32\psv.exe";
 pdfviewer="c:\Program Files\FoxitReader\FoxitReader.exe";
  
--          A test asy file:
+- A test asy file (must be in UTF-8 format):
  
+/* the file must be utf8-encoded.
+ * emacs: c-x RET f utf-8
+ * vi: :set fileencoding=utf-8
+ */
 settings.tex = "xelatex";
  
 texpreamble("\usepackage{xeCJK}");
 texpreamble("\setCJKmainfont{SimSun}");
+//texpreamble("\setCJKmainfont{SimHei}");
  
  
 draw((0,0)--(1cm,1cm));
-label("中文", (1cm,1cm));
+label("涓枃", (1cm,1cm));
  
 -          Command line for generating the pdf:
  
@@ -103,7 +105,7 @@ label(Label(rotate(-90)*scale(1.2)*"\texttt{bruin}"), (22,240), white);
 filldraw(lowleft2--(lowleft2.x,lowleft2.y+rect_height)--(lowleft2.x+rect_width,lowleft2.y+rect_height)--(lowleft2.x+rect_width, lowleft2.y)--cycle,black);
 label(Label(rotate(90)*scale(1.2)*"\texttt{bruin}"), (398,240), white);
  
-/* label("中文", (1cm,1cm)); */
+/* label("涓枃", (1cm,1cm)); */
  
  
 - change it to double pages: 
