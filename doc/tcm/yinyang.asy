@@ -21,7 +21,8 @@
 settings.tex = "xelatex";
  
 texpreamble("\usepackage{xeCJK}");
-texpreamble("\setCJKmainfont{SimHei}");
+texpreamble("\setCJKmainfont[Path=../surangama/fonts/]{simhei-lyj.ttf}");
+//texpreamble("\setCJKmainfont{arialuni.ttf}");
 
 
 import math;
@@ -38,9 +39,9 @@ real bp2cm = 1 / 72 * 2.54;    // 1 bp = 1/72 inch
 real cm2pt = 1 / pt2cm;
 real cm2bp = 1 / bp2cm;
 
-real unit_size_in_cm = 0.5;   // make yingyang circle size about 1x1cm
+real unit_size_in_cm = 0.5;   // make yinyang circle size about 1x1cm
 real unit_size_in_pt = unit_size_in_cm * cm2pt;
-real line_width_in_cm = 0.01;
+real line_width_in_cm = 0.006;
 real line_width_in_bp = line_width_in_cm * cm2bp;
 real font_size_in_cm = 0.4;
 real font_size_in_pt = font_size_in_cm * cm2pt; 
@@ -162,7 +163,7 @@ guide fish(int n, real gui_interp(real))
 	return fish;
 }
 
-void draw_yingyang(){
+void draw_yinyang(){
 
 	// circle
 	draw(unitcircle);
@@ -225,7 +226,7 @@ void circular_annotate(real r1, real r2, string[] texts)
 		//draw(labelpath(texts[i], p3));
 
                 /* simple label */
-                label(rotate(degrees(tang)) * Label(texts[i], md));
+                label(scale(0.5) * rotate(degrees(tang)) * Label(texts[i], md));
 	}
 }
 
@@ -238,11 +239,15 @@ void circular_annotate(real r1, real r2, string[] texts)
  * draw stuff now 
  */
 
-draw_yingyang();
-//circular_annotate(1, 2, new string[]{"11", "22", "33"});
-circular_annotate(1, 2, new string[]{"北", "东", "南", "西"});
+draw_yinyang();
 
-circular_annotate(2, 3, new string[]{"乾", "坤", "兑", "巽", "震", "艮", "坎", "离"});
+//circular_annotate(1, 2, new string[]{"北", "东", "南", "西"});
+
+// 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
+circular_annotate(1, 2, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"});
+circular_annotate(2, 3, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"});
+//circular_annotate(3, 4, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"});
+//circular_annotate(4, 5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"});
 
 //circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
 //circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
@@ -256,7 +261,5 @@ circular_annotate(2, 3, new string[]{"乾", "坤", "兑", "巽", "震", "艮", "
 //draw(unitcircle);
 //draw(W--E, grey+linewidth(0.2));
 //draw(N--S, grey+linewidth(0.2));
-
-
 
 
