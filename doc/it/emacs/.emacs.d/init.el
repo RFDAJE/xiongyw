@@ -1,6 +1,9 @@
 ;;
 ;; size is not the primary concern nowadays
 (prefer-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment "UTF-8")
 
 ;;
 ;; measure the loading time per file.
