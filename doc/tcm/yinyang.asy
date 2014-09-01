@@ -306,6 +306,14 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
 {
     int i, n = radius.length;
     pair[] north_west;
+
+    // put some negative margin
+    for(i = 0; i < n / 2; ++ i){
+        real delta = 0.01;
+        radius[i*2] -= delta;
+        radius[i*2+1] += delta;
+    }
+
     
     for(i = 0; i < n; ++ i) {
         north_west[i] = rotate(45) * (radius[i], 0);
@@ -335,19 +343,38 @@ draw_yinyang();
 //circular_annotate(1, 2, new string[]{"冬", "春", "夏", "秋"});
 
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
-circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"}, 0.4, draw_r1=false, draw_r2=false, draw_delim=false);
-circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, 0.65, draw_r1=false, draw_r2=false, draw_delim=false);
-circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}, 0.4, draw_r2=false);
-circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, 0.6, draw_r1=false);
-circular_annotate(3.0, 3.3, new string[]{"23", "1", "3", "5", "7", "9", "11", "13", "15", "17", "19", "21"}, text_inside=false, 0.3, draw_r1=false, draw_delim=false);
-circular_annotate(3.3, 4.0, new string[]{"冬月", "蜡月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, 0.4);
-circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, text_scale=0.3, draw_r1=false, draw_delim=false);
+circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"}, 0.3, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, 0.5, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}, 0.3, draw_r2=false);
+circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, 0.5, draw_r1=false);
+//circular_annotate(3.0, 3.4, new string[]{"23", "1", "3", "5", "7", "9", "11", "13", "15", "17", "19", "21"}, text_inside=false, 0.3, draw_r1=false, draw_delim=false);
+circular_annotate(3.0, 3.5, new string[]{"胆", "1", "肝", "3", "肺", "5", "大肠", "7", "胃", "9", "脾", "11", 
+                                         "心", "13", "小肠", "15", "膀胱", "17", "肾", "19", "心包", "21", "三焦", "23"}, 
+                  text_inside=true, 0.3, draw_r1=false, draw_delim=false);
+//circular_annotate(3.0, 3.4, new string[]{"胆", "肝", "肺", "大肠", "胃", "脾", "心", "小肠", "膀胱", "肾", "心包", "三焦"}, 0.3);
 
-//circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
-//circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
-//circular_annotate(5, 6, new string[]{"11", "22", "33", "44", "55", "66", "77"});
-//circular_annotate(6, 7, new string[]{"11", "22", "33", "44", "55", "66", "77", "88"});
-//circular_annotate(7, 8, new string[]{"1", "2", "3", "4", "5", "6", "7", "8", "9","10", "11", "12", "13", "14", "15", "16", "17"});
+circular_annotate(3.5, 4.0, new string[]{"冬月", "腊月", "正月",  "二月", "三月", "四月", 
+                                         "五月", "六月", "七月", "八月", "九月", "十月"}, 0.3);
+circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", 
+                                         "春分", "清明", "谷雨", "立夏", "小满", "芒种", 
+                                         "夏至", "小暑", "大暑", "立秋", "处暑", "白露", 
+                                         "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, 
+                  text_scale=0.3, draw_r1=false, draw_delim=false);
+
+// 四灵二十八宿
+circular_annotate(4.5, 5.0, new string[]{"玄武","青龙","朱雀","白虎"}, text_scale=0.3);
+
+circular_annotate(5.0, 5.5, new string[]{"虚","女","牛","斗","箕","尾","心",
+                                         "房","氐","亢","角","轸","翼","张",
+                                         "星","柳","鬼","井","参","觜","毕",
+                                         "昴","胃","娄","奎","壁","室","危"}, text_scale=0.3, draw_r1=false);
+
+draw(scale(5.6)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+
+// this is to make 4 seasons/directions more distinguishable
+draw_4_delims(new real[]{2.0, 3.0,   3.5, 4.0,   4.5, 5.5}, 
+              defaultpen + linewidth(line_width_in_bp * 4) + linecap(0), 
+              defaultpen + linewidth(line_width_in_bp * 2) + linecap(2) + white);
 
 //draw(unitsquare);
 //draw(scale(2)*unitcircle);
@@ -355,7 +382,3 @@ circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春",
 //draw(unitcircle);
 //draw(W--E, grey+linewidth(0.2));
 //draw(N--S, grey+linewidth(0.2));
-
-draw_4_delims(new real[]{2.0, 3.0, 3.3, 4.0}, 
-              defaultpen + linewidth(line_width_in_bp * 3) + linecap(0), 
-              defaultpen + linewidth(line_width_in_bp * 1) + linecap(2) + white);
