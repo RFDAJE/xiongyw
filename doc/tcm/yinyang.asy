@@ -67,8 +67,8 @@ int i;
 
 // return the length of the shadow of GUI, as an arithmetic progression.
 // radius range: (0, pi), where,
-// - 0 present winter soltice, with fixed value 1.0,
-// - pi present summer soltice, with fixed value 0; 
+// - 0 represents winter soltice, with fixed value 1.0,
+// - pi represents summer soltice, with fixed value 0; 
 // and this function provides other values in between.
 // notes: why pi not 2 pi? because the rest half circle is just a mirror;
 real gui_arithmetic(real radius)
