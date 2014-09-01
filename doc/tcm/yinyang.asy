@@ -1,6 +1,6 @@
 /*
  * created(bruin, 2014-08-25)
- * last updated(bruin, 2014-08-27)
+ * last updated(bruin, 2014-09-1)
  *
  * 据《周髀算经》，八尺表杆正午晷长:
  * - 冬至 (winter solstice): 1.35丈
@@ -21,8 +21,8 @@
 settings.tex = "xelatex";
  
 texpreamble("\usepackage{xeCJK}");
-texpreamble("\setCJKmainfont[Path=../surangama/fonts/]{simhei-lyj.ttf}");
-//texpreamble("\setCJKmainfont{arialuni.ttf}");
+texpreamble("\setCJKmainfont{arialuni.ttf}");
+texpreamble("\xeCJKsetcharclass{\"2600}{\"267F}{1}");  // this tells xetex to treat "symbol misc" as CJK
 
 
 import math;
