@@ -90,10 +90,14 @@ real gui_sine(real radius)
 	return cos(radius / 2.);
 }
 
-// this function returns a cyclic guide for the fish curve, which starts from winter soltice (0, 1),
-// goes through the circle, passing through the summer soltice (0, -1), and then goes back to 
-// the winter soltice by following the left part of the circumference of the circle.
-// the nodes in the guide are in CW order.
+// this function returns a cyclic guide for the "black fish", which,
+// - starts from winter soltice (0, 1)
+// - goes inside the circle SE-ward CW
+// - passes the center point
+// - changes to CCW and continue
+// - passes the summer soltice (0, -1)),
+// - then goes back to the winter soltice CW by exactly following the circumference of the circle.
+// the nodes in the guide are over-all in CW order.
 // n: 1/4 of the number of points around the circle. 
 guide fish(int n, real gui_interp(real)) 
 {
@@ -205,7 +209,7 @@ void circular_annotate(real r1, real r2, string[] texts)
 	
 	for(i = 0; i < n; ++ i){
 		
-		draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
+		//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
 		draw(scale(r1)*delimits[i]--scale(r2)*delimits[i]);
 		
 		path p = label_path[i];
@@ -226,7 +230,7 @@ void circular_annotate(real r1, real r2, string[] texts)
 		//draw(labelpath(texts[i], p3));
 
                 /* simple label */
-                label(scale(0.5) * rotate(degrees(tang)) * Label(texts[i], md));
+                label(scale(0.6) * rotate(degrees(tang)) * Label(texts[i], md));
 	}
 }
 
@@ -246,7 +250,7 @@ draw_yinyang();
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
 circular_annotate(1, 2, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"});
 circular_annotate(2, 3, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"});
-//circular_annotate(3, 4, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"});
+circular_annotate(3, 4, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"});
 //circular_annotate(4, 5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"});
 
 //circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
