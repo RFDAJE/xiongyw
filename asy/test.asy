@@ -14,7 +14,7 @@ settings.tex = "xelatex";
  
 texpreamble("\usepackage{xeCJK}");
 texpreamble("\setCJKmainfont{arialuni.ttf}");
-//texpreamble("\setCJKmainfont{SimHei}");
+texpreamble("\xeCJKsetcharclass{\"2600}{\"267F}{1}");  // this tells xetex to treat "symbol misc" as CJK
  
  
 draw((0,0)--(1cm,1cm));
