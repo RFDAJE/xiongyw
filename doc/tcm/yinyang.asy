@@ -19,7 +19,7 @@
  */
 
 settings.tex = "xelatex";
- 
+
 texpreamble("\usepackage{xeCJK}");
 texpreamble("\setCJKmainfont{arialuni.ttf}");
 texpreamble("\xeCJKsetcharclass{\"2600}{\"267F}{1}");  // this tells xetex to treat "symbol misc" as CJK
@@ -41,7 +41,7 @@ real cm2bp = 1 / bp2cm;
 
 real unit_size_in_cm = 0.5;   // make yinyang circle size about 1x1cm
 real unit_size_in_pt = unit_size_in_cm * cm2pt;
-real line_width_in_cm = 0.006;
+real line_width_in_cm = 0.01;
 real line_width_in_bp = line_width_in_cm * cm2bp;
 real font_size_in_cm = 0.4;
 real font_size_in_pt = font_size_in_cm * cm2pt; 
@@ -73,21 +73,21 @@ int i;
 // notes: why pi not 2 pi? because the rest half circle is just a mirror;
 real gui_arithmetic(real radius)
 {
-	if(radius < 0 || radius > pi){
-		return 0;
-	}
-	
-	return (1. -radius / pi);
+    if(radius < 0 || radius > pi){
+	return 0;
+    }
+    
+    return (1. -radius / pi);
 }
 
 // return the length of the shadow of GUI, employing cos() function.
 real gui_sine(real radius)
 {
-	if(radius < 0 || radius > pi){
-		return 0;
-	}
-	
-	return cos(radius / 2.);
+    if(radius < 0 || radius > pi){
+	return 0;
+    }
+    
+    return cos(radius / 2.);
 }
 
 // this function returns a cyclic guide for the "black fish", which,
@@ -101,141 +101,228 @@ real gui_sine(real radius)
 // n: 1/4 of the number of points around the circle. 
 guide fish(int n, real gui_interp(real)) 
 {
-	int i;
-	
-	// 1. determine the array of shadow length, starting from winter solstice, in CW order
-	real[] gui;  
-	for(i = 0; i < n * 4; ++ i){
-		real rad = radians(90. / n * i);
-		if(rad > pi){
-			rad = rad - pi;
-		}
+    int i;
+    
+    // 1. determine the array of shadow length, starting from winter solstice, in CW order
+    real[] gui;  
+    for(i = 0; i < n * 4; ++ i){
+	real rad = radians(90. / n * i);
+	if(rad > pi){
+	    rad = rad - pi;
+	}
     	gui[i] = gui_interp(rad);
-		//write(gui[i]);
-	}
+	//write(gui[i]);
+    }
 
-	// 2. obtain the direction for each point, respective to the shadow array.
-	pair[] roots;
-	for(i = 0; i < n * 4; ++ i){
-		roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
-	}
+    // 2. obtain the direction for each point, respective to the shadow array.
+    pair[] roots;
+    for(i = 0; i < n * 4; ++ i){
+	roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
+    }
 
-	// make it starts from winter soltice and in CW order, by indexing an array by an array
-/*
-	//int[] index24 = {6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7};
-	int[] index = reverse(n + 1);
-	index.append(reverse(n * 4));
-	index = index[:n * 4];
-	roots = roots[index];  
-	
-	for(i = 0; i < n * 4; ++ i){
-		dot(" ", roots[i], red);
-		dot(roots2[i], green);
-	}
-*/	
+    // make it starts from winter soltice and in CW order, by indexing an array by an array
+    /*
+    //int[] index24 = {6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7};
+    int[] index = reverse(n + 1);
+    index.append(reverse(n * 4));
+    index = index[:n * 4];
+    roots = roots[index];  
+    
+    for(i = 0; i < n * 4; ++ i){
+    dot(" ", roots[i], red);
+    dot(roots2[i], green);
+    }
+    */	
 
-	roots = reflect(S, N) * (rotate(90) * roots);  // rotate followed by vertical reflect/mirror
+    roots = reflect(S, N) * (rotate(90) * roots);  // rotate followed by vertical reflect/mirror
 
-	// make it cyclic
-	//roots.cyclic = true;
+    // make it cyclic
+    //roots.cyclic = true;
 
-	// 3. the interior part of the "fish" curve.
-	guide fish;
-	// right-hand half: in CW order
-	for(i = 0; i < n * 2; ++ i){
-		pair p = O + gui[i] * dir(roots[i]);
-		fish = fish..p;
-		//dot(" ", p);
-	}
-	// the center of the circle
-	fish = fish..(0, 0);
-	// left-hand half: in CCW order, not including the summer soltice
-	for(i = n * 4 - 1; i > n * 2; -- i){
-		pair p = O + gui[i] * dir(roots[i]);
-		fish = fish..p;
-		//dot(" ", p);
-	}
-	// the summer soltice: need special treatment as its shadow length is zero.
-	fish = fish..{E}(0, -1){W};
+    // 3. the interior part of the "fish" curve.
+    guide fish;
+    // right-hand half: in CW order
+    for(i = 0; i < n * 2; ++ i){
+	pair p = O + gui[i] * dir(roots[i]);
+	fish = fish..p;
+	//dot(" ", p);
+    }
+    // the center of the circle
+    fish = fish..(0, 0);
+    // left-hand half: in CCW order, not including the summer soltice
+    for(i = n * 4 - 1; i > n * 2; -- i){
+	pair p = O + gui[i] * dir(roots[i]);
+	fish = fish..p;
+	//dot(" ", p);
+    }
+    // the summer soltice: need special treatment as its shadow length is zero.
+    fish = fish..{E}(0, -1){W};
 
-	// 4. add the exterior part, to make it cyclic.
-	for(i = n * 2 + 1; i < n * 4; ++ i){
-		fish = fish..roots[i];
-	}
-	fish = fish..{E}cycle;
-	
-	return fish;
+    // 4. add the exterior part, to make it cyclic.
+    for(i = n * 2 + 1; i < n * 4; ++ i){
+	fish = fish..roots[i];
+    }
+    fish = fish..{E}cycle;
+    
+    return fish;
 }
 
 void draw_yinyang(){
 
-	// circle
-	draw(unitcircle);
+    // circle
+    draw(unitcircle);
 
-	// fish
-	filldraw(fish(6, gui_sine));
-	//draw(fish(6, gui_arithmetic), grey);
-	
-	// eyes
-	fill(circle((-0.35, 0), 1/12.));
-	unfill(circle((0.35, 0), 1/12.));
+    // fish
+    filldraw(fish(6, gui_sine));
+    //draw(fish(6, gui_arithmetic), grey);
+    
+    // eyes
+    fill(circle((-0.35, 0), 1/12.));
+    unfill(circle((0.35, 0), 1/12.));
 }
 
 
 /*
  * 
  */
-void circular_annotate(real r1, real r2, string[] texts)
+void circular_annotate(real r1, // radius for inner circle
+                       real r2, // radius for outter circle
+                       string[] texts, // array of the annoation text. the length of the array determines how to divide circumference into ranges;
+                       bool text_inside = true, // way of annotation: inside ranges, or across ranges?
+                       real text_scale=0.5,     // scale factor for the text
+                       bool draw_r1=true,       // draw the inner circle?
+                       bool draw_r2=true,       // draw the outer circule?
+                       bool draw_delim=true,    // draw the delim between two adjacent ranges
+                       bool fill=false,         // fill in between the two circles?
+                       pen dp=defaultpen)    
 {
-	int i, n = texts.length;
-	pair[] roots, delimits;
-	for(i = 0; i < n; ++ i){
-		roots[i] = unityroot(n, i);
-	}
-	roots = reflect(S, N) * (rotate(90) * roots);
-	//roots = rotate(90) * reflect(S, N) * roots;
-	//roots = reflect(O, roots[0]) * roots;
-	delimits = rotate(360. / n / 2) * roots;
-	delimits.cyclic = true;
+    int i, n = texts.length;
 
-	path[] label_path;
-	for(i = 0; i < n; ++ i){
-		label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits[i], delimits[i + 1], CW);
-	}
+    /*
+     * 1. equally divide the circumference into n regions:
+     *
+     * - roots[] are the center of each region, and
+     * - delimits[] are the boundary betw regions.
+     *
+     * the order of the regions and delimites are both CW, 
+     * while the regions start from the due north, and the dilimites[]
+     * is cyclic, starting from the "left" boundary of the first region.
+     */
+    pair[] roots, delimits;
+    for(i = 0; i < n; ++ i){
+	roots[i] = unityroot(n, i);
+    }
+    roots = reflect(S, N) * (rotate(90) * roots);
+    //roots = rotate(90) * reflect(S, N) * roots;
+    //roots = reflect(O, roots[0]) * roots;
+    delimits = rotate(360. / n / 2) * roots;
+    delimits.cyclic = true;
+
+    /*
+     * 2. label_path[] for each region is an arc of radius (r1+r2)/2, inside the region, CW direction
+     */
+    path[] label_path;
+    for(i = 0; i < n; ++ i){
+	label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits[i], delimits[i + 1], CW);
+    }
+
+    /*
+     * 3. draw text for each region
+     */
+    
+    for(i = 0; i < n; ++ i){
+
+	path p = label_path[i];
+
+        // the start/middle/stop point of the arc:
+        // - [0]: the point
+        // - [1]: the tang at the point
+        // - [2]: the norm at the point
+        pair start[], middle[], end[];
+
+        start[0] = relpoint(p, 0.);
+        middle[0] = relpoint(p, 0.5); // midpoint(p);
+        end[0] = relpoint(p, 1.0);
+
+        // the tang/norm direction of the arc at mdpoint
+	real len = arclength(p);
+        start[1] = dir(p, arctime(p, 0));
+        start[2] = rotate(90) * start[1];
+	middle[1] = dir(p, arctime(p, len / 2));
+	middle[2] = rotate(90) * middle[1];
+	end[1] = dir(p, arctime(p, len));
+	end[2] = rotate(90) * end[1];
+
+	//draw(p, Arrow);
+	//draw(md--(md + tang), Arrow);
+	//draw(md--(md - norm), Arrow);
+
+        /* labelpath, but not support xelatex for chinese */
+	//labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
+
+        /* labelpath3, not clear how to use it yet */
+        //path3 p3 = path3(p);
+	//draw(labelpath(texts[i], p3));
+
+        /* simple label */
+        if(text_inside) {
+            label(scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
+        }
+        else {
+            label(scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
+        }
+    }
+
+    /*
+     * 3. circles
+     */
+    if(draw_r1) {	
+        draw(scale(r1)*unitcircle, dp);
+    }
+
+    if(draw_r2) {
+        draw(scale(r2)*unitcircle, dp);
+    }
+
+    /*
+     * 4. delimites
+     */
+    for(i = 0; i < n; ++ i){
 	
-	draw(scale(r1)*unitcircle);
-	draw(scale(r2)*unitcircle);
-	
-	
-	for(i = 0; i < n; ++ i){
-		
-		//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
-		draw(scale(r1)*delimits[i]--scale(r2)*delimits[i]);
-		
-		path p = label_path[i];
-		pair md = midpoint(p);
-		real len = arclength(p);
-		real time = arctime(p, len / 2);
-		pair tang = dir(p, time);
-		pair norm = rotate(90) * tang;
-		//draw(p, Arrow);
-		//draw(md--(md + tang), Arrow);
-		//draw(md--(md - norm), Arrow);
+	//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
 
-                /* labelpath, but not support xelatex for chinese */
-		//labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
-
-                /* labelpath3, not clear how to use it yet */
-                //path3 p3 = path3(p);
-		//draw(labelpath(texts[i], p3));
-
-                /* simple label */
-                label(scale(0.6) * rotate(degrees(tang)) * Label(texts[i], md));
-	}
+        if(draw_delim) {
+            if(text_inside) {
+	        draw(scale(r1)*delimits[i]--scale(r2)*delimits[i], dp);
+            }
+            else{
+	        draw(scale((r1+r2)/2)*roots[i]--scale(r2)*roots[i], dp);
+            }
+        }
+    }
 }
 
+void draw_4_delims(real[] radius, pen noir, pen blanc)
+{
+    int i, n = radius.length;
+    pair[] north_west;
+    
+    for(i = 0; i < n; ++ i) {
+        north_west[i] = rotate(45) * (radius[i], 0);
+    }
 
+    for(i = 0; i < n / 2; ++ i){
+        draw(north_west[i*2]--north_west[i*2+1], noir);
+        draw(rotate(90) * (north_west[i*2]--north_west[i*2+1]), noir);
+        draw(rotate(180) * (north_west[i*2]--north_west[i*2+1]), noir);
+        draw(rotate(270) * (north_west[i*2]--north_west[i*2+1]), noir);
 
+        draw(north_west[i*2]--north_west[i*2+1], blanc);
+        draw(rotate(90) * (north_west[i*2]--north_west[i*2+1]), blanc);
+        draw(rotate(180) * (north_west[i*2]--north_west[i*2+1]), blanc);
+        draw(rotate(270) * (north_west[i*2]--north_west[i*2+1]), blanc);
+    }
+}
 
 
 
@@ -245,13 +332,16 @@ void circular_annotate(real r1, real r2, string[] texts)
 
 draw_yinyang();
 
-//circular_annotate(1, 2, new string[]{"北", "东", "南", "西"});
+//circular_annotate(1, 2, new string[]{"冬", "春", "夏", "秋"});
 
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
-circular_annotate(1, 2, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"});
-circular_annotate(2, 3, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"});
-circular_annotate(3, 4, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"});
-//circular_annotate(4, 5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"});
+circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"}, 0.4, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, 0.65, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}, 0.4, draw_r2=false);
+circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, 0.6, draw_r1=false);
+circular_annotate(3.0, 3.3, new string[]{"23", "1", "3", "5", "7", "9", "11", "13", "15", "17", "19", "21"}, text_inside=false, 0.3, draw_r1=false, draw_delim=false);
+circular_annotate(3.3, 4.0, new string[]{"冬月", "蜡月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, 0.4);
+circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, text_scale=0.3, draw_r1=false, draw_delim=false);
 
 //circular_annotate(3, 4, new string[]{"11", "22", "33", "44", "55"});
 //circular_annotate(4, 5, new string[]{"11", "22", "33", "44", "55", "66"});
@@ -266,4 +356,6 @@ circular_annotate(3, 4, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "
 //draw(W--E, grey+linewidth(0.2));
 //draw(N--S, grey+linewidth(0.2));
 
-
+draw_4_delims(new real[]{2.0, 3.0, 3.3, 4.0}, 
+              defaultpen + linewidth(line_width_in_bp * 3) + linecap(0), 
+              defaultpen + linewidth(line_width_in_bp * 1) + linecap(2) + white);
