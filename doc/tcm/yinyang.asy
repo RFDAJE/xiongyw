@@ -361,21 +361,25 @@ circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春",
                                          "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, 
                   text_scale=0.3, draw_r1=false, draw_delim=false);
 
+// 六气
+circular_annotate(4.5, 5.0, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
+                                           "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
 // 四灵二十八宿
-circular_annotate(4.5, 5.0, new string[]{"玄武","青龙","朱雀","白虎"}, text_scale=0.3);
+circular_annotate(5.0, 5.5, new string[]{"玄武","青龙","朱雀","白虎"}, text_scale=0.3);
 
-circular_annotate(5.0, 5.5, new string[]{"虚","女","牛","斗","箕","尾","心",
+circular_annotate(5.5, 6.0, new string[]{"虚","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","轸","翼","张",
                                          "星","柳","鬼","井","参","觜","毕",
                                          "昴","胃","娄","奎","壁","室","危"}, text_scale=0.3, draw_r1=false);
 
-draw(scale(5.6)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+draw(scale(6.1)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // this is to make 4 seasons/directions more distinguishable
-draw_4_delims(new real[]{2.0, 3.0,   3.5, 4.0,   4.5, 5.5}, 
+/*
+draw_4_delims(new real[]{2.0, 3.0,   3.5, 4.0,   5.0, 6.0}, 
               defaultpen + linewidth(line_width_in_bp * 4) + linecap(0), 
               defaultpen + linewidth(line_width_in_bp * 2) + linecap(2) + white);
-
+*/
 //draw(unitsquare);
 //draw(scale(2)*unitcircle);
 
