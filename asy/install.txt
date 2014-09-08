@@ -18,6 +18,7 @@ pdfviewer="c:\Program Files\FoxitReader\FoxitReader.exe";
  * note that the source file must be utf8-encoded.
  * emacs: 
  *   c-x RET f utf-8
+ *   c-x c-s
  * vim: 
  *   :setlocal nobomb
  *   :set encoding=utf-8

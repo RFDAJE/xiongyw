@@ -355,24 +355,31 @@ circular_annotate(3.0, 3.5, new string[]{"胆", "1", "肝", "3", "肺", "5", "�
 
 circular_annotate(3.5, 4.0, new string[]{"冬月", "腊月", "正月",  "二月", "三月", "四月", 
                                          "五月", "六月", "七月", "八月", "九月", "十月"}, 0.3);
-circular_annotate(4.0, 4.5, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", 
+circular_annotate(4.0, 4.3, new string[]{"12.23", "1.6", "1.21", "2.6", "2.21", "3.6", 
+                                         "3.21", "4.6", "4.21", "5.6", "5.21", "6.7", 
+                                         "6.23", "7.8", "7.23", "8.8", "8.23", "9.8", 
+                                         "9.23", "10.8", "10.23", "11.8", "11.23", "12.8"}, 
+                  text_scale=0.3, draw_r1=false, draw_r2=false, draw_delim=false);
+
+circular_annotate(4.3, 4.7, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", 
                                          "春分", "清明", "谷雨", "立夏", "小满", "芒种", 
                                          "夏至", "小暑", "大暑", "立秋", "处暑", "白露", 
                                          "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, 
-                  text_scale=0.3, draw_r1=false, draw_delim=false);
+                  text_scale=0.35, draw_r1=false, draw_delim=false);
 
 // 六气
-circular_annotate(4.5, 5.0, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
+circular_annotate(4.7, 5.3, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
                                            "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
 // 四灵二十八宿
-circular_annotate(5.0, 5.5, new string[]{"玄武","青龙","朱雀","白虎"}, text_scale=0.3);
 
-circular_annotate(5.5, 6.0, new string[]{"虚","女","牛","斗","箕","尾","心",
+circular_annotate(5.3, 5.8, new string[]{"虚","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","轸","翼","张",
                                          "星","柳","鬼","井","参","觜","毕",
                                          "昴","胃","娄","奎","壁","室","危"}, text_scale=0.3, draw_r1=false);
 
-draw(scale(6.1)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+circular_annotate(5.8, 6.3, new string[]{"玄\ 武","青\ 龙","朱\ 雀","白\ 虎"}, text_scale=0.3);
+
+draw(scale(6.4)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // this is to make 4 seasons/directions more distinguishable
 /*
