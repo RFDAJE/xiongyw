@@ -183,7 +183,7 @@ void draw_yinyang(){
 
 
 /*
- * 
+ * evenly distributed annotation around the circumference of a circle
  */
 void circular_annotate(real r1, // radius for inner circle
                        real r2, // radius for outter circle
@@ -302,6 +302,128 @@ void circular_annotate(real r1, // radius for inner circle
     }
 }
 
+/*
+ * manually distributed annotation around the circumference of a circle
+ */
+void circular_annotate2(real r1, // radius for inner circle
+                        real r2, // radius for outter circle
+                        real[] angles,  // array of the (start_angle, stop_angle). angle 0 is due north, CW.
+                        string[] texts, // array of the corresponding texts.
+                        bool text_inside = true, // way of annotation: inside ranges, or across ranges?
+                        real text_scale=0.5,     // scale factor for the text
+                        bool draw_r1=true,       // draw the inner circle?
+                        bool draw_r2=true,       // draw the outer circule?
+                        bool draw_delim=true,    // draw the delim between two adjacent ranges
+                        bool fill=false,         // fill in between the two circles?
+                        pen dp=defaultpen)    
+{
+    int i, n = texts.length;
+
+    /*
+     * 1. read the regions from the argument:
+     *
+     * - delimits_left[] are the unit direction of the left boundary of each region
+     * - middles[] are the unit direction of the center of each region
+     * - delimits_right[] are the unit direction of the right boundary of each region
+     *
+     * the order of the regions and delimites are both CW.
+     */
+    pair[] delimits_left, middles, delimits_right;
+    for(i = 0; i < n; ++ i){
+        real gauche = angles[i*2];
+        real droit = angles[i*2+1];
+        real moyen = (gauche + droit) / 2;
+	delimits_left[i] = rotate(-gauche) * dir(O--(0,1));
+	delimits_right[i] = rotate(-droit) * dir(O--(0,1));
+        middles[i] = rotate(-moyen) * dir(O--(0,1));
+    }
+
+    /*
+     * 2. label_path[] for each region is an arc of radius (r1+r2)/2, inside the region, CW direction
+     */
+    path[] label_path;
+    for(i = 0; i < n; ++ i){
+	label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits_left[i], delimits_right[i], CW);
+    }
+
+    /*
+     * 3. draw text for each region
+     */
+    
+    for(i = 0; i < n; ++ i){
+
+	path p = label_path[i];
+
+        // the start/middle/stop point of the arc:
+        // - [0]: the point
+        // - [1]: the tang at the point
+        // - [2]: the norm at the point
+        pair start[], middle[], end[];
+
+        start[0] = relpoint(p, 0.);
+        middle[0] = relpoint(p, 0.5); // midpoint(p);
+        end[0] = relpoint(p, 1.0);
+
+        // the tang/norm direction of the arc at mdpoint
+	real len = arclength(p);
+        start[1] = dir(p, arctime(p, 0));
+        start[2] = rotate(90) * start[1];
+	middle[1] = dir(p, arctime(p, len / 2));
+	middle[2] = rotate(90) * middle[1];
+	end[1] = dir(p, arctime(p, len));
+	end[2] = rotate(90) * end[1];
+
+	//draw(p, Arrow);
+	//draw(md--(md + tang), Arrow);
+	//draw(md--(md - norm), Arrow);
+
+        /* labelpath, but not support xelatex for chinese */
+	//labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
+
+        /* labelpath3, not clear how to use it yet */
+        //path3 p3 = path3(p);
+	//draw(labelpath(texts[i], p3));
+
+        /* simple label */
+        if(text_inside) {
+            label(scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
+        }
+        else {
+            label(scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
+        }
+    }
+
+    /*
+     * 3. circles
+     */
+    if(draw_r1) {	
+        draw(scale(r1)*unitcircle, dp);
+    }
+
+    if(draw_r2) {
+        draw(scale(r2)*unitcircle, dp);
+    }
+
+    /*
+     * 4. delimites
+     */
+    for(i = 0; i < n; ++ i){
+	
+	//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
+
+        if(draw_delim) {
+            if(text_inside) {
+	        draw(scale(r1)*delimits_left[i]--scale(r2)*delimits_left[i], dp);
+	        draw(scale(r1)*delimits_right[i]--scale(r2)*delimits_right[i], dp);
+            }
+            else{
+	        draw(scale((r1+r2)/2)*middles[i]--scale(r2)*middles[i], dp);
+            }
+        }
+    }
+}
+
+
 void draw_4_delims(real[] radius, pen noir, pen blanc)
 {
     int i, n = radius.length;
@@ -368,8 +490,14 @@ circular_annotate(4.3, 4.7, new string[]{"冬至", "小寒", "大寒", "立春",
                   text_scale=0.35, draw_r1=false, draw_delim=false);
 
 // 六气
+/*
 circular_annotate(4.7, 5.3, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
-                                           "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
+                                         "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
+*/
+
+circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
+                   new string[]{"厥阴风木", "少阴君火", "少阳相火", "太阴湿土", "阳明燥金", "太阳寒水"}, text_scale=0.3);
+
 // 四灵二十八宿
 
 circular_annotate(5.3, 5.8, new string[]{"虚","女","牛","斗","箕","尾","心",
@@ -379,14 +507,17 @@ circular_annotate(5.3, 5.8, new string[]{"虚","女","牛","斗","箕","尾","�
 
 circular_annotate(5.8, 6.3, new string[]{"玄\ 武","青\ 龙","朱\ 雀","白\ 虎"}, text_scale=0.3);
 
+//circular_annotate2(6.8, 7.3, new real[]{0, 30, 30, 90, 90, 150, 150, 180}, new string[]{"1","2","3","5"}, text_scale=0.3);
+
+
 draw(scale(6.4)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // this is to make 4 seasons/directions more distinguishable
-/*
-draw_4_delims(new real[]{2.0, 3.0,   3.5, 4.0,   5.0, 6.0}, 
+
+draw_4_delims(new real[]{2.0, 3.0,   3.5, 4.0,   4.7, 6.3}, 
               defaultpen + linewidth(line_width_in_bp * 4) + linecap(0), 
               defaultpen + linewidth(line_width_in_bp * 2) + linecap(2) + white);
-*/
+
 //draw(unitsquare);
 //draw(scale(2)*unitcircle);
 
