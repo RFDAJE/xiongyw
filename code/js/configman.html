@@ -1055,7 +1055,7 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYA
 
     function gen_tab_view (x, idx, array) {
     	var size = array.length;
-        var xml = get_xml(x[1]);
+        var xml = get_xml(encodeURI(x[1])); // encodeURI() for XHR
         var obj = xml2obj(xml);
         var json = jsonify(obj);
 
