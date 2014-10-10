@@ -454,6 +454,113 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
     }
 }
 
+/*
+ * circularly bend a guide array (guides)
+ *
+ * the idea: the source, i.e. the guides can be seen as a rectangle (which is
+ * the bounding box of the guides), and the destination's boundary 
+ * has four segments: two arcs (inner, and outer), and two straight lines 
+ * (which are part of the radius having length r2-r1). If we can map each horizontal
+ * line from the source into an arc inside the destination, then we can map each point 
+ * from the source into the destination, as each source point must be on a source line.
+ * (the same apply for vertical lines in the source rectangle).
+ *
+ * so, bending a guide is just transforming the position of each node in the guide.
+ * 
+ * 1. transform the guides by shifting/scaling it into an unitsquare, i.e., box((0,0),(1,1)).
+ *    so the x/y coordinate of each point in the guides is now a horizontal/vertial ratio.
+ * 2. let the destination arc starts from positive part of x-axis and extends CCW, using (0,0) 
+ *    as the origin
+ * 3. rotate to the desired position
+ *
+ * Note that the concavity/convexity of the guides may change due to the bend, or even change
+ * from concave to convex, or vice vesa. Adjust the parameters for best results desired.
+ *
+ * The following is an example of using this function:
+ *
+ * guide[] g = {
+ *    (0,0)..(50, 70)..(100,100), 
+ *    (100, 100)..(150,30)..(200,0),
+ *    (0,0)..(50,0)..(100,0)..(150,0)..(200,0),
+ *    (0,50)..(50,50)..(100,50)..(150,50)..(200,50),
+ *    (0,100)..(50,100)..(100,100)..(150,100)..(200,100)
+ * };
+ *
+ * draw(g);
+ * guide[] g2 = bend_guide(g, 280, 300, 30, 30);
+ * draw(g2);
+ */
+ 
+guide[] bend_guide(guide[] gg, // array of guides
+                 real r1, // inner radius
+                 real r2, // outer radius
+                 real start, // start angle in degree
+                 real angle){ // angle span in degree
+    /* 
+     * 1. unify the guides
+     */
+    // find out the bounding box
+    real xmin = infinity, ymin = infinity;  
+    real xmax = -infinity, ymax = -infinity;
+    for (guide g: gg) {
+        path p = g; // need resolve the guide to get the bounding box, i.e. min()/max()
+        pair sw = min(p), ne = max(p);
+        if(sw.x < xmin) xmin = sw.x;
+        if(sw.y < ymin) ymin = sw.y;
+        if(ne.x > xmax) xmax = ne.x;
+        if(ne.y > ymax) ymax = ne.y;
+    }
+    //write(xmin, ymin, xmax, ymax);
+
+    // shift + scale
+    guide[] gg2;
+    for (guide g: gg) {
+        g = shift (-xmin, -ymin) * g;
+        g = scale(1 / (xmax - xmin), 1 / (ymax - ymin)) * g;
+        gg2.push(g);
+    }
+
+    /*
+     * 2.
+     */
+    guide[] gg3;
+    for (guide g2: gg2) {
+        guide g3;
+        path p2 = g2;
+        // bend g2 into g3
+        for (int i = 0; i < size(p2); ++ i) {
+            real r, theta;
+            path rp; // arc path
+            pair p = point(p2, i);
+            //write("p=", p);
+            r = r1 + (r2 - r1) * p.y;
+            //write("r=", r);
+            theta = angle * (1 - p.x);
+            //write("theta=", theta);
+            rp = arc((0, 0), r,  0., theta, CCW);
+            p = relpoint(rp, 1.0);  // now we have the end point of the arc
+            //write("final p=", p);
+            //write();
+            g3 = g3..p;
+        }
+
+        // add g3 into gg3
+        gg3.push(g3);
+    }
+
+    /*
+     * 3. rotate
+     */
+    guide[] gg4;
+    for( guide g: gg3) {
+        g = rotate(start) * g;
+        gg4.push(g);
+    }
+
+    return gg4;
+}
+
+
 
 
 /*
