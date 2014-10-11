@@ -1,0 +1,233 @@
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <style type="text/css">
+    body {
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
+    <script type="text/javascript">
+
+// constants
+var CANVAS_WIDTH = 1020;
+var CANVAS_HEIGHT = 1024;
+var GRID_SIZE = 8;
+
+var result = []; // an array of points array, representing the guides
+var guide = [];  // an array of points, representing the current guide
+var started = false;
+
+
+var lastPoint = []; // the last point in the current guide
+
+var img = new Image();
+var c, ctx; // canvas and its context
+var start, stop, undo; // buttons
+
+//img.src = "http://10.12.2.225:8080/test.png";
+img.src = "test.png";
+
+function getCanvasPos(ctx, e) {
+    var c = ctx.canvas; 
+
+    var bb = c.getBoundingClientRect(); 
+
+    // Translate and scale mouse event coordinates to canvas coordinates
+    var x = (e.clientX-bb.left)*(c.width/bb.width);
+    var y = (e.clientY-bb.top)*(c.height/bb.height);
+
+    return [x, y];
+}
+
+// canvas hooks
+function onClick(e) {
+    //console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+    console.log(result);
+    if (started === true) {
+        //lastPoint = [e.clientX, e.clientY]; 
+        lastPoint = getCanvasPos(ctx, e);
+        guide.push(lastPoint);
+    }
+    outputGuide();
+
+}
+
+function onDoubleClick(e) {
+    //console.log("onDoubleClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+}
+
+function onRightClick(e) {
+    console.log("onRightClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+}
+
+function onMouseMove(e) {
+    //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+    var cur = getCanvasPos(ctx, e); // current position
+    drawResult();
+    if(lastPoint.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(lastPoint[0], lastPoint[1]);
+            ctx.lineTo(cur[0], cur[1]);
+            ctx.stroke();
+    }
+}
+
+function onMouseWheel(e) {
+    console.log("onMouseWhell: dx=" + e.deltaX + ", dy=" + e.deltaY);
+}
+
+// button hooks
+function startPath() {
+    console.log("startPath: ");
+    if (guide.length > 0) {
+        result.push(guide);
+    }
+    guide = [];
+    lastPoint = [];
+    outputGuide();
+    started = true;
+}
+
+function stopPath() {
+    if (guide.length > 0) {
+        result.push(guide);
+    }
+
+    guide = [];
+    lastPoint = [];
+    started = false;
+
+    outputResult();
+    drawResult();
+}
+
+function undoPath() {
+    if (guide.length > 0) {
+        guide.pop();
+    }
+    if (guide.length > 0) {
+        lastPoint = guide[guide.length - 1];
+    } else {
+        lastPoint = [];
+    }
+    outputGuide();
+}
+
+function guide2text(g) {
+    return "" + g.map(function(x) { return "(" + x[0] + "," + x[1] + ")"; }).join("..");
+}
+
+
+function outputGuide() {
+    var ta =  document.getElementById("guide"); // textarea
+    ta.value = guide2text(guide);
+}
+
+function outputResult() {
+    var ta =  document.getElementById("result"); // textarea
+    ta.value = result.map(function(x){return guide2text(x);}).join(",\r");
+    console.log("guide[] gg = {" + ta.value + "}");
+}
+
+
+function drawImageAndGrid() {
+    // draw the image
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+
+    // draw the grid
+    ctx.lineWidth = 0.2;
+    ctx.strokeStyle = "grey";
+
+    // horizontal lines
+    for (var i = 0;i <= c.width / GRID_SIZE; i ++){
+	ctx.beginPath();
+	ctx.moveTo(0, i * GRID_SIZE);
+	ctx.lineTo(c.width, i * GRID_SIZE);
+	ctx.stroke();
+    }
+    
+    // vertical lines
+    for (var i = 0; i <= c.height / GRID_SIZE; i ++){
+	ctx.beginPath();
+	ctx.moveTo(i * GRID_SIZE, 0);
+	ctx.lineTo(i * GRID_SIZE, c.height);
+	ctx.stroke();
+    }
+}
+
+function drawResult(){
+
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    drawImageAndGrid();
+
+    // draw lines
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = "black";
+
+    // add the current guide into the result
+    var res_temp = JSON.parse(JSON.stringify(result)); // deep copy
+    res_temp.push(guide);  
+
+    for(var i = 0; i < res_temp.length; i ++) {
+        for(var j = 0; j < res_temp[i].length - 1; j ++) {
+            ctx.beginPath();
+            ctx.moveTo(res_temp[i][j][0], res_temp[i][j][1]);
+            ctx.lineTo(res_temp[i][j+1][0], res_temp[i][j+1][1]);
+            ctx.stroke();
+        }
+    }
+    res_temp = null;
+}
+
+function onLoad() {
+
+    c = document.getElementById("myCanvas");
+
+    c.width = CANVAS_WIDTH;
+    c.height = CANVAS_HEIGHT;
+
+    // event hooks
+    c.onclick = onClick;
+    c.ondblclick = onDoubleClick;
+    c.oncontextmenu = onRightClick;
+    c.onmousemove = onMouseMove;
+    c.onmousewheel = onMouseWheel;
+
+    ctx = c.getContext('2d');
+
+    drawImageAndGrid();
+
+    // set button callbacks
+    start = document.getElementById("startPath");
+    stop = document.getElementById("stopPath");
+    undo = document.getElementById("undoPath");
+
+    start.onclick = startPath;
+    stop.onclick = stopPath;
+    undo.onclick = undoPath;
+
+}
+
+
+window.onload = onLoad;
+</script>
+    </head>
+    <body>
+    <div id="div1" style="float: left;">
+    <canvas id="myCanvas" width="100" height="512" style="border:2px solid green;"></canvas>
+    </div>
+    <div id="div2" style="float: left;">
+    <form>
+    <input id="startPath" type="button" value="Start"/>
+    <input id="undoPath" type="button" value="Undo"/>
+    <input id="stopPath" type="button" value="Stop"/>
+    </form>
+    <br>
+    <textarea id="guide" rows="2" cols="50"></textarea>
+    <br>
+    <textarea id="result" rows="10" cols="50"></textarea>
+    </div>
+    </body>
+    </html>
