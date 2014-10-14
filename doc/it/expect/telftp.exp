@@ -99,7 +99,7 @@ proc put_main {} {
             put $expect_out(1,string) $expect_out(2,string) 
         } -re  "(\[^ ]+)\n" { 
             send_user "copying $expect_out(1,string)\n" 
-            put $expect_out(1,string) $expect_out(1, string) 
+            put $expect_out(1,string) $expect_out(1,string) 
         } -re  "\n" { 
             send_user  "eh?\n" 
         }
