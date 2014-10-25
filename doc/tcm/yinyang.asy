@@ -580,7 +580,7 @@ circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳
 circular_annotate(3.0, 3.35, new string[]{"胆经", "1", "肝经", "3", "肺经", "5", "大肠经", "7", "胃经", "9", "脾经", "11", 
                                          "心经", "13", "小肠经", "15", "膀胱经", "17", "肾经", "19", "心包经", "21", "三焦经", "23"}, 
                   text_inside=true, 0.25, draw_r1=false, draw_r2=false, draw_delim=false);
-circular_annotate(3.25, 3.6, new string[]{"足少阳", "足厥阴", "手太阴", "手阳明", "足阳明", "足太阳",
+circular_annotate(3.25, 3.6, new string[]{"足少阳", "足厥阴", "手太阴", "手阳明", "足阳明", "足太阴",
                                          "手少阴", "手太阳", "足太阳", "足少阴", "手厥阴", "手少阳"},
                   text_inside=true, 0.25, draw_r1=false, draw_r2=false, draw_delim=false);
                   
