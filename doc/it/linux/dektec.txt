@@ -1,0 +1,424 @@
+0. Summary
+This is a memo on how to play a TS stream by using the DekTec card on Linux.
+
+For playing TS streams, DekTec provides:
+
+StreamXpress, for Windows, in binary/installer form
+DtPlay, for Linux, in source code form
+ 
+
+On Linux, DtPlay has two dependencies:
+
+The driver for the Dektec cards. The driver is a kernel module, which will create device nodes once loaded. 
+The DTAPI header file (DTAPI.h) and libraries (DTAPI.o or DTAPI64.o).
+ 
+
+The following briefly describes how to get these stuff in place.
+
+ 
+
+1. The card I am using: DTA-2107
+
+
+2. My Linux Distro (Debian 7.4 64-bit)
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ uname -a
+Linux d7 3.2.0-4-amd64 #1 SMP Debian 3.2.57-3+deb7u2 x86_64 GNU/Linux
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ gcc --version
+gcc (Debian 4.7.2-5) 4.7.2
+Copyright (C) 2012 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions. There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+3. Build & Load the driver
+Unzip the LinuxSDK (which comes with the card in an USB dongle, or can be downloaded from DekTec homepage)
+bruin@d7:~/work/Dektec/Software/LinuxSDK$ ls
+-rwxr--r-- 1 bruin bruin 18230890 oct. 22 11:04 LinuxSDK.tar.gz
+bruin@d7:~/work/Dektec/Software/LinuxSDK$ tar xzvf LinuxSDK.tar.gz
+...
+ 
+
+"make" 
+bruin@d7:~/work/Dektec/Software/LinuxSDK$ cd LinuxSDK/Drivers/Dta/Source/Linux/
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$ make
+make -C ../../../DtSal/Source/Linux DRIVER_NAME=Dta
+make[1]: entrant dans le répertoire « /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux »
+make MYPWD=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux -C /lib/modules/3.2.0-4-amd64/build SUBDIRS=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux clean
+make[2]: entrant dans le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+make[2]: quittant le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+make MYPWD=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux -C /lib/modules/3.2.0-4-amd64/build SUBDIRS=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux modules
+make[2]: entrant dans le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtDma.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtMutex.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtSpinLock.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtEvent.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtNonVolatileSettings.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtString.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtDpc.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtWorkItem.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtThread.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtUtility.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtList.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/../DtUsb.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/DtSalDta.o
+Building modules, stage 2.
+MODPOST 1 modules
+CC /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/DtSalDta.mod.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux/DtSalDta.ko
+make[2]: quittant le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+make[1]: quittant le répertoire « /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtSal/Source/Linux »
+make -C ../../../DtDrvCommon/Source/Linux DRIVER_NAME=Dta
+make[1]: entrant dans le répertoire « /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux »
+make MYPWD=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux -C /lib/modules/3.2.0-4-amd64/build SUBDIRS=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux modules
+make[2]: entrant dans le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/../DtProperties.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/../IoConfigCodes.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/../DtTables.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/../DtUtilities.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.o
+Building modules, stage 2.
+MODPOST 1 modules
+WARNING: "IoConfigCodeStrings" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "IoConfigCodeHashSets" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtTableStores" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtStringAppendChars" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtStringAlloc" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtAnsiCharArrayStartsWith" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtAnsiCharArrayIsEqual" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "IoConfigCodeStringCount" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "IoConfigCodesHashCount" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtAnsiCharArrayToUInt" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtStringFree" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtMemCopy" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtStringUIntegerToDtStringAppend" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtPropertyStoreCount" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtPropertyStores" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtStringClear" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtDjb2" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+WARNING: "DtTableStoreCount" [/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko] undefined!
+CC /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.mod.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux/DtDrvCommon.ko
+make[2]: quittant le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+make[1]: quittant le répertoire « /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/DtDrvCommon/Source/Linux »
+make MYPWD=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux -C /lib/modules/3.2.0-4-amd64/build SUBDIRS=/tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux modules
+make[1]: entrant dans le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Linux/DtaIal.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Dta.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../DtaUtility.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Eeprom.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../I2c.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Vpd.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Events.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../NonIp.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../NonIpTx.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../NonIpRx.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Ip.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../IpTx.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../IpRx.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../DtaPropertyStore.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../IoConfig.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Dma.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../ShBuffer.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../NwPhyMac.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../DtaTableStore.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../DtaMatrix.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Genlock.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Gs296x.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Lmh1982.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../FpgaGenlock.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/../Linux/DtaDeviceTable.o
+CC [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/Messages.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/Dta.o
+Building modules, stage 2.
+MODPOST 1 modules
+CC /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/Dta.mod.o
+LD [M] /tank/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux/Dta.ko
+make[1]: quittant le répertoire « /usr/src/linux-headers-3.2.0-4-amd64 »
+ 
+
+Check that the kernel module is built
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$ ls -la Dta.ko
+-rw-r--r-- 1 bruin bruin 9599083 oct. 22 11:41 Dta.ko
+"make install"
+ 
+
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$ sudo make install
+su -c "rmmod Dta 2>/dev/null || true && install -d /lib/modules/3.2.0-4-amd64/kernel/drivers/misc && cp -v Dta.ko /lib/modules/3.2.0-4-amd64/kernel/drivers/misc && /sbin/depmod -a && /sbin/modprobe Dta && install -o root -g root -m 644 51-dta.rules /etc/udev/rules.d/"
+« Dta.ko » -> « /lib/modules/3.2.0-4-amd64/kernel/drivers/misc/Dta.ko »
+ 
+
+Check that the kernel module is loaded and the device is created
+ 
+
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$ lsmod |grep Dta
+Dta 422114 0
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$ ls -la /dev/Dta*
+crw-rw-rwT 1 root root 251, 0 oct. 22 11:43 /dev/Dta0
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/Drivers/Dta/Source/Linux$
+
+4. Build DtPlay
+
+Download the source & unzip it
+ 
+
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK$ wget http://www.dektec.com/Products/Apps/DtPlay/Downloads/DtPlay.zip
+--2014-10-22 11:45:32-- http://www.dektec.com/Products/Apps/DtPlay/Downloads/DtPlay.zip
+Résolution de www.dektec.com (www.dektec.com)... 77.94.250.162
+Connexion vers www.dektec.com (www.dektec.com)|77.94.250.162|:80...connecté.
+requête HTTP transmise, en attente de la réponse...200 OK
+Longueur: 1351786 (1,3M) [application/x-zip-compressed]
+Sauvegarde en : «DtPlay.zip»
+ 
+100%[====================================================================================================================================================>] 1 351 786 82,3K/s ds 25s
+ 
+2014-10-22 11:45:58 (53,8 KB/s) - «DtPlay.zip» sauvegardé [1351786/1351786]
+ 
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK$ 
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK$ ls -la
+total 1741
+drwxr-xr-x 6 bruin bruin 10 oct. 22 11:45 .
+drwxr-xr-x 3 bruin bruin 4 oct. 22 11:39 ..
+drwxr-xr-x 4 bruin bruin 4 août 13 2013 Common
+drwxr-xr-x 7 bruin bruin 7 août 13 2013 Drivers
+drwxr-xr-x 5 bruin bruin 5 août 13 2013 DTAPI
+drwxr-xr-x 2 bruin bruin 4 août 13 2013 DtapiService
+-rw-r--r-- 1 bruin bruin 1351786 mars 14 2014 DtPlay.zip
+-rw-r--r-- 1 bruin bruin 1565 août 14 2013 License
+-rw-r--r-- 1 bruin bruin 3354 août 14 2013 Readme
+-rw-r--r-- 1 bruin bruin 166148 août 13 2013 SDK - Revision History.pdf
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK$ unzip DtPlay.zip 
+Archive: DtPlay.zip
+creating: DtPlay/
+creating: DtPlay/DTAPI/
+inflating: DtPlay/DtPlay.exe 
+inflating: DtPlay/DtPlay.sln 
+inflating: DtPlay/DtPlay.vcxproj 
+inflating: DtPlay/DtPlay.vcxproj.filters 
+inflating: DtPlay/Makefile 
+inflating: DtPlay/readme.txt 
+creating: DtPlay/Source/
+inflating: DtPlay/Source/DtOpt.cpp 
+inflating: DtPlay/Source/DtOpt.h 
+inflating: DtPlay/Source/DtPlay.cpp 
+inflating: DtPlay/Source/DtPlay.h 
+inflating: DtPlay/Source/DtSdiFileFmt.h
+ 
+
+Copy the DTAPI header and library to the right place
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK$ cd DtPlay/
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ cp ../DTAPI/Include/DTAPI.h DTAPI/
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ cp ../DTAPI/Lib/GCC4.4.6/DTAPI64.o DTAPI/
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$
+"make"
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ make
+g++ -g -O2 -I/usr/local/include -I./DTAPI -fexceptions -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -c -o Source/DtPlay.o Source/DtPlay.cpp
+g++ -g -O2 -I/usr/local/include -I./DTAPI -fexceptions -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -c -o Source/DtOpt.o Source/DtOpt.cpp
+g++ -g -O2 -I/usr/local/include -I./DTAPI -fexceptions -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE Source/DtPlay.o Source/DtOpt.o ./DTAPI/DTAPI64.o -lpthread -o DtPlay
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$
+
+5. Try it (get its usage instruction)
+ 
+
+bruin@d7:~/work/Dektec/Software/LinuxSDK/LinuxSDK/DtPlay$ ./DtPlay -?
+ 
+Usage:
+DtPlay playfile [-l count] [-r rate] [-t type] [-n number] [-i port]
+[-m mode] [-mt type] [-mf freq] [-mc coderate] [-ma annex]
+[-mC constellation] [-mB bandwidth] [-mT txmode] [-mG gaurditv]
+[-mH hdrmode] [-mP Pilots] [-mF fecframe] [-mI initval]
+[-ml level_dbm] [-snr snr_db]
+[-ipa ip_address_pair] [-ipp protocol] [-ipn num_tp_per_ip]
+[-mS Stuffing]
+[-s] [-?]
+ 
+Where:
+playfile is the name of the file to output
+ 
+Options:
+-l Number of times to loop the file (0=loop infinitely)
+ 
+-r Transport-Stream Rate in bps or sample rate in case of IQ-modulation mode
+NOTE: set the rate to '0' to playout a file with timestamps
+ 
+-t Device type to use (default: any output device)
+100, 102, 105, 107, 110, 111, 112, 115, 116, 117, 140, 145, 160, 205,
+215, 245, 2107, 2111, 2136, 2137, 2144, 2145, 2152, 2154, 2160 or 2162
+ 
+-n Device number to use (default: 1)
+ 
+-i Port number of the output channel to use
+ 
+-db Port to use as doubly buffered output
+ 
+-m Transmit Mode (default: 188)
+188 188-byte packets in file, 188-byte packets transmitted
+ADD16 188-byte packets in file, 204-byte packets transmitted
+(16 dummy bytes are automatically added to the packets)
+192 192-byte packets in file, 192-byte packets transmitted
+Note: this mode is only supported by the DTA-102
+204 204-byte packets in file, 204-byte packets transmitted
+MIN16 204-byte packets in file, 188-byte packets transmitted
+(last 16 bytes are invalidated)
+RAW No notion of packets, data is transmitted as is
+SDI8B_625 8-Bit/625-line SDI in file, 8-bit SDI transmitted
+SDI8B_525 8-Bit/525-line SDI in file, 8-bit SDI transmitted
+DTSDI .dtsdi file, SDI format is auto detected
+ 
+-mt Modulation type
+ATSC ATSC modulation
+CMMB CMMB modulation
+DAB DAB modulation
+DTMB DTMB modulation
+DVBS DVB-S QPSK modulation
+DVBS2_16APSK DVB-S.2 16APSK modulation
+DVBS2_32APSK 32APSK modulation
+DVBS2_8PSK DVB-S.2 8PSK modulation
+DVBS2_QPSK DVB-S.2 QPSK modulation
+DVBS2_L3 DVB-S.2 L3 modulation
+DVBT DVB-T/H modulation
+ISDBS ISDB-S modulation
+ISDBT ISDB-T modulation
+IQ IQ direct
+QAM4 QAM-4 modulation
+QAM16 QAM-16 modulation
+QAM32 QAM-32 modulation
+QAM64 QAM-64 modulation
+QAM128 QAM-128 modulation
+QAM256 QAM-256 modulation
+T2MI T2MI modulation
+ 
+-mf Modulation carrier frequency in MHz
+ 
+-ml Output level in dBm (default: -27.5dBm)
+ 
+-mc Convolutional rate (default: 1/2)
+General : 1/2, 2/3, 3/4, 4/5, 5/6, 6/7 or 7/8
+DVB-S2 Specific: 1/3, 2/5, 3/5, 8/9 or 9/10
+DTMB Specific : 0.4, 0.6 or 0.8
+ 
+-ma J.83 Annex (default: Annex A)
+A J.83 annex A (DVB-C)
+B J.83 annex B ('American QAM')
+C J.83 annex C ('Japanese QAM')
+ 
+-mC ATSC/DVB-H/DVB-T/DTMB constellation (default: QAM64)
+QPSK QPSK modulation
+QAM16 QAM-16 modulation
+QAM64 QAM-64 modulation
+-- DTMB Specific
+QAM4NR QAM-4NR modulation
+QAM4 QAM-4 modulation
+QAM32 QAM-32 modulation
+-- ATSC Specific
+VSB8 VSB-8 modulation
+VSB16 VSB-16 modulation
+ 
+-mB DVB-H/DVB-T/DTMB bandwidth (default: 8MHz)
+5, 6, 7 or 8 (MHz)
+ 
+-mT DVB-H/DVB-T transmission mode (default: 8k)
+2k 2k
+4k 4k
+8k 8k
+ 
+-mG DVB-H/DVB-T guard interval (default: 1/4)
+1/4 1/4
+1/8 1/8
+1/16 1/16
+1/32 1/32
+ 
+-mH DTMB frame-header-mode (default: PN420)
+PN420 PN420
+PN595 PN595
+PN945 PN945
+ 
+-mP Enable Pilots in DVB-S2 (default: OFF)
+OFF Pilots disabled
+ON Pilots enabled
+ 
+-mF Long/short FEC frame in DVB-S2 (default: LONG)
+SHORT Short FECFRAME
+LONG Long FECFRAME
+ 
+-mI Gold sequence initialisation value (default: 0)
+0 ... 262143
+ 
+-if Interpolation filter used in IQ mode (default: OFDM)
+OFDM OFDM interpolation filter
+QAM QAM interpolation filter
+ 
+-snr Enable noise generation and set SNR in dB (e.g. -snr 26.0)
+ 
+-ipa IP address/port (e.g. 192.168.0.1[:5768], port is optional)
+ 
+-ipp IP Protocol (default: UDP)
+UDP UDP
+RTP RTP
+ 
+-ipn Number of TPs per IP packet (valid range: 1-7, default: 7)
+ 
+-ipt Time-To-Live value (for TX only)
+ 
+-mS Enable Stuffing (default: OFF)
+OFF ASI Null packet / SDI Black frame stuffing disabled
+ON ASI Null packet / SDI Black frame stuffing enabled
+ 
+-dP PID of the data stream (T2MI/CCMB)
+ 
+-dP2 Second PID of the data stream (T2MI)
+ 
+-s Silent mode. No messages printed
+ 
+-? Display this help
+ 
+Examples:
+DtPlay myfile.ts -r 38000000
+DtPlay myfile.ts -r 38000000 -t 100 -n 2 -m RAW 
+DtPlay myfile.ts -r 38000000 -t 107 -mt QPSK -mf 1915.0 -mc 7/8 -snr 26.0
+DtPlay myfile.dtsdi -t 2144 -i 1 -m DTSDI -l 0 -mS ON
+DtPlay version: 4.5.0
+ 
+
+6. Run DtPlay with an OTV5 SDK stream
+ 
+
+bruin@d7:~/work/SDKTestStream/10 mins$ DtPlay demo_sdk_11170_27500_2v3_withEIT_10min.ts -t 2107 -mt DVBS -mf 1420.0 -mc 2/3 -snr 26.0 -r 33790850 -l 0
+DtPlay player V4.5.0 (c) 2000-2013 DekTec Digital Video B.V.
+ 
+DTAPI compile version: V5.2.4.31
+ 
+DTAPI link version: V5.2.4.31
+ 
+ 
+Start playing
+- Play file name : demo_sdk_11170_27500_2v3_withEIT_10min.ts
+- Loop file : 0x
+- Transport-Stream rate : 33790850 bps
+- Transmit Mode : 188
+- Output device : DTA-2107 (#1)
+- Modulation Type : QPSK
+- Carrier Frequency : 1420.00 MHz
+- Output Level : -27.5 dBm
+- Convolutional Rate : 2/3
+ 
+Press any key to stop playing
+
+-t 2107: use the DTA-2107 card
+-mt DVBS: the parameter for modulation type is "DVBS", not "QPSK"
+-mf 1420.0: output frequency, equals to 11170 - 9750 (mHz). This implies that for LNB config, LO=9750 and the switch_freq > 11170 mHz.
+-r 33790850: in bps. this value is taken from StreamXpress from Windows. The calculation seems: bps=baud_rate*bit_per_baud*fec*(188/204)=27500000*2*(2/3)*(188/204)=33790849.67; It's not clear why to multiply (188/204)??? Not doing so the stream play is not working...
+-l 0: loop for ever
+Note that if I press Ctrl+C to quit from DtPlay, the stream will be still played in the background for the current loop somehow (probably a feature?), although the DtPlay process is ended;
+
+To stop the stream, press SPACE to quit from DtPlay.
+
+7. Output Signal Strength
+"-ml" controls the output level, and by default, it's "-27.5 dBm". 
+
+Using the signal checking equipment (PROMAX TV Explorer HD, in Beijing Lab) to measure the direct output of the signal strength:
+
+"-ml -35.0": > 70.2 dBuV
+"-ml -30.0": > 75.2 dBuV
+"-ml -27.5": > 78.0 dBuV
+"-ml -20".0: > 85.9 dBuV
+"-ml -15.0": > 90.8 dBuV
+"-ml -10.0": > 95.7 dBuV
