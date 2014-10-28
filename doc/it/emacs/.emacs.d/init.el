@@ -56,6 +56,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'git-emacs)
 
+;; http://ergoemacs.org/emacs/emacs_dired_recursive_load_error.html
+(require 'tramp)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; set frame title as the file name
@@ -264,8 +266,8 @@
 ;;   - xcscope.el: put this under "C:\emacs\emacs-24.2\site-lisp", and add the following line
 ;;     in "init.el", try "c-x c-e". if success (minibuffer shows "xcscope", then the elisp
 ;;     package is installed correctly. otherwise, an error window will show up.
-(require 'xcscope)
-;(require 'ascope)
+;(require 'xcscope)
+(require 'ascope)
 ;(require 'cscope)
 ;;     be noted that cscope commands "C-c s *" are only activiated in source files.
 ;;   - xcscope_indexer
