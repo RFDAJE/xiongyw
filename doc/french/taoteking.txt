@@ -4,25 +4,29 @@ Tao Te King: Livre de la voie et de la vertu
 
 Stanislas Julien, 1842
 
-1  
+1 道可道
 
 La voie qui peut être exprimée par la parole n'est pas la Voie éternelle;
-le nom qui peut être nommé n'est pas le Nom éternel.
+  le nom qui peut être nommé n'est pas le Nom éternel.
 (L'être) sans nom est l'origine du ciel et de la terre;
-avec un nom, il est la mère de toutes choses.
+  avec un nom, il est la mère de toutes choses.
 C'est pourquoi, lorsqu'on est constamment exempt de passions,
-on voit son essence spirituelle; 
-lorsqu'on a constamment des passions, on le voit sous une forme bornée.
+  on voit son essence spirituelle; 
+  lorsqu'on a constamment des passions, 
+  on le voit sous une forme bornée.
 Ces deux choses ont une même origine et reçoivent des noms différents. 
 On les appelle toutes deux profondes. 
-Elles sont profondes, doublement profondes. 
+Elles sont profondes, doublement profondes.
 C'est la porte de toutes les choses spirituelles.
 
-2
+道可道也，非恒道也。名可名也，非恒名也。无名，万物之始也；有名，万物之母也。故恒无欲也，以观其眇；恒有欲也，以观其所徼。两者同出，异名同谓。玄之又玄，众眇之门。
+
+2 天下皆知
 
 Dans le monde, lorsque tous les hommes ont su apprécier la beauté (morale),
-alors la laideur (du vice) a paru.
-Lorsque tous les hommes ont su apprécier le bien, alors la mal a paru.
+  alors la laideur (du vice) a paru.
+Lorsque tous les hommes ont su apprécier le bien, 
+  alors la mal a paru.
 C'est pourquoi l'être et le non-être naissent l'un de l'autre.
 Le difficile et le facile se produisent mutuellement.
 Le long et le court se donnent mutuellement leur forme.
@@ -30,7 +34,7 @@ Le haut et le bas montrent mutuellement leur inégalité.
 Les tons et la voix s'accordent mutuellement.
 L'antériorité et la postériorité sont la conséquence l'une de l'autre.
 De là vient que le saint homme fait son occupation du non-agir.
-Il fait consister ses instructions dans le silence.  
+Il fait consister ses instructions dans le silence.
 Alors tous les êtres se mettent en mouvement, et il ne leur refuse rien.
 Il les produit et ne se les approprie pas.
 Il les perfectionne et ne compte pas sur eux.
@@ -38,23 +42,64 @@ Ses mérites étant accomplis, il ne s'y attache pas.
 Il ne s'attache pas à ses mérites; 
 c'est pourquoi ils ne le quittent point. 
 
-3
+天下皆知美之为美，恶已；皆知善，斯不善矣。有无之相生也，难易之相成也，长短之相刑也，高下之相盈也，音声之相和也，先后之相随，恒也。是以圣人居无为之事，行不言之教，万物作而弗始也，为而弗志也，成功而弗居也。夫唯弗居，是以弗去。
 
-En n'exaltant pas les sages, on empêche le peuple de se disputer. En ne prisant pas les biens d'une acquisition difficile, on empêche le peuple de se livrer au vol.  En ne regardant point des objets propres à exciter des désirs, on empêche que le cœur du peuple ne se trouble[1].  C'est pourquoi, lorsque le saint  homme gouverne, il vide son cœur, il remplit son ventre (son intérieur), il affaiblit sa volonté, et il fortifie ses os. Il s'étudie constamment à rendre le peuple ignorant et exempt de désirs. Il fait en sorte que ceux qui ont du savoir n'osent pas agir.  Il pratique le non-agir, et alors il n'y a rien qui ne soit bien gouverné.  
+3 不上贤
+
+En n'exaltant pas les sages, 
+  on empêche le peuple de se disputer. 
+En ne prisant pas les biens d'une acquisition difficile, 
+  on empêche le peuple de se livrer au vol.  
+En ne regardant point des objets propres à exciter des désirs, 
+  on empêche que le cœur du peuple ne se trouble[1].  
+C'est pourquoi, lorsque le saint  homme gouverne, 
+  il vide son cœur, 
+  il remplit son ventre (son intérieur), 
+  il affaiblit sa volonté, 
+  et il fortifie ses os. 
+Il s'étudie constamment à rendre le peuple ignorant et exempt de désirs. 
+Il fait en sorte que ceux qui ont du savoir n'osent pas agir.  
+Il pratique le non-agir, 
+  et alors il n'y a rien qui ne soit bien gouverné.  
+
+不上贤，使民不争；不贵难得之货，使民不为盗；不见可欲，使民不乱。是以圣人之治也，虚其心，实其腹，弱其志，强其骨，恒使民无知、无欲也。使夫知不敢、弗为而已，则无不治矣。
 
 Notes du chapitre 3
 
 |1| Le cœur de l'homme est naturellement calme. Lorsqu'il se trouble et perd son état habituel, c'est qu'il est ému par la vue des choses propres à exciter ses désirs. C'est pourquoi, en ne regardant pas les choses propres à exciter les désirs, on empêche que le cœur ne se trouble.
 Dans les passages précédents, les mots « ne pas estimer », pouchang, « ne pas priser », pou-koueï, montrent que les mots « ne pas regarder », pou-kien, doivent se rapporter au roi.
 
-4
+4 道冲
 
-Le Tao est vide; si l'on en fait usage, il paraît inépuisable.  Ô qu'il est profond ! Il semble le patriarche de tous les êtres. Il émousse sa subtilité, il se dégage de tous liens, il tempère sa splendeur, il s'assimile à la poussière.  Ô qu'il est pur ! Il semble subsister éternellement.  J'ignore de qui il est fils; il semble avoir précédé le maître du ciel. 
+Le Tao est vide; 
+  si l'on en fait usage, 
+  il paraît inépuisable.
+Ô qu'il est profond! 
+Il semble le patriarche de tous les êtres. 
+Il émousse sa subtilité, 
+  il se dégage de tous liens, 
+  il tempère sa splendeur, 
+  il s'assimile à la poussière.
+Ô qu'il est pur! 
+Il semble subsister éternellement.
+J'ignore de qui il est fils; 
+  il semble avoir précédé le maître du ciel.
 
-5
+道冲，而用之有弗盈也。渊呵！似万物之宗。锉其兑，解其纷，和其光，同其尘。湛呵！似或存。吾不知其谁之子，象帝之先。
 
-Le ciel et la terre n'ont point  d'affection particulière. Ils regardent toutes les créatures comme le chien[2] de paille (du sacrifice).  Le saint homme n'a point d'affection particulière; il regarde tout le peuple comme le chien de paille (du sacrifice).  L'être qui est entre le ciel et la terre ressemble à un soufflet de forge qui est vide et ne s'épuise point , que l'on met en mouvement et qui produit de plus en plus (du vent).  Celui qui parle beaucoup (du Tao) est souvent réduit au silence.  Il vaut mieux observer le milieu. 
+5 天地不仁
 
+Le ciel et la terre n'ont point d'affection particulière;
+  ils regardent toutes les créatures comme le chien[2] de paille (du sacrifice).
+Le saint homme n'a point d'affection particulière; 
+  il regarde tout le peuple comme le chien de paille (du sacrifice).
+L'être qui est entre le ciel et la terre ressemble à un soufflet de forge
+  qui est vide et ne s'épuise point,
+  que l'on met en mouvement et qui produit de plus en plus (du vent).
+Celui qui parle beaucoup (du Tao) est souvent réduit au silence.
+Il vaut mieux observer le milieu.
+
+天地不仁，以万物为刍狗；圣人不仁，以百姓为刍狗。天地之间，其犹橐龠乎？虚而不屈，动而俞出。多闻数穷，不若守于中。
 
 Notes du chapitre 5
 
@@ -103,8 +148,7 @@ Trente rais se réunissent autour d'un moyeu. C'est de son vide que dépend l'us
 
 12
 
-Les cinq couleurs émoussent la vue de l'homme.  Les cinq notes (de musique) émoussent l'ouïe de l'homme.  Les cinq saveurs émoussent le goût de l'homme.  Les courses violentes, l'exercice de la chasse égarent le cœur de 
-l'homme.  Les biens d'une acquisition difficile poussent l'homme à des actes qui lui nuisent.  De là vient que le saint home s'occupe de son intérieur et ne s'occupe pas de ses yeux. C'est pourquoi il renonce à ceci et adopte cela.  
+Les cinq couleurs émoussent la vue de l'homme.  Les cinq notes (de musique) émoussent l'ouïe de l'homme.  Les cinq saveurs émoussent le goût de l'homme.  Les courses violentes, l'exercice de la chasse égarent le cœur de l'homme.  Les biens d'une acquisition difficile poussent l'homme à des actes qui lui nuisent.  De là vient que le saint home s'occupe de son intérieur et ne s'occupe pas de ses yeux. C'est pourquoi il renonce à ceci et adopte cela.  
 
 13
 
