@@ -1,4 +1,4 @@
-http://taoteking.free.fr/
+12;rgb:0000/0000/0000http://taoteking.free.fr/
 http://www.quanxue.cn/CT_DaoJia/LaoZiIndex.html
 
 Tao Te King: Livre de la voie et de la vertu
@@ -169,7 +169,7 @@ Si l'on est comblé d'honneurs et qu'on s'enorgueillisse,
   on s'attirera des malheurs.
 Lorsqu'on a fait de grandes choses et obtenu de la réputation,
   il se retirer à l'écart.
-Telle est la voie du ciel.  
+Telle est la voie du ciel.
 
 持而盈之，不如其已；揣而锐之，不可长保。金玉满堂，莫之能守；富贵而骄，自遗其咎。功成身退，天之道也。
 
