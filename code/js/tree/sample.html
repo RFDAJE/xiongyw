@@ -1,0 +1,133 @@
+<!DOCTYPE HTML><html><head><title>xml2tree</title><style>
+
+      body {background-color: white}
+
+      #my_tab {
+      margin:2px auto;
+      border:2px solid blue;
+      } 
+      .tab-menu {
+      height:24px;
+      border-bottom:1px solid blue;
+      background:#cacaca;
+      } 
+      .tab-menu ul {
+      list-style:none;
+      margin:3px 3px;
+      padding:0px;
+      position:absolute;
+      } 
+      .tab-menu ul li {
+      float:left;
+      padding-left:5px;
+      padding-right:5px;
+      background:blue;
+      line-height:20px;
+      display:block;
+      cursor:pointer;
+      text-align:center;
+      color:white;
+      font-weight:bold;
+      border-top:1px solid blue;
+      border-left:1px solid blue;
+      border-right:1px solid #cacaca;
+      } 
+      .tab-menu ul li.focused {
+      background:white;
+      border-bottom:1px solid white;
+      color:blue;
+      } 
+      .tab-content {
+      clear:both;
+      margin-top:0px;
+      border-top:none;
+      padding:8px;
+      overflow:auto;
+      }
+    </style>
+    <link rel="stylesheet" type="text/css" href="tree.css"/>
+  <script type="text/javascript" src="tree.js"></script>
+  <script type="text/javascript" src="xml2json.js"></script>
+  <script type="text/javascript">
+
+    function setTab(cursel,n){ 
+    for(i=0;i<n;i++){ 
+                var menu=document.getElementById("tab_menu_" + i); 
+                var con=document.getElementById("tab_cont_" + i); 
+                menu.className = (i == cursel)? "focused" : " "; 
+                con.style.display= (i==cursel)?"block":"none"; 
+                } 
+                } 
+
+
+                function gen_tab_view (x, idx, array) {
+    	        var size = array.length;
+                var xml = get_xml(encodeURI(x[1]));
+                var json = xml2json(xml);
+                var txt = JSON.stringify(json, null, 4);
+
+
+    	        /*
+    	        * the tab itself
+    	        */
+  	        $("tab_menu_ul").innerHTML += '<li id="tab_menu_' + idx + '"onclick="setTab(' + idx + ', ' + size +')">' + x[0] + '</li> ';
+  	        
+  	        /*
+  	        * the content of the tab
+  	        */
+   	        $("tab_cont").innerHTML += [ 
+   	        '<div id="tab_cont_' + idx +'">',  
+	        '<table style="width: 100%;" class="boxed">',
+	        '<tr>',
+	        '<td class="xxx"><div id="tree_' + idx + '"style="display:block;"></div></td>',
+	        '<td class="xxx"><div id="json_' + idx + '" style="display:block;">',
+	        formatJson(json),
+	        '</div></td>',
+	        '</tr>',
+	        '</table>',
+	        '<table></table>',
+   	        '</div>'
+   	        ].join("");
+
+   	        // tree
+                var root = json2tree(json);
+                $("tree_" + idx).innerHTML = root.render();  // question: why this text can not be inserted in the step above? innerHTML behavior += vs =?
+                root.onclick();
+                }
+
+                
+                function body_onload() {
+    	        var size = data.length;
+    	        
+    	        // skeleton
+    	        if (size > 0) {
+      $("my_body").innerHTML += '<div id="my_tab"><div class="tab-menu"><ul id="tab_menu_ul"></ul></div><div id="tab_cont" class="tab-content"></div></div>';
+      }
+      
+      // gen html elements for tabs & contents
+      data.forEach(gen_tab_view);
+      
+      setTab(0, size);
+      
+      }
+
+      function get_xml(url) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, false);
+      xhr.send();
+      return xhr.responseText;
+      }
+
+      function formatJson(obj){
+      return ["<pre>", JSON.stringify(obj, null, 4), "</pre>"].join("");
+      }
+
+      var data = [
+      ["sample", "sample.xml"]
+      ];
+
+
+  </script>
+  </head>
+
+  <body id="my_body" onload="body_onload()"></body></html>

@@ -1,0 +1,11 @@
+<dir icon="folder" name="nx docs">
+  <dir name="my products" icon="pdf">
+    <file icon="txt" desc="prd" href="http://www.baidu.com"/>
+  </dir>
+  <dir name="my projects">
+    <file icon="doc" desc="proj" href="ecr"/>
+    <file icon="docx" name="foxtel" desc="xxx" href="http://www.sina.com"/>
+    <file icon="js" name="baidu" desc="xxx" href="yyy"/>
+    <file icon="ppt" name="sina" desc="xxx" href="yyy"/>
+  </dir>
+</dir>
