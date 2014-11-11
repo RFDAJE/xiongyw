@@ -47,8 +47,10 @@
  * a) eiter an empty object or a primitive value, or
  * b) an object which only contains properties whose name are reserved (see below);
  * 
- * If the property value is an array, it's treated as a non-leaf-node object. For example:
- *   ["item1", "item2"] is treated as {"0": "item1", "1", "item2"}
+ * If the property value is an array, it's treated as an array of objects which share the same
+ * property name. For example:
+ *   {"branch": ["item1", "item2"]} is treated as {"branch": "item1"} followed by {"branch", "item2"} \
+ *   as a sibling.
  *
  * 2. HTML elements ID naming convention
  *
@@ -150,11 +152,13 @@ var escapeXml = function (txt) {
 function isPropReserved(p) {
 
     var reserved_prop_names = ["@icon", "@name", "@desc", "@href"];
-
+    /*
     // assume there is no match, and we set the initial value as 1
     // if there is any match, then multiply by 0, then the reduced result will be 0;
     // if there is no match, the reduced result will be 1;
     return reserved_prop_names.reduce(function(acc, x){ return (acc * ((p === x)? 0 : 1));}, 1) === 0? true : false;
+    */
+    return reserved_prop_names.some(function(x){ return x === p; });
 }
 
 /** 
