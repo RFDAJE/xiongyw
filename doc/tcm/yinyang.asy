@@ -454,113 +454,116 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
     }
 }
 
+
 /*
- * circularly bend a guide array (guides)
+ * circularly bend a path[]: typically a return from texpath()
  *
- * the idea: the source, i.e. the guides can be seen as a rectangle (which is
- * the bounding box of the guides), and the destination's boundary 
- * has four segments: two arcs (inner, and outer), and two straight lines 
- * (which are part of the radius having length r2-r1). If we can map each horizontal
- * line from the source into an arc inside the destination, then we can map each point 
- * from the source into the destination, as each source point must be on a source line.
- * (the same apply for vertical lines in the source rectangle).
+ * The idea: a cubic-bezier path is completely determined by the coordinations of its nodes 
+ * and the associated control points (pre/post)...so translating a path is the same as to 
+ * translate all its points (nodes and control points).
  *
- * so, bending a guide is just transforming the position of each node in the guide.
+ * A path[] can be treated as a rectangle (i.e., its bounding box), which represents the 
+ * "source" area before the translation; The "destination" of the translation in a circular
+ * bend is an area has 4 boundaries: two arcs (inner, and outer), and two straight lines 
+ * (which are part of the radius having length r2-r1). 
  * 
- * 1. transform the guides by shifting/scaling it into an unitsquare, i.e., box((0,0),(1,1)).
- *    so the x/y coordinate of each point in the guides is now a horizontal/vertial ratio.
- * 2. let the destination arc starts from positive part of x-axis and extends CCW, using (0,0) 
- *    as the origin
- * 3. rotate to the desired position
+ * If we can map each horizontal line from the source bb into an arc inside the destination, 
+ * then we can map each point from the source into the destination, as each source point 
+ * must be on a source line (the same apply for vertical lines in the source bb).
  *
+ * So, bending a path is just "translating" the position of each node and its control points
+ * in the path, and using the translated coordinates to "clone" a new path (it seems there is
+ * no way to change the coordinates of the points of a path by assigning operation).
+ * 
  * Note that the concavity/convexity of the guides may change due to the bend, or even change
  * from concave to convex, or vice vesa. Adjust the parameters for best results desired.
  *
  * The following is an example of using this function:
- *
- * guide[] g = {
- *    (0,0)..(50, 70)..(100,100), 
- *    (100, 100)..(150,30)..(200,0),
- *    (0,0)..(50,0)..(100,0)..(150,0)..(200,0),
- *    (0,50)..(50,50)..(100,50)..(150,50)..(200,50),
- *    (0,100)..(50,100)..(100,100)..(150,100)..(200,100)
- * };
- *
- * draw(g);
- * guide[] g2 = bend_guide(g, 280, 300, 30, 30);
- * draw(g2);
+ * 
+ * path[] C = texpath("中文E");
+ * path[] bend = bend_path(C, 10, 12, 30, 10);
+ * 
+ * draw(C);
+ * draw(bend);
  */
- 
-guide[] bend_guide(guide[] gg, // array of guides
+path[] bend_path(path[] pp, // array of paths
                  real r1, // inner radius
                  real r2, // outer radius
                  real start, // start angle in degree
-                 real angle){ // angle span in degree
-    /* 
-     * 1. unify the guides
-     */
-    // find out the bounding box
-    real xmin = infinity, ymin = infinity;  
-    real xmax = -infinity, ymax = -infinity;
-    for (guide g: gg) {
-        path p = g; // need resolve the guide to get the bounding box, i.e. min()/max()
-        pair sw = min(p), ne = max(p);
-        if(sw.x < xmin) xmin = sw.x;
-        if(sw.y < ymin) ymin = sw.y;
-        if(ne.x > xmax) xmax = ne.x;
-        if(ne.y > ymax) ymax = ne.y;
-    }
-    //write(xmin, ymin, xmax, ymax);
+                 real angle_span){ // angle span in degree
 
-    // shift + scale
-    guide[] gg2;
-    for (guide g: gg) {
-        g = shift (-xmin, -ymin) * g;
-        g = scale(1 / (xmax - xmin), 1 / (ymax - ymin)) * g;
-        gg2.push(g);
-    }
+    path[] _normalize(path[]) = new path[] (path[] pp){
+        path[] pp2;
 
-    /*
-     * 2.
-     */
-    guide[] gg3;
-    for (guide g2: gg2) {
-        guide g3;
-        path p2 = g2;
-        // bend g2 into g3
-        for (int i = 0; i < size(p2); ++ i) {
-            real r, theta;
-            path rp; // arc path
-            pair p = point(p2, i);
-            //write("p=", p);
-            r = r1 + (r2 - r1) * p.y;
-            //write("r=", r);
-            theta = angle * (1 - p.x);
-            //write("theta=", theta);
-            rp = arc((0, 0), r,  0., theta, CCW);
-            p = relpoint(rp, 1.0);  // now we have the end point of the arc
-            //write("final p=", p);
-            //write();
-            g3 = g3..p;
+        // find out the bounding box
+        real xmin = infinity, ymin = infinity;  
+        real xmax = -infinity, ymax = -infinity;
+        for (path p: pp) {
+            pair sw = min(p), ne = max(p);
+            if(sw.x < xmin) xmin = sw.x;
+            if(sw.y < ymin) ymin = sw.y;
+            if(ne.x > xmax) xmax = ne.x;
+            if(ne.y > ymax) ymax = ne.y;
+        }
+        //write(xmin, ymin, xmax, ymax);
+
+        // shift + scale
+        for (path p: pp) {
+            p = shift (-xmin, -ymin) * p;
+            p = scale(1 / (xmax - xmin), 1 / (ymax - ymin)) * p;
+            pp2.push(p);
         }
 
-        // add g3 into gg3
-        gg3.push(g3);
-    }
+        return pp2;
+    };
 
     /*
-     * 3. rotate
+     * translate the normalized (x, y) 
      */
-    guide[] gg4;
-    for( guide g: gg3) {
-        g = rotate(start) * g;
-        gg4.push(g);
+    pair _trans(pair, real, real, real) = new pair (pair xy, real r1, real r2, real angle_span) {
+        // first translate into polar coordinate (radius, theta)
+        real radius = r1 + (r2 - r1) * xy.y;
+        real theta = angle_span * (1.0 - xy.x);
+
+        // then return in (x, y)
+        return (radius * Cos(theta), radius * Sin(theta));
+    };
+
+    /*
+     * clone a normalized path with translation of positions of the nodes and the control points
+     */
+    path _clone_path(path) = new path (path p) {
+        path clone;
+        for (int i = 0; i < size(p); ++ i) {
+            if(i == 0) {
+                clone = clone.._trans(point(p, i), r1, r2, angle_span);
+            } else {
+                clone = clone..controls _trans(postcontrol(p, i-1), r1, r2, angle_span) and _trans(precontrol(p, i), r1, r2, angle_span) .. _trans(point(p, i), r1, r2, angle_span);
+            }
+        }
+
+        if (cyclic(p)) {
+            //write("cyclic");
+            clone = clone..controls _trans(postcontrol(p, size(p) - 1), r1, r2, angle_span) and _trans(precontrol(p, 0), r1, r2, angle_span) .. _trans(point(p, 0), r1, r2, angle_span) .. cycle;
+        }
+
+        return clone;
+    };
+
+    
+
+
+    // 1. normalize
+    path[] pp_norm = _normalize(pp);
+
+    // 2. clone with translation & rotate
+    path[] pp_clone;
+    for (path p: pp_norm) {
+        pp_clone.push(rotate(start) * _clone_path(p));
     }
 
-    return gg4;
+    return pp_clone;
 }
-
-
 
 
 /*
