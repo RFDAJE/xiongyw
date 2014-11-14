@@ -1,21 +1,7 @@
 /*
  * created(bruin, 2014-08-25)
- * last updated(bruin, 2014-09-1)
+ * last updated(bruin, 2014-11-14)
  *
- * 据《周髀算经》，八尺表杆正午晷长:
- * - 冬至 (winter solstice): 1.35丈
- * - 夏至 (summer solstice): 0.16丈
- * - 24节气的晷长为等差数列，公差为：(1.3-0.16)/12=0.0991666666丈，亦即 9.9分1小分
- * 注：1丈=10尺=3.33333米；1尺=10寸；1寸=10分；1分=6小分
- *
- * 若“标准化”晷长，即以夏至为0，冬至为1，则公差为1/12。
- * 取上北下南左西右东，即冬至为北、夏至为南、春分为东、秋分为西，则以冬至为首以顺时针
- * 为序，各节气的标准化晷长为：
- * 冬至，小寒，大寒，立春，雨水，惊蛰，春分，清明，谷雨，立夏，小满，芒种：1 ~  1/12
- * 夏至，小暑，大暑，立秋，处暑，白露，秋分，寒露，霜降，立冬，小雪，大雪：0 ~ 11/12
- *
- * 但等差数列得出的并不是传统的阴阳图。若采用cos()函数计算晷长序列，得出的图更符合惯例。
- * 这里分别定义两种计算晷长序列。
  */
 
 settings.tex = "xelatex";
@@ -65,29 +51,46 @@ pair O=0, S=(0,-1), N=(0,1), W=(-1,0), E=(1,0);
 int i;
 
 
+/*
+ * 据《周髀算经》，八尺表杆正午晷长:
+ * - 冬至 (winter solstice): 1.35丈
+ * - 夏至 (summer solstice): 0.16丈
+ * - 24节气的晷长为等差数列，公差为：(1.3-0.16)/12=0.0991666666丈，亦即 9.9分1小分
+ * 注：1丈=10尺=3.33333米；1尺=10寸；1寸=10分；1分=6小分
+ *
+ * 若“标准化”晷长，即以夏至为0，冬至为1，则公差为1/12。
+ * 取上北下南左西右东，即冬至为北、夏至为南、春分为东、秋分为西，则以冬至为首以顺时针
+ * 为序，各节气的标准化晷长为：
+ * 冬至，小寒，大寒，立春，雨水，惊蛰，春分，清明，谷雨，立夏，小满，芒种：1 ~  1/12
+ * 夏至，小暑，大暑，立秋，处暑，白露，秋分，寒露，霜降，立冬，小雪，大雪：0 ~ 11/12
+ *
+ * 但等差数列得出的并不是传统的阴阳图。若采用cos()函数计算晷长序列，得出的图更符合惯例。
+ * 这里分别定义两种计算晷长序列。
+ */
+
 // return the length of the shadow of GUI, as an arithmetic progression.
-// radius range: (0, pi), where,
+// radian range: (0, pi), where,
 // - 0 represents winter soltice, with fixed value 1.0,
 // - pi represents summer soltice, with fixed value 0; 
 // and this function provides other values in between.
 // notes: why pi not 2 pi? because the rest half circle is just a mirror;
-real gui_arithmetic(real radius)
+real gui_arithmetic(real radian)
 {
-    if(radius < 0 || radius > pi){
+    if(radian < 0 || radian > pi){
 	return 0;
     }
     
-    return (1. -radius / pi);
+    return (1. - radian / pi);
 }
 
 // return the length of the shadow of GUI, employing cos() function.
-real gui_sine(real radius)
+real gui_sine(real radian)
 {
-    if(radius < 0 || radius > pi){
+    if(radian < 0 || radian > pi){
 	return 0;
     }
     
-    return cos(radius / 2.);
+    return cos(radian / 2.);
 }
 
 // this function returns a cyclic guide for the "black fish", which,
@@ -121,19 +124,6 @@ guide fish(int n, real gui_interp(real))
     }
 
     // make it starts from winter soltice and in CW order, by indexing an array by an array
-    /*
-    //int[] index24 = {6, 5, 4, 3, 2, 1, 0, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7};
-    int[] index = reverse(n + 1);
-    index.append(reverse(n * 4));
-    index = index[:n * 4];
-    roots = roots[index];  
-    
-    for(i = 0; i < n * 4; ++ i){
-    dot(" ", roots[i], red);
-    dot(roots2[i], green);
-    }
-    */	
-
     roots = reflect(S, N) * (rotate(90) * roots);  // rotate followed by vertical reflect/mirror
 
     // make it cyclic
@@ -180,6 +170,130 @@ void draw_yinyang(){
     fill(circle((-0.35, 0), 1/12.));
     unfill(circle((0.35, 0), 1/12.));
 }
+
+/*
+ * return the bounding box of a path[]:
+ * - [0]: low-left point
+ * - [1]: up-right point
+ */
+pair[] bound_box(path[] pp){
+    pair[] bb;
+    real xmin = infinity, ymin = infinity;  
+    real xmax = -infinity, ymax = -infinity;
+
+    for (path p: pp) {
+        pair sw = min(p), ne = max(p);
+        if(sw.x < xmin) xmin = sw.x;
+        if(sw.y < ymin) ymin = sw.y;
+        if(ne.x > xmax) xmax = ne.x;
+        if(ne.y > ymax) ymax = ne.y;
+    }
+
+    bb.push((xmin, ymin));
+    bb.push((xmax, ymax));
+
+    return bb;
+}
+
+/*
+ * circularly bend a path[]: typically a return from texpath()
+ *
+ * The idea: a cubic-bezier path is completely determined by the coordinations of its nodes 
+ * and the associated control points (pre/post)...so translating a path is the same as to 
+ * translate all its points (nodes and control points).
+ *
+ * A path[] can be treated as a rectangle (i.e., its bounding box), which represents the 
+ * "source" area before the translation; The "destination" of the translation in a circular
+ * bend is an area has 4 boundaries: two arcs (inner, and outer), and two straight lines 
+ * (which are part of the radius having length r2-r1). 
+ * 
+ * If we can map each horizontal line from the source bb into an arc inside the destination, 
+ * then we can map each point from the source into the destination, as each source point 
+ * must be on a source line (the same apply for vertical lines in the source bb).
+ *
+ * So, bending a path is just "translating" the position of each node and its control points
+ * in the path, and using the translated coordinates to "clone" a new path (it seems there is
+ * no way to change the coordinates of the points of a path by assigning operation).
+ * 
+ * Note that the concavity/convexity of the guides may change due to the bend, or even change
+ * from concave to convex, or vice vesa. Adjust the parameters for best results desired.
+ *
+ * The following is an example of using this function:
+ * 
+ * path[] C = texpath("中文E");
+ * path[] bend = bend_path(C, 10, 12, 30, 10);
+ * 
+ * draw(C);
+ * draw(bend);
+ */
+path[] bend_path(path[] pp, // array of paths
+                 real r1, // inner radius
+                 real r2, // outer radius
+                 real start, // start angle in degree
+                 real angle_span){ // angle span in degree
+
+    path[] _normalize(path[]) = new path[] (path[] pp){
+        pair[] bb = bound_box(pp);
+        path[] pp2;
+
+        // shift + scale
+        for (path p: pp) {
+            p = shift (-bb[0].x, -bb[0].y) * p;
+            p = scale(1 / (bb[1].x - bb[0].x), 1 / (bb[1].y - bb[0].y)) * p;
+            pp2.push(p);
+        }
+
+        return pp2;
+    };
+
+    /*
+     * translate the normalized (x, y) 
+     */
+    pair _trans(pair, real, real, real) = new pair (pair xy, real r1, real r2, real angle_span) {
+        // first translate into polar coordinate (radius, theta)
+        real radius = r1 + (r2 - r1) * xy.y;
+        real theta = angle_span * (1.0 - xy.x);
+
+        // then return in (x, y)
+        return (radius * Cos(theta), radius * Sin(theta));
+    };
+
+    /*
+     * clone a normalized path with translation of positions of the nodes and the control points
+     */
+    path _clone_path(path) = new path (path p) {
+        path clone;
+        for (int i = 0; i < size(p); ++ i) {
+            if(i == 0) {
+                clone = clone.._trans(point(p, i), r1, r2, angle_span);
+            } else {
+                clone = clone..controls _trans(postcontrol(p, i-1), r1, r2, angle_span) and _trans(precontrol(p, i), r1, r2, angle_span) .. _trans(point(p, i), r1, r2, angle_span);
+            }
+        }
+
+        if (cyclic(p)) {
+            //write("cyclic");
+            clone = clone..controls _trans(postcontrol(p, size(p) - 1), r1, r2, angle_span) and _trans(precontrol(p, 0), r1, r2, angle_span) .. _trans(point(p, 0), r1, r2, angle_span) .. cycle;
+        }
+
+        return clone;
+    };
+
+    
+
+
+    // 1. normalize
+    path[] pp_norm = _normalize(pp);
+
+    // 2. clone with translation & rotate
+    path[] pp_clone;
+    for (path p: pp_norm) {
+        pp_clone.push(rotate(start) * _clone_path(p));
+    }
+
+    return pp_clone;
+}
+
 
 
 /*
@@ -244,7 +358,7 @@ void circular_annotate(real r1, // radius for inner circle
         middle[0] = relpoint(p, 0.5); // midpoint(p);
         end[0] = relpoint(p, 1.0);
 
-        // the tang/norm direction of the arc at mdpoint
+        // the tang/norm direction of the arc at each point
 	real len = arclength(p);
         start[1] = dir(p, arctime(p, 0));
         start[2] = rotate(90) * start[1];
@@ -265,12 +379,29 @@ void circular_annotate(real r1, // radius for inner circle
 	//draw(labelpath(texts[i], p3));
 
         /* simple label */
+        /*
         if(text_inside) {
             label(scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
         }
         else {
             label(scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
         }
+        */
+
+        // the path[] for the text
+        path[] text = texpath(Label(texts[i]));
+        pair[] bb = bound_box(text);
+        real text_width = bb[1].x - bb[0].x;
+        real text_height = bb[1].y - bb[0].y;
+        // calculate the bent width, by scaling the text height to the 3/4 * (r2-r1)
+        real r_gap = (r2 - r1) / 4;  /* 1/8 on top, 1/8 at bottom */
+        real text_width2 = text_width * (r2 - r1) / text_height * 3 / 4;
+        real rad = text_width2 / ((r1 + r2) / 2);
+        real deg = Degrees(rad);
+        //write(deg);
+        path[] bent_text = bend_path(text, r1 + r_gap / 2, r2 - r_gap / 2, degrees(middle[0]) - deg / 2, deg);
+        //draw(bent_text, dp);
+        fill(bent_text, dp);
     }
 
     /*
@@ -455,116 +586,6 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
 }
 
 
-/*
- * circularly bend a path[]: typically a return from texpath()
- *
- * The idea: a cubic-bezier path is completely determined by the coordinations of its nodes 
- * and the associated control points (pre/post)...so translating a path is the same as to 
- * translate all its points (nodes and control points).
- *
- * A path[] can be treated as a rectangle (i.e., its bounding box), which represents the 
- * "source" area before the translation; The "destination" of the translation in a circular
- * bend is an area has 4 boundaries: two arcs (inner, and outer), and two straight lines 
- * (which are part of the radius having length r2-r1). 
- * 
- * If we can map each horizontal line from the source bb into an arc inside the destination, 
- * then we can map each point from the source into the destination, as each source point 
- * must be on a source line (the same apply for vertical lines in the source bb).
- *
- * So, bending a path is just "translating" the position of each node and its control points
- * in the path, and using the translated coordinates to "clone" a new path (it seems there is
- * no way to change the coordinates of the points of a path by assigning operation).
- * 
- * Note that the concavity/convexity of the guides may change due to the bend, or even change
- * from concave to convex, or vice vesa. Adjust the parameters for best results desired.
- *
- * The following is an example of using this function:
- * 
- * path[] C = texpath("中文E");
- * path[] bend = bend_path(C, 10, 12, 30, 10);
- * 
- * draw(C);
- * draw(bend);
- */
-path[] bend_path(path[] pp, // array of paths
-                 real r1, // inner radius
-                 real r2, // outer radius
-                 real start, // start angle in degree
-                 real angle_span){ // angle span in degree
-
-    path[] _normalize(path[]) = new path[] (path[] pp){
-        path[] pp2;
-
-        // find out the bounding box
-        real xmin = infinity, ymin = infinity;  
-        real xmax = -infinity, ymax = -infinity;
-        for (path p: pp) {
-            pair sw = min(p), ne = max(p);
-            if(sw.x < xmin) xmin = sw.x;
-            if(sw.y < ymin) ymin = sw.y;
-            if(ne.x > xmax) xmax = ne.x;
-            if(ne.y > ymax) ymax = ne.y;
-        }
-        //write(xmin, ymin, xmax, ymax);
-
-        // shift + scale
-        for (path p: pp) {
-            p = shift (-xmin, -ymin) * p;
-            p = scale(1 / (xmax - xmin), 1 / (ymax - ymin)) * p;
-            pp2.push(p);
-        }
-
-        return pp2;
-    };
-
-    /*
-     * translate the normalized (x, y) 
-     */
-    pair _trans(pair, real, real, real) = new pair (pair xy, real r1, real r2, real angle_span) {
-        // first translate into polar coordinate (radius, theta)
-        real radius = r1 + (r2 - r1) * xy.y;
-        real theta = angle_span * (1.0 - xy.x);
-
-        // then return in (x, y)
-        return (radius * Cos(theta), radius * Sin(theta));
-    };
-
-    /*
-     * clone a normalized path with translation of positions of the nodes and the control points
-     */
-    path _clone_path(path) = new path (path p) {
-        path clone;
-        for (int i = 0; i < size(p); ++ i) {
-            if(i == 0) {
-                clone = clone.._trans(point(p, i), r1, r2, angle_span);
-            } else {
-                clone = clone..controls _trans(postcontrol(p, i-1), r1, r2, angle_span) and _trans(precontrol(p, i), r1, r2, angle_span) .. _trans(point(p, i), r1, r2, angle_span);
-            }
-        }
-
-        if (cyclic(p)) {
-            //write("cyclic");
-            clone = clone..controls _trans(postcontrol(p, size(p) - 1), r1, r2, angle_span) and _trans(precontrol(p, 0), r1, r2, angle_span) .. _trans(point(p, 0), r1, r2, angle_span) .. cycle;
-        }
-
-        return clone;
-    };
-
-    
-
-
-    // 1. normalize
-    path[] pp_norm = _normalize(pp);
-
-    // 2. clone with translation & rotate
-    path[] pp_clone;
-    for (path p: pp_norm) {
-        pp_clone.push(rotate(start) * _clone_path(p));
-    }
-
-    return pp_clone;
-}
-
 
 /*
  * draw stuff now 
@@ -574,12 +595,15 @@ draw_yinyang();
 
 //circular_annotate(1, 2, new string[]{"冬", "春", "夏", "秋"});
 
+
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
 circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"}, 0.3, draw_r1=false, draw_r2=false, draw_delim=false);
+
+
 circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, 0.5, draw_r1=false, draw_r2=false, draw_delim=false);
 circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}, 0.3, draw_r2=false);
 circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, 0.5, draw_r1=false);
-//circular_annotate(3.0, 3.4, new string[]{"23", "1", "3", "5", "7", "9", "11", "13", "15", "17", "19", "21"}, text_inside=false, 0.3, draw_r1=false, draw_delim=false);
+
 circular_annotate(3.0, 3.35, new string[]{"胆经", "1", "肝经", "3", "肺经", "5", "大肠经", "7", "胃经", "9", "脾经", "11", 
                                          "心经", "13", "小肠经", "15", "膀胱经", "17", "肾经", "19", "心包经", "21", "三焦经", "23"}, 
                   text_inside=true, 0.25, draw_r1=false, draw_r2=false, draw_delim=false);
@@ -587,7 +611,6 @@ circular_annotate(3.25, 3.6, new string[]{"足少阳", "足厥阴", "手太阴",
                                          "手少阴", "手太阳", "足太阳", "足少阴", "手厥阴", "手少阳"},
                   text_inside=true, 0.25, draw_r1=false, draw_r2=false, draw_delim=false);
                   
-//circular_annotate(3.0, 3.4, new string[]{"胆经", "肝经", "肺经", "大肠经", "胃经", "脾经", "心经", "小肠经", "膀胱经", "肾经", "心包经", "三焦经"}, 0.3);
 
 circular_annotate(3.6, 4.0, new string[]{"冬月", "腊月", "正月",  "二月", "三月", "四月", 
                                           "五月", "六月", "七月", "八月", "九月", "十月"}, 0.3);
@@ -603,14 +626,6 @@ circular_annotate(4.3, 4.7, new string[]{"冬至", "小寒", "大寒", "立春",
                                          "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, 
                   text_scale=0.35, draw_r1=false, draw_delim=false);
 
-// 六气
-/*
-circular_annotate(4.7, 5.3, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
-                                         "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
-
-circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
-                   new string[]{"厥阴风木", "少阴君火", "少阳相火", "太阴湿土", "阳明燥金", "太阳寒水"}, text_scale=0.3);
-*/
 // 四灵二十八宿
 circular_annotate(4.7, 5.1, new string[]{"虚","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","轸","翼","张",
@@ -629,6 +644,17 @@ circular_annotate(5.8, 6.2, new string[]{"北","东","南","西"}, text_scale=0.
 draw_4_delims(new real[]{2.0, 3.0,   3.6, 4.0,   4.7, 5.6}, 
               defaultpen + linewidth(line_width_in_bp * 4) + linecap(0), 
               defaultpen + linewidth(line_width_in_bp * 2) + linecap(2) + white);
+
+
+// 六气
+/*
+circular_annotate(4.7, 5.3, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
+                                         "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
+
+circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
+                   new string[]{"厥阴风木", "少阴君火", "少阳相火", "太阴湿土", "阳明燥金", "太阳寒水"}, text_scale=0.3);
+*/
+
 
 //draw(unitsquare);
 //draw(scale(2)*unitcircle);
