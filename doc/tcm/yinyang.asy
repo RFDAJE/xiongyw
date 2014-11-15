@@ -52,7 +52,7 @@ int i;
 
 
 /*
- * 据《周髀算经》，八尺表杆正午晷长:
+ * 据《周髀算經》，八尺表杆正午晷长:
  * - 冬至 (winter solstice): 1.35丈
  * - 夏至 (summer solstice): 0.16丈
  * - 24节气的晷长为等差数列，公差为：(1.3-0.16)/12=0.0991666666丈，亦即 9.9分1小分
@@ -394,9 +394,9 @@ void circular_annotate(real r1, // radius for inner circle
         pair[] bb = bound_box(text);
         real text_width = bb[1].x - bb[0].x;
         real text_height = bb[1].y - bb[0].y;
-        // calculate the target height/width, by scaling the text height to the 2/3 * (r2-r1)
-        real r_gap = (r2 - r1) / 3;  /* 1/6 on top, 1/6 at bottom */
-        real text_height2 = (r2 - r1) * 2 /3;
+        // calculate the target height/width, by scaling the text height to the 3/5 * (r2-r1)
+        real r_gap = (r2 - r1) * 2 / 5;  /* 1/5 on top, 1/5 at bottom */
+        real text_height2 = (r2 - r1) * 3 / 5;
         real text_width2 = text_width / text_height * text_height2;
         real rad = text_width2 / ((r1 + r2) / 2); // text区域对应的夹角(弧度)
         real deg = Degrees(rad);
@@ -605,36 +605,36 @@ draw_yinyang();
 
 
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
-circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兑", "乾"}, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兌", "乾"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}, draw_r2=false);
+circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"}, draw_r2=false);
 circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, draw_r1=false);
 
-circular_annotate(3.0, 3.35, new string[]{"胆经", "1", "肝经", "3", "肺经", "5", "大肠经", "7", "胃经", "9", "脾经", "11", "心经", "13", "小肠经", "15", "膀胱经", "17", "肾经", "19", "心包经", "21", "三焦经", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(3.0, 3.35, new string[]{"膽經", "1", "肝經", "3", "肺經", "5", "大腸經", "7", "胃經", "9", "脾經", "11", "心經", "13", "小腸經", "15", "膀胱經", "17", "腎經", "19", "心包經", "21", "三焦經", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(3.25, 3.6, new string[]{"足少阳", "足厥阴", "手太阴", "手阳明", "足阳明", "足太阴", "手少阴", "手太阳", "足太阳", "足少阴", "手厥阴", "手少阳"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
                   
 
-circular_annotate(3.6, 4.0, new string[]{"冬月", "腊月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true);
+circular_annotate(3.6, 4.0, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true);
 
 circular_annotate(4.0, 4.2, new string[]{"12.23", "1.6", "1.21", "2.6", "2.21", "3.6", "3.21", "4.6", "4.21", "5.6", "5.21", "6.6", "6.21", "7.8", "7.23", "8.8", "8.23", "9.8", "9.23", "10.8", "10.23", "11.8", "11.23", "12.8"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(4.2, 4.7, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
+circular_annotate(4.2, 4.7, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
 
 // 四灵二十八宿
-circular_annotate(4.7, 5.1, new string[]{"虚","女","牛","斗","箕","尾","心",
-                                         "房","氐","亢","角","轸","翼","张",
-                                         "星","柳","鬼","井","参","觜","毕",
-                                         "昴","胃","娄","奎","壁","室","危"}, draw_r1=false);
+circular_annotate(4.7, 5.1, new string[]{"虛","女","牛","斗","箕","尾","心",
+                                         "房","氐","亢","角","軫","翼","張",
+                                         "星","柳","鬼","井","參","觜","畢",
+                                         "昴","胃","婁","奎","壁","室","危"}, draw_r1=false);
 
-circular_annotate(5.1, 5.6, new string[]{"玄\ \ \ 武","青\ \ \ 龙","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
+circular_annotate(5.1, 5.6, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
 
 draw(scale(5.7)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // 四方
-circular_annotate(5.8, 6.2, new string[]{"北","东","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(5.8, 6.2, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 // this is to make 4 seasons/directions more distinguishable
 
@@ -647,11 +647,11 @@ draw_4_delims(new real[]{2.0, 3.0,   3.6, 4.0,   4.7, 5.6},
 
 // 六气
 /*
-circular_annotate(4.7, 5.3, new string[]{"太阳寒水", "厥阴风木", "少阴君火", 
-                                         "少阳相火", "太阴湿土", "阳明燥金"}, text_scale=0.3);
+circular_annotate(4.7, 5.3, new string[]{"太陽寒水", "厥陰風木", "少陰君火", 
+                                         "少陽相火", "太陰濕土", "陽明燥金"}, text_scale=0.3);
 
 circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
-                   new string[]{"厥阴风木", "少阴君火", "少阳相火", "太阴湿土", "阳明燥金", "太阳寒水"}, text_scale=0.3);
+                   new string[]{"厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金", "太陽寒水"}, text_scale=0.3);
 */
 
 
