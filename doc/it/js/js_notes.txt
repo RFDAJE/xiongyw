@@ -1,6 +1,7 @@
 
        - what happens internally at "var xxx = xxx || {};" when "xxx" exists?
        - expr vs. stmt: http://en.wikipedia.org/wiki/CAL_Actor_Language#Statements_and_expressions
+       - iife: http://benalman.com/news/2010/11/immediately-invoked-function-expression/
        - prototype vs __proto__: __proto__ type is supposed to be a hidden link, so prototype is provided...
          http://anykoro.sinaapp.com/2012/01/31/javascript%E4%B8%ADfunctionobjectprototypes__proto__%E7%AD%89%E6%A6%82%E5%BF%B5%E8%AF%A6%E8%A7%A3/
          http://www.cnblogs.com/snandy/archive/2012/09/01/2664134.html
