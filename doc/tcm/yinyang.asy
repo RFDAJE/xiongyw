@@ -617,7 +617,9 @@ circular_annotate(3.0, 3.35, new string[]{"膽經", "1", "肝經", "3", "肺經"
 circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
                   
 
-circular_annotate(3.6, 4.0, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true);
+circular_annotate(3.6, 4.0, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false);
+
+//circular_annotate(3.6, 4.0, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true);
 
 circular_annotate(4.0, 4.2, new string[]{"12.23", "1.6", "1.21", "2.6", "2.21", "3.6", "3.21", "4.6", "4.21", "5.6", "5.21", "6.6", "6.21", "7.8", "7.23", "8.8", "8.23", "9.8", "9.23", "10.8", "10.23", "11.8", "11.23", "12.8"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
