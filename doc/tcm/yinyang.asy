@@ -595,13 +595,15 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
 
 
 
-/*
+/*************************************************************************
  * draw stuff now 
+ *************************************************************************/
+
+
+/*
+ * 阴阳鱼和八卦
  */
-
 draw_yinyang();
-
-//circular_annotate(1, 2, new string[]{"冬", "春", "夏", "秋"});
 
 
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
@@ -609,34 +611,44 @@ circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤
 
 circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
+/*
+ * 十二生肖
+ */
 circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"}, draw_r2=false);
 circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, draw_r1=false);
 
-circular_annotate(3.0, 3.35, new string[]{"膽經", "1", "肝經", "3", "肺經", "5", "大腸經", "7", "胃經", "9", "脾經", "11", "心經", "13", "小腸經", "15", "膀胱經", "17", "腎經", "19", "心包經", "21", "三焦經", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+/*
+ * 子午流注
+ */
+circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "1", "足厥陰肝經", "3", "手太陰肺經", "5", "手陽明大腸經", "7", "足陽明胃經", "9", "足太陰脾經", "11", "手少陰心經", "13", "手太陽小腸經", "15", "足太陽膀胱經", "17", "足少陰腎經", "19", "手厥陰心包經", "21", "手少陽三焦經", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
-                  
+//circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(3.6, 4.0, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false);
+circular_annotate(3.3, 3.8, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false);
 
-//circular_annotate(3.6, 4.0, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true);
+/* 
+ * 二十四节气
+ */
+circular_annotate(3.8, 4.1, new string[]{"12.23", "1.6", "1.21", "2.6", "2.21", "3.6", "3.21", "4.6", "4.21", "5.6", "5.21", "6.6", "6.21", "7.8", "7.23", "8.8", "8.23", "9.8", "9.23", "10.8", "10.23", "11.8", "11.23", "12.8"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(4.0, 4.2, new string[]{"12.23", "1.6", "1.21", "2.6", "2.21", "3.6", "3.21", "4.6", "4.21", "5.6", "5.21", "6.6", "6.21", "7.8", "7.23", "8.8", "8.23", "9.8", "9.23", "10.8", "10.23", "11.8", "11.23", "12.8"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(4.1, 4.7, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(4.2, 4.7, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
+circular_annotate(4.7, 5.1, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true, draw_r1=false);
 
-// 四灵二十八宿
-circular_annotate(4.7, 5.1, new string[]{"虛","女","牛","斗","箕","尾","心",
+/*
+ * 四灵二十八宿
+ */
+circular_annotate(5.1, 5.5, new string[]{"虛","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","軫","翼","張",
                                          "星","柳","鬼","井","參","觜","畢",
                                          "昴","胃","婁","奎","壁","室","危"}, draw_r1=false);
 
-circular_annotate(5.1, 5.6, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
+circular_annotate(5.5, 6.1, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
 
-draw(scale(5.7)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+draw(scale(6.2)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // 四方
-circular_annotate(5.8, 6.2, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(6.3, 6.7, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 // this is to make 4 seasons/directions more distinguishable
 
