@@ -48,3 +48,7 @@ git remote set-url origin git@github.com:xiongyw/xiongyw.git
 - delete: git tag -d <yyyymmdd>
 - list all: git tag #
 - push: git push origin --tags
+
+6. tutorial:
+
+http://lostechies.com/joshuaflanagan/2010/09/03/use-gitk-to-understand-git/
