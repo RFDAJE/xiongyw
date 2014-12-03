@@ -789,61 +789,55 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, i
 // sent in 1GB chunks for large files, even on 64-bit platform
 #define CHUNK_SIZE	(1024 * 1024 * 1024)  
 
+
 	long long int byte_sent = 0;
 	unsigned char *pf = NULL;
 
 	int nr_chunks = file_size / CHUNK_SIZE;
 	int last_chunk_size = file_size % CHUNK_SIZE;
 	int i;
+	ssize_t written;
 
 	log_debug_msg(LOG_INFO, "nr_chunks=%d, last_chunk_size=%d", nr_chunks,last_chunk_size);
 
 	if(file_size > 0){
-		for (i = 0; i < nr_chunks; i ++) {
+		for (i = 0; i <= nr_chunks; i ++) {
 			log_debug_msg(LOG_INFO, "chunk nr=%d", i);
 			/* mmap the current chunk */
 			pf = (unsigned char*)mmap(0, CHUNK_SIZE, PROT_READ, MAP_PRIVATE, fileno(fp), CHUNK_SIZE * i);
-			if(!pf){
-				log_debug_msg(LOG_INFO, "mmap fail");
+			if(pf == MAP_FAILED){
+				log_debug_msg(LOG_INFO, "mmap failed. errno=%d(%s)", errno, strerror(errno));
 				*status_code = 500;
 				write_status_line(sd, *status_code, "server internal error");
 				write(sd, CRLF, 2);
 				return byte_sent;
 			}
+			log_debug_msg(LOG_INFO, "pf=0x%08x", pf);
 			/* write */
-			byte_sent += write(sd, pf, CHUNK_SIZE);
+			if(i == nr_chunks){
+				written = write(sd, pf, last_chunk_size);
+			}
+			else {
+				written = write(sd, pf, CHUNK_SIZE);
+			}
+			if(written < 0){
+				log_debug_msg(LOG_INFO, "write() failed (%d). errno=%d(%s)", written, errno, strerror(errno));
+				*status_code = 500;
+				write_status_line(sd, *status_code, "server internal error");
+				write(sd, CRLF, 2);
+				return byte_sent;
+			}
+			byte_sent += written;			
 			log_debug_msg(LOG_INFO, "byte_sent=%lld", byte_sent);
 			/* unmap */
-			munmap(pf, CHUNK_SIZE);
-			pf = NULL;
+			if (munmap(pf, CHUNK_SIZE) != 0) {
+				log_debug_msg(LOG_INFO, "munmap failed. errno=%d(%s)", errno, strerror(errno));
+				*status_code = 500;
+				write_status_line(sd, *status_code, "server internal error");
+				write(sd, CRLF, 2);
+				return byte_sent;
+			}
 		}
-
-		
-		/* 
-		 * now the last chunk 
-		 */
-		log_debug_msg(LOG_INFO, "last chunk...");
-		pf = (unsigned char*)mmap(0, last_chunk_size, PROT_READ, MAP_PRIVATE, fileno(fp), CHUNK_SIZE * nr_chunks);
-		if(!pf){
-			log_debug_msg(LOG_INFO, "mmap fail");
-			*status_code = 500;
-			write_status_line(sd, *status_code, "server internal error");
-			write(sd, CRLF, 2);
-			return byte_sent;
-		}
-		/* write */
-		log_debug_msg(LOG_INFO, "writing the last chunk...");
-		i = write(sd, pf, last_chunk_size);
-		if(i < 0){
-			log_debug_msg(LOG_INFO, "write() failed. err=%s", strerror(errno));
-			*status_code = 500;
-			write_status_line(sd, *status_code, "server internal error");
-			write(sd, CRLF, 2);
-			return byte_sent;
-		}
-		byte_sent += i;
-		/* unmap */
-		munmap(pf, last_chunk_size);
 	}
 
 	
