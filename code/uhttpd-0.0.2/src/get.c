@@ -825,6 +825,7 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, i
 				*status_code = 500;
 				write_status_line(sd, *status_code, "server internal error");
 				write(sd, CRLF, 2);
+				munmap(pf, CHUNK_SIZE);
 				return byte_sent;
 			}
 			byte_sent += written;			
