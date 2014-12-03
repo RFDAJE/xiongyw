@@ -28,6 +28,13 @@ set images_path(2t) "humax7430/hnb100/p2/BLD_2_2"
 set images_path(3p) "humax7430/hnb200/p2/BLD_2_1"
 set images_path(tch7356) "tch7356/released"
 set images_path(tch7356) "tch7356/20140704-qa"
+set images_path(tch7356) "tch7356/20140728-14"
+set images_path(tch7356) "tch7356/20140729-10"
+set images_path(tch7356) "tch7356/20140729-15"
+set images_path(tch7356) "tch7356/512bld19-1"
+set images_path(tch7356) "tch7356/20140917-13"
+set images_path(tch7356) "tch7356/20141022-15"
+set images_path(tch7356) "tch7356/513bld5"
 
 set kernel_name(2t) "vmlinuz-main"
 set kernel_name(3p) $kernel_name(2t)

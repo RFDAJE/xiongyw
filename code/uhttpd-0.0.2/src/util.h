@@ -28,7 +28,7 @@ void  itoa_k(char *buf, int buf_size, int num);
 int   log_debug_msg(int priority, char *fmt, ...);
 
 
-#define DEBUG
+//#define DEBUG
 
 /*
 char *dsprintf(const char *fmt, ...);
