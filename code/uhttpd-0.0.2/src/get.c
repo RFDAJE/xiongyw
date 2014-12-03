@@ -93,6 +93,7 @@ int alphasort(const struct dirent **a, const struct dirent **b)
 
 
 static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, long long int *bytes_sent);
+static long long int s_write_entity(int sd, FILE* fp, long long int file_size, int* status_code);
 	
 	
 /* "url" is the original url sent from the client */
@@ -107,7 +108,6 @@ int handle_get_request(int sd, const char *url,     /* input  */
 
 	struct stat st;
 	FILE* fp = NULL;
-	unsigned char *pf = NULL;
 	long long int   file_size = 0;
 
 	log_debug_msg(LOG_INFO, "entering handle_get_request(), url=%s", url);
@@ -201,18 +201,6 @@ int handle_get_request(int sd, const char *url,     /* input  */
 	}
 			
 	log_debug_msg(LOG_INFO, "file opened");
-	if(file_size > 0){
-		/* mmap it */
-		pf = (unsigned char*)mmap(0, file_size, PROT_READ, MAP_PRIVATE, fileno(fp), 0);
-		if(!pf){
-			log_debug_msg(LOG_INFO, "mmap fail");
-			*status_code = 500;
-			write_status_line(sd, *status_code, "server internal error");
-			write(sd, CRLF, 2);
-			return 0;
-		}
-	}
-
 	
 	log_debug_msg(LOG_INFO, "ready to write responose");
 	/* everything is ready, response to the request */
@@ -229,11 +217,12 @@ int handle_get_request(int sd, const char *url,     /* input  */
 	/* entity-body */
 	write(sd, CRLF, 2);
 	log_debug_msg(LOG_INFO, "CRLF done");
-	*bytes_sent = write(sd, pf, file_size);
+	//*bytes_sent = write(sd, pf, file_size);
+	*bytes_sent = s_write_entity(sd, fp, file_size, status_code);
 	log_debug_msg(LOG_INFO, "entity done");
 
-	if(pf)
-		munmap(pf, file_size);	
+	//if(pf)
+	//	munmap(pf, file_size);	
 	if(fp)
 		fclose(fp);
 
@@ -792,5 +781,73 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	/*closedir(dp);	*/
 		
 	return 0;
+}
+
+
+static long long int s_write_entity(int sd, FILE* fp, long long int file_size, int* status_code){
+
+// sent in 1GB chunks for large files, even on 64-bit platform
+#define CHUNK_SIZE	(1024 * 1024 * 1024)  
+
+	long long int byte_sent = 0;
+	unsigned char *pf = NULL;
+
+	int nr_chunks = file_size / CHUNK_SIZE;
+	int last_chunk_size = file_size % CHUNK_SIZE;
+	int i;
+
+	log_debug_msg(LOG_INFO, "nr_chunks=%d, last_chunk_size=%d", nr_chunks,last_chunk_size);
+
+	if(file_size > 0){
+		for (i = 0; i < nr_chunks; i ++) {
+			log_debug_msg(LOG_INFO, "chunk nr=%d", i);
+			/* mmap the current chunk */
+			pf = (unsigned char*)mmap(0, CHUNK_SIZE, PROT_READ, MAP_PRIVATE, fileno(fp), CHUNK_SIZE * i);
+			if(!pf){
+				log_debug_msg(LOG_INFO, "mmap fail");
+				*status_code = 500;
+				write_status_line(sd, *status_code, "server internal error");
+				write(sd, CRLF, 2);
+				return byte_sent;
+			}
+			/* write */
+			byte_sent += write(sd, pf, CHUNK_SIZE);
+			log_debug_msg(LOG_INFO, "byte_sent=%lld", byte_sent);
+			/* unmap */
+			munmap(pf, CHUNK_SIZE);
+			pf = NULL;
+		}
+
+		
+		/* 
+		 * now the last chunk 
+		 */
+		log_debug_msg(LOG_INFO, "last chunk...");
+		pf = (unsigned char*)mmap(0, last_chunk_size, PROT_READ, MAP_PRIVATE, fileno(fp), CHUNK_SIZE * nr_chunks);
+		if(!pf){
+			log_debug_msg(LOG_INFO, "mmap fail");
+			*status_code = 500;
+			write_status_line(sd, *status_code, "server internal error");
+			write(sd, CRLF, 2);
+			return byte_sent;
+		}
+		/* write */
+		log_debug_msg(LOG_INFO, "writing the last chunk...");
+		i = write(sd, pf, last_chunk_size);
+		if(i < 0){
+			log_debug_msg(LOG_INFO, "write() failed. err=%s", strerror(errno));
+			*status_code = 500;
+			write_status_line(sd, *status_code, "server internal error");
+			write(sd, CRLF, 2);
+			return byte_sent;
+		}
+		byte_sent += i;
+		/* unmap */
+		munmap(pf, last_chunk_size);
+	}
+
+	
+	log_debug_msg(LOG_INFO, "byte_sent=%lld", byte_sent);
+	return byte_sent;
 }
 
