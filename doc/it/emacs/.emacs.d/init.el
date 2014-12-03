@@ -1,8 +1,3 @@
-;; http://www.emacswiki.org/emacs/ELPA
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("melpa" . "http://melpa.milkbox.net/packages/")))
-
 ;;
 ;; size is not the primary concern nowadays
 (prefer-coding-system 'utf-8)
@@ -271,7 +266,7 @@
 ;;   - xcscope.el: put this under "C:\emacs\emacs-24.2\site-lisp", and add the following line
 ;;     in "init.el", try "c-x c-e". if success (minibuffer shows "xcscope", then the elisp
 ;;     package is installed correctly. otherwise, an error window will show up.
-(require 'xcscope)
+;(require 'xcscope)
 (require 'ascope)
 ;(require 'cscope)
 ;;     be noted that cscope commands "C-c s *" are only activiated in source files.
