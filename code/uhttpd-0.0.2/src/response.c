@@ -56,7 +56,7 @@ int  doresponse(int sd){
 	char        *p1, *p2;
 
 	int         status_code;
-	int         bytes_sent = 0;
+	long long int    bytes_sent = 0;
 
 	int         ret = 0;
 

@@ -21,6 +21,8 @@
 #include <config.h>
 #endif
 
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE64_SOURCE
 #define _FILE_OFFSET_BITS 64
 
 #include <unistd.h>
@@ -90,14 +92,14 @@ int alphasort(const struct dirent **a, const struct dirent **b)
 #endif
 
 
-static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, int *bytes_sent);
+static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, long long int *bytes_sent);
 	
 	
 /* "url" is the original url sent from the client */
 int handle_get_request(int sd, const char *url,     /* input  */
 						int host_index,             /* input */
 						int *status_code,           /* output */
-						int *bytes_sent,            /* output, excluding http headers */
+						long long int *bytes_sent,            /* output, excluding http headers */
 						int is_head){               /* input, 0 for "GET", others for HEAD request */
 
 	char url_cp[MAX_PATH_NAME_SIZE + 2];  /* local copy of the url */
@@ -106,10 +108,10 @@ int handle_get_request(int sd, const char *url,     /* input  */
 	struct stat st;
 	FILE* fp = NULL;
 	unsigned char *pf = NULL;
-	int   file_size = 0;
+	long long int   file_size = 0;
 
 	log_debug_msg(LOG_INFO, "entering handle_get_request(), url=%s", url);
-	*bytes_sent = 0;
+	*bytes_sent = -1;
 	
 
 	if(strlen(url) == 1 && url[0] == '/')
@@ -174,6 +176,7 @@ int handle_get_request(int sd, const char *url,     /* input  */
 	}
 			
 	file_size = st.st_size;
+	log_debug_msg(LOG_INFO, "file_size=%lld", file_size);
 
 	if(is_head){
 		*status_code = 200;
@@ -657,7 +660,7 @@ static char s_part3[] =
     
 
 
-static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, int *bytes_sent){
+static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, long long int *bytes_sent){
 
 #define INIT_CONTENT_SIZE       2048
 

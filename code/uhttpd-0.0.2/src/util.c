@@ -187,7 +187,7 @@ int write_response_header(int sd, const char* location){
 	return 0;
 }
 
-int write_entity_header(int sd, int content_size, const char* content_type){
+int write_entity_header(int sd, long long int content_size, const char* content_type){
 	/* RFC 2616 section 7.1:
 		entity-header = allow | content-encoding | content-language | content-length | content-location | content-md5 | content-range | content-type | expires | last-modified | extension-header
          */
@@ -197,7 +197,7 @@ int write_entity_header(int sd, int content_size, const char* content_type){
 	if(content_size <= 0)
 		len = snprintf(buf, 255, "Allow: GET%s", CRLF);
 	else
-		len = snprintf(buf, 255, "Content-Length: %d\nContent-Type: %s%s", content_size, content_type, CRLF);
+		len = snprintf(buf, 255, "Content-Length: %lld\nContent-Type: %s%s", content_size, content_type, CRLF);
 
 	write(sd, buf, len);
 	
@@ -310,7 +310,7 @@ void itoa_k(char *buf, int buf_size, int num){
    %s: status
    %b: bytes sent, excluding http headers
 */
-void  log_session_clf(int fd, const char *client_ip, const char *request, int status_code, int bytes_sent){
+void  log_session_clf(int fd, const char *client_ip, const char *request, int status_code, long long int bytes_sent){
 	
 #define REFERER             "Referer: "
 #define USER_AGENT          "User-Agent: "
@@ -351,7 +351,7 @@ void  log_session_clf(int fd, const char *client_ip, const char *request, int st
 	if(bytes_sent <= 0)
 		len += snprintf(buf + len, MAX_LINE_SIZE - len, "- ");
 	else
-		len += snprintf(buf + len, MAX_LINE_SIZE - len, "%d ", bytes_sent);
+		len += snprintf(buf + len, MAX_LINE_SIZE - len, "%lld ", bytes_sent);
 	
 	/* \"%{Referer}i\" */
 	p1 = strstr(request, REFERER);
