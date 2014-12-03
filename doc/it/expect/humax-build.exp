@@ -92,11 +92,14 @@ proc build {target_root build_type config_type} {
     #spawn make BUILD_TYPE=sdk CONFIG_TYPE=netbrazil_2t clean
     #expect eof
 
+    spawn time  make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean
+    expect eof
     spawn time  make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type
     expect "password for $::user: "
     send $::supass\r
     expect eof
-    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_nagraca clean_drm clean_netcfg_ca clean_sdp_client
+    #exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_licmgr clean_nagraca clean_drm clean_netcfg_ca clean_sdp_client
+    exec make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type clean_resman
     spawn make BUILD_TYPE=$build_type CONFIG_TYPE=$config_type LOG_LEVEL=O_TRACE
     expect "password for $::user: "
     send $::supass\r
