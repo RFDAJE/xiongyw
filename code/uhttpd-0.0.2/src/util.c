@@ -138,6 +138,8 @@ char* get_mime_type(const char* filename){
 	if(strcasecmp(dot, ".avi") == 0)
 		return "video/x-msvideo";
 
+	if(strcasecmp(dot, ".mp4") == 0)
+		return "video/mp4";
          
 	return "text/plain";
 }
@@ -177,17 +179,19 @@ int write_general_header(int sd){
 int write_response_header(int sd, const char* location){
 	/* RFC 2616 section 6.2:
 		response-header = accept-range | age | etag | location | proxy-authentication | retry-after | server | vary | www-authenticate
-         */
-	if(location){
-		char buf[1024];
-		int  len;
-		len = snprintf(buf, 1023, "Location: %s%s", location, CRLF);
-		write(sd, buf, len);
+      */
+      
+	char buf[1024];
+	int  len;
+	len = snprintf(buf, 1023, "Accept-Ranges: bytes%s", CRLF);
+	if (location) {
+		len += snprintf(buf + len, 1023 - len, "Location: %s%s", location, CRLF);
 	}
+	write(sd, buf, len);
 	return 0;
 }
 
-int write_entity_header(int sd, long long int content_size, const char* content_type){
+int write_entity_header(int sd, long long int content_size, long long int start, long long int end, long long total_size, const char* content_type){
 	/* RFC 2616 section 7.1:
 		entity-header = allow | content-encoding | content-language | content-length | content-location | content-md5 | content-range | content-type | expires | last-modified | extension-header
          */
@@ -197,7 +201,7 @@ int write_entity_header(int sd, long long int content_size, const char* content_
 	if(content_size <= 0)
 		len = snprintf(buf, 255, "Allow: GET%s", CRLF);
 	else
-		len = snprintf(buf, 255, "Content-Length: %lld\nContent-Type: %s%s", content_size, content_type, CRLF);
+		len = snprintf(buf, 255, "Content-Length: %lld\nContent-Range: bytes %lld-%lld/%lld\nContent-Type: %s%s", content_size, start, end, total_size, content_type, CRLF);
 
 	write(sd, buf, len);
 	

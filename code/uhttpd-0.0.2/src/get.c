@@ -93,13 +93,14 @@ int alphasort(const struct dirent **a, const struct dirent **b)
 
 
 static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int *status_code, long long int *bytes_sent);
-static long long int s_write_entity(int sd, FILE* fp, long long int file_size, int* status_code);
-	
+static long long int s_write_entity(int sd, FILE* fp, long long int file_size, long long int range_start, long long int range_end, int* status_code);
 	
 /* "url" is the original url sent from the client */
 int handle_get_request(int sd, const char *url,     /* input  */
 						int host_index,             /* input */
 						int *status_code,           /* output */
+						long long int range_start,	/* input, inclusive; "-1" means ALL and range_end is ignored; "-2" means the last 'end' bytes */
+						long long int range_end,	/* input, inclusive */
 						long long int *bytes_sent,            /* output, excluding http headers */
 						int is_head){               /* input, 0 for "GET", others for HEAD request */
 
@@ -183,7 +184,7 @@ int handle_get_request(int sd, const char *url,     /* input  */
 		write_status_line(sd, *status_code, "");
 		write_general_header(sd);
 		write_response_header(sd, NULL);
-		write_entity_header(sd, file_size, get_mime_type(fullpath));
+		write_entity_header(sd, file_size, 0, file_size - 1, file_size, get_mime_type(fullpath));
 		write(sd, CRLF, 2);
 		return 0;
 	}
@@ -199,30 +200,67 @@ int handle_get_request(int sd, const char *url,     /* input  */
 		write(sd, CRLF, 2);
 		return 0;
 	}
+
+
+#if (1)
+	/* 
+	 * making sure start/end and total size are correct 
+	 */
+#define PAGE_SIZE   4096  // for mmap() 
+	if (range_start == - 1) { // whole file 
+		range_start = 0;
+		range_end = file_size - 1;
+	} else if (range_start == - 2) { // last 'end' bytes 
+		range_start = file_size - range_end;
+		range_end = file_size - 1;
+	}
+
+	// now (range_start >= 0) should hold 
+	if (range_end == -1) {
+		range_end = file_size - 1;
+	}
+
+	if (range_start < 0 || range_end > (file_size - 1)) {
+		log_debug_msg(LOG_INFO, "wrong start/end request. start=%lld, end=%lld, file_size=%lld", range_start, range_end, file_size);
+		*status_code = 500;
+		write_status_line(sd, *status_code, "invalid ranges");
+		write(sd, CRLF, 2);
+		fclose(fp);		
+		return 0;
+	}
+	
+	log_debug_msg(LOG_INFO, "start=%lld, end=%lld", range_start, range_end);
+#endif
+
 			
 	log_debug_msg(LOG_INFO, "file opened");
 	
-	log_debug_msg(LOG_INFO, "ready to write responose");
-	/* everything is ready, response to the request */
-	*status_code = 200;
+	/* 
+	 * everything is ready, response to the request 
+	 */
+	if (range_start == 0 && range_end == file_size - 1) {
+		*status_code = 200;
+	} else {
+		*status_code = 206; // partial response
+	}
 	write_status_line(sd, *status_code, "");
 	log_debug_msg(LOG_INFO, "status line done");
+
 	write_general_header(sd);
 	log_debug_msg(LOG_INFO, "general header done");
+
 	write_response_header(sd, NULL);
 	log_debug_msg(LOG_INFO, "response header done");
-	write_entity_header(sd, file_size, get_mime_type(fullpath));
+
+	write_entity_header(sd, range_end - range_start + 1, range_start, range_end, file_size, get_mime_type(fullpath));
 	log_debug_msg(LOG_INFO, "entity header done");
 
 	/* entity-body */
 	write(sd, CRLF, 2);
 	log_debug_msg(LOG_INFO, "CRLF done");
-	//*bytes_sent = write(sd, pf, file_size);
-	*bytes_sent = s_write_entity(sd, fp, file_size, status_code);
+	*bytes_sent = s_write_entity(sd, fp, file_size, range_start, range_end, status_code);
 	log_debug_msg(LOG_INFO, "entity done");
 
-	//if(pf)
-	//	munmap(pf, file_size);	
 	if(fp)
 		fclose(fp);
 
@@ -673,6 +711,7 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	int           entry_len;
 	char          timebuf[128];
 	char          fullpath[MAX_PATH_NAME_SIZE + 1];
+	int           total_size;
 
 	*bytes_sent = 0;
 
@@ -760,12 +799,14 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 	/* part 3 */
 	tail_size = snprintf(tail, MAX_TAIL_SIZE, s_part3, VERSION, VERSION);
 	log_debug_msg(LOG_INFO, "tail_size=%d>%s", tail_size, tail);
+
+	total_size = head_size + content_size +  tail_size;
 	
 	*status_code = 200;
 	write_status_line(sd, *status_code, "");
 	write_general_header(sd);
 	write_response_header(sd, NULL);
-	write_entity_header(sd, head_size + content_size +  tail_size, "text/html");
+	write_entity_header(sd, total_size, 0, total_size - 1, total_size, "text/html");
 
 	/* entity-body: the html page(head + content + tail) */
 	write(sd, CRLF, 2);
@@ -784,27 +825,59 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 }
 
 
-static long long int s_write_entity(int sd, FILE* fp, long long int file_size, int* status_code){
+static long long int s_write_entity(int sd, FILE* fp, long long int file_size, long long int range_start, long long int range_end, int* status_code){
 
-// sent in 1GB chunks for large files, even on 64-bit platform
-#define CHUNK_SIZE	(1024 * 1024 * 1024)  
-
+#define CHUNK_SIZE	(32 * 1024 * 1024)  // mmap & write in chunks less than 2^31-1
 
 	long long int byte_sent = 0;
 	unsigned char *pf = NULL;
+#define PAGE_SIZE 4096    // for mmap(...offset) 
+	long long int range_start_adj = range_start - range_start % PAGE_SIZE;
+	long long int total_size = range_end - range_start_adj + 1;
+	
 
-	int nr_chunks = file_size / CHUNK_SIZE;
-	int last_chunk_size = file_size % CHUNK_SIZE;
+#if (0)
+	/* 
+	 * making sure start/end and total size are correct 
+	 */
+	if (range_start == - 1) { // whole file 
+		range_start = 0;
+		range_end = file_size - 1;
+	} else if (range_start == - 2) { // last 'end' bytes 
+		range_start = file_size - range_end;
+		range_end = file_size - 1;
+	}
+
+	// now (range_start >= 0) should hold 
+	if (range_end == -1) {
+		range_end = file_size - 1;
+	}
+
+	if (range_start < 0 || range_end > (file_size - 1)) {
+		log_debug_msg(LOG_INFO, "wrong start/end request. start=%lld, end=%lld, file_size=%lld", range_start, range_end, file_size);
+		*status_code = 500;
+		write_status_line(sd, *status_code, "invalid ranges");
+		write(sd, CRLF, 2);
+		return byte_sent;
+	}
+	
+	total_size = range_end - range_start + 1;
+	log_debug_msg(LOG_INFO, "start=%lld, end=%lld, total_size=%lld", range_start, range_end, total_size);
+	
+#endif
+
+	int nr_chunks = total_size / CHUNK_SIZE;
+	int last_chunk_size = total_size % CHUNK_SIZE;
 	int i;
 	ssize_t written;
 
 	log_debug_msg(LOG_INFO, "nr_chunks=%d, last_chunk_size=%d", nr_chunks,last_chunk_size);
 
-	if(file_size > 0){
+	if(total_size > 0){
 		for (i = 0; i <= nr_chunks; i ++) {
 			log_debug_msg(LOG_INFO, "chunk nr=%d", i);
 			/* mmap the current chunk */
-			pf = (unsigned char*)mmap(0, CHUNK_SIZE, PROT_READ, MAP_PRIVATE, fileno(fp), CHUNK_SIZE * i);
+			pf = (unsigned char*)mmap(0, CHUNK_SIZE, PROT_READ, MAP_PRIVATE, fileno(fp), range_start_adj + CHUNK_SIZE * i);
 			if(pf == MAP_FAILED){
 				log_debug_msg(LOG_INFO, "mmap failed. errno=%d(%s)", errno, strerror(errno));
 				*status_code = 500;
@@ -814,7 +887,9 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, i
 			}
 			log_debug_msg(LOG_INFO, "pf=0x%08x", pf);
 			/* write */
-			if(i == nr_chunks){
+			if (i == 0) {
+				written = write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
+			} else if(i == nr_chunks){
 				written = write(sd, pf, last_chunk_size);
 			}
 			else {

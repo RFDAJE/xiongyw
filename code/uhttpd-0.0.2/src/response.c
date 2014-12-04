@@ -41,6 +41,9 @@
 
 static const char s_allow[] = "Allow: GET, HEAD";          /* methods supported */
 
+void s_parse_range(char* range, long long int* start, long long int* end);
+
+
 /*** return:     0: normal termination
              other: errno each condition */
 int  doresponse(int sd){
@@ -56,6 +59,8 @@ int  doresponse(int sd){
 	char        *p1, *p2;
 
 	int         status_code;
+	long long range_start = -1;
+	long long range_end = -1;
 	long long int    bytes_sent = 0;
 
 	int         ret = 0;
@@ -122,7 +127,27 @@ int  doresponse(int sd){
 			goto done;
 		}
 
-		handle_get_request(sd, url, index, &status_code, &bytes_sent, strncmp(request, "GET", 3));
+		/* determine the range */
+		p1 = strstr(request, "Range: bytes=");
+		if (p1) {
+			p2 = strstr(p1 + 13, CRLF);
+			if(!p2){		
+				status_code = 400;
+				write_status_line(sd, status_code, "Bad Request: bad Range");
+				write(sd, CRLF, 2);
+				goto done;
+			}
+			char* range = strndup(p1 + 13, p2-p1-13);
+			if(range){
+				log_debug_msg(LOG_INFO, "Range: bytes=%s", range);
+				s_parse_range(range, &range_start, &range_end);
+				log_debug_msg(LOG_INFO, "start=%lld, end=%lld", range_start, range_end);
+				free(range);
+			}
+		}
+
+		/* handle the request now */		
+		handle_get_request(sd, url, index, &status_code, range_start, range_end, &bytes_sent, strncmp(request, "GET", 3));
 	}
 	else{ /* OPTIONS | POST | PUT | DELETE | TRACE | CONNECT */
 		status_code = 405;
@@ -130,7 +155,7 @@ int  doresponse(int sd){
 		write_status_line(sd, status_code, s_allow);
 		write_general_header(sd);
 		write_response_header(sd, NULL);
-		write_entity_header(sd, 0, NULL);
+		write_entity_header(sd, 0, 0, 0, 0, NULL);
 		write(sd, CRLF, 2);
 	}
 
@@ -145,3 +170,25 @@ done:
 
 	return ret;
 }
+
+
+/*
+ * start (output): the idx of the first byte to send
+ *                 -1: the whole file; end is ignored.
+ *                 -2: the last "end" bytes.
+ * end(output): the idx of the last byte to send.
+ */
+void s_parse_range(char* range, long long int* start, long long int* end) {
+
+     *start = *end = - 1;
+
+    if (range[0] == '-') { // "-500" means the last 500 bytes
+       *start = -2; // start idx is not yet determined.
+       sscanf(range+1, "%lld", end);
+    }
+    else{
+        // "123-456,789-1000" is not supported: only the first range is captured
+       sscanf(range, "%lld-%lld", start, end);
+    }
+}
+
