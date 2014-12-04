@@ -1,0 +1,93 @@
+byte serving: http://en.wikipedia.org/wiki/Byte_serving
+
+--------------------------------------
+uhttpd: without "byte serving" feature
+--------------------------------------
+
+GET /pub/ts/Once.Upon.a.Time.in.the.West.1968.720p.BluRay.X264-AMIABLE/Sample/once.upon.a.time.in.the.west.1968.720p.bluray.x264-amiable.sample.mkv HTTP/1.1
+Host: 10.12.6.250:8080
+Connection: keep-alive
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Referer: http://10.12.6.250:8080/pub/ts/Once.Upon.a.Time.in.the.West.1968.720p.BluRay.X264-AMIABLE/Sample/
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+
+HTTP/1.1 200 OK
+Connection: close
+Date: Thu, 04 Dec 2014 03:35:39 GMT
+Content-Length: 45486193
+Content-Type: text/plain
+
+---------------------------------
+Byte serving: apache <--> chrome
+---------------------------------
+GET /amelie.mp4 HTTP/1.1
+Host: 10.12.6.250:8081
+Connection: keep-alive
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+
+HTTP/1.1 200 OK
+Date: Thu, 04 Dec 2014 03:48:10 GMT
+Server: Apache/2.2.17 (Fedora)
+Last-Modified: Wed, 07 May 2014 13:14:00 GMT
+ETag: "e2993-8f8f5cd5-4f8cf23489d16"
+Accept-Ranges: bytes
+Content-Length: 2408537301
+Connection: close
+Content-Type: video/mp4
+
+--------------------------------------
+
+GET /amelie.mp4 HTTP/1.1
+Host: 10.12.6.250:8081
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Accept: */*
+Referer: http://10.12.6.250:8081/amelie.mp4
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Range: bytes=0-
+
+HTTP/1.1 206 Partial Content
+Date: Thu, 04 Dec 2014 03:48:10 GMT
+Server: Apache/2.2.17 (Fedora)
+Last-Modified: Wed, 07 May 2014 13:14:00 GMT
+ETag: "e2993-8f8f5cd5-4f8cf23489d16"
+Accept-Ranges: bytes
+Content-Length: 2408537301
+Content-Range: bytes 0-2408537300/2408537301
+Connection: close
+Content-Type: video/mp4
+
+--------------------------------------
+
+GET /amelie.mp4 HTTP/1.1
+Host: 10.12.6.250:8081
+Connection: keep-alive
+Accept-Encoding: identity;q=1, *;q=0
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36
+Accept: */*
+Referer: http://10.12.6.250:8081/amelie.mp4
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Range: bytes=2408537232-2408537300
+If-Range: "e2993-8f8f5cd5-4f8cf23489d16"
+
+HTTP/1.1 206 Partial Content
+Date: Thu, 04 Dec 2014 03:48:10 GMT
+Server: Apache/2.2.17 (Fedora)
+Last-Modified: Wed, 07 May 2014 13:14:00 GMT
+ETag: "e2993-8f8f5cd5-4f8cf23489d16"
+Accept-Ranges: bytes
+Content-Length: 69
+Content-Range: bytes 2408537232-2408537300/2408537301
+Connection: close
+Content-Type: video/mp4
+
+
+
+
+
