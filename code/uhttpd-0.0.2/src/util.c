@@ -198,7 +198,7 @@ int write_entity_header(int sd, long long int content_size, long long int start,
 	
 	char buf[256];
 	int  len;
-	if(content_size <= 0)
+	if(content_size < 0)  // when content_size = 0, it's still meaningful/necessary to tell the client.
 		len = snprintf(buf, 255, "Allow: GET%s", CRLF);
 	else
 		len = snprintf(buf, 255, "Content-Length: %lld\nContent-Range: bytes %lld-%lld/%lld\nContent-Type: %s%s", content_size, start, end, total_size, content_type, CRLF);

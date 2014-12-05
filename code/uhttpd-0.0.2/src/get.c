@@ -200,13 +200,12 @@ int handle_get_request(int sd, const char *url,     /* input  */
 		write(sd, CRLF, 2);
 		return 0;
 	}
+	log_debug_msg(LOG_INFO, "file opened");
 
 
-#if (1)
 	/* 
 	 * making sure start/end and total size are correct 
 	 */
-#define PAGE_SIZE   4096  // for mmap() 
 	if (range_start == - 1) { // whole file 
 		range_start = 0;
 		range_end = file_size - 1;
@@ -215,11 +214,21 @@ int handle_get_request(int sd, const char *url,     /* input  */
 		range_end = file_size - 1;
 	}
 
-	// now (range_start >= 0) should hold 
-	if (range_end == -1) {
-		range_end = file_size - 1;
+	if(range_start < 0) {  // still < 0? strange but...
+		range_start = 0;
 	}
 
+	if (range_start >= file_size) { // out of range...nothing to transfer
+		range_start = file_size;  
+		range_end = file_size - 1;
+	}
+		
+	if (range_end < 0 || range_end > (file_size - 1)) { // in case of -1, it means the last 'end' bytes, so...
+		range_end = file_size - 1;
+	}
+	log_debug_msg(LOG_INFO, "start=%lld, end=%lld", range_start, range_end);
+	
+#if (0)
 	if (range_start < 0 || range_end > (file_size - 1)) {
 		log_debug_msg(LOG_INFO, "wrong start/end request. start=%lld, end=%lld, file_size=%lld", range_start, range_end, file_size);
 		*status_code = 500;
@@ -228,12 +237,9 @@ int handle_get_request(int sd, const char *url,     /* input  */
 		fclose(fp);		
 		return 0;
 	}
-	
-	log_debug_msg(LOG_INFO, "start=%lld, end=%lld", range_start, range_end);
-#endif
+#endif	
 
 			
-	log_debug_msg(LOG_INFO, "file opened");
 	
 	/* 
 	 * everything is ready, response to the request 
@@ -828,50 +834,20 @@ static int s_write_dir_page(int sd, char *p_dirpath,  const char *root_dir, int 
 static long long int s_write_entity(int sd, FILE* fp, long long int file_size, long long int range_start, long long int range_end, int* status_code){
 
 #define CHUNK_SIZE	(32 * 1024 * 1024)  // mmap & write in chunks less than 2^31-1
+#define PAGE_SIZE 4096    // for mmap(...offset) 
 
 	long long int byte_sent = 0;
 	unsigned char *pf = NULL;
-#define PAGE_SIZE 4096    // for mmap(...offset) 
+	long long int total_size = range_end - range_start + 1;
 	long long int range_start_adj = range_start - range_start % PAGE_SIZE;
-	long long int total_size = range_end - range_start_adj + 1;
-	
+	long long int total_size_adj = range_end - range_start_adj + 1;
 
-#if (0)
-	/* 
-	 * making sure start/end and total size are correct 
-	 */
-	if (range_start == - 1) { // whole file 
-		range_start = 0;
-		range_end = file_size - 1;
-	} else if (range_start == - 2) { // last 'end' bytes 
-		range_start = file_size - range_end;
-		range_end = file_size - 1;
-	}
-
-	// now (range_start >= 0) should hold 
-	if (range_end == -1) {
-		range_end = file_size - 1;
-	}
-
-	if (range_start < 0 || range_end > (file_size - 1)) {
-		log_debug_msg(LOG_INFO, "wrong start/end request. start=%lld, end=%lld, file_size=%lld", range_start, range_end, file_size);
-		*status_code = 500;
-		write_status_line(sd, *status_code, "invalid ranges");
-		write(sd, CRLF, 2);
-		return byte_sent;
-	}
-	
-	total_size = range_end - range_start + 1;
-	log_debug_msg(LOG_INFO, "start=%lld, end=%lld, total_size=%lld", range_start, range_end, total_size);
-	
-#endif
-
-	int nr_chunks = total_size / CHUNK_SIZE;
-	int last_chunk_size = total_size % CHUNK_SIZE;
+	int nr_chunks = total_size_adj / CHUNK_SIZE;
+	int last_chunk_size = total_size_adj % CHUNK_SIZE;
 	int i;
 	ssize_t written;
 
-	log_debug_msg(LOG_INFO, "nr_chunks=%d, last_chunk_size=%d", nr_chunks,last_chunk_size);
+	log_debug_msg(LOG_INFO, "start=%lld, end=%lld, total_size=%lld, total_size_adj=%lld, nr_chunks=%d, last_chunk_size=%d", range_start, range_end, total_size, total_size_adj, nr_chunks,last_chunk_size);
 
 	if(total_size > 0){
 		for (i = 0; i <= nr_chunks; i ++) {
