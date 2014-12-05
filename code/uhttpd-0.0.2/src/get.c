@@ -864,12 +864,15 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, l
 			log_debug_msg(LOG_INFO, "pf=0x%08x", pf);
 			/* write */
 			if (i == 0) {
-				written = write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
+				//written = write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
+				written = socket_loop_write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
 			} else if(i == nr_chunks){
-				written = write(sd, pf, last_chunk_size);
+				//written = write(sd, pf, last_chunk_size);
+				written = socket_loop_write(sd, pf, last_chunk_size);
 			}
 			else {
-				written = write(sd, pf, CHUNK_SIZE);
+				//written = write(sd, pf, CHUNK_SIZE);
+				written = socket_loop_write(sd, pf, CHUNK_SIZE);
 			}
 			if(written < 0){
 				log_debug_msg(LOG_INFO, "write() failed (%d). errno=%d(%s)", written, errno, strerror(errno));
