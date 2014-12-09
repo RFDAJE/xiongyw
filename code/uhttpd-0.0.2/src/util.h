@@ -26,7 +26,7 @@ void  itoa_k(char *buf, int buf_size, int num);
 
 
 int   log_debug_msg(int priority, char *fmt, ...);
-int   socket_loop_write(int fd, void *buf,int len);
+int   socket_loop_write(int fd, void *buf,int len, int* written);
 
 
 #define DEBUG
