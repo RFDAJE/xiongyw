@@ -29,7 +29,7 @@ int   log_debug_msg(int priority, char *fmt, ...);
 int   socket_loop_write(int fd, void *buf,int len, int* written);
 
 
-#define DEBUG
+//#define DEBUG
 
 /*
 char *dsprintf(const char *fmt, ...);
