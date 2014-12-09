@@ -402,24 +402,28 @@ void  log_session_clf(int fd, const char *client_ip, const char *request, int st
 	
 }
 
-int socket_loop_write(int fd, void *buf,int len) { 
+int socket_loop_write(int fd, void *buf,int len, int* written) { 
+	
     int left = len; 
     char *ptr = buf; 
+	*written = 0;
 
     while (left > 0) { 
-        int written = write(fd, ptr, left);
-        if (written <= 0) {
+        int _written = write(fd, ptr, left);
+        if (_written <= 0) {
             if(errno == EINTR) {
-                written = 0; 
+                _written = 0; 
             } else {
                 return (-1); 
             }
         }
 
-        left -= written; 
-        ptr += written;
+        left -= _written; 
+        ptr += _written;
+
+		*written = len - left;
     } 
 
-    return len - left; 
+    return *written; 
 } 
 

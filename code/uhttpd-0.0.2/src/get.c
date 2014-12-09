@@ -845,7 +845,7 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, l
 	int nr_chunks = total_size_adj / CHUNK_SIZE;
 	int last_chunk_size = total_size_adj % CHUNK_SIZE;
 	int i;
-	ssize_t written;
+	ssize_t written, written2; // when error happens, written < 0 and written2 is the bytes actually written.
 
 	log_debug_msg(LOG_INFO, "start=%lld, end=%lld, total_size=%lld, total_size_adj=%lld, nr_chunks=%d, last_chunk_size=%d", range_start, range_end, total_size, total_size_adj, nr_chunks,last_chunk_size);
 
@@ -865,15 +865,16 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, l
 			/* write */
 			if (i == 0) {
 				//written = write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
-				written = socket_loop_write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE);
+				written = socket_loop_write(sd, pf + range_start % PAGE_SIZE, (nr_chunks == 0)? last_chunk_size : CHUNK_SIZE - range_start % PAGE_SIZE, &written2);
 			} else if(i == nr_chunks){
 				//written = write(sd, pf, last_chunk_size);
-				written = socket_loop_write(sd, pf, last_chunk_size);
+				written = socket_loop_write(sd, pf, last_chunk_size, &written2);
 			}
 			else {
 				//written = write(sd, pf, CHUNK_SIZE);
-				written = socket_loop_write(sd, pf, CHUNK_SIZE);
+				written = socket_loop_write(sd, pf, CHUNK_SIZE, &written2);
 			}
+			byte_sent += written2;
 			if(written < 0){
 				log_debug_msg(LOG_INFO, "write() failed (%d). errno=%d(%s)", written, errno, strerror(errno));
 				*status_code = 500;
@@ -882,7 +883,6 @@ static long long int s_write_entity(int sd, FILE* fp, long long int file_size, l
 				munmap(pf, CHUNK_SIZE);
 				return byte_sent;
 			}
-			byte_sent += written;			
 			log_debug_msg(LOG_INFO, "byte_sent=%lld", byte_sent);
 			/* unmap */
 			if (munmap(pf, CHUNK_SIZE) != 0) {
