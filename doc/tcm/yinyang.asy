@@ -628,7 +628,10 @@ circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳
  * 子午流注
  */
 //circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "1", "足厥陰肝經", "3", "手太陰肺經", "5", "手陽明大腸經", "7", "足陽明胃經", "9", "足太陰脾經", "11", "手少陰心經", "13", "手太陽小腸經", "15", "足太陽膀胱經", "17", "足少陰腎經", "19", "手厥陰心包經", "21", "手少陽三焦經", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
-circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "①", "足厥陰肝經", "③", "手太陰肺經", "⑤", "手陽明大腸經", "⑦", "足陽明胃經", "⑨", "足太陰脾經", "⑪", "手少陰心經", "①", "手太陽小腸經", "③", "足太陽膀胱經", "⑤", "足少陰腎經", "⑦", "手厥陰心包經", "⑨", "手少陽三焦經", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+
+//circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "①", "足厥陰肝經", "③", "手太陰肺經", "⑤", "手陽明大腸經", "⑦", "足陽明胃經", "⑨", "足太陰脾經", "⑪", "手少陰心經", "①", "手太陽小腸經", "③", "足太陽膀胱經", "⑤", "足少陰腎經", "⑦", "手厥陰心包經", "⑨", "手少陽三焦經", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+
+circular_annotate(3.0, 3.3, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
 //circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
