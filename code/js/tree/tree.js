@@ -530,12 +530,16 @@ function json2tree(o, /* optional */ name) {
             return kids;
         }
 
-
-        node = new MyNode(uid(), 
-                          _getAttrib(o, "icon"), 
-                          _getAttrib(o, "name") || name, // name overriding
-                          _getAttrib(o, "desc"),
-                          _getAttrib(o, "href"));
+        if (isNsb(o)) {
+            // if the object is a simple value...put the object content as the description
+            node = new MyNode(uid(), null, name, o, null);
+        } else {
+            node = new MyNode(uid(), 
+                              _getAttrib(o, "icon"), 
+                              _getAttrib(o, "name") || name, // name overriding
+                              _getAttrib(o, "desc"),
+                              _getAttrib(o, "href"));
+        }
         window[node.node_id()] = node;
         
         if (!_isLeafNode(o)) {
