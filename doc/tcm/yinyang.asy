@@ -569,6 +569,18 @@ void circular_annotate2(real r1, // radius for inner circle
     }
 }
 
+void draw_color_background(real r1, real r2) {
+
+     path pie = rotate(-45) * buildcycle(arc((0, 0), r1, 0, 90), (0, r1)--(0, r2), arc((0, 0), r2, 90, 0), (r2, 0)--(r1, 0));
+
+     fill(pie, lightgreen);
+     fill(rotate(90) * pie, lightgray);
+     //fill(rotate(180) * pie, gray);   // blanc pour automne
+     fill(rotate(270) * pie, lightred);
+
+     fill(scale(r1) * unitcircle, lightyellow);
+}
+
 
 void draw_4_delims(real[] radius, pen noir, pen blanc)
 {
@@ -605,7 +617,11 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
 /*************************************************************************
  * draw stuff now 
  *************************************************************************/
+/*
+ * 青赤黄白黑 背景
+ */
 
+draw_color_background(2.0, 6.4);
 
 /*
  * 阴阳鱼和八卦
@@ -631,45 +647,54 @@ circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳
 
 //circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "①", "足厥陰肝經", "③", "手太陰肺經", "⑤", "手陽明大腸經", "⑦", "足陽明胃經", "⑨", "足太陰脾經", "⑪", "手少陰心經", "①", "手太陽小腸經", "③", "足太陽膀胱經", "⑤", "足少陰腎經", "⑦", "手厥陰心包經", "⑨", "手少陽三焦經", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(3.0, 3.3, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(3.0, 3.4, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
 //circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(3.3, 3.9, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false);
+circular_annotate(3.4, 3.9, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false, draw_r2=false);
+
+circular_annotate(3.9, 4.3, new string[]{"足少陽膽經", "足厥陰肝經", "手太陰肺經", "手陽明大腸經", "足陽明胃經", "足太陰脾經", "手少陰心經", "手太陽小腸經", "足太陽膀胱經", "足少陰腎經", "手厥陰心包經", "手少陽三焦經"}, bend_text=true, draw_r1=false, draw_delim=true);
+
 
 /* 
  * 二十四节气
  */
-circular_annotate(3.9, 4.3, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true, draw_r2=false);
+circular_annotate(4.3, 4.7, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true, draw_r2=false);
 
-circular_annotate(4.3, 4.5, new string[]{"\texttt{12.23}", "\texttt{1.6}", "\texttt{1.21}", "\texttt{2.6}", "\texttt{2.21}", "\texttt{3.6}", "\texttt{3.21}", "\texttt{4.6}", "\texttt{4.21}", "\texttt{5.6}", "\texttt{5.21}", "\texttt{6.6}", "\texttt{6.21}", "\texttt{7.8}", "\texttt{7.23}", "\texttt{8.8}", "\texttt{8.23}", "\texttt{9.8}", "\texttt{9.23}", "\texttt{10.8}", "\texttt{10.23}", "\texttt{11.8}", "\texttt{11.23}", "\texttt{12.8}"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(4.7, 4.9, new string[]{"\texttt{12.23}", "\texttt{1.6}", "\texttt{1.21}", "\texttt{2.6}", "\texttt{2.21}", "\texttt{3.6}", "\texttt{3.21}", "\texttt{4.6}", "\texttt{4.21}", "\texttt{5.6}", "\texttt{5.21}", "\texttt{6.6}", "\texttt{6.21}", "\texttt{7.8}", "\texttt{7.23}", "\texttt{8.8}", "\texttt{8.23}", "\texttt{9.8}", "\texttt{9.23}", "\texttt{10.8}", "\texttt{10.23}", "\texttt{11.8}", "\texttt{11.23}", "\texttt{12.8}"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(4.5, 5.0, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
+circular_annotate(4.9, 5.4, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
 
 
 /*
  * 四灵二十八宿
  */
-circular_annotate(5.0, 5.4, new string[]{"虛","女","牛","斗","箕","尾","心",
+circular_annotate(5.4, 5.8, new string[]{"虛","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","軫","翼","張",
                                          "星","柳","鬼","井","參","觜","畢",
                                          "昴","胃","婁","奎","壁","室","危"}, draw_r1=false);
 
-circular_annotate(5.4, 6.0, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
+circular_annotate(5.8, 6.4, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
 
-draw(scale(6.1)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+draw(scale(6.5)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // 四方
-circular_annotate(6.2, 6.6, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(6.6, 7.0, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 // this is to make 4 seasons/directions more distinguishable
 
-
+/*
 draw_4_delims(new real[]{2.0, 3.0,   
-                         3.3, 4.3,   
-                         5.0, 6.0}, 
+                         3.4, 4.7,   
+                         5.4, 6.4}, 
               defaultpen + linewidth(line_width_in_bp * 6) + linecap(0), 
               defaultpen + linewidth(line_width_in_bp * 4) + linecap(2) + white);
+*/
+
+
+
+
+
 
 
 
