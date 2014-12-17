@@ -574,7 +574,7 @@ void draw_color_background(real r1, real r2) {
      path pie = rotate(-45) * buildcycle(arc((0, 0), r1, 0, 90), (0, r1)--(0, r2), arc((0, 0), r2, 90, 0), (r2, 0)--(r1, 0));
 
      fill(pie, lightgreen);
-     fill(rotate(90) * pie, lightgray);
+     fill(rotate(90) * pie, gray);
      //fill(rotate(180) * pie, gray);   // blanc pour automne
      fill(rotate(270) * pie, lightred);
 
