@@ -48,6 +48,7 @@ git remote set-url origin git@github.com:xiongyw/xiongyw.git
 - delete: git tag -d <yyyymmdd>
 - list all: git tag #
 - push: git push origin --tags
+- delete from remote: git push :refs/tags/<the_tag>
 
 6. tutorial:
 
