@@ -618,6 +618,12 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
  * draw stuff now 
  *************************************************************************/
 /*
+ * draw the invisible line to extend the margin of the picture
+ */
+draw(shift(-7,-7)*scale(7*2)*unitsquare, white);
+
+
+/*
  * 青赤黄白黑 背景
  */
 
@@ -680,6 +686,8 @@ draw(scale(6.5)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 // 四方
 circular_annotate(6.6, 7.0, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+
+
 
 // this is to make 4 seasons/directions more distinguishable
 
