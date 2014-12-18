@@ -150,6 +150,9 @@ var escapeXml = function (txt) {
 
 
 function isPropReserved(p) {
+    if (window.JSON2TREE_NO_CUST_ATTR) {
+        return false;
+    }
 
     var reserved_prop_names = ["@icon", "@name", "@desc", "@href"];
     /*
@@ -534,11 +537,15 @@ function json2tree(o, /* optional */ name) {
             // if the object is a simple value...put the object content as the description
             node = new MyNode(uid(), null, name, o, null);
         } else {
-            node = new MyNode(uid(), 
-                              _getAttrib(o, "icon"), 
-                              _getAttrib(o, "name") || name, // name overriding
-                              _getAttrib(o, "desc"),
-                              _getAttrib(o, "href"));
+            if (window.JSON2TREE_NO_CUST_ATTR) {
+                node = new MyNode(uid(), "", name, _getAttrib(o, "name"), "");
+            } else{
+                node = new MyNode(uid(), 
+                                  _getAttrib(o, "icon"), 
+                                  _getAttrib(o, "name") || name, // name overriding
+                                  _getAttrib(o, "desc"),
+                                  _getAttrib(o, "href"));
+            }
         }
         window[node.node_id()] = node;
         
