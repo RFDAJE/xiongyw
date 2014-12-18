@@ -86,6 +86,7 @@
  * 4. typical usage
  *
  * var json =  JSON.parse(JSON.stringify(obj));  // make sure the object is JSON compatible
+ * json2tree.enableReservedAttributes = true;    // to enable reserved attributes (icon/name/desc/href)
  * var root = json2tree(json);  // convert the object into a tree
  * document.getElementByID("elem_id").innerHTML = root.render(); //  render the tree into HTML elementssss
  * root.onclick();  // clapse the 1st level
@@ -150,7 +151,7 @@ var escapeXml = function (txt) {
 
 
 function isPropReserved(p) {
-    if (window.JSON2TREE_NO_CUST_ATTR) {
+    if (json2tree.enableReservedAttributes === false) {
         return false;
     }
 
@@ -537,7 +538,7 @@ function json2tree(o, /* optional */ name) {
             // if the object is a simple value...put the object content as the description
             node = new MyNode(uid(), null, name, o, null);
         } else {
-            if (window.JSON2TREE_NO_CUST_ATTR) {
+            if (json2tree.enableReservedAttributes === false) {
                 node = new MyNode(uid(), "", name, _getAttrib(o, "name"), "");
             } else{
                 node = new MyNode(uid(), 
@@ -572,3 +573,6 @@ function json2tree(o, /* optional */ name) {
     root.set_left_n_last(true, []);  // need call this once the tree is built
     return root;
 }
+
+// by default, disable it
+json2tree.enableReservedAttributes = false;
