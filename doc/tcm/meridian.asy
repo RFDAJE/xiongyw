@@ -28,10 +28,10 @@ real font_size_in_pt = font_size_in_cm * cm2pt;
 
 unitsize(unit_size_in_pt);
 
-pen pen_e = linewidth(400) + black + linecap(2);
+pen pen_e = linewidth(400) + darkgray + linecap(2);
 pen pen_yin = linewidth(1) + black;
 pen pen_yang = linewidth(1) + red;
-pen pen_text = fontsize(240) + lightgrey;
+pen pen_text = fontsize(240) + white;
 
 /*
  * size/coordinates of the big E:
@@ -45,7 +45,7 @@ pen pen_text = fontsize(240) + lightgrey;
  */
 path[]  BIG_E = (0,0)--(150,0)^^(0,100)--(150,100)^^(0,200)--(150,200)^^(0,0)--(0,200);
 pair up = (0, 10), down = (0, -20);
-pair left1 = (-5, 0), left2 = (-50, 0);
+pair left1 = (-5, 0), left2 = (-70, 0);
 pair lu = (0, 200) + up + left1,   li = (150, 200) + up + left2,
      sp = (0, 200) + down + left1, st = (150, 200) + down + left2,
      ht = (0, 100) + up + left1,   si = (150, 100) + up + left2,
@@ -58,19 +58,19 @@ pair lu = (0, 200) + up + left1,   li = (150, 200) + up + left2,
  * text outline: http://tex.stackexchange.com/questions/21548/outlining-filling-glyph-outline-with-text-in-tikz
  */
 
-path[]  LU = texpath(Label("平旦 \texttt{\bfseries LU}", font_size_in_pt, align=Align));
-path[]  LI = texpath(Label("日出 \texttt{\bfseries LI}", font_size_in_pt, align=Align));
-path[]  ST = texpath(Label("食時 \texttt{\bfseries ST}", font_size_in_pt, align=Align));
-path[]  SP = texpath(Label("隅中 \texttt{\bfseries SP}", font_size_in_pt, align=Align));
-path[]  HT = texpath(Label("日中 \texttt{\bfseries HT}", font_size_in_pt, align=Align));
-path[]  SI = texpath(Label("日昳 \texttt{\bfseries SI}", font_size_in_pt, align=Align));
-path[]  BL = texpath(Label("晡時 \texttt{\bfseries BL}", font_size_in_pt, align=Align));
-path[]  KI = texpath(Label("日入 \texttt{\bfseries KI}", font_size_in_pt, align=Align));
-path[]  PC = texpath(Label("黄昏 \texttt{\bfseries PC}", font_size_in_pt, align=Align));
-path[]  TE = texpath(Label("人定 \texttt{\bfseries TE}", font_size_in_pt, align=Align));
-path[]  GB = texpath(Label("夜半 \texttt{\bfseries GB}", font_size_in_pt, align=Align));
-path[]  LR = texpath(Label("雞鳴 \texttt{\bfseries LR}", font_size_in_pt, align=Align));
-//path[]  LR = texpath(Label("雞鳴 \texttt{\bfseries\underline{LR}}", font_size_in_pt, align=Align));
+path[]  LU = texpath(Label("平旦 寅\texttt{\bfseries LU}", font_size_in_pt, align=Align));
+path[]  LI = texpath(Label("日出 卯\texttt{\bfseries LI}", font_size_in_pt, align=Align));
+path[]  ST = texpath(Label("食時 辰\texttt{\bfseries ST}", font_size_in_pt, align=Align));
+path[]  SP = texpath(Label("隅中 巳\texttt{\bfseries SP}", font_size_in_pt, align=Align));
+path[]  HT = texpath(Label("日中 午\texttt{\bfseries HT}", font_size_in_pt, align=Align));
+path[]  SI = texpath(Label("日昳 未\texttt{\bfseries SI}", font_size_in_pt, align=Align));
+path[]  BL = texpath(Label("晡時 申\texttt{\bfseries BL}", font_size_in_pt, align=Align));
+path[]  KI = texpath(Label("日入 酉\texttt{\bfseries KI}", font_size_in_pt, align=Align));
+path[]  PC = texpath(Label("黄昏 戌\texttt{\bfseries PC}", font_size_in_pt, align=Align));
+path[]  TE = texpath(Label("人定 亥\texttt{\bfseries TE}", font_size_in_pt, align=Align));
+path[]  GB = texpath(Label("夜半 子\texttt{\bfseries GB}", font_size_in_pt, align=Align));
+path[]  LR = texpath(Label("雞鳴 丑\texttt{\bfseries LR}", font_size_in_pt, align=Align));
+//path[]  LR = texpath(Label("雞鳴 丑\texttt{\bfseries\underline{LR}}", font_size_in_pt, align=Align));
 
 
 LU = shift(lu) * LU;
