@@ -796,9 +796,14 @@ Parmi tous les êtres de l'univers, il n'en est pas un seul qui n'ait besoin de 
 
 41
 
-Quand les lettrés supérieurs ont entendu parler du Tao, ils le pratiquent avec zèle.
-Quand les lettrés du second ordre ont entendu parler du Tao, tantôt ils le conservent, tantôt ils le perdent.
-Quand les lettrés inférieurs ont entendu parler du Tao, ils le tournent en dérision. S'ils ne le tournaient pas en dérision, il ne mériterait pas le nom de Tao.
+Quand les lettrés supérieurs ont entendu parler du Tao, 
+  ils le pratiquent avec zèle.
+Quand les lettrés du second ordre ont entendu parler du Tao, 
+  tantôt ils le conservent, tantôt ils le perdent.
+Quand les lettrés inférieurs ont entendu parler du Tao, 
+  ils le tournent en dérision. 
+S'ils ne le tournaient pas en dérision, 
+  il ne mériterait pas le nom de Tao.
 C'est pourquoi les Anciens disaient :
 Celui qui a l'intelligence du Tao paraît enveloppé de ténèbres.
 Celui qui est avancé dans le Tao ressemble à un homme arriéré.
@@ -808,9 +813,14 @@ L'homme d'une grande pureté est comme couvert d'opprobre.
 L'homme d'un mérite immense paraît frappé d'incapacité.
 L'homme d'une vertu solide semble dénué d'activité.
 L'homme simple est vrai semble vil et dégradé.
-C'est un grand carré dont on ne voit pas les angles ; un grand vase qui semble loin d'être achevé ; une grande voix dont le son est imperceptible ; une grand image dont on n'aperçoit point la forme§
+C'est un grand carré dont on ne voit pas les angles ; 
+  un grand vase qui semble loin d'être achevé ; 
+  une grande voix dont le son est imperceptible ; 
+  une grand image dont on n'aperçoit point la forme.
 Le Tao se cache et personne ne peut le nommer.
 Il sait prêter (secours aux êtres) et les conduire à la perfection.
+
+上士闻道，勤而行之；中士闻道，若存若亡；下士闻道，大笑之。不笑不足以为道。故建言有之：明道若昧，进道若退，夷道若纇。上德若谷；大白若辱；广德若不足；建德若偷；质真若渝。大方无隅；大器晚成；大音希声；大象无形；道隐无名。夫唯道，善贷且成。
 
 42
 
