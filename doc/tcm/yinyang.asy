@@ -723,3 +723,9 @@ circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315,
 //draw(unitcircle);
 //draw(W--E, grey+linewidth(0.2));
 //draw(N--S, grey+linewidth(0.2));
+
+
+/*
+ * 万物负阴而抱阳: 坐北朝南；背北朝南；面南背北；左青龙右白虎；左升右降
+ */
+currentpicture = rotate(180) * currentpicture;
