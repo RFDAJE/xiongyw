@@ -617,17 +617,13 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
 /*************************************************************************
  * draw stuff now 
  *************************************************************************/
-/*
- * draw the invisible line to extend the margin of the picture
- */
-draw(shift(-7,-7)*scale(7*2)*unitsquare, white);
 
 
 /*
  * 青赤黄白黑 背景
  */
 
-draw_color_background(2.0, 6.4);
+draw_color_background(2.0, 6.9);
 
 /*
  * 阴阳鱼和八卦
@@ -669,23 +665,39 @@ circular_annotate(4.3, 4.7, new string[]{"冬月", "臘月", "正月",  "二月"
 
 circular_annotate(4.7, 4.9, new string[]{"\texttt{12.23}", "\texttt{1.6}", "\texttt{1.21}", "\texttt{2.6}", "\texttt{2.21}", "\texttt{3.6}", "\texttt{3.21}", "\texttt{4.6}", "\texttt{4.21}", "\texttt{5.6}", "\texttt{5.21}", "\texttt{6.6}", "\texttt{6.21}", "\texttt{7.8}", "\texttt{7.23}", "\texttt{8.8}", "\texttt{8.23}", "\texttt{9.8}", "\texttt{9.23}", "\texttt{10.8}", "\texttt{10.23}", "\texttt{11.8}", "\texttt{11.23}", "\texttt{12.8}"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-circular_annotate(4.9, 5.4, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_delim=false);
+circular_annotate(4.9, 5.4, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_r2=true, draw_delim=false);
+
+
+// 六气
+circular_annotate(5.4, 5.9, new string[]{"太陽寒水", "厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金"},  bend_text=true, draw_r1=false);
+
+/*
+circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
+                   new string[]{"厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金", "太陽寒水"}, text_scale=0.3);
+*/
 
 
 /*
  * 四灵二十八宿
  */
-circular_annotate(5.4, 5.8, new string[]{"虛","女","牛","斗","箕","尾","心",
+
+circular_annotate(5.9, 6.3, new string[]{"虛","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","軫","翼","張",
                                          "星","柳","鬼","井","參","觜","畢",
                                          "昴","胃","婁","奎","壁","室","危"}, draw_r1=false);
 
-circular_annotate(5.8, 6.4, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
+circular_annotate(6.3, 6.9, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
 
-draw(scale(6.5)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
+/*
+ * 外圈
+ */
+draw(scale(7.0)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
-// 四方
-circular_annotate(6.6, 7.0, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+
+/*
+ * 四方
+ */
+circular_annotate(7.1, 7.5, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 
 
@@ -699,30 +711,11 @@ draw_4_delims(new real[]{2.0, 3.0,
               defaultpen + linewidth(line_width_in_bp * 4) + linecap(2) + white);
 */
 
-
-
-
-
-
-
-
-
-// 六气
 /*
-circular_annotate(4.7, 5.3, new string[]{"太陽寒水", "厥陰風木", "少陰君火", 
-                                         "少陽相火", "太陰濕土", "陽明燥金"}, text_scale=0.3);
+ * draw the invisible line to extend the margin of the picture
+ */
+draw(shift(-8,-8)*scale(8*2)*unitsquare, white);
 
-circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
-                   new string[]{"厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金", "太陽寒水"}, text_scale=0.3);
-*/
-
-
-//draw(unitsquare);
-//draw(scale(2)*unitcircle);
-
-//draw(unitcircle);
-//draw(W--E, grey+linewidth(0.2));
-//draw(N--S, grey+linewidth(0.2));
 
 
 /*
