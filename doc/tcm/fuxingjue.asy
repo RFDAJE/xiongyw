@@ -89,7 +89,19 @@ pair[] bound_box(path[] pp){
  * then we can map each point from the source into the destination, as each source point 
  * must be on a source line (the same apply for vertical lines in the source bb).
  *
- * So, bending a path is just "translating" the position of each node and its control points
+ * We can normalize the "source" path[] into an unit square, and the map the unit square
+ * into the anglar area which starts from east and grows CCW, as shown below:
+ *
+ *       x ^                             X ^
+ *         |                               |
+ *         |-------+(1,1)                  |    `
+ *         |///////|                       | o /  \
+ *         |///////|          ==>          |  \    \
+ *         |///////|                       |   \    \
+ *      ---+------------> y            ----+----\----+------> Y
+ *        o|                              O|       (1,1)
+ *
+ * Bending a path is just "translating" the position of each node and its control points
  * in the path, and using the translated coordinates to "clone" a new path (it seems there is
  * no way to change the coordinates of the points of a path by assigning operation).
  * 
@@ -134,6 +146,36 @@ path[] bend_path(path[] pp, // array of paths
 
         // then return in (x, y)
         return (radius * Cos(theta), radius * Sin(theta));
+    };
+
+    /*
+     * translate the normalized (x, y): 避免上宽下窄的情况
+     */
+    pair _trans2(pair, real, real, real) = new pair (pair xy, real r1, real r2, real angle_span) {
+
+        // 要避免上宽下窄，就是要让每条圆弧的长度都一样长。这里采用半径 (r1+r2)/2 所对应的圆弧（下称中间弧）的长度为统一的弧长。
+        // 先计算出点 xy 对应的半径 radius，目的点必然在以radius为半径的圆弧上。这里不用角度而用弧长来确定目的点：
+        // 先假设这个点落在中间弧上，并以中间弧的中点为原点，取顺时针为负，逆时针为正，算出这个点在中间弧上的弧长坐标；再把这个
+        // 弧长坐标移到目的弧上，而得到目的点。
+
+        // use the length of arc at the center as the "standard" arc length
+        path mid_arc = arc((0,0), (r1+r2)/2, 0, angle_span);
+        real arc_len = arclength(mid_arc);
+
+        // xy 点所对应的弧长坐标
+        real len = (0.5 - xy.x) * arc_len;
+
+        // xy 点所对应的弧的半径
+        real radius = r1 + (r2 - r1) * xy.y;
+        // 以 radius 为半径，以 angle_span/2 为起点，按顺时针和逆时针分别作弧
+        path arc_ccw = arc((0,0), radius, angle_span/2, angle_span, CCW);
+        path arc_cw =  arc((0,0), radius, angle_span/2, angle_span, CW);
+
+        if (len >= 0) {
+            return arcpoint(arc_ccw, len);
+        } else {
+            return arcpoint(arc_cw, -len);
+        }
     };
 
     /*
