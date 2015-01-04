@@ -140,11 +140,12 @@ fill(TE, pen_yang);
 fill(GB, pen_yang);
 
 // 3 yin & 3 yang
-pair shift1 = (-20, 0);
-pair shift2 = (20, 0);
-label("太陰", taiyin + shift1, pen_text);
-label("少陰", shaoyin + shift1, pen_text);
-label("厥陰", jueyin + shift1, pen_text);
-label("陽明", yangming + shift2, pen_text);
-label("太陽", taiyang + shift2, pen_text);
-label("少陽", shaoyang + shift2, pen_text);
+pair shift1 = (-25, 0);
+pair shift2 = (25, 0);
+label("太陰濕土", taiyin + shift1, pen_text);
+label("少陰君火", shaoyin + shift1, pen_text);
+label("厥陰風木", jueyin + shift1, pen_text);
+label("陽明燥金", yangming + shift2, pen_text);
+label("太陽寒水", taiyang + shift2, pen_text);
+label("少陽相火", shaoyang + shift2, pen_text);
+
