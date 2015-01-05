@@ -19,31 +19,8 @@ texpreamble("\xeCJKsetcharclass{\"2460}{\"27BF}{1}");
 
 
 import math;
-//import three;
-//import labelpath3;
-//import labelpath;
-import fontsize;
 
-/*
- * about sizes
- */
-real pt2cm = 1 / 72.27 * 2.54; // 1 pt = 1/72.27 inch; 
-real bp2cm = 1 / 72 * 2.54;    // 1 bp = 1/72 inch
-real cm2pt = 1 / pt2cm;
-real cm2bp = 1 / bp2cm;
-
-real unit_size_in_cm = 0.5;   // make yinyang circle size about 1x1cm
-real unit_size_in_pt = unit_size_in_cm * cm2pt;
-real line_width_in_cm = 0.01;
-real line_width_in_bp = line_width_in_cm * cm2bp;
-real font_size_in_cm = 0.4;
-real font_size_in_pt = font_size_in_cm * cm2pt; 
-real font_size_in_user = font_size_in_cm / unit_size_in_cm;
-
-unitsize(unit_size_in_pt);
-defaultpen(linewidth(line_width_in_bp));
-defaultpen(fontsize(font_size_in_pt));
-//defaultpen(basealign(0));
+size(10cm);
 
 pair O=0, S=(0,-1), N=(0,1), W=(-1,0), E=(1,0);
 int i;
@@ -347,10 +324,10 @@ void draw_color_background(picture pic=currentpicture, real r1, real r2) {
 /*
  * 劃一組草藥圓圈
  */
-picture draw_one_circle(real r1, real r2, // 內圓和外圓半徑
+picture draw_one_circle(picture pic, 
+                        real r1, real r2, // 內圓和外圓半徑
                         string[] herbs) { // 順序：北東南西中
-     picture pic;
-     unitsize(pic, unit_size_in_pt);
+
      pen mypen = defaultpen + linewidth(0.05) + linecap(0);
 
      // 背景
@@ -381,18 +358,27 @@ picture draw_one_circle(real r1, real r2, // 內圓和外圓半徑
  * draw stuff now 
  *************************************************************************/
 
+
+picture bg, tu, mu, huo, jin, shui;
+unitsize(currentpicture, 1cm);
+unitsize(bg, 1cm);
+unitsize(tu, 1cm);
+unitsize(mu, 1cm);
+unitsize(huo, 1cm);
+unitsize(jin, 1cm);
+unitsize(shui, 1cm);
+
 real big_r1 = 6;
 real big_r2 = 10;
 
-picture bg;
 //draw_color_background(bg, big_r1, big_r2);
 draw(bg, scale(big_r2)*unitcircle, defaultpen + linewidth(0.1));
 
-picture tu   = draw_one_circle(1.5, 3.0, new string[]{"茯苓","甘草","大棗","麥冬", "人參"});
-picture mu   = draw_one_circle(1.5, 3.0, new string[]{"附子","桂",  "椒", "細辛", "薑"});
-picture huo  = draw_one_circle(1.5, 3.0, new string[]{"硝石","大黃","旋覆花","厚樸", "澤瀉"});
-picture jin  = draw_one_circle(1.5, 3.0, new string[]{"薯蕷","枳實","豉","五味", "芍藥"});
-picture shui = draw_one_circle(1.5, 3.0, new string[]{"地黃","黃芩","黃連","竹葉", "朮"});
+draw_one_circle(tu, 1.5, 3.0, new string[]{"茯苓","甘草","大棗","麥冬","人參"});
+draw_one_circle(mu, 1.5, 3.0, new string[]{"附子","桂","椒","細辛","薑"});
+draw_one_circle(huo, 1.5, 3.0, new string[]{"硝石","大黃","旋覆花","厚樸","澤瀉"});
+draw_one_circle(jin, 1.5, 3.0, new string[]{"薯蕷","枳實","豉","五味","芍藥"});
+draw_one_circle(shui, 1.5, 3.0, new string[]{"地黃","黃芩","黃連","竹葉","朮"});
 
 
 add(rotate(180) * bg,   (0, 0));
@@ -401,7 +387,6 @@ add(shift(-big_r2, 0) * rotate(180) * mu,  (0, 0));
 add(shift(0, big_r2) * rotate(180) * huo,  (0, 0));
 add(shift(big_r2, 0) * rotate(180) * jin,  (0, 0));
 add(shift(0, -big_r2) * rotate(180) * shui,(0, 0));
-
 
 
 
