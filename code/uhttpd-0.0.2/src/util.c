@@ -184,6 +184,10 @@ int write_response_header(int sd, const char* location){
 	char buf[1024];
 	int  len;
 	len = snprintf(buf, 1023, "Accept-Ranges: bytes%s", CRLF);
+
+        // CORS: allow all: http://www.w3.org/TR/cors/
+        len += snprintf(buf + len, 1023 - len, "Access-Control-Allow-Origin: *%s", CRLF);
+
 	if (location) {
 		len += snprintf(buf + len, 1023 - len, "Location: %s%s", location, CRLF);
 	}
