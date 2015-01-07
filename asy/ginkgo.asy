@@ -1,3 +1,5 @@
+import "misc.asy" as misc;
+
 guide ginkgo = (29.90617634375916,398.7538656487486)..
 (73.76856831460593,415.70090493882043)..
 (104.67161720315706,426.66663624416105)..
@@ -52,6 +54,19 @@ guide ginkgo = (29.90617634375916,398.7538656487486)..
 (57.818607597934374,346.9158631144113)..
 (39.87490179167888,366.8535563968488)..
 (28.909303798967187,393.7694423281393)--cycle;
+
+/*
+ * make some margin at each side
+ * - center the path at origin (0,0)
+ * - draw the invisible bound box of the path
+ * - scale down the path and draw it
+ */
+pair[] bb = bound_box(ginkgo); 
+ginkgo = shift(-(bb[0].x+bb[1].x)/2,-(bb[0].y+bb[1].y)/2) * ginkgo; // center the path
+bb = bound_box(ginkgo); // new bb
+draw(bb[0]--bb[1], invisible);
+ginkgo = scale(0.95)*ginkgo;
+
 
 fill(ginkgo, cmyk(green));
 currentpicture = reflect((1,0), (0,0)) * currentpicture;
