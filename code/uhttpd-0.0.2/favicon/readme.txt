@@ -1,0 +1,3 @@
+- favicon: http://en.wikipedia.org/wiki/Favicon
+- use "gimp" to edit the .xcf file, and export to other formats (.ico, .png, .jpg, etc)
+- put a file named as "favicon.ico" under the root of the web server.
