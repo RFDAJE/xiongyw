@@ -339,3 +339,22 @@ void circular_annotate(picture pic,
     }
 }
 
+/*
+ * add x/y margins to a picture
+ */
+picture add_margin(picture pic=currentpicture,
+           real xmargin=0.05, // in percentage
+           real ymargin=xmargin,
+           pen dp=invisible) {
+
+    pair size = size(pic, user=true);
+    pair min = min(pic, user=true);
+    pair max = max(pic, user=true);
+
+    real delta_x = size.x * xmargin;
+    real delta_y = size.y * ymargin;
+
+    draw(pic, (min.x-delta_x, min.y-delta_y)--(max.x+delta_x, max.y+delta_y), dp);
+
+    return pic;
+}
