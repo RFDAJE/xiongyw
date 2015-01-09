@@ -1,6 +1,7 @@
 http://taoteking.free.fr/
 http://wengu.tartarie.com/wg/wengu.php?l=Daodejing&lang=fr
 http://www.quanxue.cn/CT_DaoJia/LaoZiIndex.html
+http://www.quanxue.cn/CT_NanHuaiJin/LaoZiIndex.html: 南怀瑾:老子他说
 
 Tao Te King: Livre de la voie et de la vertu
 
@@ -528,7 +529,7 @@ C'est pourquoi celui qui possède le Tao ne s'attache pas à cela.
 
 企者不立，跨者不行；自见者不明；自是者不彰；自伐者无功；自矜者不长。其在道也，曰余食赘形。物或恶之，故有道者不处。
 
-25
+25 有物混成
 
 Il est un être confus qui existait avant le ciel et la terre.
 Ô qu'il est calme ! Ô qu'il est immatériel !
@@ -545,39 +546,76 @@ C'est pourquoi le Tao est grand, le ciel est grand, la terre est grande, le roi 
 Dans le monde, il y a quatre grandes choses, et le roi en est une.
 L'homme imite la terre ; la terre imite le ciel, le ciel imite le Tao ; le Tao imite sa nature.
 
-26
+有物混成，先天地生。寂兮寥兮，独立而不改，周行而不殆，可以为天地母。吾不知其名，强字之曰：道，强为之名曰：大。大曰逝，逝曰远，远曰反。故道大，天大，地大，人亦大。域中有四大，而人居其一焉。人法地，地法天，天法道，道法自然。
 
-Le grave est la racine du léger ; le calme est le maître du mouvement.
-De là vient que le saint homme marche tout le jour (dans le Tao) et ne s'écarte point de la quiétude et de la gravité.
-Quoiqu'il possède des palais magnifiques, il reste calme et les fuit.
+26 重为轻根
+
+Le grave est la racine du léger; 
+  le calme est le maître du mouvement.
+De là vient que le saint homme marche tout le jour (dans le Tao)
+  et ne s'écarte point de la quiétude et de la gravité.
+Quoiqu'il possède des palais magnifiques, 
+  il reste calme et les fuit.
 Mais hélas ! les maîtres de dix mille chars se conduisent légèrement dans l'empire !
-Par une conduite légère, on perd ses ministres ; par l'emportement des passions, on perd son trône.
+Par une conduite légère, on perd ses ministres; 
+  par l'emportement des passions, on perd son trône.
 
-27
+重为轻根，静为躁君。是以君子终日行不离辎重，虽有荣观，燕处超然。奈何万乘之主，而以身轻天下？轻则失根，躁则失君。
 
-Celui qui sait marcher (dans le Tao) ne laisse pas de traces ; celui qui sait parler ne commet point de fautes ; celui qui sait compter ne se sert point d'instruments de calcul ; celui qui sait fermer (quelque chose) ne se sert point de verrou, et il est impossible de l'ouvrir ; celui qui sait lier (quelque chose) ne se sert point de cordes, et il est impossible de le délier.
-De là vient que le Saint excelle constamment à sauver les hommes ; c'est pourquoi il n'abandonne pas les hommes.
-Il excelle constamment à sauver les êtres ; c'est pourquoi il n'abandonne pas les êtres.
+27 善行无辙迹
+
+Celui qui sait marcher (dans le Tao) ne laisse pas de traces;
+  celui qui sait parler ne commet point de fautes;
+  celui qui sait compter ne se sert point d'instruments de calcul;
+  celui qui sait fermer (quelque chose) ne se sert point de verrou,
+  et il est impossible de l'ouvrir;
+  celui qui sait lier (quelque chose) ne se sert point de cordes,
+  et il est impossible de le délier.
+De là vient que le Saint excelle constamment à sauver les hommes;
+  c'est pourquoi il n'abandonne pas les hommes.
+Il excelle constamment à sauver les êtres;
+  c'est pourquoi il n'abandonne pas les êtres.
 Cela s'appelle être doublement éclairé.
 C'est pourquoi l'homme vertueux[14] est le maître de celui qui n'est pas vertueux.
-L'homme qui n'est pas vertueux est le secours15 de l'homme vertueux.
-Si l'un n'estime pas son maître, si l'autre n'affectionne pas celui qui est son secours, quand on leur accorderait une grande prudence, ils sont plongés dans l'aveuglement. Voilà ce qu'il y a de plus important et de plus subtil !
+L'homme qui n'est pas vertueux est le secours[15] de l'homme vertueux.
+Si l'un n'estime pas son maître, 
+  si l'autre n'affectionne pas celui qui est son secours, 
+  quand on leur accorderait une grande prudence, 
+  ils sont plongés dans l'aveuglement. 
+Voilà ce qu'il y a de plus important et de plus subtil !
 
 Notes du chapitre 27
 
 [14] L'homme vertueux ne l'est pas pour lui seul ; il est destiné à être le modèle des hommes. Si les hommes qui ne sont pas vertueux peuvent imiter sa conduite, alors ils peuvent corriger leurs mauvaises qualités et arriver à la vertu. C'est en cela que l'homme vertueux est le maître (le précepteur) de ceux qui ne sont pas vertueux.
 
-[15] Le mot tse a le sens de tsou, « aide, secours ». L'homme dénué de vertu n'est pas nécessairement condamné à persévérer jusqu'à la fin dans le mal. (Son amélioration) dépend uniquement d'une bonne éducation. Si l'homme vertueux peut l'accueillir avec bienveillance et l'instruire, alors chacun d'eux acquerra du mérite, et l'homme vertueux en retirera à son tour un avantage marqué. C'est ainsi que l'homme qui n'est pas vertueux devient le secours de l'homme vertueux.
-       
-28
+[15] Le mot tse (资) a le sens de tsou (助), « aide, secours ». L'homme dénué de vertu n'est pas nécessairement condamné à persévérer jusqu'à la fin dans le mal. (Son amélioration) dépend uniquement d'une bonne éducation. Si l'homme vertueux peut l'accueillir avec bienveillance et l'instruire, alors chacun d'eux acquerra du mérite, et l'homme vertueux en retirera à son tour un avantage marqué. C'est ainsi que l'homme qui n'est pas vertueux devient le secours de l'homme vertueux.
+ 
+善行，无辙迹；善言，无瑕谪；善数，不用筹策；善闭，无关楗而不可开；善结，无绳约而不可解。是以圣人常善救人，故无弃人；常善救物，故无弃物。是谓袭明。故善人者，不善人之师；不善人者，善人之资。不贵其师，不爱其资，虽智大迷，是谓要妙。
+      
+28 知其雄
 
-Celui qui connaît sa force et garde la faiblesse est la vallée de l'empire (c'est-à-dire le centre où accourt tout l'empire).
-S'il est la vallée de l'empire, la vertu constante ne l'abandonnera pas ; il reviendra à l'état d'enfant.
-Celui qui connaît ses lumières et garde les ténèbres, est le modèle de l'empire.
-S'il est le modèle de l'empire, la vertu constante ne faillira pas (en lui), et il reviendra au comble (de la pureté). Celui qui connaît sa gloire et garde l'ignominie est aussi la vallée de l'empire.
-S'il est la vallée de l'empire, sa vertu constante atteindra la perfection et il reviendra à la simplicité parfaite (au Tao).
-Quand la simplicité parfaite (le Tao) s'est répandue, elle a formé les êtres.
-Lorsque le saint homme est élevé aux emplois, il devient le chef des magistrats. Il gouverne grandement et ne blesse personne.
+Celui qui connaît sa force et garde la faiblesse est 
+  la vallée de l'empire (c'est-à-dire le centre où accourt tout l'empire).
+S'il est la vallée de l'empire, 
+  la vertu constante ne l'abandonnera pas ; 
+  il reviendra à l'état d'enfant.
+Celui qui connaît ses lumières et garde les ténèbres, 
+  est le modèle de l'empire.
+S'il est le modèle de l'empire, 
+  la vertu constante ne faillira pas (en lui), 
+  et il reviendra au comble (de la pureté). 
+Celui qui connaît sa gloire et garde l'ignominie est 
+  aussi la vallée de l'empire.
+S'il est la vallée de l'empire, 
+  sa vertu constante atteindra la perfection et 
+  il reviendra à la simplicité parfaite (au Tao).
+Quand la simplicité parfaite (le Tao) s'est répandue, 
+  elle a formé les êtres.
+Lorsque le saint homme est élevé aux emplois, 
+  il devient le chef des magistrats. 
+Il gouverne grandement et ne blesse personne.
+
+知其雄，守其雌，为天下溪；为天下溪，常德不离，复归于婴儿。知其白，守其黑，为天下式；为天下式，常德不忒，复归于无极。知其荣，守其辱，为天下谷。为天下谷，常德乃足，复归于朴。朴散则为器，圣人用之，则为官长，故大制不割。
 
 29
 
