@@ -13,6 +13,7 @@
 /* 
  * todos:
  * 
+ * + support cyclic guide
  * - output coordinates in normal y direction (up): canvas y is down, asy y is up;
  * - add button to load picture from file system or url
  * - add button/check_box to display/hide the picture, if loaded
@@ -30,16 +31,19 @@ var CANVAS_WIDTH = 1020;
 var CANVAS_HEIGHT = 1024;
 var GRID_SIZE = 8;
 
-var result = []; // an array of points array, representing the guides
-var guide = [];  // an array of points, representing the current guide
-var started = false;
-
-
-var lastPoint = []; // the last point in the current guide
+/*
+ * a point is represented by a number array, which has only two elements: [x, y];
+ * it can optionally contain a property "cyclic", if "cyclic" is "true", it means
+ * the path/guide this point belongs to is cyclic, thus its own x and y are ignored.
+ */
+var g_result = []; // an array of array of points, representing the guides
+var g_current_guide = [];  // an array of points, representing the current g_current_guide
+var g_last_point = []; // the last point in the current g_current_guide
+var g_current_guide_started = false;
 
 var img = new Image();
 var c, ctx; // canvas and its context
-var start, stop, undo; // buttons
+var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
 //img.src = "http://10.12.2.225:8080/test.png";
 img.src = "test.png";
@@ -59,13 +63,13 @@ function getCanvasPos(ctx, e) {
 // canvas hooks
 function onClick(e) {
     //console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
-    console.log(result);
-    if (started === true) {
-        //lastPoint = [e.clientX, e.clientY]; 
-        lastPoint = getCanvasPos(ctx, e);
-        guide.push(lastPoint);
+    console.log(g_result);
+    if (g_current_guide_started === true) {
+        //g_last_point = [e.clientX, e.clientY]; 
+        g_last_point = getCanvasPos(ctx, e);
+        g_current_guide.push(g_last_point);
     }
-    outputGuide();
+    displayCurrentGuide();
 
 }
 
@@ -81,9 +85,9 @@ function onMouseMove(e) {
     //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
     var cur = getCanvasPos(ctx, e); // current position
     drawResult();
-    if(lastPoint.length > 0) {
+    if(g_last_point.length > 0) {
             ctx.beginPath();
-            ctx.moveTo(lastPoint[0], lastPoint[1]);
+            ctx.moveTo(g_last_point[0], g_last_point[1]);
             ctx.lineTo(cur[0], cur[1]);
             ctx.stroke();
     }
@@ -96,60 +100,88 @@ function onMouseWheel(e) {
 // button hooks
 function startPath() {
     console.log("startPath: ");
-    if (guide.length > 0) {
-        result.push(guide);
+    if (g_current_guide.length > 0) {
+        g_result.push(g_current_guide);
     }
-    guide = [];
-    lastPoint = [];
-    outputGuide();
-    started = true;
+    g_current_guide = [];
+    g_last_point = [];
+    displayCurrentGuide();
+    g_current_guide_started = true;
 }
 
 function stopPath() {
-    if (guide.length > 0) {
-        result.push(guide);
+    if (g_current_guide.length > 0) {
+        g_result.push(g_current_guide);
     }
 
-    guide = [];
-    lastPoint = [];
-    started = false;
+    g_current_guide = [];
+    g_last_point = [];
+    g_current_guide_started = false;
 
     outputResult();
     drawResult();
 }
 
+function cyclePath() {
+    if (g_current_guide.length > 0) {
+        g_current_guide.push({"cycle":true});
+        g_result.push(g_current_guide);
+    }
+
+    g_current_guide = [];
+    g_last_point = [];
+    g_current_guide_started = false;
+
+    outputResult();
+    drawResult();
+}
+
+/*
+ * discard the last point of the current guide
+ */
 function undoPath() {
-    if (guide.length > 0) {
-        guide.pop();
+    if (g_current_guide.length > 0) {
+        g_current_guide.pop();
     }
-    if (guide.length > 0) {
-        lastPoint = guide[guide.length - 1];
+    if (g_current_guide.length > 0) {
+        g_last_point = g_current_guide[g_current_guide.length - 1];
     } else {
-        lastPoint = [];
+        g_last_point = [];
     }
-    outputGuide();
+    displayCurrentGuide();
 }
 
-function guide2text(g) {
-    return "" + g.map(function(x) { return "(" + x[0] + "," + x[1] + ")"; }).join("..");
+function pointArrayToAsyGuide(g) {
+    // note: change the y direction from canvas to normal: inverse the sign
+    return "" + g.map(function(x) { return x.cycle? "cycle" : "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")"; }).join("..");
 }
 
 
-function outputGuide() {
-    var ta =  document.getElementById("guide"); // textarea
-    ta.value = guide2text(guide);
+function displayCurrentGuide() {
+    var ta =  document.getElementById("g_current_guide"); // textarea
+    ta.value = pointArrayToAsyGuide(g_current_guide);
 }
 
 function outputResult() {
-    var ta =  document.getElementById("result"); // textarea
-    ta.value = result.map(function(x){return guide2text(x);}).join(",\r");
+    var ta =  document.getElementById("g_result"); // textarea
+    ta.value = g_result.map(function(x){return pointArrayToAsyGuide(x);}).join(",\r");
     console.log("guide[] gg = {" + ta.value + "}");
 }
 
 
 function drawImageAndGrid() {
-    // draw the image
-    ctx.drawImage(img, 0, 0, c.width, c.height);
+    /*
+     * draw the image, scale within the canvas size, as much as possible, but also keep the aspect ratio
+     */
+    var img_ar = img.width / img.height;  // image aspect ratio
+    var can_ar = CANVAS_WIDTH / CANVAS_HEIGHT; // canvas aspect ratio
+
+    if(can_ar >= img_ar) {
+        ctx.drawImage(img, 0, 0, c.height * img_ar, c.height);
+    } else {
+        ctx.drawImage(img, 0, 0, c.width, c.width / img_ar);
+    }
+    
 
     // draw the grid
     ctx.lineWidth = 0.2;
@@ -182,9 +214,9 @@ function drawResult(){
     ctx.lineWidth = 0.5;
     ctx.strokeStyle = "black";
 
-    // add the current guide into the result
-    var res_temp = JSON.parse(JSON.stringify(result)); // deep copy
-    res_temp.push(guide);  
+    // add the current g_current_guide into the g_result
+    var res_temp = JSON.parse(JSON.stringify(g_result)); // deep copy
+    res_temp.push(g_current_guide);  
 
     for(var i = 0; i < res_temp.length; i ++) {
         for(var j = 0; j < res_temp[i].length - 1; j ++) {
@@ -216,13 +248,15 @@ function onLoad() {
     drawImageAndGrid();
 
     // set button callbacks
-    start = document.getElementById("startPath");
-    stop = document.getElementById("stopPath");
-    undo = document.getElementById("undoPath");
+    start_btn = document.getElementById("startPath");
+    stop_btn = document.getElementById("stopPath");
+    undo_btn = document.getElementById("undoPath");
+    cycle_btn = document.getElementById("cyclePath");
 
-    start.onclick = startPath;
-    stop.onclick = stopPath;
-    undo.onclick = undoPath;
+    start_btn.onclick = startPath;
+    stop_btn.onclick = stopPath;
+    undo_btn.onclick = undoPath;
+    cycle_btn.onclick = cyclePath;
 
 }
 
@@ -236,14 +270,14 @@ window.onload = onLoad;
     </div>
     <div id="div2" style="float: left;">
     <form>
-    <input id="startPath" type="button" value="Start"/>
-    <input id="undoPath" type="button" value="Undo"/>
-    <input id="stopPath" type="button" value="Stop"/>
+    <input id="startPath" type="button" value="Start Path"/>
+    <input id="undoPath" type="button" value="Undo Path"/>
+    <input id="stopPath" type="button" value="Stop Path"/>
+    <input id="cyclePath" type="button" value="Stop Cyclic Path"/>
     </form>
     <br>
-    <textarea id="guide" rows="2" cols="50"></textarea>
-    <br>
-    <textarea id="result" rows="10" cols="50"></textarea>
+    <textarea id="g_current_guide" rows="50" cols="50"></textarea>
+    <textarea id="g_result" rows="50" cols="50"></textarea>
     </div>
     </body>
     </html>

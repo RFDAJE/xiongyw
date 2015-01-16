@@ -13,6 +13,9 @@ texpreamble("\setCJKmainfont{arialuni.ttf}");
 import math;
 import fontsize;
 
+import "../../asy/misc.asy" as misc;
+import "../../asy/symbols.asy" as symbols;
+
 /*
  * about sizes
  */
@@ -79,7 +82,6 @@ pair lr = zuyin + jueyin;
 /* 
  * text outline: http://tex.stackexchange.com/questions/21548/outlining-filling-glyph-outline-with-text-in-tikz
  */
-
 path[]  LU = texpath(Label("\texttt{\bfseries LU}", font_size_in_pt, align=Align));
 path[]  LI = texpath(Label("\texttt{\bfseries LI}", font_size_in_pt, align=Align));
 path[]  ST = texpath(Label("\texttt{\bfseries ST}", font_size_in_pt, align=Align));
@@ -109,10 +111,7 @@ GB = shift(gb) * GB;
 LR = shift(lr) * LR;
 
 
-/*
- * draw now...
- */
-
+// draw now...
 draw(BIG_E, pen_e);
 
 // left side
@@ -124,14 +123,6 @@ fill(PC, pen_yin);
 fill(LR, pen_yin);
 
 // right side
-/*
-draw(LI, pen_yang);
-draw(ST, pen_yang);
-draw(SI, pen_yang);
-draw(BL, pen_yang);
-draw(TE, pen_yang);
-draw(GB, pen_yang);
-*/
 fill(LI, pen_yang);
 fill(ST, pen_yang);
 fill(SI, pen_yang);
@@ -149,3 +140,39 @@ label("陽明燥金", yangming + shift2, pen_text);
 label("太陽寒水", taiyang + shift2, pen_text);
 label("少陽相火", shaoyang + shift2, pen_text);
 
+// hand and foot symbols
+
+add(get_symbol_hand().fit(250,250), (70, -4));
+add(get_symbol_hand().fit(250,250), (70, -4+100));
+add(get_symbol_hand().fit(250,250), (70, -4+200));
+
+add(get_symbol_foot().fit(250,250), (70, -27));
+add(get_symbol_foot().fit(250,250), (70, -27+100));
+add(get_symbol_foot().fit(250,250), (70, -27+200));
+
+
+// meridain directions
+guide left_curve = (10, 7)..(75/2, -5)..(65,-10);
+guide right_curve = (75+10, -10)..(75+75/2, -5)..(140, 7);
+
+draw(left_curve, EndArrow(50));
+draw(shift(0, 100)*left_curve, EndArrow(50));
+draw(shift(0, 200)*left_curve, EndArrow(50));
+
+draw(shift(0, -22)*left_curve, BeginArrow(50));
+draw(shift(0, -22+100)*left_curve, BeginArrow(50));
+draw(shift(0, -22+200)*left_curve, BeginArrow(50));
+
+draw(right_curve, EndArrow(50));
+draw(shift(0, 100)*right_curve, EndArrow(50));
+draw(shift(0, 200)*right_curve, EndArrow(50));
+
+draw(shift(0, -22)*right_curve, BeginArrow(50));
+draw(shift(0, -22+100)*right_curve, BeginArrow(50));
+draw(shift(0, -22+200)*right_curve, BeginArrow(50));
+
+// body & head
+add(get_symbol_body().fit(250,250), (10, 230));
+add(get_symbol_head().fit(250,250), (140, 230));
+
+misc.add_margin();
