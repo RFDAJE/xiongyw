@@ -16,6 +16,8 @@ import fontsize;
 import "../../asy/misc.asy" as misc;
 import "../../asy/symbols.asy" as symbols;
 
+bool draw_text = true;  // it's time consuming; set to 0 for testing other parts
+
 /*
  * about sizes
  */
@@ -31,7 +33,7 @@ real font_size_in_pt = font_size_in_cm * cm2pt;
 
 unitsize(unit_size_in_pt);
 
-pen pen_e = linewidth(300) + black + linecap(1); // 0: square cap, 1: roundcap, 2: extendcap
+pen pen_e = linewidth(320) + black + linecap(1); // 0: square cap, 1: roundcap, 2: extendcap
 pen pen_yin = linewidth(1) + black;
 pen pen_yang = linewidth(1) + red;
 pen pen_text = fontsize(240) + black;
@@ -78,67 +80,72 @@ pair te = shouyang + shaoyang;
 pair gb = zuyang + shaoyang;
 pair lr = zuyin + jueyin;
 
-
+path[] LU, LI, ST, SP, HT, SI, BL, KI, PC, TE, GB, LR;
 /* 
  * text outline: http://tex.stackexchange.com/questions/21548/outlining-filling-glyph-outline-with-text-in-tikz
  */
-path[]  LU = texpath(Label("\texttt{\bfseries LU}", font_size_in_pt, align=Align));
-path[]  LI = texpath(Label("\texttt{\bfseries LI}", font_size_in_pt, align=Align));
-path[]  ST = texpath(Label("\texttt{\bfseries ST}", font_size_in_pt, align=Align));
-path[]  SP = texpath(Label("\texttt{\bfseries SP}", font_size_in_pt, align=Align));
-path[]  HT = texpath(Label("\texttt{\bfseries HT}", font_size_in_pt, align=Align));
-path[]  SI = texpath(Label("\texttt{\bfseries SI}", font_size_in_pt, align=Align));
-path[]  BL = texpath(Label("\texttt{\bfseries BL}", font_size_in_pt, align=Align));
-path[]  KI = texpath(Label("\texttt{\bfseries KI}", font_size_in_pt, align=Align));
-path[]  PC = texpath(Label("\texttt{\bfseries PC}", font_size_in_pt, align=Align));
-path[]  TE = texpath(Label("\texttt{\bfseries TE}", font_size_in_pt, align=Align));
-path[]  GB = texpath(Label("\texttt{\bfseries GB}", font_size_in_pt, align=Align));
-path[]  LR = texpath(Label("\texttt{\bfseries LR}", font_size_in_pt, align=Align));
-//path[]  LR = texpath(Label("\texttt{\bfseries\underline{LR}}", font_size_in_pt, align=Align));
+if (draw_text) {
+    LU = texpath(Label("\texttt{\bfseries LU}", font_size_in_pt, align=Align));
+    LI = texpath(Label("\texttt{\bfseries LI}", font_size_in_pt, align=Align));
+    ST = texpath(Label("\texttt{\bfseries ST}", font_size_in_pt, align=Align));
+    SP = texpath(Label("\texttt{\bfseries SP}", font_size_in_pt, align=Align));
+    HT = texpath(Label("\texttt{\bfseries HT}", font_size_in_pt, align=Align));
+    SI = texpath(Label("\texttt{\bfseries SI}", font_size_in_pt, align=Align));
+    BL = texpath(Label("\texttt{\bfseries BL}", font_size_in_pt, align=Align));
+    KI = texpath(Label("\texttt{\bfseries KI}", font_size_in_pt, align=Align));
+    PC = texpath(Label("\texttt{\bfseries PC}", font_size_in_pt, align=Align));
+    TE = texpath(Label("\texttt{\bfseries TE}", font_size_in_pt, align=Align));
+    GB = texpath(Label("\texttt{\bfseries GB}", font_size_in_pt, align=Align));
+    LR = texpath(Label("\texttt{\bfseries LR}", font_size_in_pt, align=Align));
+    //path[]  LR = texpath(Label("\texttt{\bfseries\underline{LR}}", font_size_in_pt, align=Align));
 
 
-LU = shift(lu) * LU;
-LI = shift(li) * LI;
-ST = shift(st) * ST;
-SP = shift(sp) * SP;
-HT = shift(ht) * HT;
-SI = shift(si) * SI;
-BL = shift(bl) * BL;
-KI = shift(ki) * KI;
-PC = shift(pc) * PC;
-TE = shift(te) * TE;
-GB = shift(gb) * GB;
-LR = shift(lr) * LR;
+    LU = shift(lu) * LU;
+    LI = shift(li) * LI;
+    ST = shift(st) * ST;
+    SP = shift(sp) * SP;
+    HT = shift(ht) * HT;
+    SI = shift(si) * SI;
+    BL = shift(bl) * BL;
+    KI = shift(ki) * KI;
+    PC = shift(pc) * PC;
+    TE = shift(te) * TE;
+    GB = shift(gb) * GB;
+    LR = shift(lr) * LR;
+}
 
-
-// draw now...
+/*
+ * draw stuff now...
+ */
 draw(BIG_E, pen_e);
 
-// left side
-fill(LU, pen_yin);
-fill(SP, pen_yin);
-fill(HT, pen_yin);
-fill(KI, pen_yin);
-fill(PC, pen_yin);
-fill(LR, pen_yin);
+if (draw_text) {
+    // left side
+    fill(LU, pen_yin);
+    fill(SP, pen_yin);
+    fill(HT, pen_yin);
+    fill(KI, pen_yin);
+    fill(PC, pen_yin);
+    fill(LR, pen_yin);
 
-// right side
-fill(LI, pen_yang);
-fill(ST, pen_yang);
-fill(SI, pen_yang);
-fill(BL, pen_yang);
-fill(TE, pen_yang);
-fill(GB, pen_yang);
+    // right side
+    fill(LI, pen_yang);
+    fill(ST, pen_yang);
+    fill(SI, pen_yang);
+    fill(BL, pen_yang);
+    fill(TE, pen_yang);
+    fill(GB, pen_yang);
 
-// 3 yin & 3 yang
-pair shift1 = (-25, 0);
-pair shift2 = (25, 0);
-label("太陰濕土", taiyin + shift1, pen_text);
-label("少陰君火", shaoyin + shift1, pen_text);
-label("厥陰風木", jueyin + shift1, pen_text);
-label("陽明燥金", yangming + shift2, pen_text);
-label("太陽寒水", taiyang + shift2, pen_text);
-label("少陽相火", shaoyang + shift2, pen_text);
+    // 3 yin & 3 yang
+    pair shift1 = (-25, 0);
+    pair shift2 = (25, 0);
+    label("太陰濕土", taiyin + shift1, pen_text);
+    label("少陰君火", shaoyin + shift1, pen_text);
+    label("厥陰風木", jueyin + shift1, pen_text);
+    label("陽明燥金", yangming + shift2, pen_text);
+    label("太陽寒水", taiyang + shift2, pen_text);
+    label("少陽相火", shaoyang + shift2, pen_text);
+}
 
 // hand and foot symbols
 
@@ -171,8 +178,14 @@ draw(shift(0, -22)*right_curve, BeginArrow(50));
 draw(shift(0, -22+100)*right_curve, BeginArrow(50));
 draw(shift(0, -22+200)*right_curve, BeginArrow(50));
 
-// body & head
-add(get_symbol_body().fit(250,250), (10, 230));
-add(get_symbol_head().fit(250,250), (140, 230));
+// head
+add(get_symbol_head().fit(250,250), (145, 204));
+add(get_symbol_head().fit(250,250), (145, 204-100));
+add(get_symbol_head().fit(250,250), (145, 204-200));
+
+//body
+add(get_symbol_body().fit(250,250), (0, 201));
+add(get_symbol_body().fit(250,250), (0, 201-100));
+add(get_symbol_body().fit(250,250), (0, 201-200));
 
 misc.add_margin();
