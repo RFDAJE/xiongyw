@@ -94,6 +94,94 @@ function mp_uv(z0, z1, theta, phi, alpha, beta) {
     return [u,v];
 }
 
+/*
+ * http://en.wikipedia.org/wiki/Gaussian_elimination
+ *
+ * A: matrix (an array of array, mxn, i.e. m rows and n columns)
+ * b: vector (mx1)
+ * m,n: size of the matrix
+ * return: x, a vector (array of m elements)
+ *
+ * sample usage:
+ *
+ * var A=[[2,1,-1],[-3,-1,2],[-2,1,2]];
+ * var b=[8,-11,-3];
+ * var x=mp_solve_matrix(A,b,3,3);
+ *
+ * then: x=[2, 3, -0.9999999999999999];
+ */
+function mp_solve_matrix(A, b, m, n) {
+    var i, j, k, u, maxi, tmp, pivot, sum;
+    var M = [], x = [];
+
+    // deep copy A and b into M as combined
+    for (i = 0; i < m; i ++) {
+        var row = [];
+        for (j = 0; j < n; j ++) {
+            row.push(A[i][j]);
+        }
+        row.push(b[i]);
+        M.push(row);
+    }
+
+    /*
+     * elimination 
+     */
+    i = 0;  // row 
+    j = 0;  // col
+    while (i < m && j < n) {
+        // find pivot (i.e. its row index) in col j, starting from row i
+        maxi = i;  // idx of the row whose column j is the max
+        for (k = i+1; k < m; k ++) {
+            if (Math.abs(M[k][j]) > Math.abs(M[maxi][j])) {
+                maxi = k;
+            }
+        }
+
+        if (M[maxi][j] != 0) {
+            // swap row maxi and i
+            if (maxi != i) { 
+                tmp = M[maxi];
+                M[maxi] = M[i];
+                M[i] = tmp;
+            }
+            pivot = M[i][j];
+
+            // divide i row by the pivot
+            for (k = 0; k < n + 1; k ++) {
+                M[i][k] = M[i][k] / pivot;
+            }
+            // now the pivot M[i][j] = 1
+
+            // substract M[u][j] * row i from row u 
+            for (u = i+1; u < m; u ++) {
+                pivot = M[u][j];
+                for (k = 0; k < n + 1; k ++) {
+                    M[u][k] = M[u][k] - M[i][k] * pivot;
+                }
+            }
+            i = i + 1;
+        }
+        j = j +1;
+    }
+
+    /* 
+     * get the results
+     */
+    if (m == n) {
+        x[m-1] = M[m-1][m];
+        for (i = m-2; i >=0; i --) {
+            sum = 0;
+            for (j = i+1; j < m; j ++) {
+                sum = sum + M[i][j] * x[j];
+            }
+            x[i] = M[i][m] - sum;
+        }
+    }
+
+    return x;
+}
+
 function getCanvasPos(ctx, e) {
     var c = ctx.canvas; 
 
