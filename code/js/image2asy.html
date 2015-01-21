@@ -48,6 +48,52 @@ var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 //img.src = "http://10.12.2.225:8080/test.png";
 img.src = "test.png";
 
+
+/*
+ * velocity function f(theta, phi) from "John Hobby 1986", for metafont/metapost
+ *
+ * theta: departure angle (in rad) at the first point z0, relative to z1-z0
+ * phi: arrival angle (in rad) at the second point z1, relative to z1-z0
+ */
+function mp_f(theta, phi) {
+    var n = 2+Math.sqrt(2)*(Math.sin(theta)-Math.sin(phi)/16)*(Math.sin(phi)-Math.sin(theta)/16)*(Math.cos(theta)-Math.cos(phi));
+    var m = 3*(1 + 0.5*(Math.sqrt(5)-1)*Math.cos(theta) + 0.5*(3-Math.sqrt(5))*Math.cos(phi));
+    return n/m;
+}
+
+/*
+ * return u and v in an array: [[ux,uy], [vx,vy]]
+ */
+function mp_uv(z0, z1, theta, phi, alpha, beta) {
+    // the formula using complex numbers:
+    // u = z0+exp(i*theta)*(z1-z0)*f(theta,-phi)/alpha
+    // v = z1-exp(i*phi)*(z1-z0)*f(-phi,theta)/beta
+
+    // return the complex sum
+    function _sum(z0, z1) {
+        return [z0[0]+z1[0], z0[1]+z1[1]];
+    }
+
+    // return the complex sub
+    function _sub(z0, z1) {
+        return [z0[0]-z1[0], z0[1]-z1[1]];
+    }
+
+    // return the complex production
+    function _prod(z0, z1) {
+        return [z0[0]*z1[0]-z0[1]*z1[1], z0[0]*z1[1]+z0[1]*z1[0]];
+    }
+
+    var l = [z1[0]-z0[0], z1[1]-z0[1]];  // l = z1-z0
+    var t = [Math.cos(theta), Math.sin(theta)];  // exp(i*theta)
+    var p = [Math.cos(phi), Math.sin(phi)];    // exp(i*phi)
+
+    var u = _sum(z0, _prod(t,_prod(l,[mp_f(theta,-phi)/alpha,0])));
+    var v = _sub(z1, _prod(p,_prod(l,[mp_f(-phi,theta)/beta,0])));
+
+    return [u,v];
+}
+
 function getCanvasPos(ctx, e) {
     var c = ctx.canvas; 
 
