@@ -205,7 +205,7 @@ function mp_solve_matrix(A, b, m, n) {
 }
 
 /*
- * the following routines are "cloned" from its python version:
+ * the following routines are "cloned" from the original python code:
  * http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
  */
 
@@ -273,6 +273,109 @@ function mp_compute_distances_and_angles(g) {
         g[n-1].xi = 0;
     }
 }
+
+/*
+ * This function creates five vectors which are coefficients of a
+ * linear system which allows finding the right values of "theta" at
+ * each point of the path (being "theta" the angle of departure of the
+ * path at each point). The theory is from METAFONT book."""
+ */
+/*
+function build_coefficients(g) {
+    A=[];  B=[];  C=[];  D=[];   R=[]
+    pre_compute_distances_and_angles(path)
+    if not path.cyclic:
+        # In this case, first equation doesnt follow the general rule
+        A.append(0)
+        B.append(0)
+        curl = path.curl_begin
+        alpha_0 = path[0].alpha
+        beta_1 = path[1].beta
+        xi_0 = (alpha_0**2) * curl / (beta_1**2)
+        xi_1 = path[1].xi
+        C.append(xi_0*alpha_0 + 3 - beta_1)
+        D.append((3 - alpha_0)*xi_0 + beta_1)
+        R.append(-D[0]*xi_1)
+
+    # Equations 1 to n-1 (or 0 to n for cyclic paths)
+    for k in path.range():
+        A.append(   path[k-1].alpha  / ((path[k].beta**2)  * path[k].d_ant))
+        B.append((3-path[k-1].alpha) / ((path[k].beta**2)  * path[k].d_ant))
+        C.append((3-path[k+1].beta)  / ((path[k].alpha**2) * path[k].d_post))
+        D.append(   path[k+1].beta   / ((path[k].alpha**2) * path[k].d_post))
+        R.append(-B[k] * path[k].xi  - D[k] * path[k+1].xi)
+
+    if not path.cyclic:
+        # The last equation doesnt follow the general form
+        n = len(R)     # index to generate
+        C.append(0)
+        D.append(0)
+        curl = path.curl_end
+        beta_n = path[n].beta
+        alpha_n_1 = path[n-1].alpha
+        xi_n = (beta_n**2) * curl / (alpha_n_1**2)
+        A.append((3-beta_n)*xi_n + alpha_n_1)
+        B.append(beta_n*xi_n + 3 - alpha_n_1)
+        R.append(0)
+    return (A, B, C, D, R)
+}
+
+function mp_solve_for_thetas(A, B, C, D, R) {
+    """This function receives the five vectors created by
+    build_coefficients() and uses them to build a linear system with N
+    unknonws (being N the number of points in the path). Solving the system
+    finds the value for theta (departure angle) at each point"""
+    L=len(R)
+    a = np.zeros((L, L))
+    for k in range(L):
+       prev = (k-1)%L
+       post = (k+1)%L
+       a[k][prev] = A[k]
+       a[k][k]    = B[k]+C[k]
+       a[k][post] = D[k]
+    b = np.array(R)
+    return np.linalg.solve(a,b)
+}
+
+function mp_solve_angles(g) {
+    """This function receives a path in which each point is "open", i.e. it
+    does not specify any direction of departure or arrival at each node,
+    and finds these directions in such a way which minimizes "mock
+    curvature". The theory is from METAFONT book."""
+
+    # Basically it solves
+    # a linear system which finds all departure angles (theta), and from
+    # these and the turning angles at each point, the arrival angles (phi)
+    # can be obtained, since theta + phi + xi = 0  at each knot"""
+    x = solve_for_thetas(*build_coefficients(path))
+    L = len(path)
+    for k in range(L):
+        path[k].theta = x[k]
+    for k in range(L):
+        path[k].phi = - path[k].theta - path[k].xi
+}
+
+function mp_find_controls(g) {
+    """This function receives a path in which, for each point, the values
+    of theta and phi (leave and enter directions) are known, either because
+    they were previously stored in the structure, or because it was
+    computed by function solve_angles(). From this path description
+    this function computes the control points for each knot and stores
+    it in the path. After this, it is possible to print path to get
+    a string suitable to be feed to tikz."""
+    r = []
+    for k in range(len(path)):
+        z0 = path[k].z
+        z1 = path[k+1].z
+        theta = path[k].theta
+        phi = path[k+1].phi
+        alpha = path[k].alpha
+        beta = path[k+1].beta
+        u,v=control_points(z0, z1, theta, phi, alpha, beta)
+        path[k].u_right = u
+        path[k+1].v_left = v
+}
+*/
 
 function getCanvasPos(ctx, e) {
     var c = ctx.canvas; 
