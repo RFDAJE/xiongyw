@@ -32,9 +32,11 @@ var CANVAS_HEIGHT = 1024;
 var GRID_SIZE = 8;
 
 /*
- * a point is represented by a number array, which has only two elements: [x, y];
- * it can optionally contain a property "cyclic", if "cyclic" is "true", it means
- * the path/guide this point belongs to is cyclic, thus its own x and y are ignored.
+ * a point is represented by a number array, which has only two elements: [x,y];
+ * it can optionally contain a property "cycle", if "cycle" is "true", it means:
+ * - the guide this point belongs to is cyclic;
+ * - its own x and y are ignored;
+ * - it's the last element in the array
  */
 var g_result = []; // an array of array of points, representing the guides
 var g_current_guide = [];  // an array of points, representing the current g_current_guide
@@ -46,8 +48,43 @@ var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
 //img.src = "http://10.12.2.225:8080/test.png";
-img.src = "test.png";
+//img.src = "test.png";
 
+
+// return the complex sum
+function c_sum(z0, z1) {
+    return [z0[0]+z1[0], z0[1]+z1[1]];
+}
+
+// return the complex sub
+function c_sub(z0, z1) {
+    return [z0[0]-z1[0], z0[1]-z1[1]];
+}
+
+// return the complex production
+function c_prod(z0, z1) {
+    return [z0[0]*z1[0]-z0[1]*z1[1], z0[0]*z1[1]+z0[1]*z1[0]];
+}
+
+// return the length of the vector
+function c_mod(z) {
+    return Math.sqrt(z[0]*z[0] + z[1]*z[1]);
+}
+
+// return the angle (in rad) of a vector
+function c_arg(z) {
+    if (z[0] == 0) {
+        if (z[1] > 0) {
+            return Math.PI/2;
+        } else if (z[1] < 0) {
+            return -Math.PI/2;
+        } else {
+            return 0; // ?
+        }
+    } else {
+        return Math.atan(z[1]/z[0]);
+    }
+}
 
 /*
  * velocity function f(theta, phi) from "John Hobby 1986", for metafont/metapost
@@ -69,27 +106,12 @@ function mp_uv(z0, z1, theta, phi, alpha, beta) {
     // u = z0+exp(i*theta)*(z1-z0)*f(theta,-phi)/alpha
     // v = z1-exp(i*phi)*(z1-z0)*f(-phi,theta)/beta
 
-    // return the complex sum
-    function _sum(z0, z1) {
-        return [z0[0]+z1[0], z0[1]+z1[1]];
-    }
-
-    // return the complex sub
-    function _sub(z0, z1) {
-        return [z0[0]-z1[0], z0[1]-z1[1]];
-    }
-
-    // return the complex production
-    function _prod(z0, z1) {
-        return [z0[0]*z1[0]-z0[1]*z1[1], z0[0]*z1[1]+z0[1]*z1[0]];
-    }
-
     var l = [z1[0]-z0[0], z1[1]-z0[1]];  // l = z1-z0
     var t = [Math.cos(theta), Math.sin(theta)];  // exp(i*theta)
     var p = [Math.cos(phi), Math.sin(phi)];    // exp(i*phi)
 
-    var u = _sum(z0, _prod(t,_prod(l,[mp_f(theta,-phi)/alpha,0])));
-    var v = _sub(z1, _prod(p,_prod(l,[mp_f(-phi,theta)/beta,0])));
+    var u = c_sum(z0, c_prod(t,c_prod(l,[mp_f(theta,-phi)/alpha,0])));
+    var v = c_sub(z1, c_prod(p,c_prod(l,[mp_f(-phi,theta)/beta,0])));
 
     return [u,v];
 }
@@ -180,6 +202,76 @@ function mp_solve_matrix(A, b, m, n) {
     }
 
     return x;
+}
+
+/*
+ * the following routines are "cloned" from its python version:
+ * http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
+ */
+
+/* 
+ * traverses the guide and computes the distance between adjacent points, and the 
+ * turning angles of the polyline which joins them
+ *
+ * g: an array of points (which forms an asymptote guide)
+ * output: none. but following properties of each point g[k] (treated as a complex number here) is added or updated:
+ *  "d_ant": |g[k]-g[k-1]|
+ *  "d_post": |g[k+1]-g[k]|
+ *  "xi": turning angle at g[k], in rad: arg((g[k+1]-g[k])/(g[k]-g[k-1]))
+ */
+function mp_compute_distances_and_angles(g) {
+
+    var i = 0, l_post, l_ant, arg_post, arg_ant; 
+    var cyclic = g[g.length-1].cycle? true: false;
+    var n = g.length - (cyclic? 1: 0); // number of nodes
+    
+    if (n < 2) {
+        return;
+    }
+    
+    // middle nodes
+    for (i = 1; i < n-1; i ++) {
+        l_post = c_sub(g[i+1], g[i]);
+        l_ant = c_sub(g[i], g[i-1]);
+        arg_post = c_arg(l_post);
+        arg_ant = c_arg(l_ant);
+
+        g[i].d_post = c_mod(l_post);
+        g[i].d_ant = c_mod(l_ant);
+        g[i].xi = arg_post - arg_ant;
+    }
+
+    // first/last node: what if Javascript supports cyclic array!!!
+    if (cyclic) {
+        // first node
+        l_post = c_sub(g[1], g[0])
+        l_ant = c_sub(g[0], g[n-1]);
+        arg_post = c_arg(l_post);
+        arg_ant = c_arg(l_ant);
+
+        g[0].d_ant = c_mod(l_ant);
+        g[0].d_post = c_mod(l_post);
+        g[0].xi = arg_post - arg_ant;
+
+        // last node
+        l_post = c_sub(g[0], g[n-1])
+        l_ant = c_sub(g[n-1], g[n-2]);
+        arg_post = c_arg(l_post);
+        arg_ant = c_arg(l_ant);
+
+        g[n-1].d_ant = c_mod(l_ant);
+        g[n-1].d_post = c_mod(l_post);
+        g[n-1].xi = arg_post - arg_ant;
+    } else {
+        // first node
+        g[0].d_ant = 0;
+        g[0].d_post = c_mod(c_sub(g[1], g[0]));
+        g[0].xi = 0;
+        // last node
+        g[n-1].d_ant = c_mod(c_sub(g[n-1], g[n-2]));
+        g[n-1].d_post = 0;
+        g[n-1].xi = 0;
+    }
 }
 
 function getCanvasPos(ctx, e) {
