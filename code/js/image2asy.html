@@ -31,13 +31,26 @@ var CANVAS_WIDTH = 1020;
 var CANVAS_HEIGHT = 1024;
 var GRID_SIZE = 8;
 
-/*
- * a point is represented by a number array, which has only two elements: [x,y];
- * it can optionally contain a property "cycle", if "cycle" is "true", it means:
- * - the guide this point belongs to is cyclic;
- * - its own x and y are ignored;
- * - it's the last element in the array
+/* note: 
+ *  A node/knot of a guide/path is represented by a point on the plane (z), which is 
+ *  represented here by an array of two numbers: [x,y]; 
+ *  A node, i.e., this array (also an object), can also contain "metapost properties":
+ *   - d_post: |z[k+1]-z[k]|
+ *   - d_ant: |z[k]-z[k-1]|
+ *   - xi: turning angle (at the node on the polygon of the guide)
+ *   - alpha: 
+ *   - beta:
+ *   - theta: departure angle
+ *   - phi: arraival angle
+ *   - ...
+ *
+ * A path/guide is represented by an array of points. The path/guide can contain 
+ * the following "metapost" properties:
+ *   - cyclic: 
+ *   - curl_begin:
+ *   - curl_end:
  */
+
 var g_result = []; // an array of array of points, representing the guides
 var g_current_guide = [];  // an array of points, representing the current g_current_guide
 var g_last_point = []; // the last point in the current g_current_guide
@@ -208,7 +221,10 @@ function mp_solve_matrix(A, b, m, n) {
  * the following routines are "cloned" from the original python code:
  * http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
  */
-
+var MP_DEFAULT_ALPHA = 1;
+var MP_DEFAULT_BETA = 1;
+var MP_DEFAULT_CURL_BEGIN = 1;
+var MP_DEFAULT_CURL_END = 1;
 /* 
  * traverses the guide and computes the distance between adjacent points, and the 
  * turning angles of the polyline which joins them
@@ -218,59 +234,70 @@ function mp_solve_matrix(A, b, m, n) {
  *  "d_ant": |g[k]-g[k-1]|
  *  "d_post": |g[k+1]-g[k]|
  *  "xi": turning angle at g[k], in rad: arg((g[k+1]-g[k])/(g[k]-g[k-1]))
+ *
+ * sample test cases:
+ * 1. non-cyclic:
+ *   var g=[[0,0],[100,0],[100,100]];
+ *   mp_compute_distances_and_angles(g);
+ * then:
+ *   g[0]: [0, 0, d_ant: 0, d_post: 100, xi: 0]
+ *   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
+ *   g[2]: [100, 100, d_ant: 100, d_post: 0, xi: 0]
+ *
+ * 2. cyclic:
+ *   var g=[[0,0],[100,0],[100,100]];
+ *   g.cyclic = true;
+ *   mp_compute_distances_and_angles(g);
+ * then:
+ *   g[0]: [0, 0, d_post: 100, d_ant: 141.4213562373095, xi: -0.7853981633974483]
+ *   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
+ *   g[2]: [100, 100, d_post: 141.4213562373095, d_ant: 100, xi: -0.7853981633974483]
  */
 function mp_compute_distances_and_angles(g) {
 
-    var i = 0, l_post, l_ant, arg_post, arg_ant; 
-    var cyclic = g[g.length-1].cycle? true: false;
-    var n = g.length - (cyclic? 1: 0); // number of nodes
+    var i; 
     
-    if (n < 2) {
+    if (g.length < 2) {
         return;
     }
-    
-    // middle nodes
-    for (i = 1; i < n-1; i ++) {
-        l_post = c_sub(g[i+1], g[i]);
-        l_ant = c_sub(g[i], g[i-1]);
-        arg_post = c_arg(l_post);
-        arg_ant = c_arg(l_ant);
 
-        g[i].d_post = c_mod(l_post);
-        g[i].d_ant = c_mod(l_ant);
-        g[i].xi = arg_post - arg_ant;
+    /*
+     * input: _k : g[k-1] : read-only
+     *         k : g[k]   : in and out. the d_post/d_ant/xi properties of this node will be updated
+     *         k_: g[k+1] : read-only
+     */
+    function _for_each_node (_k, k, k_) {
+        var l_post = c_sub(k_, k);
+        var l_ant = c_sub(k, _k);
+        var arg_post = c_arg(l_post);
+        var arg_ant = c_arg(l_ant);
+
+        k.d_post = c_mod(l_post);
+        k.d_ant = c_mod(l_ant);
+        k.xi = arg_post - arg_ant;
     }
 
-    // first/last node: what if Javascript supports cyclic array!!!
-    if (cyclic) {
-        // first node
-        l_post = c_sub(g[1], g[0])
-        l_ant = c_sub(g[0], g[n-1]);
-        arg_post = c_arg(l_post);
-        arg_ant = c_arg(l_ant);
-
-        g[0].d_ant = c_mod(l_ant);
-        g[0].d_post = c_mod(l_post);
-        g[0].xi = arg_post - arg_ant;
-
-        // last node
-        l_post = c_sub(g[0], g[n-1])
-        l_ant = c_sub(g[n-1], g[n-2]);
-        arg_post = c_arg(l_post);
-        arg_ant = c_arg(l_ant);
-
-        g[n-1].d_ant = c_mod(l_ant);
-        g[n-1].d_post = c_mod(l_post);
-        g[n-1].xi = arg_post - arg_ant;
-    } else {
-        // first node
+    // first node
+    if (!g.cyclic) {
         g[0].d_ant = 0;
         g[0].d_post = c_mod(c_sub(g[1], g[0]));
         g[0].xi = 0;
-        // last node
-        g[n-1].d_ant = c_mod(c_sub(g[n-1], g[n-2]));
-        g[n-1].d_post = 0;
-        g[n-1].xi = 0;
+    } else {
+        _for_each_node(g[g.length-1], g[0], g[1]); 
+    }
+
+    // middle nodes
+    for (i = 1; i < g.length-1; i ++) {
+        _for_each_node(g[i-1], g[i], g[i+1]);
+    }
+
+    // last node
+    if (!g.cyclic) {
+        g[g.length-1].d_ant = c_mod(c_sub(g[g.length-1], g[g.length-2]));
+        g[g.length-1].d_post = 0;
+        g[g.length-1].xi = 0;
+    } else {
+        _for_each_node(g[g.length-2], g[g.length-1], g[0]);
     }
 }
 
@@ -282,43 +309,82 @@ function mp_compute_distances_and_angles(g) {
  */
 /*
 function build_coefficients(g) {
-    A=[];  B=[];  C=[];  D=[];   R=[]
-    pre_compute_distances_and_angles(path)
-    if not path.cyclic:
-        # In this case, first equation doesnt follow the general rule
-        A.append(0)
-        B.append(0)
-        curl = path.curl_begin
-        alpha_0 = path[0].alpha
-        beta_1 = path[1].beta
-        xi_0 = (alpha_0**2) * curl / (beta_1**2)
-        xi_1 = path[1].xi
-        C.append(xi_0*alpha_0 + 3 - beta_1)
-        D.append((3 - alpha_0)*xi_0 + beta_1)
-        R.append(-D[0]*xi_1)
+    var A=[], B=[], C=[], D=[], R=[];
+    //var cyclic = g[g.length-1].circle || false;
+    var i, n = g.length - (cyclic? 1: 0); // number of nodes
 
-    # Equations 1 to n-1 (or 0 to n for cyclic paths)
+    mp_compute_distances_and_angles(g);
+
+    // making sure the following exist in g and each node of g:
+    g.curl_begin = g.curl_begin || MP_DEFAULT_CURL_BEGIN;
+    g.curl_end = g.curl_end || MP_DEFAULT_CURL_END;
+    for (i = 0; i < n; i ++) {
+        g[i].alpha = g[i].alpha || MP_DEFAULT_ALPHA;
+        g[i].beta = g[i].beta || MP_DEFAULT_BETA;
+    }
+
+    // input: _n : g[n-1]
+    //         n : g[n]  
+    //         n_: g[n+1]
+    //        idx: the idx for node "n"
+    // output: A/B/C/D/R is updated accordingly
+    function _for_each_node (_n, n, n_, idx) {
+        // making sure alpha/beta exists
+        _n.alpha = _n.alpha || MP_DEFAULT_ALPHA;
+        n.alpha  = n.alpha  || MP_DEFAULT_ALPHA;
+        n_.alpha = n_.alpha || MP_DEFAULT_ALPHA;
+
+        _n.beta  = _n.beta  || MP_DEFAULT_BETA;
+        n.beta   = n.beta   || MP_DEFAULT_BETA;
+        n_.beta  = n_.beta  || MP_DEFAULT_BETA;
+
+        A.push(   _n.alpha  / (Math.pow(n.beta,2)  * n.d_ant))
+        B.push((3-_n.alpha) / (Math.pow(n.beta,2)  * n.d_ant))
+        C.push((3-n_.beta)  / (Math.pow(n.alpha,2) * n.d_post))
+        D.push(   n_.beta   / (Math.pow(n.alpha,2) * n.d_post))
+        R.push(-B[idx] * n.xi  - D[idx] * n_.xi)
+    }
+
+    if (g.cyclic) {
+        // In this case, first equation doesnt follow the general rule
+        A.push(0);
+        B.push(0);
+        var curl = g.curl_begin;
+        var alpha_0 = g[0].alpha;
+        var beta_1 = g[1].beta;
+        var xi_0 = Math.pow(alpha_0,2) * curl / Math.pow(beta_1,2);
+        var xi_1 = g[1].xi;
+        C.push(xi_0*alpha_0 + 3 - beta_1)
+        D.push((3 - alpha_0)*xi_0 + beta_1)
+        R.push(-D[0]*xi_1)
+    } else {
+        _for_each_node(g[n-1], g[0], g[1], 0);
+    }
+
+
+    // Equations 1 to n-1 (or 0 to n for cyclic paths)
     for k in path.range():
-        A.append(   path[k-1].alpha  / ((path[k].beta**2)  * path[k].d_ant))
-        B.append((3-path[k-1].alpha) / ((path[k].beta**2)  * path[k].d_ant))
-        C.append((3-path[k+1].beta)  / ((path[k].alpha**2) * path[k].d_post))
-        D.append(   path[k+1].beta   / ((path[k].alpha**2) * path[k].d_post))
-        R.append(-B[k] * path[k].xi  - D[k] * path[k+1].xi)
+        A.push(   path[k-1].alpha  / ((path[k].beta**2)  * path[k].d_ant))
+        B.push((3-path[k-1].alpha) / ((path[k].beta**2)  * path[k].d_ant))
+        C.push((3-path[k+1].beta)  / ((path[k].alpha**2) * path[k].d_post))
+        D.push(   path[k+1].beta   / ((path[k].alpha**2) * path[k].d_post))
+        R.push(-B[k] * path[k].xi  - D[k] * path[k+1].xi)
 
     if not path.cyclic:
         # The last equation doesnt follow the general form
         n = len(R)     # index to generate
-        C.append(0)
-        D.append(0)
+        C.push(0)
+        D.push(0)
         curl = path.curl_end
         beta_n = path[n].beta
         alpha_n_1 = path[n-1].alpha
         xi_n = (beta_n**2) * curl / (alpha_n_1**2)
-        A.append((3-beta_n)*xi_n + alpha_n_1)
-        B.append(beta_n*xi_n + 3 - alpha_n_1)
-        R.append(0)
+        A.push((3-beta_n)*xi_n + alpha_n_1)
+        B.push(beta_n*xi_n + 3 - alpha_n_1)
+        R.push(0)
     return (A, B, C, D, R)
 }
+
 
 function mp_solve_for_thetas(A, B, C, D, R) {
     """This function receives the five vectors created by
@@ -451,9 +517,10 @@ function stopPath() {
     drawResult();
 }
 
+// this also end the current path
 function cyclePath() {
-    if (g_current_guide.length > 0) {
-        g_current_guide.push({"cycle":true});
+    if (g_current_guide.length > 0) {  // should be > 1?
+        g_current_guide.cyclic =true;
         g_result.push(g_current_guide);
     }
 
@@ -482,7 +549,11 @@ function undoPath() {
 
 function pointArrayToAsyGuide(g) {
     // note: change the y direction from canvas to normal: inverse the sign
-    return "" + g.map(function(x) { return x.cycle? "cycle" : "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")"; }).join("..");
+    var txt = "" + g.map(function(x) { return "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")"; }).join("..");
+    if (g.cyclic) {
+        txt = txt + "..cycle";
+    }
+    return txt;
 }
 
 
