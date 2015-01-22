@@ -307,46 +307,56 @@ function mp_compute_distances_and_angles(g) {
  * each point of the path (being "theta" the angle of departure of the
  * path at each point). The theory is from METAFONT book."""
  */
-/*
-function build_coefficients(g) {
+function mp_build_coefficients(g) {
+    var i, n, N = g.length;
     var A=[], B=[], C=[], D=[], R=[];
-    //var cyclic = g[g.length-1].circle || false;
-    var i, n = g.length - (cyclic? 1: 0); // number of nodes
 
-    mp_compute_distances_and_angles(g);
 
-    // making sure the following exist in g and each node of g:
-    g.curl_begin = g.curl_begin || MP_DEFAULT_CURL_BEGIN;
-    g.curl_end = g.curl_end || MP_DEFAULT_CURL_END;
-    for (i = 0; i < n; i ++) {
-        g[i].alpha = g[i].alpha || MP_DEFAULT_ALPHA;
-        g[i].beta = g[i].beta || MP_DEFAULT_BETA;
+    // 
+    // check & update (when needed) properties of g and the nodes in g
+    //
+    function _check_guide(g) {
+
+        // the properties of the guide
+        if (!g.cyclic) {
+            g.cyclic = false;
+        } else {
+            g.cyclic = true;
+        }
+        g.curl_begin = g.curl_begin || MP_DEFAULT_CURL_BEGIN;
+        g.curl_end = g.curl_end || MP_DEFAULT_CURL_END;
+
+        // the properties of each node
+        g.forEach(function(x) {
+            x.alpha = x.alpha || MP_DEFAULT_ALPHA;
+            x.beta = x.beta || MP_DEFAULT_BETA;
+        });
     }
 
-    // input: _n : g[n-1]
-    //         n : g[n]  
-    //         n_: g[n+1]
-    //        idx: the idx for node "n"
+    // input: _k : g[k-1]
+    //         k : g[k]  
+    //         k_: g[k+1]
+    //        idx: the idx for node "k"
     // output: A/B/C/D/R is updated accordingly
-    function _for_each_node (_n, n, n_, idx) {
-        // making sure alpha/beta exists
-        _n.alpha = _n.alpha || MP_DEFAULT_ALPHA;
-        n.alpha  = n.alpha  || MP_DEFAULT_ALPHA;
-        n_.alpha = n_.alpha || MP_DEFAULT_ALPHA;
-
-        _n.beta  = _n.beta  || MP_DEFAULT_BETA;
-        n.beta   = n.beta   || MP_DEFAULT_BETA;
-        n_.beta  = n_.beta  || MP_DEFAULT_BETA;
-
-        A.push(   _n.alpha  / (Math.pow(n.beta,2)  * n.d_ant))
-        B.push((3-_n.alpha) / (Math.pow(n.beta,2)  * n.d_ant))
-        C.push((3-n_.beta)  / (Math.pow(n.alpha,2) * n.d_post))
-        D.push(   n_.beta   / (Math.pow(n.alpha,2) * n.d_post))
-        R.push(-B[idx] * n.xi  - D[idx] * n_.xi)
+    function _for_each_node (_k, k, k_, idx) {
+        A.push(   _k.alpha  / (Math.pow(k.beta,2)  * k.d_ant));
+        B.push((3-_k.alpha) / (Math.pow(k.beta,2)  * k.d_ant));
+        C.push((3-k_.beta)  / (Math.pow(k.alpha,2) * k.d_post));
+        D.push(   k_.beta   / (Math.pow(k.alpha,2) * k.d_post));
+        R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
     }
 
-    if (g.cyclic) {
-        // In this case, first equation doesnt follow the general rule
+    //
+    // prepare...
+    //
+    mp_compute_distances_and_angles(g);
+    _check_guide(g);
+
+    //
+    // traverse the path now...
+    //
+    if (!g.cyclic) {
+        // In this case, first equation doesn't follow the general rule
         A.push(0);
         B.push(0);
         var curl = g.curl_begin;
@@ -354,55 +364,62 @@ function build_coefficients(g) {
         var beta_1 = g[1].beta;
         var xi_0 = Math.pow(alpha_0,2) * curl / Math.pow(beta_1,2);
         var xi_1 = g[1].xi;
-        C.push(xi_0*alpha_0 + 3 - beta_1)
-        D.push((3 - alpha_0)*xi_0 + beta_1)
-        R.push(-D[0]*xi_1)
+        C.push(xi_0*alpha_0 + 3 - beta_1);
+        D.push((3 - alpha_0)*xi_0 + beta_1);
+        R.push(-D[0]*xi_1);
     } else {
         _for_each_node(g[n-1], g[0], g[1], 0);
     }
 
+    // Equations 1 to N-1 
+    for (k = 1; k < N-1; k ++ ) {
+        _for_each_node(g[k-1], g[k], g[k+1], k);
+    }
 
-    // Equations 1 to n-1 (or 0 to n for cyclic paths)
-    for k in path.range():
-        A.push(   path[k-1].alpha  / ((path[k].beta**2)  * path[k].d_ant))
-        B.push((3-path[k-1].alpha) / ((path[k].beta**2)  * path[k].d_ant))
-        C.push((3-path[k+1].beta)  / ((path[k].alpha**2) * path[k].d_post))
-        D.push(   path[k+1].beta   / ((path[k].alpha**2) * path[k].d_post))
-        R.push(-B[k] * path[k].xi  - D[k] * path[k+1].xi)
+    if (!g.cyclic) {
+        // The last equation doesnt follow the general form
+        n = R.length;     // index to generate
+        C.push(0);
+        D.push(0);
+        var curl = g.curl_end;
+        var beta_n = g[n].beta;
+        var alpha_n_1 = g[n-1].alpha;
+        var xi_n = Math.pow(beta_n,2) * curl / Math.pow(alpha_n_1,2);
+        A.push((3-beta_n)*xi_n + alpha_n_1);
+        B.push(beta_n*xi_n + 3 - alpha_n_1);
+        R.push(0);
+    } else {
+        _for_each_node(g[N-2], g[N-1], g[0], N-1);
+    }
 
-    if not path.cyclic:
-        # The last equation doesnt follow the general form
-        n = len(R)     # index to generate
-        C.push(0)
-        D.push(0)
-        curl = path.curl_end
-        beta_n = path[n].beta
-        alpha_n_1 = path[n-1].alpha
-        xi_n = (beta_n**2) * curl / (alpha_n_1**2)
-        A.push((3-beta_n)*xi_n + alpha_n_1)
-        B.push(beta_n*xi_n + 3 - alpha_n_1)
-        R.push(0)
-    return (A, B, C, D, R)
+    return [A, B, C, D, R];
 }
 
-
+// This function receives the five vectors created by
+// mp_build_coefficients() and uses them to build a linear system with N
+// unknonws (being N the number of points in the path). Solving the system
+// finds the value for theta (departure angle) at each point
 function mp_solve_for_thetas(A, B, C, D, R) {
-    """This function receives the five vectors created by
-    build_coefficients() and uses them to build a linear system with N
-    unknonws (being N the number of points in the path). Solving the system
-    finds the value for theta (departure angle) at each point"""
-    L=len(R)
-    a = np.zeros((L, L))
-    for k in range(L):
-       prev = (k-1)%L
-       post = (k+1)%L
-       a[k][prev] = A[k]
-       a[k][k]    = B[k]+C[k]
-       a[k][post] = D[k]
-    b = np.array(R)
-    return np.linalg.solve(a,b)
+    var k, prev, post, L = R.length;
+
+    // create the empty matrix
+    var a = new Array(L), b = R;
+    for(k = 0; k < L; k ++) {
+        a[k] = new Array(L);
+    }
+
+    for(k = 0; k < L; k ++) {
+        prev = (k-1+L)%L;  // "+L" is to make (prev>=0)
+        post = (k+1)%L;
+        a[k][prev] = A[k];
+        a[k][k]    = B[k]+C[k];
+        a[k][post] = D[k];
+    }
+
+    return mp_solve_matrix(a, b, L, L);
 }
 
+/*
 function mp_solve_angles(g) {
     """This function receives a path in which each point is "open", i.e. it
     does not specify any direction of departure or arrival at each node,
@@ -461,11 +478,21 @@ function onClick(e) {
     console.log(g_result);
     if (g_current_guide_started === true) {
         //g_last_point = [e.clientX, e.clientY]; 
+
         g_last_point = getCanvasPos(ctx, e);
+        // set some default properties
+        g_last_point.alpha = MP_DEFAULT_ALPHA;
+        g_last_point.beta = MP_DEFAULT_BETA;
+        g_last_point.theta = 0;
+        g_last_point.phi = 0;
+        g_last_point.d_ant = 0;
+        g_last_point.d_post = 0;
+
+        // add the point to the current guide/path
         g_current_guide.push(g_last_point);
     }
-    displayCurrentGuide();
 
+    displayCurrentGuide();
 }
 
 function onDoubleClick(e) {
@@ -498,8 +525,15 @@ function startPath() {
     if (g_current_guide.length > 0) {
         g_result.push(g_current_guide);
     }
+ 
+    // init the guide
     g_current_guide = [];
+    g_current_guide.curl_begin = MP_DEFAULT_CURL_BEGIN;
+    g_current_guide.curl_end = MP_DEFAULT_CURL_END;
+    g_current_guide.cyclic = false;
+
     g_last_point = [];
+
     displayCurrentGuide();
     g_current_guide_started = true;
 }
