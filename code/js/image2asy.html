@@ -107,7 +107,12 @@ function c_arg(z) {
             return 0; // ?
         }
     } else {
-        return Math.atan(z[1]/z[0]);
+        var arg = Math.atan(Math.abs(z[1]/z[0]));
+        if (z[0] > 0) {
+            return (z[1]>0)? arg: -arg;
+        } else {
+            return (z[1]>0)? Math.PI - arg: - Math.PI  + arg;
+        }
     }
 }
 
@@ -270,9 +275,9 @@ function mp_uv(z0, z1, theta, phi, alpha, beta) {
  */
 function _mp_compute_distances_and_angles(g) {
 
-    var i; 
+    var i, N = g.length; 
     
-    if (g.length < 2) {
+    if (N < 2) {
         return;
     }
 
@@ -282,14 +287,23 @@ function _mp_compute_distances_and_angles(g) {
      *         k_: g[k+1] : read-only
      */
     function _for_each_node (_k, k, k_) {
-        var l_post = c_sub(k_, k);
+
         var l_ant = c_sub(k, _k);
-        var arg_post = c_arg(l_post);
+        var l_post = c_sub(k_, k);
         var arg_ant = c_arg(l_ant);
+        var arg_post = c_arg(l_post);
 
         k.d_post = c_mod(l_post);
         k.d_ant = c_mod(l_ant);
+
+        // making sure that xi is between [-PI, PI]
         k.xi = arg_post - arg_ant;
+        if(k.xi > Math.PI) {
+            k.xi = k.xi - Math.PI*2;
+        }
+        if(k.xi < -Math.PI) {
+            k.xi = k.xi + Math.PI*2;
+        }
     }
 
     // first node
@@ -298,7 +312,7 @@ function _mp_compute_distances_and_angles(g) {
         g[0].d_post = c_mod(c_sub(g[1], g[0]));
         g[0].xi = 0;
     } else {
-        _for_each_node(g[g.length-1], g[0], g[1]); 
+        _for_each_node(g[N-1], g[0], g[1]); 
     }
 
     // middle nodes
@@ -308,11 +322,11 @@ function _mp_compute_distances_and_angles(g) {
 
     // last node
     if (!g.cyclic) {
-        g[g.length-1].d_ant = c_mod(c_sub(g[g.length-1], g[g.length-2]));
-        g[g.length-1].d_post = 0;
-        g[g.length-1].xi = 0;
+        g[N-1].d_ant = c_mod(c_sub(g[N-1], g[N-2]));
+        g[N-1].d_post = 0;
+        g[N-1].xi = 0;
     } else {
-        _for_each_node(g[g.length-2], g[g.length-1], g[0]);
+        _for_each_node(g[N-2], g[N-1], g[0]);
     }
 }
 
