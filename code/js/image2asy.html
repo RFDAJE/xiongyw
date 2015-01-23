@@ -21,9 +21,13 @@
  * - add selection of the current point/path connection types
  * - make it possible to make comments for a path
  * - make it possible to specify draw/fill color for a path
+ * + hilights nodes on the paths
+ * - snap to nodes on the paths
  * - make it possible to manually adjust point position, at any time (by selecting the path first)
  * + make it possible to draw cubic curves in canvas to reflect what's going to be drawn in asy
  * - make it possible to export SVG format data
+ * + detect when mouse move out of canvas (and update the draw accordingly)
+ * - read: http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
  */
 
 // constants
@@ -34,10 +38,12 @@ var GRID_SIZE = 8;
 // canvas context constants
 var GRID_LINE_WIDTH = 0.2;
 var GRID_STROKE_STYLE = "grey";
-var POLYGON_LINE_WIDTH = 0.6;
+var POLYGON_LINE_WIDTH = 1;
 var POLYGON_STROKE_STYLE = "red";
-var BEZIER_LINE_WIDTH =2;
+var BEZIER_LINE_WIDTH = 3;
 var BEZIER_STROKE_STYLE = "blue";
+var DOT_RADIUS = 3;
+var DOT_FILL_STYLE = "black";
 
 var g_result = []; // an array of array of points, representing the guides
 var g_current_guide = [];  // an array of points, representing the current g_current_guide
@@ -47,7 +53,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
-img.src = "http://10.12.6.250:8080/test.png";
+//img.src = "http://10.12.6.250:8080/test.png";
 //img.src = "test.png";
 
 
@@ -82,21 +88,44 @@ function onRightClick(e) {
     console.log("onRightClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
 }
 
+//
+// the fact: canvas fires onmousemove events even the mouse position is not moved.
+// the impact: when click event happens, the current position is added into the path, but
+//   a mouse move event with the same position will be emitted. if we want to draw the
+//   current path, the last two points are identical...then the Bezier curve will not be draw,
+//   probably because the linear equations are not properly formed...
+// the remedy: omit mouse move event when the position is not changed. use closure the keep the 
+//   previous positions;
 function onMouseMove(e) {
-    //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
-    if (g_current_guide_started != true) {
-        return;
+    // previous e.clientX and e.clientY
+    var pre_x = -1;
+    var pre_y = -1;
+    return function(e){
+        if(pre_x === e.clientX && pre_y === e.clientY) {
+            // console.log("move without position change!");
+            return;
+        }
+        pre_x = e.clientX;
+        pre_y = e.clientY;
+        //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+
+        if (g_current_guide_started != true) {
+            return;
+        }
+
+        g_current_guide.push(getCanvasPos(ctx, e));
+        redrawCanvas();
+        g_current_guide.pop(); // remove it immediately, as the node is a temp one
     }
-
-    var cur = getCanvasPos(ctx, e); // current position
-
-    g_current_guide.push(cur);
-    redrawCanvas();
-    g_current_guide.pop();
 }
 
 function onMouseWheel(e) {
-    console.log("onMouseWhell: dx=" + e.deltaX + ", dy=" + e.deltaY);
+    console.log("onMouseWheel: dx=" + e.deltaX + ", dy=" + e.deltaY);
+}
+
+function onMouseLeave(e) {
+    //console.log("onMouseLeave: e=" + e);
+    redrawCanvas();
 }
 
 // button hooks
@@ -151,6 +180,7 @@ function undoPath() {
     }
 
     displayCurrentGuide();
+    redrawCanvas();
 }
 
 function pointArrayToAsyGuide(g) {
@@ -210,26 +240,10 @@ function drawImageAndGrid() {
     }
 }
 
+//
+// draw polygon (thiner) on top of bezier (thicker)
+// 
 function drawOnePath(p) {
-
-    //
-    // draw polygons
-    //
-    if (p.length < 1) {
-        return;
-    }
-
-    ctx.lineWidth = POLYGON_LINE_WIDTH;
-    ctx.strokeStyle = POLYGON_STROKE_STYLE;
-    ctx.beginPath();
-    ctx.moveTo(p[0][0], p[0][1]);
-    for(j = 1; j < p.length; j ++) {
-        ctx.lineTo(p[j][0], p[j][1]);
-    }
-    if (p.cyclic) {
-        ctx.closePath();
-    }
-    ctx.stroke();
 
     //
     // draw bezier
@@ -260,14 +274,51 @@ function drawOnePath(p) {
         ctx.closePath();
     }
     ctx.stroke();
+
+    //
+    // draw polygons
+    //
+    if (p.length < 1) {
+        return;
+    }
+
+    ctx.lineWidth = POLYGON_LINE_WIDTH;
+    ctx.strokeStyle = POLYGON_STROKE_STYLE;
+    ctx.beginPath();
+    ctx.moveTo(p[0][0], p[0][1]);
+    for(j = 1; j < p.length; j ++) {
+        ctx.lineTo(p[j][0], p[j][1]);
+    }
+    if (p.cyclic) {
+        ctx.closePath();
+    }
+    ctx.stroke();
+}
+
+
+function dotAllNodes() {
+    function _dot(x, y) {
+        ctx.beginPath(); 
+        ctx.arc(x, y, DOT_RADIUS, 0, Math.PI*2, true); 
+        ctx.fillStyle = DOT_FILL_STYLE; 
+        ctx.fill();
+    }
+
+    function _dotPath(p) {
+        p.map(function(k){return _dot(k[0], k[1]);});
+    }
+
+    g_result.map(function(p){return _dotPath(p);});
+    _dotPath(g_current_guide);
 }
 
 function redrawCanvas (){
-    console.log("redrawCanvas...");
+//    console.log("redrawCanvas...");
     ctx.clearRect(0, 0, c.width, c.height);
     drawImageAndGrid();
     g_result.map(function(x){return drawOnePath(x);});
     drawOnePath(g_current_guide);
+    dotAllNodes();
 }
 
 function onLoad() {
@@ -281,8 +332,9 @@ function onLoad() {
     c.onclick = onClick;
     c.ondblclick = onDoubleClick;
     c.oncontextmenu = onRightClick;
-    c.onmousemove = onMouseMove;
+    c.onmousemove = onMouseMove();  // note that this returns a closure
     c.onmousewheel = onMouseWheel;
+    c.onmouseleave = onMouseLeave;
 
     ctx = c.getContext('2d');
 
@@ -313,8 +365,8 @@ window.onload = onLoad;
     <form>
     <input id="startPath" type="button" value="Start Path"/>
     <input id="undoPath" type="button" value="Undo Path"/>
-    <input id="stopPath" type="button" value="Stop Path"/>
-    <input id="cyclePath" type="button" value="Stop Cyclic Path"/>
+    <input id="stopPath" type="button" value="End Path"/>
+    <input id="cyclePath" type="button" value="Cycle Path"/>
     </form>
     <br>
     <textarea id="g_current_guide" rows="50" cols="50"></textarea>
