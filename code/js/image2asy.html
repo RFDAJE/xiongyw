@@ -73,10 +73,17 @@ function getCanvasPos(ctx, e) {
 function onClick(e) {
     if (g_current_guide_started === true) {
         var cur = getCanvasPos(ctx, e);
-        console.log(cur);
+        //console.log(cur);
+        // preventing the two _adjacent_ nodes having the same position
+        var n= g_current_guide.length;
+        if (n > 1 && 
+            g_current_guide[n-1][0] === cur[0] &&
+            g_current_guide[n-1][1] === cur[1]) {
+            console.log("you click too quick!");
+            return;
+        }
         g_current_guide.push(cur);
         displayCurrentGuide();
-        //redrawCanvas();
     }
 }
 
