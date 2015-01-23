@@ -60,14 +60,12 @@ function getCanvasPos(ctx, e) {
 // canvas hooks
 function onClick(e) {
     //console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
-    console.log(g_result);
+    //console.log(g_result);
     if (g_current_guide_started === true) {
-        //g_last_point = [e.clientX, e.clientY]; 
-
         g_last_point = getCanvasPos(ctx, e);
         // set some default properties
-        g_last_point.alpha = MP_DEFAULT_ALPHA;
-        g_last_point.beta = MP_DEFAULT_BETA;
+        g_last_point.alpha = jh.DEFAULT_ALPHA;
+        g_last_point.beta = jh.DEFAULT_BETA;
         g_last_point.theta = 0;
         g_last_point.phi = 0;
         g_last_point.d_ant = 0;
@@ -78,6 +76,7 @@ function onClick(e) {
     }
 
     displayCurrentGuide();
+    drawResult();
 }
 
 function onDoubleClick(e) {
@@ -113,8 +112,8 @@ function startPath() {
  
     // init the guide
     g_current_guide = [];
-    g_current_guide.curl_begin = MP_DEFAULT_CURL_BEGIN;
-    g_current_guide.curl_end = MP_DEFAULT_CURL_END;
+    g_current_guide.curl_begin = jh.DEFAULT_CURL_BEGIN;
+    g_current_guide.curl_end = jh.DEFAULT_CURL_END;
     g_current_guide.cyclic = false;
 
     g_last_point = [];
@@ -139,7 +138,7 @@ function stopPath() {
 // this also end the current path
 function cyclePath() {
     if (g_current_guide.length > 0) {  // should be > 1?
-        g_current_guide.cyclic =true;
+        g_current_guide.cyclic = true;
         g_result.push(g_current_guide);
     }
 
@@ -224,28 +223,73 @@ function drawImageAndGrid() {
 }
 
 function drawResult(){
+    var i, j;
 
     ctx.clearRect(0, 0, c.width, c.height);
 
     drawImageAndGrid();
 
-    // draw lines
-    ctx.lineWidth = 0.5;
-    ctx.strokeStyle = "black";
 
-    // add the current g_current_guide into the g_result
-    var res_temp = JSON.parse(JSON.stringify(g_result)); // deep copy
-    res_temp.push(g_current_guide);  
-
-    for(var i = 0; i < res_temp.length; i ++) {
-        for(var j = 0; j < res_temp[i].length - 1; j ++) {
-            ctx.beginPath();
-            ctx.moveTo(res_temp[i][j][0], res_temp[i][j][1]);
-            ctx.lineTo(res_temp[i][j+1][0], res_temp[i][j+1][1]);
-            ctx.stroke();
+    // draw polygons
+    function _for_each_path_straight(p) {
+        if (p.length < 1) {
+            return;
         }
+
+        ctx.beginPath();
+        ctx.moveTo(p[0][0], p[0][1]);
+        for(j = 1; j < p.length; j ++) {
+            ctx.lineTo(p[j][0], p[j][1]);
+        }
+        if (p.cyclic) {
+            ctx.closePath();
+        }
+        ctx.stroke();
     }
-    res_temp = null;
+
+    // draw bezier
+    function _for_each_path_bezier(p) {
+        var u, v;
+
+        if (p.length < 2) {
+            return;
+        }
+
+        // get the control points
+        jh.solve_angles(p);
+        jh.find_control_points(p);
+
+        ctx.beginPath();
+        ctx.moveTo(p[0][0], p[0][1]);
+        u = p[0].u;
+        for(j = 1; j < p.length; j ++) {
+            v = p[j].v;
+            ctx.bezierCurveTo(u[0], u[1], v[0], v[1], p[j][0], p[j][1]);
+            u = p[j].u;
+        }
+        if (p.cyclic) {
+            v = p[0].v;
+            ctx.bezierCurveTo(u[0], u[1], v[0], v[1], p[0][0], p[0][1]);
+            ctx.closePath();
+        }
+        ctx.stroke();
+    }
+
+    // straight lines
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = "blue";
+    for (i = 0; i < g_result.length; i ++) {
+        _for_each_path_straight(g_result[i]);
+    }
+    _for_each_path_straight(g_current_guide);
+
+    // bezier curves
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "red";
+    for (i = 0; i < g_result.length; i ++) {
+        _for_each_path_bezier(g_result[i]);
+    }
+    _for_each_path_bezier(g_current_guide);
 }
 
 function onLoad() {

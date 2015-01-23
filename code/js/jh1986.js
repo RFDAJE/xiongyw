@@ -193,10 +193,10 @@ var jh = (function(){
      * http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
      */
 
-    var MP_DEFAULT_ALPHA = 1;
-    var MP_DEFAULT_BETA = 1;
-    var MP_DEFAULT_CURL_BEGIN = 1;
-    var MP_DEFAULT_CURL_END = 1;
+    var DEFAULT_ALPHA = 1;
+    var DEFAULT_BETA = 1;
+    var DEFAULT_CURL_BEGIN = 1;
+    var DEFAULT_CURL_END = 1;
 
     /*
      * velocity function f(theta, phi)
@@ -334,13 +334,13 @@ var jh = (function(){
             } else {
                 g.cyclic = true;
             }
-            g.curl_begin = g.curl_begin || MP_DEFAULT_CURL_BEGIN;
-            g.curl_end = g.curl_end || MP_DEFAULT_CURL_END;
+            g.curl_begin = g.curl_begin || DEFAULT_CURL_BEGIN;
+            g.curl_end = g.curl_end || DEFAULT_CURL_END;
 
             // the properties of each node
             g.forEach(function(x) {
-                x.alpha = x.alpha || MP_DEFAULT_ALPHA;
-                x.beta = x.beta || MP_DEFAULT_BETA;
+                x.alpha = x.alpha || DEFAULT_ALPHA;
+                x.beta = x.beta || DEFAULT_BETA;
             });
         }
 
@@ -411,12 +411,16 @@ var jh = (function(){
     // unknonws (being N the number of points in the path). Solving the system
     // finds the value for theta (departure angle) at each point
     function _solve_for_thetas(A, B, C, D, R) {
-        var k, prev, post, L = R.length;
+        var k, j, prev, post, L = R.length;
 
         // create the empty matrix
         var a = new Array(L), b = R;
         for(k = 0; k < L; k ++) {
             a[k] = new Array(L);
+            // dont forget to zero the array!
+            for (j = 0; j < L; j ++) {
+                a[k][j] = 0; 
+            }
         }
 
         for(k = 0; k < L; k ++) {
@@ -494,5 +498,14 @@ var jh = (function(){
         }
     }
 
-    return { solve_angles: solve_angles, find_control_points: find_control_points};
+    return {
+        // methods
+        "solve_angles": solve_angles, 
+        "find_control_points": find_control_points,
+        // constants
+        "DEFAULT_ALPHA": DEFAULT_ALPHA,
+        "DEFAULT_BETA": DEFAULT_BETA,
+        "DEFAULT_CURL_BEGIN": DEFAULT_BETA,
+        "DEFAULT_CURL_END": DEFAULT_BETA
+    };
 }());
