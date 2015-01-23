@@ -15,15 +15,14 @@
  * todos:
  * 
  * + support cyclic guide
- * - output coordinates in normal y direction (up): canvas y is down, asy y is up;
+ * + output coordinates in normal y direction (up): canvas y is down, asy y is up;
  * - add button to load picture from file system or url
  * - add button/check_box to display/hide the picture, if loaded
  * - add selection of the current point/path connection types
- * - add logic to produce mutliple paths (path[])
  * - make it possible to make comments for a path
  * - make it possible to specify draw/fill color for a path
  * - make it possible to manually adjust point position, at any time (by selecting the path first)
- * - make it possible to draw cubic curves in canvas to reflect what's going to be drawn in asy
+ * + make it possible to draw cubic curves in canvas to reflect what's going to be drawn in asy
  * - make it possible to export SVG format data
  */
 
@@ -42,7 +41,6 @@ var BEZIER_STROKE_STYLE = "blue";
 
 var g_result = []; // an array of array of points, representing the guides
 var g_current_guide = [];  // an array of points, representing the current g_current_guide
-var g_last_point = []; // the last point in the current g_current_guide
 var g_current_guide_started = false;
 
 var img = new Image();
@@ -67,28 +65,17 @@ function getCanvasPos(ctx, e) {
 
 // canvas hooks
 function onClick(e) {
-    //console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
-    //console.log(g_result);
     if (g_current_guide_started === true) {
-        g_last_point = getCanvasPos(ctx, e);
-        // set some default properties
-        g_last_point.alpha = jh.DEFAULT_ALPHA;
-        g_last_point.beta = jh.DEFAULT_BETA;
-        g_last_point.theta = 0;
-        g_last_point.phi = 0;
-        g_last_point.d_ant = 0;
-        g_last_point.d_post = 0;
-
-        // add the point to the current guide/path
-        g_current_guide.push(g_last_point);
+        var cur = getCanvasPos(ctx, e);
+        console.log(cur);
+        g_current_guide.push(cur);
+        displayCurrentGuide();
+        //redrawCanvas();
     }
-
-    displayCurrentGuide();
-    redrawCanvas();
 }
 
 function onDoubleClick(e) {
-    //console.log("onDoubleClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+    console.log("onDoubleClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
 }
 
 function onRightClick(e) {
@@ -97,6 +84,10 @@ function onRightClick(e) {
 
 function onMouseMove(e) {
     //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+    if (g_current_guide_started != true) {
+        return;
+    }
+
     var cur = getCanvasPos(ctx, e); // current position
 
     g_current_guide.push(cur);
@@ -121,8 +112,6 @@ function startPath() {
     g_current_guide.curl_end = jh.DEFAULT_CURL_END;
     g_current_guide.cyclic = false;
 
-    g_last_point = [];
-
     displayCurrentGuide();
     g_current_guide_started = true;
 }
@@ -133,7 +122,6 @@ function stopPath() {
     }
 
     g_current_guide = [];
-    g_last_point = [];
     g_current_guide_started = false;
 
     outputResult();
@@ -148,7 +136,6 @@ function cyclePath() {
     }
 
     g_current_guide = [];
-    g_last_point = [];
     g_current_guide_started = false;
 
     outputResult();
@@ -162,11 +149,7 @@ function undoPath() {
     if (g_current_guide.length > 0) {
         g_current_guide.pop();
     }
-    if (g_current_guide.length > 0) {
-        g_last_point = g_current_guide[g_current_guide.length - 1];
-    } else {
-        g_last_point = [];
-    }
+
     displayCurrentGuide();
 }
 
@@ -280,6 +263,7 @@ function drawOnePath(p) {
 }
 
 function redrawCanvas (){
+    console.log("redrawCanvas...");
     ctx.clearRect(0, 0, c.width, c.height);
     drawImageAndGrid();
     g_result.map(function(x){return drawOnePath(x);});

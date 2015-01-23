@@ -1,9 +1,10 @@
 // created(bruin, 2015-01-19)
-// last updated(bruin, 2015-01-22)
+// last updated(bruin, 2015-01-23)
 // email: sansidee at foxmail.com
 //
 // This "module" implements the algorithm described in the following paper, without external dependency: 
 // - John D. Hobby:　Smooth,　easy　to　compute　interpolating　splines. Discrete　Comput.　Geom.,　1:123－140,1986
+//
 // ...by using the following references:
 // - Donald E Knuth. The METAFONT book, Addison-Wesley, Reading, Massachusetts, 1986
 // - Python version of the algo: http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
@@ -12,6 +13,8 @@
 // This "module" may be used in a browser app...using Canvas or SVG for drawing, 
 // together with mouse/kbd events, just for fun, or for some "creative activities"...
 // and it's straight forward to "export" the created path(s) to other systems (e.g. Asymptote).
+// Actually the initial intention was to use Canvas in browser to manually "vectorize" some images 
+// (by generating Asymptote guide in JavaScript)...
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Sample usage (also a test case):
@@ -59,27 +62,41 @@
 //
 
 var jh = (function(){
-    // return the complex sum
+
+    //
+    // constants
+    //
+    var DEFAULT_ALPHA = 1;
+    var DEFAULT_BETA = 1;
+    var DEFAULT_CURL_BEGIN = 1;
+    var DEFAULT_CURL_END = 1;
+
+    // path connectors, as defined in p127 of "The METAFONT book"
+    var FREE_CURVE = "..";
+    var BOUNDED_CURVE = "::"; // use Asymtote symbol. it's "..." in MetaPost
+    var STRAIGHT_LINE = "--";
+    var TENSE_LINE = "---";
+    var SPLICE = "&";
+
+    //
+    // vector (complex number) arithmetics
+    //
     function c_sum(z0, z1) {
         return [z0[0]+z1[0], z0[1]+z1[1]];
     }
 
-    // return the complex sub
     function c_sub(z0, z1) {
         return [z0[0]-z1[0], z0[1]-z1[1]];
     }
 
-    // return the complex production
     function c_prod(z0, z1) {
         return [z0[0]*z1[0]-z0[1]*z1[1], z0[0]*z1[1]+z0[1]*z1[0]];
     }
 
-    // return the length of the vector
     function c_mod(z) {
         return Math.sqrt(z[0]*z[0] + z[1]*z[1]);
     }
 
-    // return the angle (in rad) of a vector
     function c_arg(z) {
         if (z[0] == 0) {
             if (z[1] > 0) {
@@ -130,9 +147,9 @@ var jh = (function(){
             M.push(row);
         }
 
-        /*
-         * elimination 
-         */
+        //
+        // elimination 
+        //
         i = 0;  // row 
         j = 0;  // col
         while (i < m && j < n) {
@@ -171,9 +188,9 @@ var jh = (function(){
             j = j +1;
         }
 
-        /* 
-         * get the results
-         */
+        //
+        // get the results
+        //
         if (m == n) {
             x[m-1] = M[m-1][m];
             for (i = m-2; i >=0; i --) {
@@ -188,31 +205,26 @@ var jh = (function(){
         return x;
     }
 
-    /*
-     * the following routines are "cloned" from the original python code:
-     * http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
-     */
+    //
+    // the following routines are "cloned" from the original python code:
+    // http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
+    //
 
-    var DEFAULT_ALPHA = 1;
-    var DEFAULT_BETA = 1;
-    var DEFAULT_CURL_BEGIN = 1;
-    var DEFAULT_CURL_END = 1;
-
-    /*
-     * velocity function f(theta, phi)
-     *
-     * theta: departure angle (in rad) at the first point z0, relative to z1-z0
-     * phi: arrival angle (in rad) at the second point z1, relative to z1-z0
-     */
+    //
+    // velocity function f(theta, phi)
+    //
+    // theta: departure angle (in rad) at the first point z0, relative to z1-z0
+    // phi: arrival angle (in rad) at the second point z1, relative to z1-z0
+    //
     function f(theta, phi) {
         var n = 2+Math.sqrt(2)*(Math.sin(theta)-Math.sin(phi)/16)*(Math.sin(phi)-Math.sin(theta)/16)*(Math.cos(theta)-Math.cos(phi));
         var m = 3*(1 + 0.5*(Math.sqrt(5)-1)*Math.cos(theta) + 0.5*(3-Math.sqrt(5))*Math.cos(phi));
         return n/m;
     }
 
-    /*
-     * return u and v in an array: [[ux,uy], [vx,vy]]
-     */
+    //
+    // return u and v in an array: [[ux,uy], [vx,vy]]
+    //
     function calc_uv(z0, z1, theta, phi, alpha, beta) {
         // the formula using complex numbers:
         // u = z0+exp(i*theta)*(z1-z0)*f(theta,phi)/alpha
@@ -228,34 +240,34 @@ var jh = (function(){
         return [u,v];
     }
 
-    /* 
-     * traverses the guide and computes the distance between adjacent points, and the 
-     * turning angles of the polyline which joins them
-     *
-     * g: an array of points (which forms an asymptote guide)
-     * output: none. but following properties of each point g[k] (treated as a complex number here) is added or updated:
-     *  "d_ant": |g[k]-g[k-1]|
-     *  "d_post": |g[k+1]-g[k]|
-     *  "xi": turning angle at g[k], in rad: arg((g[k+1]-g[k])/(g[k]-g[k-1]))
-     *
-     * sample test cases:
-     * 1. non-cyclic:
-     *   var g=[[0,0],[100,0],[100,100]];
-     *   _compute_distances_and_angles(g);
-     * then:
-     *   g[0]: [0, 0, d_ant: 0, d_post: 100, xi: 0]
-     *   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
-     *   g[2]: [100, 100, d_ant: 100, d_post: 0, xi: 0]
-     *
-     * 2. cyclic:
-     *   var g=[[0,0],[100,0],[100,100]];
-     *   g.cyclic = true;
-     *   _compute_distances_and_angles(g);
-     * then:
-     *   g[0]: [0, 0, d_post: 100, d_ant: 141.4213562373095, xi: -0.7853981633974483]
-     *   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
-     *   g[2]: [100, 100, d_post: 141.4213562373095, d_ant: 100, xi: -0.7853981633974483]
-     */
+    // 
+    // traverses the guide and computes the distance between adjacent points, and the 
+    // turning angles of the polyline which joins them
+    //
+    // g: an array of points (which forms an asymptote guide)
+    // output: none. but following properties of each point g[k] (treated as a complex number here) is added or updated:
+    //  "d_ant": |g[k]-g[k-1]|
+    //  "d_post": |g[k+1]-g[k]|
+    //  "xi": turning angle at g[k], in rad: arg((g[k+1]-g[k])/(g[k]-g[k-1]))
+    //
+    // sample test cases:
+    // 1. non-cyclic:
+    //   var g=[[0,0],[100,0],[100,100]];
+    //   _compute_distances_and_angles(g);
+    // then:
+    //   g[0]: [0, 0, d_ant: 0, d_post: 100, xi: 0]
+    //   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
+    //   g[2]: [100, 100, d_ant: 100, d_post: 0, xi: 0]
+    //
+    // 2. cyclic:
+    //   var g=[[0,0],[100,0],[100,100]];
+    //   g.cyclic = true;
+    //   _compute_distances_and_angles(g);
+    // then:
+    //   g[0]: [0, 0, d_post: 100, d_ant: 141.4213562373095, xi: -0.7853981633974483]
+    //   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
+    //   g[2]: [100, 100, d_post: 141.4213562373095, d_ant: 100, xi: -0.7853981633974483]
+    //
     function _compute_distances_and_angles(g) {
 
         var i, N = g.length; 
@@ -264,11 +276,11 @@ var jh = (function(){
             return;
         }
 
-        /*
-         * input: _k : g[k-1] : read-only
-         *         k : g[k]   : in and out. the d_post/d_ant/xi properties of this node will be updated
-         *         k_: g[k+1] : read-only
-         */
+        //
+        // input: _k : g[k-1] : read-only
+        //         k : g[k]   : in and out. the d_post/d_ant/xi properties of this node will be updated
+        //         k_: g[k+1] : read-only
+        //
         function _for_each_node (_k, k, k_) {
 
             var l_ant = c_sub(k, _k);
@@ -313,12 +325,12 @@ var jh = (function(){
         }
     }
 
-    /*
-     * This function creates five vectors which are coefficients of a
-     * linear system which allows finding the right values of "theta" at
-     * each point of the path (being "theta" the angle of departure of the
-     * path at each point). The theory is from METAFONT book."""
-     */
+    //
+    // This function creates five vectors which are coefficients of a
+    // linear system which allows finding the right values of "theta" at
+    // each point of the path (being "theta" the angle of departure of the
+    // path at each point). The theory is from METAFONT book."""
+    //
     function _build_coefficients(g) {
         var i, n, N = g.length;
         var A=[], B=[], C=[], D=[], R=[];
@@ -506,6 +518,13 @@ var jh = (function(){
         "DEFAULT_ALPHA": DEFAULT_ALPHA,
         "DEFAULT_BETA": DEFAULT_BETA,
         "DEFAULT_CURL_BEGIN": DEFAULT_BETA,
-        "DEFAULT_CURL_END": DEFAULT_BETA
+        "DEFAULT_CURL_END": DEFAULT_BETA,
+        "conn": { // enum
+            "FREE_CURVE": FREE_CURVE,
+            "BOUNDED_CURVE": BOUNDED_CURVE,
+            "STRAIGHT_LINE": STRAIGHT_LINE,
+            "TENSE_LINE": TENSE_LINE,
+            "SPLICE": SPLICE
+        }
     };
 }());
