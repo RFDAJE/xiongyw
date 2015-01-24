@@ -27,6 +27,7 @@
  * + make it possible to draw cubic curves in canvas to reflect what's going to be drawn in asy
  * - make it possible to export SVG format data
  * + detect when mouse move out of canvas (and update the draw accordingly)
+ * + add keyboard event (up/down/left/right) support: http://dbp-consulting.com/tutorials/canvas/CanvasKeyEvents.html
  * - read: http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
  */
 
@@ -34,6 +35,12 @@
 var CANVAS_WIDTH = 1020;
 var CANVAS_HEIGHT = 1024;
 var GRID_SIZE = 8;
+
+var LEFT_KEY = 37;
+var UP_KEY = 38;
+var RIGHT_KEY = 39;
+var DOWN_KEY = 40;
+var ENTER_KEY = 13; 
 
 // canvas context constants
 var GRID_LINE_WIDTH = 0.2;
@@ -53,7 +60,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
-//img.src = "http://10.12.6.250:8080/test.png";
+img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sine_cosine_one_period.svg/300px-Sine_cosine_one_period.svg.png";
 //img.src = "test.png";
 
 
@@ -103,7 +110,7 @@ function onRightClick(e) {
 //   probably because the linear equations are not properly formed...
 // the remedy: omit mouse move event when the position is not changed. use closure the keep the 
 //   previous positions;
-function onMouseMove(e) {
+var onMouseMove = (function() {
     // previous e.clientX and e.clientY
     var pre_x = -1;
     var pre_y = -1;
@@ -124,7 +131,7 @@ function onMouseMove(e) {
         redrawCanvas();
         g_current_guide.pop(); // remove it immediately, as the node is a temp one
     }
-}
+}());
 
 function onMouseWheel(e) {
     console.log("onMouseWheel: dx=" + e.deltaX + ", dy=" + e.deltaY);
@@ -181,7 +188,7 @@ function cyclePath() {
 /*
  * discard the last point of the current guide
  */
-function undoPath() {
+function undoPoint() {
     if (g_current_guide.length > 0) {
         g_current_guide.pop();
     }
@@ -328,6 +335,42 @@ function redrawCanvas (){
     dotAllNodes();
 }
 
+function handleFocus(e) {
+    if(e.type == 'mouseover'){
+        //console.log("mouseover");
+        c.focus();
+        return false;
+    }else if(e.type == 'mouseout'){
+        c.blur();
+        return false;
+    }
+    return true;
+};
+
+function handleKeyDown(e) {
+    console.log("key down:" + e.keyCode);
+
+    if (!g_current_guide_started) {
+        return true;
+    }
+
+    var key_id = e.keyCode || e.which;
+
+    // todo: simulate mouse move event, pixel by pixel
+    if (key_id === LEFT_KEY) {
+    } else if (key_id === RIGHT_KEY) {
+    } else if (key_id === UP_KEY) {
+    } else if (key_id === DOWN_KEY) {
+    } else if (key_id === ENTER_KEY) {
+        // todo: simulate the click event
+    } else {
+        return true;
+    }
+
+    return false;
+};
+
+
 function onLoad() {
 
     c = document.getElementById("myCanvas");
@@ -339,9 +382,14 @@ function onLoad() {
     c.onclick = onClick;
     c.ondblclick = onDoubleClick;
     c.oncontextmenu = onRightClick;
-    c.onmousemove = onMouseMove();  // note that this returns a closure
+    c.onmousemove = onMouseMove;  // note that this is a closure
     c.onmousewheel = onMouseWheel;
     c.onmouseleave = onMouseLeave;
+    c.addEventListener('mouseover',handleFocus,false);
+    c.addEventListener('mouseout',handleFocus,false);
+    c.addEventListener('keydown',handleKeyDown,false);
+
+
 
     ctx = c.getContext('2d');
 
@@ -350,12 +398,12 @@ function onLoad() {
     // set button callbacks
     start_btn = document.getElementById("startPath");
     stop_btn = document.getElementById("stopPath");
-    undo_btn = document.getElementById("undoPath");
+    undo_btn = document.getElementById("undoPoint");
     cycle_btn = document.getElementById("cyclePath");
 
     start_btn.onclick = startPath;
     stop_btn.onclick = stopPath;
-    undo_btn.onclick = undoPath;
+    undo_btn.onclick = undoPoint;
     cycle_btn.onclick = cyclePath;
 
 }
@@ -366,12 +414,12 @@ window.onload = onLoad;
     </head>
     <body>
     <div id="div1" style="float: left;">
-    <canvas id="myCanvas" width="100" height="512" style="border:2px solid green;"></canvas>
+    <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid green;"></canvas>
     </div>
     <div id="div2" style="float: left;">
     <form>
     <input id="startPath" type="button" value="Start Path"/>
-    <input id="undoPath" type="button" value="Undo Path"/>
+    <input id="undoPoint" type="button" value="Undo Point"/>
     <input id="stopPath" type="button" value="End Path"/>
     <input id="cyclePath" type="button" value="Cycle Path"/>
     </form>
