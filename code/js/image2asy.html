@@ -249,14 +249,6 @@ function onMySpliceConn () {
 }
 
 function pointArrayToAsyGuide(G) {
-/*
-    // note: change the y direction from canvas to normal: inverse the sign
-    var txt = "" + g.map(function(x) { return "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")"; }).join("..");
-    if (g.cyclic) {
-        txt = txt + "..cycle";
-    }
-*/
-
     // for each subpath, return the guide
     function _for_each_sub(sub) {
         return "" + sub.map(function(x) {
@@ -267,15 +259,23 @@ function pointArrayToAsyGuide(G) {
     var subs = divideOnePath(G);
     var txt = "" + subs.map(function(sub){return _for_each_sub(sub);}).join(",");
 
-    // use buildcycle() if G.buildcycle=true, or G.cyclic=true and it contains "&&"
-    if (G.buildcycle === true || 
-        (G.cyclic && G.filter(function(x){ return x.conn === MY_SPLICE}))) {
-        if(subs.length == 1){
+    console.log(txt);
+
+    // use buildcycle() if G.buildcycle=true, or G.cyclic=true and (subs.length > 1)
+    if (G.buildcycle === true) {
+        if(subs.length === 1){
             // only one sub, this means the first and last points are the same, 
             // we only need to close the path now
             // if we buildcycle() on this single path, it will not work, as buildcycle()
             // expects at least two paths.
             txt = txt + "--cycle";
+        } else {
+            txt = "buildcycle(" + txt + ")";
+        }
+    } else if (G.cyclic === true) {
+        console.log("subs.length:", subs.length);
+        if(subs.length === 1) {
+            txt = txt + (G[G.length-1].conn || jh.conn.FREE_CURVE) + "cycle";
         } else {
             txt = "buildcycle(" + txt + ")";
         }
@@ -528,16 +528,23 @@ function divideOnePath(P) {
     
     // handle the last node for cyclic path
     if (p.cyclic) {
-        if(p[p.length-1].conn === jh.conn.STRAIGHT_LINE || 
-           p[0].conn === jh.conn.STRAIGHT_LINE) {
+        if(p[p.length-1].conn === jh.conn.STRAIGHT_LINE || p[0].conn === jh.conn.STRAIGHT_LINE) {
             subs[subs.length-1].push(p[0]);
         } else { 
-            // concat two free curves into one: prepend last subpath into the 1st subpath
-            subs[subs.length-1].reverse().map(function(n){subs[0].unshift(n);});
-            // remove the last subpath
-            subs.pop();
+            if (subs.length > 1) {
+                // concat two free curves into one: prepend last subpath into the 1st subpath
+                subs[subs.length-1].reverse().map(function(n){subs[0].unshift(n);});
+                // remove the last subpath
+                subs.pop();
+            }
+        }
+
+        // this is to draw cyclic curve in Canvas
+        if (subs.length == 1) {
+            subs[0].cyclic = true;
         }
     }
+
     return subs;
 }
 
