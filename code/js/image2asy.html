@@ -273,7 +273,7 @@ function pointArrayToAsyGuide(G) {
             txt = "buildcycle(" + txt + ")";
         }
     } else if (G.cyclic === true) {
-        console.log("subs.length:", subs.length);
+//        console.log("subs.length:", subs.length);
         if(subs.length === 1) {
             txt = txt + (G[G.length-1].conn || jh.conn.FREE_CURVE) + "cycle";
         } else {
@@ -525,6 +525,7 @@ function divideOnePath(P) {
     // in order of the original path;
     // the conn of the 1st node of each subpath tells if it's a straight line or a curve
     // 
+    console.log("divide: subs.length:", subs.length);
     
     // handle the last node for cyclic path
     if (p.cyclic) {
@@ -556,6 +557,7 @@ function divideOnePath(P) {
 function drawOnePath(P) {
 
     var subs = divideOnePath(P);
+    console.log("draw: subs.length:", subs.length);
     subs.map(function(x){
         if (x[0].conn === jh.conn.STRAIGHT_LINE) {
             drawStraightPath(x);
