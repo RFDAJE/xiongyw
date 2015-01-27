@@ -28,6 +28,7 @@
  * - make it possible to export SVG format data
  * + detect when mouse move out of canvas (and update the draw accordingly)
  * + add keyboard event (up/down/left/right) support: http://dbp-consulting.com/tutorials/canvas/CanvasKeyEvents.html
+ * + add connector support: "--", "&&"
  * - read: http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
  */
 
@@ -49,8 +50,11 @@ var POLYGON_LINE_WIDTH = 1;
 var POLYGON_STROKE_STYLE = "red";
 var BEZIER_LINE_WIDTH = 3;
 var BEZIER_STROKE_STYLE = "blue";
-var DOT_RADIUS = 3;
+var DOT_RADIUS = 4;
 var DOT_FILL_STYLE = "black";
+var CURSUR_LINE_WIDTH = 1; // cursor in the center or the dot
+var CURSUR_SIZE = 4;
+var CURSUR_STROKE_STYLE = "white";
 
 var g_result = []; // an array of array of points, representing the guides
 var g_current_guide = [];  // an array of points, representing the current g_current_guide
@@ -60,7 +64,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
-img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sine_cosine_one_period.svg/300px-Sine_cosine_one_period.svg.png";
+//img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sine_cosine_one_period.svg/300px-Sine_cosine_one_period.svg.png";
 //img.src = "test.png";
 
 
@@ -171,6 +175,25 @@ function stopPath() {
     redrawCanvas();
 }
 
+//
+// when exporting to Asymptote, use buildcycle() to make the path cyclic
+//
+function buildCycle() {
+    if (g_current_guide.length > 1) {
+        // push the first point
+        g_current_guide.push(g_current_guide[0]);
+        g_current_guide.buildcycle = true;
+        g_result.push(g_current_guide);
+    }
+
+    g_current_guide = [];
+    g_current_guide_started = false;
+
+    outputResult();
+    redrawCanvas();
+}
+
+
 // this also end the current path
 function cyclePath() {
     if (g_current_guide.length > 0) {  // should be > 1?
@@ -185,6 +208,7 @@ function cyclePath() {
     redrawCanvas();
 }
 
+
 /*
  * discard the last point of the current guide
  */
@@ -197,15 +221,68 @@ function undoPoint() {
     redrawCanvas();
 }
 
-function pointArrayToAsyGuide(g) {
+// by default it's free conn, so not needed
+//
+//function onFreeConn () {
+//    if (g_current_guide_started && g_current_guide.length > 0) {
+//        g_current_guide[g_current_guide.length-1].conn = jh.conn.FREE_CURVE;
+//    }
+//}
+
+function onStraightConn () {
+    if (g_current_guide_started && g_current_guide.length > 0) {
+        g_current_guide[g_current_guide.length-1].conn = jh.conn.STRAIGHT_LINE;
+    }
+}
+
+function onMySpliceConn () {
+    if (g_current_guide_started && g_current_guide.length > 0) {
+        var last = g_current_guide[g_current_guide.length-1];
+        last.conn = MY_SPLICE;
+        // insert the last node again
+        var n = [];
+        n[0] = last[0];
+        n[1] = last[1];
+        n.conn = jh.conn.FREE_CURVE;
+        g_current_guide.push(n);
+    }
+}
+
+function pointArrayToAsyGuide(G) {
+/*
     // note: change the y direction from canvas to normal: inverse the sign
     var txt = "" + g.map(function(x) { return "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")"; }).join("..");
     if (g.cyclic) {
         txt = txt + "..cycle";
     }
+*/
+
+    // for each subpath, return the guide
+    function _for_each_sub(sub) {
+        return "" + sub.map(function(x) {
+            return "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")";
+        }).join(sub[0].conn);
+    }
+
+    var subs = divideOnePath(G);
+    var txt = "" + subs.map(function(sub){return _for_each_sub(sub);}).join(",");
+
+    // use buildcycle() if G.buildcycle=true, or G.cyclic=true and it contains "&&"
+    if (G.buildcycle === true || 
+        (G.cyclic && G.filter(function(x){ return x.conn === MY_SPLICE}))) {
+        if(subs.length == 1){
+            // only one sub, this means the first and last points are the same, 
+            // we only need to close the path now
+            // if we buildcycle() on this single path, it will not work, as buildcycle()
+            // expects at least two paths.
+            txt = txt + "--cycle";
+        } else {
+            txt = "buildcycle(" + txt + ")";
+        }
+    }
+
     return txt;
 }
-
 
 function displayCurrentGuide() {
     var ta =  document.getElementById("g_current_guide"); // textarea
@@ -254,10 +331,20 @@ function drawImageAndGrid() {
     }
 }
 
+// my splice: the idea is to build path with charp corners without using explicit
+// direction specifier. the way is to concat smooth paths together, without
+// discarding the last node of the previous subpath. e.g.,
+// "z1..z2..z3&&z3..z4..z5" purely means "z1..z2..z3" plus "z3..z4..z5",
+// so effectively this is itself an array of path.
+// Be noted that the two nodes surround "&&" must be the same;
+// if we want the path array to be cyclic (in Asymptote), use buildcycle()
+var MY_SPLICE ="&&"; 
+
+
 //
-// draw polygon (thiner) on top of bezier (thicker)
+// draw a free path: connectors between nodes are all free connector ".."
 // 
-function drawOnePath(p) {
+function drawFreePath(p) {
 
     //
     // draw bezier
@@ -309,13 +396,185 @@ function drawOnePath(p) {
     ctx.stroke();
 }
 
+//
+// draw a straight path: connectors between nodes are all straightline connector "--"
+// 
+function drawStraightPath(p) {
+    //
+    // draw polygons
+    //
+    if (p.length < 1) {
+        return;
+    }
+
+    ctx.lineWidth = BEZIER_LINE_WIDTH;
+    ctx.strokeStyle = BEZIER_STROKE_STYLE;
+    ctx.beginPath();
+    ctx.moveTo(p[0][0], p[0][1]);
+    for(j = 1; j < p.length; j ++) {
+        ctx.lineTo(p[j][0], p[j][1]);
+    }
+    if (p.cyclic) {
+        ctx.closePath();
+    }
+    ctx.stroke();
+}
+
+// clone a node
+function cloneOneNode(n) {
+    var c = [];
+    c[0] = n[0];
+    c[1] = n[1];
+    c.conn = n.conn;
+    return c;
+}
+
+// clone a path
+function cloneOnePath(p) {
+    var i, c=[];
+    c.cyclic = p.cyclic;
+    c.buildcycle = p.buildcycle;
+    p.map(function(n){c.push(cloneOneNode(n))});
+    return c;
+}
+
+//
+// divide a path into a subpath array, each subpath is either a free curve,
+// or a polygon. curve or straight is determined by the conn property 
+// of the 1st node of the subpath
+//
+// input: p, read-only
+// return: an array of subpath; the "&&" connectors, if any, will be removed from the return
+//
+// e.g. a test case: z0..z1--z2..z3&&z3..z4--z5
+//
+//   var g=[[0,0],[1,1],[2,2],[3,3],[3,3],[4,4],[5,5]];
+//   g[1].conn = "--";
+//   g[3].conn = "&&";
+//   g[5].conn = "--";
+//
+// it should returns:
+// - z0..z1
+// - z2..z3
+// - z3..z4
+// - z4--z5
+// if the path is cyclic:
+//   if z5.conn is free (default): prepend z5 to the first free curve (so it becomes z5..z0..z1)
+//   if z5.conn is straight: append z0 to the last straight line (so it becomes z4--z5--z0)
+function divideOnePath(P) {
+    var p=cloneOnePath(P);
+    var mysplice=[], subs=[];  // array of array
+    var i, sub = [];  // the current subpath
+    var pre_conn, cur_conn;
+
+    // making sure each node has a connector property
+    for (i = 0; i < p.length; i ++) {
+        p[i].conn = p[i].conn || jh.conn.FREE_CURVE;
+    }
+
+    //
+    // first remove all "&&", to build mysplice[]
+    //
+    sub = [];
+    for (i = 0; i < p.length; i ++) {
+        if (p[i].conn === MY_SPLICE){
+            p[i].conn = jh.conn.FREE_CURVE; // change it to default connector
+            sub.push(p[i]);
+            mysplice.push(sub);
+            sub = [];
+        } else {
+            sub.push(p[i]);
+        }
+    }
+
+    if (sub.length != 0) {
+        mysplice.push(sub);
+    }
+
+    // 
+    // for each mysplice: connectors now can be either STRAIGHT_LINE or FREE_CURVE
+    // split straight line and curve into different subpaths, i.e., into subs[]
+    //
+    subs=[];
+    mysplice.map(function(sp){
+        sub=[];
+        sub.push(sp[0]);
+        pre_conn = sp[0].conn;
+        for (i = 1; i < sp.length; i ++) {
+            cur_conn = sp[i].conn;
+            if (pre_conn === cur_conn) {
+                sub.push(sp[i]);
+            } else {
+                // previous subpath ends
+                sub.push(sp[i]);
+                subs.push(sub);
+                // start a new subpath with the current node
+                sub = [];
+                sub.push(sp[i]);
+                pre_conn = cur_conn;
+            }
+        }
+
+        if (sub.length > 0) {
+            subs.push(sub);
+        }
+    });
+
+    //
+    // now each subpath in subs[] is either straight line or free curve (i.e., not mixed), 
+    // in order of the original path;
+    // the conn of the 1st node of each subpath tells if it's a straight line or a curve
+    // 
+    
+    // handle the last node for cyclic path
+    if (p.cyclic) {
+        if(p[p.length-1].conn === jh.conn.STRAIGHT_LINE || 
+           p[0].conn === jh.conn.STRAIGHT_LINE) {
+            subs[subs.length-1].push(p[0]);
+        } else { 
+            // concat two free curves into one: prepend last subpath into the 1st subpath
+            subs[subs.length-1].reverse().map(function(n){subs[0].unshift(n);});
+            // remove the last subpath
+            subs.pop();
+        }
+    }
+    return subs;
+}
+
+
+
+//
+// draw polygon (thiner) on top of bezier (thicker)
+// 
+function drawOnePath(P) {
+
+    var subs = divideOnePath(P);
+    subs.map(function(x){
+        if (x[0].conn === jh.conn.STRAIGHT_LINE) {
+            drawStraightPath(x);
+        } else {
+            drawFreePath(x);
+        }
+    });
+}
 
 function dotAllNodes() {
     function _dot(x, y) {
+        // dot
         ctx.beginPath(); 
         ctx.arc(x, y, DOT_RADIUS, 0, Math.PI*2, true); 
         ctx.fillStyle = DOT_FILL_STYLE; 
         ctx.fill();
+
+        // cursor
+        ctx.beginPath();
+        ctx.lineWidth = CURSUR_LINE_WIDTH;
+        ctx.strokeStyle = CURSUR_STROKE_STYLE;
+        ctx.moveTo(x-CURSUR_SIZE, y);
+        ctx.lineTo(x+CURSUR_SIZE, y);
+        ctx.moveTo(x, y-CURSUR_SIZE);
+        ctx.lineTo(x, y+CURSUR_SIZE);
+        ctx.stroke();
     }
 
     function _dotPath(p) {
@@ -400,12 +659,21 @@ function onLoad() {
     stop_btn = document.getElementById("stopPath");
     undo_btn = document.getElementById("undoPoint");
     cycle_btn = document.getElementById("cyclePath");
+    buildcycle_btn = document.getElementById("buildCycle");
+
+//    free_btn = document.getElementById("connFree");
+    mysplice_btn = document.getElementById("connMySplice");
+    straight_btn = document.getElementById("connStraight");
 
     start_btn.onclick = startPath;
     stop_btn.onclick = stopPath;
     undo_btn.onclick = undoPoint;
     cycle_btn.onclick = cyclePath;
+    buildcycle_btn.onclick = buildCycle;
 
+//    free_btn.onclick = onFreeConn;
+    mysplice_btn.onclick = onMySpliceConn;
+    straight_btn.onclick = onStraightConn;
 }
 
 
@@ -422,6 +690,12 @@ window.onload = onLoad;
     <input id="undoPoint" type="button" value="Undo Point"/>
     <input id="stopPath" type="button" value="End Path"/>
     <input id="cyclePath" type="button" value="Cycle Path"/>
+    <input id="buildCycle" type="button" value="buildcycle()"/>
+    
+
+    <!--input id="connFree" type="button" value=".."/>  --> <!-- default connection type -->
+    <input id="connMySplice" type="button" value="&&"/>
+    <input id="connStraight" type="button" value="--"/>
     </form>
     <br>
     <textarea id="g_current_guide" rows="50" cols="50"></textarea>
