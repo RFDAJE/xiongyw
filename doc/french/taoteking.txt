@@ -850,19 +850,29 @@ Alors l'empire se rectifie de lui-même.
 
 ====================================================================
 
-38
+38 上德不德
 
-Les hommes d'une vertu supérieure ignorent leur vertu ; c'est pourquoi ils ont de la vertu.
-Les hommes d'une vertu inférieure n'oublient pas leur vertu ; c'est pourquoi ils n'ont pas de vertu.
+Les hommes d'une vertu supérieure ignorent leur vertu; 
+  c'est pourquoi ils ont de la vertu.
+Les hommes d'une vertu inférieure n'oublient pas leur vertu; 
+  c'est pourquoi ils n'ont pas de vertu.
 Les hommes d'une vertu supérieure la pratiquent sans y songer.
 Les hommes d'une vertu inférieure la pratiquent avec intention.
 Les hommes d'une humanité supérieure la pratiquent sans y songer.
 Les hommes d'une équité supérieure la pratiquent avec intention.
-Les hommes d'une urbanité supérieure la pratiquent et personne n'y répond ; alors ils emploient la violence pour qu'on les paye de retour.
-C'est pourquoi l'on a de la vertu après avoir perdu le Tao ; de l'humanité après avoir perdu la vertu ; de l'équité après avoir perdu l'humanité ; de l'urbanité après avoir perdu l'équité.
-L'urbanité n'est que l'écorce de la droiture et de la sincérité ; c'est la source du désordre.
-Le faux savoir n'est que la fleur du Tao et le principe de l'ignorance.
-C'est pourquoi un grand homme[27] s'attache au solide et laisse le superficiel.
+Les hommes d'une urbanité supérieure la pratiquent et 
+  personne n'y répond; 
+  alors ils emploient la violence pour qu'on les paye de retour.
+C'est pourquoi l'on a de la vertu après avoir perdu le Tao; 
+  de l'humanité après avoir perdu la vertu; 
+  de l'équité après avoir perdu l'humanité; 
+  de l'urbanité après avoir perdu l'équité.
+L'urbanité n'est que l'écorce de la droiture et de la sincérité; 
+  c'est la source du désordre.
+Le faux savoir n'est que la fleur du Tao et 
+  le principe de l'ignorance.
+C'est pourquoi un grand homme[27] s'attache au solide et 
+  laisse le superficiel.
 Il estime le fruit et laisse la fleur.
 C'est pourquoi il rejette l'une et adopte l'autre.
 
@@ -872,6 +882,8 @@ Notes du chapitre 38
 Plusieurs auteurs raisonnent ainsi : l'humanité, la justice, les rites, les lois, sont les instruments dont se sert un homme saint (c'est-à-dire un prince parfait) pour gouverner l'empire. Mais Lao-tseu veut qu'on abandonne l'humanité et la justice, qu'on renonce aux rites et aux lois. Si une telle doctrine était mise en pratique, comment l'empire ne tomberait-il pas dans le désordre ? En effet, parmi les lettrés des siècles suivants, on en a vu qui, séduits par le goût des discussions abstraites, négligeaient les actes de la vie réelle ; d'autres qui, entraînés par l'amour de la retraite, mettaient en oubli les lois de la morale. L'empire imita leur exemple, et bientôt la société tomba dans le trouble et le désordre. C'est ce qui arriva sous la dynastie des Tsin. Ce malheur prit sa source dans la doctrine de Lao-tseu.
 Ceux qui raisonnent ainsi ne sont pas capables de comprendre le but de Lao-tseu, ni de pénétrer la véritable cause des vices qui ont éclaté sous les Tsin. Les hommes des Tsin ne suivaient pas la doctrine de Lao-tseu ; les troubles de cette époque ont eu une autre cause. Ce n'est point sans motif que Lao-tseu apprend à quitter l'humanité et la justice, à renoncer aux rites et à l'étude. Si les hommes doivent quitter l'humanité et la justice, c'est pour révérer le Tao et la Vertu ; s'ils doivent renoncer aux rites et à l'étude, c'est pour revenir à la droiture et à la sincérité. Quant aux hommes des Tsin, je vois qu'ils ont abandonné l'humanité et la justice ; je ne vois pas qu'ils aient révéré le Tao et la Vertu. Je vois qu'ils ont renoncé aux rites et à l'étude ; je ne vois pas qu'ils soient revenus à la droiture et à la sincérité.
 Depuis la période Thaï-kang (l'an 280 après J.-C.) jusqu'à la fuite sur la rive gauche du fleuve Kiang, les lettrés s'appliquaient en général à acquérir une réputation éminente ; ils s'abandonnaient mollement au repos ; ils couraient après le pouvoir et la fortune, et se passionnaient pour la musique et les arts. Le goût des discussions abstraites et l'amour de la solitude n'étaient rien en comparaison de ces excès coupables qui ont troublé la famille des Tsin, et dont il serait impossible de trouver la cause dans l'ouvrage de Lao-tseu.
+
+上德不德，是以有德；下德不失德，是以无德。上德无为而无以为；下德为之而有以为。上仁为之而无以为；上义为之而有以为。上礼为之而莫之应，则攘臂而扔之。故失道而后德，失德而后仁，失仁而后义，失义而后礼。夫礼者，忠信之薄，而乱之首。前识者，道之华，而愚之始。是以大丈夫处其厚，不居其薄；处其实，不居其华。故去彼取此。
 
 39
 
