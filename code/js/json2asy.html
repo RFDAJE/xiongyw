@@ -62,7 +62,7 @@ var CURSUR_SIZE = 4;
 var CURSUR_STROKE_STYLE = "white";
 
 var g_result = []; // an array of path
-var g_cur_path = getAnEmptyPath();  // the current path
+var g_cur_path = getOneEmptyPath();  // the current path
 var g_cur_conn = FREE_CURVE; // the current conn type
 var g_cur_path_started = false;
 
@@ -79,7 +79,7 @@ function cloneJsonObject(o) {
 }
 
 // return an empty path
-function getAnEmptyPath() {
+function getOneEmptyPath() {
     return {"nodes":[]};
 }
 
@@ -181,7 +181,7 @@ function startCurrentPath() {
     }
  
     // re-init the guide
-    g_cur_path = getAnEmptyPath();
+    g_cur_path = getOneEmptyPath();
     displayCurrentPath();
     g_cur_path_started = true;
 }
@@ -193,7 +193,7 @@ function stopCurrentPath() {
         g_paths.push(g_cur_path);
     }
 
-    g_cur_path = getAnEmptyPath();
+    g_cur_path = getOneEmptyPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -208,14 +208,14 @@ function stopCurrentPath() {
 function freeCloseCurrentPath() {
     var n = g_cur_path.nodes.length;
     if (n <= 1) {
-        console.log("too less nodes");
+        console.log("too few nodes");
         return;
     }
 
     g_cur_path.nodes[n-1].conn = FREE_CURVE;
     g_paths.push(g_cur_path);
 
-    g_cur_path = getAnEmptyPath();
+    g_cur_path = getOneEmptyPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -225,7 +225,7 @@ function freeCloseCurrentPath() {
 function straightCloseCurrentPath() {
     var n = g_cur_path.nodes.length;
     if (n <= 1) {
-        console.log("too less nodes");
+        console.log("too few nodes");
         return;
     }
 
@@ -234,7 +234,7 @@ function straightCloseCurrentPath() {
     g_cur_path.nodes.push(z0);
     g_paths.push(g_cur_path);
 
-    g_cur_path = getAnEmptyPath();
+    g_cur_path = getOneEmptyPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -439,18 +439,21 @@ function drawStraightPath(p) {
 
 
 //
-// divide a path into a subpath array, each subpath is either a connected free curve segments,
-// or a connected straightline segments.
-// a subpath is just an array of nodes;
-// curve or straight is determined by the conn property of the 1st segment
+// divide a path into a subpaths, each subpath is either a continuous free curve segments,
+// or a continuous straightline segments; subpath type (curve or straight line) can be
+// determined by any segment of the subpath.
+
+// the json format of a subpath is the same as for a path.
 //
 // input: P, read-only
 // return: an array of subpath, that:
 //     1. within each subpath, the conn type of all segments are the same;
 //     2. if several free curve segments can be contained in a single subpath, 
 //        it should not be divided into multiple subpaths.
+//     it's possible that divided subpath is the same as the original path, if it's
+//     not dividable.
 //
-// e.g. a test case: z0..z1--z2..z3--z3..z4--z5
+// A test case: z0..z1--z2..z3--z3..z4--z5
 //
 //   var g={"nodes":[ {"x":0,"y":0, "conn":".."},
 //                    {"x":1,"y":1, "conn":"--"},
@@ -470,9 +473,9 @@ function drawStraightPath(p) {
 // - z3..z4
 // - z4--z5
 //
-// when the path is cyclic:
-//   if z5.conn == "--": "z4--z5" becomes "z4--z5--z0"
-//   if z5.conn == "..": "z0..z1" becomes "z5..z0..z1"
+// when the path is closed:
+// - if(z5.conn==="--"): "z4--z5" becomes "z4--z5--z0"
+// - if(z5.conn===".."): "z0..z1" becomes "z5..z0..z1"
 function divideOnePath(P) {
 
     var i, n = P.nodes.length;
@@ -482,7 +485,7 @@ function divideOnePath(P) {
     var pre_conn, cur_conn;
 
     if (n < 2) {
-        console.log("divideOnePath(): too less nodes in the path!");
+        console.log("divideOnePath(): too few nodes in the path!");
         return [];
     }
 
@@ -506,80 +509,73 @@ function divideOnePath(P) {
             return;
     }
 
-    //-------------------> to continue!
-    //
-    // first remove all "&&", to build mysplice[]
-    //
-    sub = [];
-    for (i = 0; i < n; i ++) {
-        if (p.nodes[i].conn === MY_SPLICE){
-            p.nodes[i].conn = jh.conn.FREE_CURVE; // change it to default connector
-            sub.push(p.nodes[i]);
-            mysplice.push(sub);
-            sub = [];
-        } else {
-            sub.push(p.nodes[i]);
-        }
-    }
-
-    if (sub.length != 0) {
-        mysplice.push(sub);
-    }
-
     // 
-    // for each mysplice: connectors now can be either STRAIGHT_LINE or FREE_CURVE
     // split straight line and curve into different subpaths, i.e., into subs[]
     //
     subs=[];
-    mysplice.map(function(sp){
-        sub=[];
-        sub.push(sp.nodes[0]);
-        pre_conn = sp.nodes[0].conn;
-        for (i = 1; i < sn; i ++) {
-            cur_conn = sp.nodes[i].conn;
-            if (pre_conn === cur_conn) {
-                sub.push(sp.nodes[i]);
-            } else {
-                // previous subpath ends
-                sub.push(sp.nodes[i]);
-                subs.push(sub);
-                // start a new subpath with the current node
-                sub = [];
-                sub.push(sp.nodes[i]);
-                pre_conn = cur_conn;
-            }
-        }
-
-        if (sub.length > 0) {
+    sub=getOneEmptyPath();
+    sub.nodes.push(p.nodes[0]);
+    pre_conn = p.nodes[0].conn;
+    for (i = 1; i < n; i ++) {
+        cur_conn = p.nodes[i].conn;
+        if (pre_conn === cur_conn) {
+            sub.nodes.push(p.nodes[i]);
+        } else {
+            // previous subpath ends
+            sub.nodes.push(p.nodes[i]);
             subs.push(sub);
-        }
-    });
-
-    //
-    // now each subpath in subs[] is either straight line or free curve (i.e., not mixed), 
-    // in order of the original path;
-    // the conn of the 1st node of each subpath tells if it's a straight line or a curve
-    // 
-    console.log("divide: subs.length:", subs.length);
-    
-    // handle the last node for cyclic path
-    if (p.nodes.cyclic) {
-        if(p.nodes[n-1].conn === jh.conn.STRAIGHT_LINE || p.nodes[0].conn === jh.conn.STRAIGHT_LINE) {
-            subs[subs.length-1].push(p.nodes[0]);
-        } else { 
-            if (subs.length > 1) {
-                // concat two free curves into one: prepend last subpath into the 1st subpath
-                subs[subs.length-1].reverse().map(function(n){subs[0].unshift(n);});
-                // remove the last subpath
-                subs.pop();
-            }
-        }
-
-        // this is to draw cyclic curve in Canvas
-        if (subs.length == 1) {
-            subs[0].cyclic = true;
+            // start a new subpath with the current node
+            sub = getOneEmptyPath();
+            sub.nodes.push(p.nodes[i]);
+            pre_conn = cur_conn;
         }
     }
+    if (sub.nodes.length > 0) {
+        subs.push(sub);
+    }
+
+    //
+    // check the conn of the last node, which is stored in cur_conn now.
+    //
+    // if the path is open, we have already done;
+    // if the path is closed, we need to connect the 1st-sub and the last-sub somehow:
+    //
+    //   .-->[1st-sub] ... [last-sub]-->-.
+    //   |                               |
+    //    ------<-------------------<----
+    // 
+    // there are several cases:
+    // 
+    // 1. 1st-sub is the same as the last-sub, i.e., there is only one subpath 
+    //    (which is the original path), we are done;
+    // 2. otherwise, we have 8 possiblities, in terms of the conn type of (last-sub,last-node,1st-sub):
+    //    +----------+-----------+----------+-------------------------------+ 
+    //    | last-sub | last-node | 1st-sub  |     result                    |
+    //    +----------+-----------+----------+-------------------------------+ 
+    //  a |   --     |   --      |   --     |  prepend last-sub to 1st-sub  |
+    //  h |   ..     |   ..      |   ..     |  ditto                        |
+    //    +----------+-----------+----------+-------------------------------+ 
+    //  c |   --     |   ..      |   --     |  a new sub with one segment   |
+    //  f |   ..     |   --      |   ..     |  ditto                        |
+    //    +----------+-----------+----------+-------------------------------+ 
+    //  d |   --     |   ..      |   ..     |  prepend last-node to 1st-sub |
+    //  e |   ..     |   --      |   --     |  ditto                        |
+    //    +----------+-----------+----------+-------------------------------+ 
+    //  b |   --     |   --      |   ..     |  append z0 to last-sub        |
+    //  g |   ..     |   ..      |   --     |  ditto                        |
+    //    +----------+-----------+----------+-------------------------------+ 
+    //
+    if (cur_conn !== STRAIGHT_LINE && cur_conn !== FREE_CURVE) {
+        // it's a open path...we have already done!
+    } else { // it's a closed path
+        if (subs.length === 1) {
+            // the subpath === the original path. we are also done!
+        } else {
+            // ---------> todo!
+            
+        }
+    }
+
 
     return subs;
 }
