@@ -70,7 +70,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
-//img.src = "http://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Sine_cosine_one_period.svg/300px-Sine_cosine_one_period.svg.png";
+//img.src = "http://ts4.mm.bing.net/th?id=HN.608049640211612315&pid=1.7";
 //img.src = "test.png";
 
 // input: o, could be any json object
@@ -116,7 +116,7 @@ function onClick(e) {
             return;
         }
         g_cur_path.nodes.push(node);
-        displayCurrentPath();
+        //displayCurrentPath();
     }
 }
 
@@ -182,11 +182,11 @@ function startCurrentPath() {
  
     // re-init the guide
     g_cur_path = getOneEmptyPath();
-    displayCurrentPath();
+//    displayCurrentPath();
     g_cur_path_started = true;
 }
 
-function stopCurrentPath() {
+function endCurrentPathAsOpened() {
     var n = g_cur_path.nodes.length;
     if (n > 0) {
         g_cur_path.nodes[n-1].conn = OPEN_SEGMENT;
@@ -202,10 +202,10 @@ function stopCurrentPath() {
 
 //
 // there are two ways to close a path
-// - freeClose: change the last node conn is ".."
-// - straightClose: append the 1st node (with conn "--") into the path
+// - freeClosed: change the last node conn is ".."
+// - lineClosed: append the 1st node (with conn "--") into the path
 
-function freeCloseCurrentPath() {
+function endCurrentPathAsFreeClosed() {
     var n = g_cur_path.nodes.length;
     if (n <= 1) {
         console.log("too few nodes");
@@ -222,7 +222,7 @@ function freeCloseCurrentPath() {
     redrawCanvas();
 }
 
-function straightCloseCurrentPath() {
+function endCurrentPathAsLineClosed() {
     var n = g_cur_path.nodes.length;
     if (n <= 1) {
         console.log("too few nodes");
@@ -249,8 +249,19 @@ function undoPoint() {
         g_cur_path.nodes.pop();
     }
 
-    displayCurrentPath();
+    //displayCurrentPath();
     redrawCanvas();
+}
+
+// append the last node again
+function addDegradedSegment() {
+    var n = g_cur_path.nodes.length;
+    if (g_cur_path_started && n > 0) {
+        var last = g_cur_path.nodes[n-1];
+        var dup = cloneJsonObject(last);
+        last.conn = STRAIGHT_LINE;
+        g_cur_path.nodes.push(dup);
+    }
 }
 
 function onStraightConn () {
@@ -258,6 +269,8 @@ function onStraightConn () {
     if (g_cur_path_started && g_cur_path.nodes.length > 0) {
         g_cur_path.nodes[g_cur_path.nodes.length-1].conn = g_cur_conn;
     }
+
+    document.body.style.cursor = "crosshair";
 }
 
 function onFreeConn () {
@@ -265,60 +278,46 @@ function onFreeConn () {
     if (g_cur_path_started && g_cur_path.nodes.length > 0) {
         g_cur_path.nodes[g_cur_path.nodes.length-1].conn = g_cur_conn;
     }
+    document.body.style.cursor = "auto";
 }
 
 //
 // export a JSON path into Asymptote
 // input: a path object
 // output: a string representing a path/guide in asy
-function jsonPath2Asy(G) {
-    console.log("jsonPath2asy: to be implemented!");
-/*
-    // for each subpath, return the guide
-    function _for_each_sub(sub) {
-        return "" + sub.map(function(x) {
-            return "(" + x[0].toFixed(3) + "," + -x[1].toFixed(3) + ")";
-        }).join(sub[0].conn);
+function jsonPath2Asy(p) {
+    var i, e, n = p.nodes.length;
+    var asy = "";
+
+    for(i = 0; i < n-1; i ++) {
+        var e = p.nodes[i];
+        asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")" + e.conn;
     }
 
-    var subs = divideOnePath(G);
-    var txt = "" + subs.map(function(sub){return _for_each_sub(sub);}).join(",");
-
-    console.log(txt);
-
-    // use buildcycle() if G.buildcycle=true, or G.cyclic=true and (subs.length > 1)
-    if (G.buildcycle === true) {
-        if(subs.length === 1){
-            // only one sub, this means the first and last points are the same, 
-            // we only need to close the path now
-            // if we buildcycle() on this single path, it will not work, as buildcycle()
-            // expects at least two paths.
-            txt = txt + "--cycle";
-        } else {
-            txt = "buildcycle(" + txt + ")";
-        }
-    } else if (G.cyclic === true) {
-//        console.log("subs.length:", subs.length);
-        if(subs.length === 1) {
-            txt = txt + (G[G.length-1].conn || jh.conn.FREE_CURVE) + "cycle";
-        } else {
-            txt = "buildcycle(" + txt + ")";
-        }
+    // the last node
+    e = p.nodes[n-1];
+    asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")";
+    if (e.conn === STRAIGHT_LINE) {
+        asy += "--cycle";
+    } else if (e.conn === FREE_CURVE) {
+        asy += "..cycle";
     }
-
-    return txt;
-*/
+    
+    return asy;
 }
 
-function displayCurrentPath() {
-    var ta =  document.getElementById("g_cur_path"); // textarea
-    ta.value = JSON.stringify(g_cur_path, null, "    ");
-}
+//function displayCurrentPath() {
+//    var ta =  document.getElementById("g_cur_path"); // textarea
+//    ta.value = JSON.stringify(g_cur_path, null, "  ");
+//}
+
 
 function outputResult() {
-    var ta =  document.getElementById("g_paths"); // textarea
-    ta.value = g_paths.map(function(x){return jsonPath2Asy(x);}).join(",\r");
-    console.log("guide[] gg = {" + ta.value + "}");
+    
+    var asy = "guide[] gg = {" + g_paths.map(function(x){return jsonPath2Asy(x);}).join(",\r") + "};";
+    var ta = document.getElementById("g_paths"); // textarea
+    ta.value = asy;
+    console.log(asy+"draw(gg);");
 }
 
 
@@ -503,7 +502,7 @@ function divideOnePath(P) {
     var pre_conn, cur_conn, last_conn, first_conn;
 
     if (n < 2) {
-        console.log("divideOnePath(): too few nodes in the path!");
+        //console.log("divideOnePath(): too few nodes in the path!");
         return [];
     }
 
@@ -864,19 +863,21 @@ function onLoad() {
 
     // set button callbacks
     start_btn = document.getElementById("startCurrentPath");
-    stop_btn = document.getElementById("stopCurrentPath");
+    stop_btn = document.getElementById("endCurrentPathAsOpened");
     undo_btn = document.getElementById("undoPoint");
-    cycle_btn = document.getElementById("freeCloseCurrentPath");
-    buildcycle_btn = document.getElementById("buildCycle");
+    degraded_btn = document.getElementById("addDegradedSegment");
+    cycle_btn = document.getElementById("endCurrentPathAsFreeClosed");
+    buildcycle_btn = document.getElementById("endCurrentPathAsLineClosed");
 
     freeconn_btn = document.getElementById("connFree");
     straight_btn = document.getElementById("connStraight");
 
     start_btn.onclick = startCurrentPath;
-    stop_btn.onclick = stopCurrentPath;
+    stop_btn.onclick = endCurrentPathAsOpened;
     undo_btn.onclick = undoPoint;
-    cycle_btn.onclick = freeCloseCurrentPath;
-    buildcycle_btn.onclick = buildCycle;
+    degraded_btn.onclick = addDegradedSegment;
+    cycle_btn.onclick = endCurrentPathAsFreeClosed;
+    buildcycle_btn.onclick = endCurrentPathAsLineClosed;
 
 //    free_btn.onclick = onFreeConn;
     freeconn_btn.onclick = onFreeConn;
@@ -888,24 +889,29 @@ window.onload = onLoad;
 </script>
     </head>
     <body>
-    <div id="div1" style="float: left;">
+    <div id="div1" style="float:left;">
     <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid green;"></canvas>
     </div>
-    <div id="div2" style="float: left;">
+
+    <div id="div2" style="float:left;">
     <form>
     <input id="startCurrentPath" type="button" value="Start Path"/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <input id="undoPoint" type="button" value="Undo Point"/>
-    <input id="stopCurrentPath" type="button" value="End Path"/>
-    <input id="freeCloseCurrentPath" type="button" value="Free Cycle Path"/>
-    <input id="buildCycle" type="button" value="buildcycle()"/>
-    
-
+    <input id="addDegradedSegment" type="button" value="z--z"/>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <input id="connFree" type="button" value=".."/>
     <input id="connStraight" type="button" value="--"/>
+    <br>
+    <input id="endCurrentPathAsOpened" type="button" value="End Path (open)"/>
+    <br>
+    <input id="endCurrentPathAsFreeClosed" type="button" value="End Path (free closed)"/>
+    <br>
+    <input id="endCurrentPathAsLineClosed" type="button" value="End Path (line closed)"/>
     </form>
     <br>
-    <textarea id="g_cur_path" rows="50" cols="50"></textarea>
-    <textarea id="g_paths" rows="50" cols="50"></textarea>
+    <!--textarea id="g_cur_path" rows="50" cols="50"></textarea>-->
+    <textarea id="g_paths" rows="40" cols="100"></textarea>
     </div>
     </body>
     </html>
