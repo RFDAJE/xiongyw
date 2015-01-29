@@ -47,6 +47,7 @@ var UP_KEY = 38;
 var RIGHT_KEY = 39;
 var DOWN_KEY = 40;
 var ENTER_KEY = 13; 
+var SHIFT_KEY = 16;
 
 // canvas context constants
 var GRID_LINE_WIDTH = 0.2;
@@ -279,6 +280,14 @@ function onFreeConn () {
         g_cur_path.nodes[g_cur_path.nodes.length-1].conn = g_cur_conn;
     }
     document.body.style.cursor = "auto";
+}
+
+function toggleCurrentConn () {
+    if (g_cur_conn === STRAIGHT_LINE) {
+        onFreeConn();
+    } else {
+        onStraightConn();
+    }
 }
 
 //
@@ -844,6 +853,8 @@ function handleKeyDown(e) {
     } else if (key_id === DOWN_KEY) {
     } else if (key_id === ENTER_KEY) {
         // todo: simulate the click event
+    } else if (key_id === SHIFT_KEY) { 
+        toggleCurrentConn();
     } else {
         return true;
     }
@@ -915,8 +926,9 @@ window.onload = onLoad;
     <input id="undoPoint" type="button" value="Undo Point"/>
     <input id="addDegradedSegment" type="button" value="z--z"/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Select connector:
     <input id="connFree" type="button" value=".."/>
-    <input id="connStraight" type="button" value="--"/>
+    <input id="connStraight" type="button" value="--"/> (tip: SHIFT key to toggle)
     <br>
     <input id="endCurrentPathAsOpened" type="button" value="End Path (open)"/>
     <br>
