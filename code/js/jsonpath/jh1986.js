@@ -1,5 +1,5 @@
 // created(bruin, 2015-01-19)
-// last updated(bruin, 2015-01-23)
+// last updated(bruin, 2015-01-30)
 // email: sansidee at foxmail.com
 //
 // This "module" implements the algorithm described in the following paper, without external dependency: 
@@ -123,17 +123,9 @@ var jh = (function(){
     // A: matrix (an array of array, mxn, i.e. m rows and n columns)
     // b: vector (mx1)
     // m,n: size of the matrix
+    // known: a vector contains already known results (slots for unknown are null)
     // return: x, a vector (array of m elements)
-    //
-    // sample usage:
-    //
-    // var A=[[2,1,-1],[-3,-1,2],[-2,1,2]];
-    // var b=[8,-11,-3];
-    // var x=solve_matrix(A,b,3,3);
-    //
-    // then: x=[2, 3, -0.9999999999999999];
-    //
-    function solve_matrix(A, b, m, n) {
+    function solve_matrix(A, b, m, n, known) {
         var i, j, k, u, maxi, tmp, pivot, sum;
         var M = [], x = [];
 
@@ -145,6 +137,21 @@ var jh = (function(){
             }
             row.push(b[i]);
             M.push(row);
+        }
+
+        //
+        // apply known
+        //
+        if (known) {
+            for (i = 0; i < m; i ++) {
+                if (known[i]) {
+                    for (j = 0; j < n; j ++) {
+                        M[i][j] = 0;
+                    }
+                    M[i][i] = 1;
+                    M[i][n] = known[i];
+                }
+            }
         }
 
         //
@@ -205,6 +212,19 @@ var jh = (function(){
         return x;
     }
 
+    // test
+    function test_solve_matrix() {
+        var A = [[2,1,-1],[-3,-1,2],[-2,1,2]];
+        var b = [8,-11,-3];
+        var x = solve_matrix(A,b,3,3); // x should be [2, 3, -0.999]
+        console.log(x);
+
+        var known=[3,null,1];
+        x=solve_matrix(A,b,3,3,known); // x should be [3, 3.999, 1]
+        console.log(x);
+        
+    }
+
     //
     // the following routines are "cloned" from the original python code:
     // http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
@@ -253,7 +273,7 @@ var jh = (function(){
     // sample test cases:
     // 1. non-cyclic:
     //   var g=[[0,0],[100,0],[100,100]];
-    //   _compute_distances_and_angles(g);
+    //   compute_l_and_xi(g);
     // then:
     //   g[0]: [0, 0, d_ant: 0, d_post: 100, xi: 0]
     //   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
@@ -262,13 +282,13 @@ var jh = (function(){
     // 2. cyclic:
     //   var g=[[0,0],[100,0],[100,100]];
     //   g.cyclic = true;
-    //   _compute_distances_and_angles(g);
+    //   compute_l_and_xi(g);
     // then:
     //   g[0]: [0, 0, d_post: 100, d_ant: 141.4213562373095, xi: -0.7853981633974483]
     //   g[1]: [100, 0, d_post: 100, d_ant: 100, xi: 1.5707963267948966]
     //   g[2]: [100, 100, d_post: 141.4213562373095, d_ant: 100, xi: -0.7853981633974483]
     //
-    function _compute_distances_and_angles(g) {
+    function compute_l_and_xi(g) {
 
         var i, N = g.length; 
         
@@ -329,11 +349,69 @@ var jh = (function(){
     // This function creates five vectors which are coefficients of a
     // linear system which allows finding the right values of "theta" at
     // each point of the path (being "theta" the angle of departure of the
-    // path at each point). The theory is from METAFONT book."""
+    // path at each point). 
+    // 
+    // Notes on the meaning of A/B/C/D/R:
+    // 
+    // Here the theta at each node are treated as unknown. for node k,
+    // its equation can be expressed as (denote theta[k-1], theta[k], 
+    // and theta[k+1] as _t, t, and t respectively):
+    //
+    // a*_t + (b+c)*t + d*t_ = r
+    // 
+    // where a/b/c/d/r for all nodes forms its own vector A/B/C/D/R 
+    // respectively.
+    //
+    // then A/B/C/D/R is used to form the tri-diagonal matrix 
+    // (http://en.wikipedia.org/wiki/Tridiagonal_matrix): 
+    // 
+    // | b+c d   ...a |
+    // | a b+c d  ... |
+    // | . a b+c d  . | * T[] = R[]
+    // |    ......    |
+    // | d......a b+c |
+    //
+    // The equations are from METAFONT book, page 131 in chapter 14.
+    // There are 4 equations:
+    //
+    // (*): theta+phi+xi=0
+    // (**): equation for interior nodes
+    // (***): equation for z0 if direction is not explicitly given
+    // (***'): equation for zn if direction is not explicitly given
+    //
+    // The last 3 equations can be expressed in the unified form:
+    // (theta: t, alpha: a, beta: b, length: l, turn angle: xi)
+    //
+    // A*_t + (B+C)*t + D*t_ = R, thus
+    //
+    // (**) for interior nodes:
+    //   A=X/_a
+    //   B=X*(3-1/_a)
+    //   C=Y*(3-1/b_)
+    //   D=Y/b_
+    //   R=-B*xi-D*xi_
+    // where X=b^2/l, Y=a^2/l_
+    // 
+    // (***) for the 1st node:
+    //   A=0
+    //   B=0
+    //   C=(1/b_-3)*X-1/a*Y
+    //   D=-1/b_*X+(1/a-3)*Y
+    //   R=-D*xi_
+    // where X=a^2, Y=curl_start*b_^2
+    //
+    // (***') for the last node:
+    //   A=1/_a*X+(3-1/b)*Y
+    //   B=(3-1/_a)*X+1/b*Y
+    //   C=0
+    //   D=0
+    //   R=-B*xi
+    // where X=b^2, Y=curl_end*_a^2
     //
     function _build_coefficients(g) {
         var i, n, N = g.length;
         var A=[], B=[], C=[], D=[], R=[];
+
 
         // 
         // check & update (when needed) properties of g and the nodes in g
@@ -362,17 +440,29 @@ var jh = (function(){
         //        idx: the idx for node "k"
         // output: A/B/C/D/R is updated accordingly
         function _for_each_node (_k, k, k_, idx) {
-            A.push(   _k.alpha  / (Math.pow(k.beta,2)  * k.d_ant));
-            B.push((3-_k.alpha) / (Math.pow(k.beta,2)  * k.d_ant));
-            C.push((3-k_.beta)  / (Math.pow(k.alpha,2) * k.d_post));
-            D.push(   k_.beta   / (Math.pow(k.alpha,2) * k.d_post));
-            R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
+            //
+            // the original python code (seems not correct unless all alpha/beta are 1):
+            // 
+            //A.push(   _k.alpha  / (Math.pow(k.beta,2)  * k.d_ant));
+            //B.push((3-_k.alpha) / (Math.pow(k.beta,2)  * k.d_ant));
+            //C.push((3-k_.beta)  / (Math.pow(k.alpha,2) * k.d_post));
+            //D.push(   k_.beta   / (Math.pow(k.alpha,2) * k.d_post));
+            //R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
+            //
+
+            var X = Math.pow(k.beta,2)/k.d_ant;
+            var Y = Math.pow(k.alpha,2)/k.d_post;
+            A.push(X/_k.alpha);
+            B.push(X*(3-1/_k.alpha));
+            C.push(Y*(3-1/k_.beta));
+            D.push(Y/k_.beta);
+            R.push(-B[idx]*k.xi-D[idx]*k_.xi);
         }
 
         //
         // prepare...
         //
-        _compute_distances_and_angles(g);
+        compute_l_and_xi(g);
         _check_guide(g);
 
         //
@@ -385,11 +475,20 @@ var jh = (function(){
             var curl = g.curl_begin;
             var alpha_0 = g[0].alpha;
             var beta_1 = g[1].beta;
-            var xi_0 = Math.pow(alpha_0,2) * curl / Math.pow(beta_1,2);
-            var xi_1 = g[1].xi;
-            C.push(xi_0*alpha_0 + 3 - beta_1);
-            D.push((3 - alpha_0)*xi_0 + beta_1);
-            R.push(-D[0]*xi_1);
+            //
+            // the original formular seems not correct...
+            //
+            //var xi_0 = Math.pow(alpha_0,2) * curl / Math.pow(beta_1,2);
+            //var xi_1 = g[1].xi;
+            //C.push(xi_0*alpha_0 + 3 - beta_1);
+            //D.push((3 - alpha_0)*xi_0 + beta_1);
+            //R.push(-D[0]*xi_1);
+
+            var X=Math.pow(alpha_0,2);
+            var Y=curl*Math.pow(beta_1,2);
+            C.push(((1/beta_1)-3)*X-1/alpha_0*Y);
+            D.push(-1/beta_1*X+(1/alpha_0-3)*Y);
+            R.push(-D[0]*g[1].xi);
         } else {
             _for_each_node(g[N-1], g[0], g[1], 0);
         }
@@ -407,10 +506,19 @@ var jh = (function(){
             var curl = g.curl_end;
             var beta_n = g[n].beta;
             var alpha_n_1 = g[n-1].alpha;
-            var xi_n = Math.pow(beta_n,2) * curl / Math.pow(alpha_n_1,2);
-            A.push((3-beta_n)*xi_n + alpha_n_1);
-            B.push(beta_n*xi_n + 3 - alpha_n_1);
-            R.push(0);
+            //
+            // the original python code, seems not correct...
+            //var xi_n = Math.pow(beta_n,2) * curl / Math.pow(alpha_n_1,2);
+            //A.push((3-beta_n)*xi_n + alpha_n_1);
+            //B.push(beta_n*xi_n + 3 - alpha_n_1);
+            //R.push(0);
+            var X=Math.pow(beta_n,2);
+            var Y=curl*Math.pow(alpha_n_1,2);
+            A.push(1/alpha_n_1*X+(3-1/beta_n)*Y);
+            B.push((3-1/alpha_n_1)*X+1/beta_n*Y);
+            C.push(0);
+            D.push(0);
+            R.push(-B[n]*g[n].xi);  // g[n].xi usually be zero, so effectively R[n]=0
         } else {
             _for_each_node(g[N-2], g[N-1], g[0], N-1);
         }
@@ -510,10 +618,16 @@ var jh = (function(){
         }
     }
 
+
+    function test () {
+        test_solve_matrix();
+    }
+
     return {
         // methods
         "solve_angles": solve_angles, 
         "find_control_points": find_control_points,
+        "test": test,
         // constants
         "DEFAULT_ALPHA": DEFAULT_ALPHA,
         "DEFAULT_BETA": DEFAULT_BETA,
@@ -528,3 +642,5 @@ var jh = (function(){
         }
     };
 }());
+
+
