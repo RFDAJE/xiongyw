@@ -3,7 +3,8 @@
 // email: sansidee at foxmail.com
 //
 // This "module" implements the algorithm described in the following paper, without external dependency: 
-// - John D. Hobby:　Smooth,　easy　to　compute　interpolating　splines. Discrete　Comput.　Geom.,　1:123－140,1986
+// - John D. Hobby: Smooth, easy to compute interpolating splines, Discrete Computational Geometry, 1:123-140, 1986
+// http://i.stanford.edu/pub/cstr/reports/cs/tr/85/1047/CS-TR-85-1047.pdf
 //
 // ...by using the following references:
 // - Donald E Knuth. The METAFONT book, Addison-Wesley, Reading, Massachusetts, 1986
