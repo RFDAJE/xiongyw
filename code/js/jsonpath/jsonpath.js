@@ -374,8 +374,8 @@ var jp = (function(){
         }
 
         // get the control points
-        jh.solve_angles(p);
-        jh.find_control_points(p);
+//        jh.solve_angles(p);
+//        jh.find_control_points(p);
 
         return p;
     }

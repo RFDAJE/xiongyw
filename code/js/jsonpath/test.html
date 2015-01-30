@@ -39,8 +39,8 @@ var STRAIGHT_LINE = "--";
 var OPEN_SEGMENT = null;
 
 // constants
-var CANVAS_WIDTH = 1020;
-var CANVAS_HEIGHT = 1024;
+var CANVAS_WIDTH = 500;
+var CANVAS_HEIGHT = 500;
 var GRID_SIZE = 8;
 
 var LEFT_KEY = 37;
@@ -72,7 +72,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 
-img.src = "http://upload.wikimedia.org/wikipedia/en/9/9f/Open_tv.png";
+//img.src = "http://upload.wikimedia.org/wikipedia/en/9/9f/Open_tv.png";
 //img.src = "test.png";
 
 // input: o, could be any json object
@@ -101,7 +101,7 @@ function getNodeFromCanvas(ctx, e, conn) {
     var x = (e.clientX-bb.left)*(c.width/bb.width);
     var y = (e.clientY-bb.top)*(c.height/bb.height);
 
-    return {"x": x, "y": y, "conn": conn};
+    return {"x": x, "y": -y, "conn": conn};
 }
 
 // canvas hooks
@@ -301,12 +301,12 @@ function jsonPath2Asy(p) {
 
     for(i = 0; i < n-1; i ++) {
         var e = p.nodes[i];
-        asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")" + e.conn;
+        asy += "(" + e.x.toFixed(3) + "," + e.y.toFixed(3) + ")" + e.conn;
     }
 
     // the last node
     e = p.nodes[n-1];
-    asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")";
+    asy += "(" + e.x.toFixed(3) + "," + e.y.toFixed(3) + ")";
     if (e.conn === STRAIGHT_LINE) {
         asy += "--cycle";
     } else if (e.conn === FREE_CURVE) {
@@ -396,22 +396,22 @@ function drawFreePath(P) {
     }
 
     // get the control points
-    jh.solve_angles(p);
-    jh.find_control_points(p);
+//    jh.solve_angles(p);
+//    jh.find_control_points(p);
 
     ctx.lineWidth = BEZIER_LINE_WIDTH;
     ctx.strokeStyle = BEZIER_STROKE_STYLE;
     ctx.beginPath();
-    ctx.moveTo(p[0][0], p[0][1]);
+    ctx.moveTo(p[0][0], -p[0][1]);
     u = p[0].u;
     for(j = 1; j < p.length; j ++) {
         v = p[j].v;
-        ctx.bezierCurveTo(u[0], u[1], v[0], v[1], p[j][0], p[j][1]);
+        ctx.bezierCurveTo(u[0], -u[1], v[0], -v[1], p[j][0], -p[j][1]);
         u = p[j].u;
     }
     if (p.cyclic) {
         v = p[0].v;
-        ctx.bezierCurveTo(u[0], u[1], v[0], v[1], p[0][0], p[0][1]);
+        ctx.bezierCurveTo(u[0], -u[1], v[0], -v[1], p[0][0], -p[0][1]);
         ctx.closePath();
     }
     ctx.stroke();
@@ -426,9 +426,9 @@ function drawFreePath(P) {
     ctx.lineWidth = POLYGON_LINE_WIDTH;
     ctx.strokeStyle = POLYGON_STROKE_STYLE;
     ctx.beginPath();
-    ctx.moveTo(p[0][0], p[0][1]);
+    ctx.moveTo(p[0][0], -p[0][1]);
     for(j = 1; j < p.length; j ++) {
-        ctx.lineTo(p[j][0], p[j][1]);
+        ctx.lineTo(p[j][0], -p[j][1]);
     }
     if (p.cyclic) {
         ctx.closePath();
@@ -460,9 +460,9 @@ function drawStraightPath(p) {
     ctx.lineWidth = BEZIER_LINE_WIDTH;
     ctx.strokeStyle = BEZIER_STROKE_STYLE;
     ctx.beginPath();
-    ctx.moveTo(p.nodes[0].x, p.nodes[0].y);
+    ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
     for(j = 1; j < n; j ++) {
-        ctx.lineTo(p.nodes[j].x, p.nodes[j].y);
+        ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
     }
 
     // closeness of path/subpath is conveyed in its last node
@@ -808,7 +808,7 @@ function dotAllNodes() {
     }
 
     function _dotPath(p) {
-        p.nodes.map(function(k){return _dot(k.x, k.y);});
+        p.nodes.map(function(k){return _dot(k.x, -k.y);});
     }
 
     g_paths.map(function(p){return _dotPath(p);});
