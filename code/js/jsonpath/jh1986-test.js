@@ -1,3 +1,6 @@
+// todo: convert it so use the new path data structure
+
+
 // created(bruin, 2015-01-19)
 // last updated(bruin, 2015-01-30)
 // email: sansidee at foxmail.com
