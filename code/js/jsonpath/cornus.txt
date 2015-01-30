@@ -1,0 +1,180 @@
+http://www.advogato.org/person/raph/diary.html?start=380
+
+15 Sep 2004 »
+haruspex wrote:
+I think it's long been clear that Beziers are not a good user abstraction for curve editing - but what's wrong with circle segments between on-curve knots, as chosen by IKARUS, METAFONT, et al? I am not sure anything could be more natural. I suppose the Cornu could be seen as a French-curve style extension of circles. I think I need to write that experimental path editor I always planned, to play with these alternatives :)
+What's wrong with circle segments? I'll tell you what's wrong...
+
+But first, while circular arcs were the basis of some font formats (most notably Bitstream), they were definitely not the primitive of Metafont, and I'm not sure about Ikarus either. Metafont's primitive is the cubic Bezier, just like PostScript, but, unlike Type1 fonts, Metafont lets you do stroking with elliptical pens and constructive area geometry.
+
+From what I've been able to learn about Ikarus, the IK file format itself just specified corner points, tangent points, and on-curve points. It was basically up to the application to figure out how to fit an actual curve to those points. Certainly, circular arcs would be one approach, but I suspect that Hermite splines may have been used as well.
+
+Now, in order to argue which geometric primitive is best, I have to define the goals. One such goal is that it be expressive, meaning that, given an arbitrary smooth curve, I can fit it with a relatively small number of primitives (each with a relatively small number of paramters). Love or hate them, cubic Beziers are awesomely expressive.
+
+And circular arcs do not have this property. You need quite a few of them to closely fit an ellipse, say. Take a look at some Bitstream designs -- you'll see a great many more control points than in a typical Type1 font.
+
+I believe that curve smoothness is best defined as variation in curvature. By this metric, circular arcs are not that great; as you follow a curve, you'll have constant curvature along arcs, but a discontinuities at the joins between arcs. Of course, the more arcs you use, the less the discontinuity, but that's true of just about any primitive. Heck, you can make a decent enough outline from straight lines if you're willing to use enough.
+
+Beziers can in fact be made to be curvature-continuous, at joins as well as the interior of the primitive. In fact, one of the central themes of John Hobby's work on Metafont was a global optimizer to choose tangents at knots to minimize curvature discontinuities (technically, for reasons of numerical stability, his algorithm zeros out the discontinuity in "mock curvature", a linear approximation to curvature, but the difference is subtle).
+
+But Beziers are not naturally curvature continuous. In fact, my experience is that it's very difficult to design smooth Bezier curves by eyeball, especially as more control points are added. This is a subjective criterion, but I think it's possible to quantify it, as well: how well does curve smoothness hold up when you perturb the control points (or other parameters)? In general, if you start with a smooth Bezier curve, perturbation will make it worse.
+
+This criterion is especially important when you're dealing with meta-fonts (of whatever flavor). In fact, Adobe's use of linear interpolation of cubic Bezier control points in their Multiple Master technology doesn't even guarantee tangent continuity, much less smoothness. It can be made to work well, but requires care and skill.
+
+By these criteria, segments of the Cornu spiral are an excellent primitive. They are expressive in a way that circular arcs are not (in particular, you can cut from the central segment to make a very pretty "S" curve), while at the same time a Hobby-style global optimizer to determine the tangents can guarantee continuity of curvature across the whole curve. Variation of curvature is linear along the interior of the primitive, so you can't get wide swings there either, as you can in Beziers.
+
+It also helps that the Cornu spiral representation is so concise - the primitive is fully determined by the endpoints and tangents at the endpoints (six degrees of freedom, as opposed to four for straight lines and eight for cubic Beziers). I believe this will help make the user interface both simple to learn and productive to use.
+
+And I am hacking on a pattern plate editor, so if you're patient you will be able to play with it before too long.
+
+
+
+
+
+
+
+
+What is the best primitive for curve design?
+
+Most 2D curve design (including fonts) done today uses cubic Bezier splines. Almost all of the remainder is quadratic Beziers. There are other choices, and I wonder if some might be better.
+
+In particular, I find it tricky to make smooth curves when there are a lot of control points. I'm sure it gets easier with practice, but I'm not sure people should have to adapt to the underlying polynomial nature of the spline, when perhaps smoother, more natural primitives exist.
+
+For example, Ikarus used Hermite splines, in which all the control points lie on the curve. In Beziers, you have to position the off-curve control points so that they "magically" adjust the curve how you want it.
+
+From what I can see, the main reason inexpertly drawn Beziers look unsmooth is large variations in curvature, both discontinuities at the knots and in greater deviation in curves than needed to smoothly connect the endpoints. I'm thinking of building a tool that graphs curvature along the path of an outline. I have little doubt that this tool's output would reveal much less variation and discontinuity in splines drawn by experts than by newbies.
+
+So, to me, the most promising approach is to use a primitive that has smoothness of curvature built-in, so that by default it's easier to draw smooth curves than unsmooth. Of course, it should still be possible to do the latter, but I have no problem with making it require more control points than an equivalent unsmooth Bezier curve.
+
+The most promising primitive I've seen so far is the "circle spline" of Carlo Sequin and students [SIGGRAPH PowerPoint presentation]. Near the end of that presentation, he raises the possibility of using a Cornu Spiral, which is mathematically constructed so that curvature is continuous at endpoints, and linearly interpolated in between.
+
+For those more interested in this issue, John Hobby's paper "Smooth, Easy to Compute Interpolating Splines" is a must-read. My gut feeling is that his work is good, but that replacing his choice of cubic Bezier as a primitive with a circle spline or Cornu Spiral may give better results. He found that making curvature continuous can yield instable results, so he uses a linear approximation which guarantees stability. I wouldn't be surprised if this instability would go away with a better primitive.
+
+===========================================
+
+
+https://bosker.wordpress.com/2013/11/13/beyond-bezier-curves/
+
+Beyond Bézier curves
+
+2013-11-13 § 8 Comments
+
+There is a new feature of Pages and Keynote, not mentioned in any of Apple’s publicity nor in any press coverage I’ve seen, that is really very interesting. Perhaps it will even one day prove to have been revolutionary, in a quiet way.
+
+In case you are not an Apple follower, iWork is Apple’s answer to Microsoft Office. Last month Apple introduced a new version – now free for the first time – with the usual fanfare and to a mixed reception.
+
+Ever since the release of Adobe Illustrator 1.1 in 1987 the way ordinary people draw or edit curves on a computer has been to use Bézier splines. If you’ve ever used a vector graphics program, you’ve probably spent some time tweaking Bézier control handles, perhaps in frustration. Bézier curves were first used by French car designers in the 1960s, but as far as I know it was Adobe who introduced them to the home computer, where they have become ubiquitous.
+
+Bézier curves are a small miracle of practical mathematics. They are conceptually elegant, easy for a computer to draw, and have a graphical representation – with draggable control handles – that is well-suited to interactive computer editing. If you don’t know how a Bézier curve segment is constructed from the control handles, try staring at this animation till it starts to make sense:
+
+
+Animation by Phil Tregoning, Public Domain.
+
+The downside is that it’s difficult for a non-expert to make attractive smooth curves using Béziers. It’s all too easy to make bumpy, lumpy misshapen things.
+
+Hence the small revolution: the new iWork apps don’t present the user with Bézier curves at all, by default. There is a checkbox in the preferences to change the default curve type back to Bézier, but the default is much more interesting: Hobby splines.
+
+Hobby splines were invented by John Hobby in 1985 or so, originally for Don Knuth’s much celebrated but rarely used Metafont system. They are actually ordinary cubic Béziers, but the control handles are placed not by the user but by an efficient algorithm that ensures smoothness. So of course they interoperate perfectly with software that expects to see Bézier curves, and Keynote and Pages even allow you to mix “smooth” and Bézier points in the same curve.
+
+curves
+
+If you’re interested in the nitty-gritty of how they work, I would recommend reading John Hobby’s 1985 paper. There is also a secondary, unexpected pleasure to be had from this copy of the paper: the scanned document seems to have been processed by an unreliable optical character recognition algorithm, so that deciphering the intended meaning is at times an amusing puzzle.
+
+Some words are in a different font, apparently because they defeated the OCR algorithm and so the text is reproduced from the original document.
+Some words are in a different font, apparently because they defeated the OCR algorithm and so the text is reproduced from the original document.
+
+It’s easy to guess that ‘o’ should have been ‘0’, but takes a little more thought to see that both ‘8’ and ‘e’ are misreadings of θ.
+It’s easy to guess that ‘o’ should have been ‘0’ in the first line, but takes a little more thought to realise that both ‘8’ and ‘e’ are misreadings of θ in the second.
+
+Like all the best practical algorithms, Hobby’s method is a mixture of deep mathematical insight and low cunning. The essential trick is to use an approximate measure of curvature (“mock curvature”) that is represented by a linear expression. Then the problem of finding a smooth curve given the positions of the control points can be solved very efficiently using standard matrix methods for solving linear equations.
+
+It very quickly becomes clear, playing with them, that Hobby splines are just a better way for casual users to draw attractive curves. All the fine-tuning of control handles is eliminated, though the shape can still be refined by adding additional curve points. Because they are perfectly compatible with industry-standard Béziers, there is very little disadvantage to be had. We’ve been doing it wrong for all these years, and now we know a better way.
+
+Who will be the first to copy Apple’s excellent idea?
+
+Share this:
+
+Email
+Print
+Twitter
+Google
+More
+Like this:
+
+Like Loading...
+Related
+
+Tagged: Apple, Bézier, Bézier curves
+
+§ 8 Responses to Beyond Bézier curves
+
+	Jes Sherborne says:
+2013-11-14 at 1941
+Thanks for pointing out an interesting change in iWork that I hadn’t noticed.
+
+I agree that doing away with off-curve control points is a great idea, especially for something designed for general use. That said, using Hobby splines involves some significant tradeoffs, and I’m not convinced they’re the right ones for iWork.
+
+First, as the angle between control points gets large, Hobby splines produce large, looping arcs that don’t relate in an obvious way to your drawing intent. This behavior is kind of fun to play with, but it’s not generally useful.
+
+To mitigate this, you need to add control points. This isn’t tragic, but it does mean that altering the shape of your curve can involve tweaks to a lot more control points than a more traditional Bezier approach.
+
+Second, because the Hobby spline is determined by a system of equations involving all the control points on a curve, as you change one control point, it causes ripple effects in non-adjacent parts of the curve. You can always add more control points to moderate the effect, but the effect never completely goes away. And the more control points you have, the harder it is to alter your curve.
+
+For my money, a better approach to this particular problem is to use something even less mathematically sophisticated than the Hobby spline: a tangent/chord heuristic (Hobby gives an example of one in the introduction of his paper).
+
+Something like this provides the same input simplicity of the Hobby spline (no off-curve control points for the user to mess with) but it gives you the significant advantage that moving a control point only affects the adjacent curve segments. In addition, it’s well-behaved regardless of the angle between control points.
+
+Towards the other end of the mathematical sophistication spectrum, Raph Levien has done some really interesting work on Euler spiral splines (http://levien.com/phd/thesis.pdf). The mathematics is (a lot) more involved, but the results are quite promising. He argues that the Hobby spline amounts to an efficient Bezier approximation of an Euler spline when the angle between control points is small. I’d love to see someone explore this approach further.
+
+Reply
+	Robin Houston says:
+2013-11-14 at 2326
+Thanks for a thoughtful and interesting comment, Jes.
+
+One of the neat things about Apple’s implementation is the way that they have made adding a new curve point a very low-friction operation: just click on the little blue circle that appears half way between two curve points, and drag to adjust. This wouldn’t really work, I don’t think, if the splines were not (to a good approximation) “extensible” as Hobby calls it – i.e. adding a new curve point on the existing curve should not visibly change the shape of the curve. Wouldn’t a tangent/chord heuristic tend not to be extensible in this sense, making it harder to refine the shape of the curve by adding new points?
+
+Raph Levien’s work is terrific, and his PhD thesis is a highly enjoyable read – which is not something that can be said about very many PhD theses (certainly not mine), and is testament to the quality of Levien’s prose as well as his research.
+
+When I played with the prototype Spiro implementation in ppedit back in 2007, there were apparent problems with numerical stability, and the numerics would sometimes even fail to converge. That seems to be quite a serious disadvantage compared to Hobby splines, which have a guaranteed unique solution that can be computed analytically. I’m not sure to what extent this problem has been mitigated since, though. (Do you know?)
+
+Reply
+	Jes Sherborne says:
+2013-11-15 at 0334
+Had I followed your discussion on Twitter, I would have seen that you were already well aware of Levien’s work–sorry about that!
+
+You’re quite right that injecting new points using a tangent/chord heuristic would probably deform the curve somewhat. I’d guess that the effect would be fairly subtle given that the spline itself is interpolating the tangent between the knot points, but without trying it out it’s just speculation on my part.
+
+Even so, it might be a fair trade to get the other characteristics. The real deal-killer for me is that if you lay out a series of points, the Hobby spline is going to look weird unless the angle between adjacent knots is pretty small. And if your knots have that characteristic, it may not matter much how you’re interpolating between them (at least for the kind of application we’re discussing here).
+
+Regarding Spiro, I don’t know whether you’ve seen this: http://levien.com/garden/js/spiro.html. It only implements a subset of what ppedit does (apparently only the G2 constraint type), but it seems to be pretty stable.
+
+Reply
+	Robin Houston says:
+2013-11-15 at 2211
+Well, you could hardly be expected to have read everything I have ever written anywhere on the internet. :-)
+
+I’ve realised that I rather overstated the importance of what Hobby calls extensibility and Levien calls extensionality in my last reply to you. For Apple’s curve refinement interface to work, of course all that is needed is for there to be at least ONE point, somewhere roughly in the middle of the curve segment, that can be added without distorting the curve.
+
+This is much weaker than requiring that ANY point on the curve can be added as a control point, and I can’t see why it wouldn’t be achievable in the sort of model you’re suggesting. I’ll be interested to see how well it works, if you get a chance to try it out!
+
+Reply
+	Mark Hamburg says:
+2014-09-10 at 2020
+I’m pretty sure I used Hobby’s algorithm in FullWrite’s pen tool back in 1987-88.
+
+Reply
+	Robin Houston says:
+2014-09-10 at 2031
+Interesting! I’d love to know why you didn’t include them in Photoshop 2.0. I can’t help imagining how differently things might have turned out…
+
+Reply
+	Mark Hamburg says:
+2014-11-25 at 2047
+Photoshop’s pen tool was focused on being a clone of Illustrator’s. That said, I did modify a few of the behaviors and added support for even-odd in addition to winding-order fill. But changing the curve drawing model wasn’t in the cards particularly given the tight schedule and the fact that I was also deep in the work on AI rasterization. I agree that things might have turned out differently with respect to pen tools if Photoshop had taken a more dramatic step forward.
+
+On the roadmap again ♪ | Prototypo says:
+2014-09-22 at 1032
+[…] sources. […]
+
+Reply
+

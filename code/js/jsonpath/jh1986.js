@@ -1,8 +1,3 @@
-//todo: 
-// 1. change to new json format
-// 2. enable explictly setting direction at two ends for non-cyclic path
-// 3. update doc 
-
 // created(bruin, 2015-01-19)
 // last updated(bruin, 2015-01-23)
 // email: sansidee at foxmail.com
