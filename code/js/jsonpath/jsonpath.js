@@ -117,7 +117,7 @@ var jp = (function(){
         sub.nodes.push(jsonClone(p.nodes[0]));
         // determine "din"
         if (p.nodes[n-1] === LINE_CONN && p.nodes[0] === FREE_CONN) {
-            sub.din = [(p.nodes[n-1].x - p.nodes[0].x), (p.nodes[n-1].y - p.nodes[0].y)];
+            sub.din = {"x":(p.nodes[n-1].x - p.nodes[0].x), "y":(p.nodes[n-1].y - p.nodes[0].y)};
         } else {
             sub.din = p.din; // inherite "din" if any
         }
@@ -132,9 +132,9 @@ var jp = (function(){
                 if (cur_conn === LINE_CONN) {
                     // calculate dout: z_-z
                     if (i < n-1) {
-                        sub.dout = [(p.nodes[i+1].x - p.nodes[i].x), (p.nodes[i+1].y - p.nodes[i].y)]; 
+                        sub.dout = {"x":(p.nodes[i+1].x - p.nodes[i].x), "y":(p.nodes[i+1].y - p.nodes[i].y)}; 
                     } else {
-                        sub.dout = [(p.nodes[0].x - p.nodes[i].x), (p.nodes[0].y - p.nodes[i].y)];
+                        sub.dout = {"x":(p.nodes[0].x - p.nodes[i].x), "y":(p.nodes[0].y - p.nodes[i].y)};
                     }
                 }
                 subs.push(sub);
@@ -143,7 +143,7 @@ var jp = (function(){
                 sub.nodes.push(jsonClone(p.nodes[i]));
                 if (cur_conn === FREE_CONN) {
                     // calcuate din: _z-z
-                    sub.din = [(p.nodes[i].x - p.nodes[i-1].x), (p.nodes[i].y - p.nodes[i-1].y)];
+                    sub.din = {"x":(p.nodes[i].x - p.nodes[i-1].x), "y":(p.nodes[i].y - p.nodes[i-1].y)};
                 }
                 pre_conn = cur_conn;
             }
@@ -226,7 +226,9 @@ var jp = (function(){
                 sub.nodes[n-1].conn = null;
             });
         }
-        
+
+        console.log(arguments.callee.name, JSON.stringify(subs));
+
         return subs;
     }
 
@@ -346,7 +348,7 @@ var jp = (function(){
 
     function solvePath(P) {
         var SUBS = divideOnePath(P);
-        console.log(JSON.stringify(SUBS));
+        //console.log(JSON.stringify(SUBS));
         var i, N = SUBS.length;
         for (i = 0; i < N; i ++) {
             if (SUBS[i].nodes[0].conn === FREE_CONN) {

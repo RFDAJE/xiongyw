@@ -125,6 +125,18 @@ var jh = (function(){
         };
     }());
 
+    // limit angles within (-PI, PI]
+    function limitArg(arg) {
+        arg = arg % (PI*2);
+        if (arg > PI) {
+            arg = arg - PI*2;
+        }
+        if (arg <= -PI) {
+            arg = arg + PI*2;
+        }
+        return arg;
+    }
+
     //
     // ref: http://en.wikipedia.org/wiki/Gaussian_elimination
     //
@@ -316,7 +328,9 @@ var jh = (function(){
     //  "xi": turning angle at z[k]
     //  "_l": |z[k]-z[k-1]|
     //  "l_": |z[k+1]-z[k]|
-    function _updateXiAndL(g) {
+    //  "_arg": arg(z[k]-z[k-1])
+    //  "arg_": arg(z[k+1]-z[k])
+    function _updateArgXiL(g) {
 
         var i, N = g.nodes.length; 
         var cyclic = _isCyclic(g);
@@ -327,9 +341,17 @@ var jh = (function(){
 
         // first node
         if (!cyclic) {
+            var l_ = z.sub(g.nodes[1], g.nodes[0]);
             g.nodes[0]._l = 0;
-            g.nodes[0].l_ = z.mod(z.sub(g.nodes[1], g.nodes[0]));
-            g.nodes[0].xi = 0;
+            g.nodes[0].l_ = z.mod(l_);
+            g.nodes[0].arg_ = z.arg(l_);
+            if (g.din) {
+                g.nodes[0]._arg = z.arg(g.din);
+                g.nodes[0].xi = limitArg(g.nodes[0].arg_ - g.nodes[0]._arg);
+            } else {
+                g.nodes[0]._arg = 0;
+                g.nodes[0].xi = 0;
+            }
         } else {
             _for_interior_node(g.nodes[N-1], g.nodes[0], g.nodes[1]); 
         }
@@ -341,9 +363,18 @@ var jh = (function(){
 
         // last node
         if (!cyclic) {
-            g.nodes[N-1]._l = z.mod(z.sub(g.nodes[N-1], g.nodes[N-2]));
+            var _l = z.sub(g.nodes[N-1], g.nodes[N-2]);
+            g.nodes[N-1]._l = z.mod(_l);
+            g.nodes[N-1]._arg = z.arg(_l);
             g.nodes[N-1].l_ = 0;
-            g.nodes[N-1].xi = 0;
+            if (g.dout) {
+                g.nodes[N-1].arg_ = z.arg(g.dout);
+                g.nodes[N-1].xi = limitArg(g.nodes[N-1].arg_ - g.nodes[N-1]._arg);
+                console.log(arguments.callee.name, JSON.stringify(g));
+            } else {
+                g.nodes[N-1].arg_ = 0;
+                g.nodes[N-1].xi = 0;
+            }
         } else {
             _for_interior_node(g.nodes[N-2], g.nodes[N-1], g.nodes[0]);
         }
@@ -360,27 +391,21 @@ var jh = (function(){
 
             k.l_ = z.mod(l_);
             k._l = z.mod(_l);
-
-            // making sure that xi is between [-PI, PI]
-            k.xi = arg_ - _arg;
-            if (k.xi > PI) {
-                k.xi = k.xi - PI*2;
-            }
-            if (k.xi < -PI) {
-                k.xi = k.xi + PI*2;
-            }
+            k._arg = _arg;
+            k.arg_ = arg_;
+            k.xi = limitArg(arg_ - _arg);
         }
     }
 
-    function test_updateXiAndL() {
+    function test_updateArgXiL() {
         // 1. non-cyclic:
         var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100}]};
-        _updateXiAndL(g);
+        _updateArgXiL(g);
         console.log(arguments.callee.name, JSON.stringify(g));
 
         // 2. cyclic:
         var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100, conn:".."}]};
-        _updateXiAndL(g);
+        _updateArgXiL(g);
         console.log(arguments.callee.name, JSON.stringify(g));
 
     }
@@ -571,7 +596,7 @@ var jh = (function(){
             {x:100,y:0, conn:".."},
             {x:100,y:100, conn:".."},
             {x:50,y:50, conn:".."}]};
-        _updateXiAndL(g);
+        _updateArgXiL(g);
         _checkCurlAlphaBeta(g);
         var r = _buildLinearSystem(g);
         console.log(arguments.callee.name, JSON.stringify(r));
@@ -584,24 +609,34 @@ var jh = (function(){
         var cyclic = _isCyclic(g);
         var Mb; // [M, b]
         var x; // theta vector
+        var known = new Array(N);
 
         if (!_isValid(g)) {
             console.log(arguments.callee.name, "invalid path");
             return;
         }
 
-        _updateXiAndL(g);
+        _updateArgXiL(g);
         _checkCurlAlphaBeta(g);
         Mb = _buildLinearSystem(g);
 
         //
-        // todo: apply din/dout
+        // apply din/dout to find known theta(s).
+        // this is appliable only when the path is open
         //
+        if (!cyclic) {
+            if (g.din) {
+                known[0] = - g.nodes[0].xi; // because phi=0, so theta = -xi.
+            }
+            if (g.dout) {
+                known[N-1] = 0; // theta = 0
+            }
+        }
 
         //
         // solve thetas for each node
         //
-        x = solveLinearSystem(Mb[0], Mb[1], N, N);
+        x = solveLinearSystem(Mb[0], Mb[1], N, N, known);
 
         //
         // update theta/phi of each node
@@ -651,7 +686,7 @@ var jh = (function(){
 
     function test () {
         //test_solveLinearSystem();
-        //test_updateXiAndL();
+        //test_updateArgXiL();
         //test_buildLinearSystem();
         test_solveFreePath();
     }

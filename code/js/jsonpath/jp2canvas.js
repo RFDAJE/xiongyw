@@ -1,5 +1,18 @@
 var j2c = (function(){
     var _ctx = null;
+
+    // canvas context constants
+    var GRID_LINE_WIDTH = 0.2;
+    var GRID_STROKE_STYLE = "grey";
+    var POLYGON_LINE_WIDTH = 1;
+    var POLYGON_STROKE_STYLE = "red";
+    var BEZIER_LINE_WIDTH = 3;
+    var BEZIER_STROKE_STYLE = "blue";
+    var DOT_RADIUS = 4;
+    var DOT_FILL_STYLE = "black";
+    var CURSUR_LINE_WIDTH = 1; // cursor in the center or the dot
+    var CURSUR_SIZE = 4;
+    var CURSUR_STROKE_STYLE = "white";
      
     function setContext(ctx) {
         _ctx = ctx;
