@@ -56,7 +56,7 @@ var jh = (function(){
     //
     // constants
     //
-    var DEFAULT_ALPHA = 1;
+    var DEFAULT_ALPHA = 1;  // alpha & beta are tensions, should be >3/4. the bigger the straighter the curve
     var DEFAULT_BETA = 1;
     var DEFAULT_CURL_BEGIN = 1;
     var DEFAULT_CURL_END = 1;
@@ -223,10 +223,6 @@ var jh = (function(){
         var x = solveLinearSystem(A,b,3,3); // x should be [2, 3, -0.999]
         console.log(x);
     }
-
-    //
-    // ref: http://tex.stackexchange.com/questions/54771/curve-through-a-sequence-of-points-with-metapost-and-tikz
-    //
 
     //
     // velocity function f(theta, phi)
@@ -446,7 +442,8 @@ var jh = (function(){
         //   D=-1/b_*X+(1/a-3)*Y
         //   R=-D*xi_
         // where X=a^2, Y=curl_start*b_^2
-        //
+        // if theta_0 is known, then A=B=D=0,C=1, R=theta_0;
+        // 
         // (***') for the last node:
         //   A=1/_a*X+(3-1/b)*Y
         //   B=(3-1/_a)*X+1/b*Y
@@ -454,24 +451,15 @@ var jh = (function(){
         //   D=0
         //   R=-B*xi
         // where X=b^2, Y=curl_end*_a^2
+        // if theta_n is known, then A=B=D=0,C=1, R=theta_n;
         //
-
+        
         // input: _k : g[k-1]
         //         k : g[k]  
         //         k_: g[k+1]
         //        idx: the idx for node "k"
         // output: A/B/C/D/R is updated accordingly
         function _for_interior_node2 (_k, k, k_, idx) {
-            //
-            // the original python code (seems not correct unless all alpha/beta are 1):
-            // 
-            //A.push(   _k.alpha  / (pow(k.beta,2)  * k._l));
-            //B.push((3-_k.alpha) / (pow(k.beta,2)  * k._l));
-            //C.push((3-k_.beta)  / (pow(k.alpha,2) * k.l_));
-            //D.push(   k_.beta   / (pow(k.alpha,2) * k.l_));
-            //R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
-            //
-
             var X = pow(k.beta,2)/k._l;
             var Y = pow(k.alpha,2)/k.l_;
             A.push(X/_k.alpha);
@@ -485,26 +473,24 @@ var jh = (function(){
         // traverse the path now...
         //
         if (!_isCyclic(g)) {
-            // In this case, first equation doesn't follow the general rule
-            A.push(0);
-            B.push(0);
-            var curl = g.curl_begin;
-            var alpha_0 = g.nodes[0].alpha;
-            var beta_1 = g.nodes[1].beta;
-            //
-            // the original formular seems not correct...
-            //
-            //var xi_0 = pow(alpha_0,2) * curl / pow(beta_1,2);
-            //var xi_1 = g.nodes[1].xi;
-            //C.push(xi_0*alpha_0 + 3 - beta_1);
-            //D.push((3 - alpha_0)*xi_0 + beta_1);
-            //R.push(-D[0]*xi_1);
-
-            var X=pow(alpha_0,2);
-            var Y=curl*pow(beta_1,2);
-            C.push(((1/beta_1)-3)*X-1/alpha_0*Y);
-            D.push(-1/beta_1*X+(1/alpha_0-3)*Y);
-            R.push(-D[0]*g.nodes[1].xi);
+            if (g.din) { // already known: theta = -xi, because phi=0
+                A.push(0);
+                B.push(0);
+                C.push(1);
+                D.push(0);
+                R.push(-g.nodes[0].xi);
+            } else {
+                A.push(0);
+                B.push(0);
+                var curl = g.curl_begin;
+                var alpha_0 = g.nodes[0].alpha;
+                var beta_1 = g.nodes[1].beta;
+                var X=pow(alpha_0,2);
+                var Y=curl*pow(beta_1,2);
+                C.push(((1/beta_1)-3)*X-1/alpha_0*Y);
+                D.push(-1/beta_1*X+(1/alpha_0-3)*Y);
+                R.push(-D[0]*g.nodes[1].xi);
+            }
         } else {
             _for_interior_node2(g.nodes[N-1], g.nodes[0], g.nodes[1], 0);
         }
@@ -515,26 +501,27 @@ var jh = (function(){
         }
 
         if (!_isCyclic(g)) {
-            // The last equation doesnt follow the general form
-            n = R.length;     // index to generate
-            C.push(0);
-            D.push(0);
-            var curl = g.curl_end;
-            var beta_n = g.nodes[n].beta;
-            var alpha_n_1 = g.nodes[n-1].alpha;
-            //
-            // the original python code, seems not correct...
-            //var xi_n = pow(beta_n,2) * curl / pow(alpha_n_1,2);
-            //A.push((3-beta_n)*xi_n + alpha_n_1);
-            //B.push(beta_n*xi_n + 3 - alpha_n_1);
-            //R.push(0);
-            var X=pow(beta_n,2);
-            var Y=curl*pow(alpha_n_1,2);
-            A.push(1/alpha_n_1*X+(3-1/beta_n)*Y);
-            B.push((3-1/alpha_n_1)*X+1/beta_n*Y);
-            C.push(0);
-            D.push(0);
-            R.push(-B[n]*g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
+            if (g.dout) { // already known: theta=0, because phi=-xi;
+                A.push(0);
+                B.push(0);
+                C.push(1);
+                D.push(0);
+                R.push(0);
+            } else {
+                n = R.length;     // index to generate
+                C.push(0);
+                D.push(0);
+                var curl = g.curl_end;
+                var beta_n = g.nodes[n].beta;
+                var alpha_n_1 = g.nodes[n-1].alpha;
+                var X=pow(beta_n,2);
+                var Y=curl*pow(alpha_n_1,2);
+                A.push(1/alpha_n_1*X+(3-1/beta_n)*Y);
+                B.push((3-1/alpha_n_1)*X+1/beta_n*Y);
+                C.push(0);
+                D.push(0);
+                R.push(-B[n]*g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
+            }
         } else {
             _for_interior_node2(g.nodes[N-2], g.nodes[N-1], g.nodes[0], N-1);
         }
@@ -551,7 +538,7 @@ var jh = (function(){
             var a = new Array(L);
             for(k = 0; k < L; k ++) {
                 a[k] = new Array(L);
-                // dont forget to zero the array!
+                // need to init the array with zero!
                 for (j = 0; j < L; j ++) {
                     a[k][j] = 0; 
                 }
@@ -602,20 +589,6 @@ var jh = (function(){
         // solve thetas for each node
         //
         x = solveLinearSystem(Mb[0], Mb[1], N, N);
-
-        
-        //
-        // apply din/dout after solve the equation (fixme: get it done before solve the equation)
-        // this is appliable only when the path is open
-        //
-        if (!cyclic) {
-            if (g.din) {
-                x[0] = - g.nodes[0].xi; // because phi=0, so theta = -xi.
-            }
-            if (g.dout) {
-                x[N-1] = 0; // theta = 0
-            }
-        }
 
         //
         // update theta/phi of each node

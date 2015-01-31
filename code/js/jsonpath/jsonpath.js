@@ -31,24 +31,72 @@ var jp = (function(){
     // input: a path object
     // output: a string representing a path/guide in asy
     function toAsy(p) {
-        var i, e, n = p.nodes.length;
+        var i, e, N = p.nodes.length;
         var asy = "";
 
-        for(i = 0; i < n-1; i ++) {
-            var e = p.nodes[i];
-            asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")" + e.conn;
+        function _node2Asy(n) {
+            return "(" + n.x.toFixed(3) + "," + (-n.y).toFixed(3) + ")";
         }
 
-        // the last node
-        e = p.nodes[n-1];
-        asy += "(" + e.x.toFixed(3) + "," + -e.y.toFixed(3) + ")";
-        if (e.conn === LINE_CONN) {
-            asy += "--cycle";
-        } else if (e.conn === FREE_CONN) {
-            asy += "..cycle";
+        function _dir(from, to) {
+            var dx = to.x - from.x;
+            var dy = to.y - from.y;
+            asy += "{" + dx + "," + dy +"}";
         }
-        
-        return asy;
+
+        // 
+        // _k: previous node
+        //  k: current node
+        //
+        // --+----+-----
+        //   | _k |  k
+        // --+----+-----
+        // a | -- |  --
+        // b | -- |  ..      z{dir}..
+        // c | .. |  ..
+        // d | .. |  --      ..{dir}z
+        // --+----+-----
+        function _for_interior_node(_k, k, k_) {
+            var asy = _node2Asy(k);
+            if (_k.conn === LINE_CONN && k.conn === FREE_CONN) { // b
+                asy += _dir(_k, k);
+            } else if (_k.conn === FREE_CONN && k.conn === LINE_CONN) { // d
+                asy = _dir(k, k_) + asy;
+            }
+            k.asy = asy;
+        }
+
+        // the 1st node
+        asy = _node2Asy(p.nodes[0]);
+        if (p.nodes[0].conn === FREE_CONN && p.nodes[N-1].conn === LINE_CONN) { // din
+            asy += _dir(p.nodes[N-1], p.nodes[0]);
+        }
+        p.nodes[0].asy = asy;
+
+        for(i = 1; i < N-1; i ++) {
+            _for_interior_node(p.nodes[i-1], p.nodes[i], p.nodes[i+1]);
+        }
+
+        //
+        // the last node
+        //
+        _e = p.nodes[N-2];
+        e = p.nodes[N-1];
+        e_ = p.nodes[0];
+        if (e.conn === FREE_CONN) {
+            _for_interior_node(_e, e, e_);
+            if (e_.conn === LINE_CONN) {
+                e.asy += ".." + _dir(e_, p.nodes[1]) + "cycle";
+            } else {
+                e.asy += "..cycle";
+            }
+        } else if (e.conn === LINE_CONN) {
+            e.asy = _node2Asy(e) + "--cycle";
+        } else {
+            e.asy = _node2Asy(e);
+        }
+
+        return p.nodes.map(function(x){return x.asy+(x.conn?x.conn:"");}).join("");
     }
 
     function toSvg(p) {
