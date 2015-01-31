@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // created(bruin, 2015-01-19)
-// last updated(bruin, 2015-01-30)
+// last updated(bruin, 2015-01-31)
 // email: sansidee at foxmail.com
 //
 // This "module" implements the algorithm described in the following paper: 
@@ -577,64 +577,8 @@ var jh = (function(){
         console.log(arguments.callee.name, JSON.stringify(r));
     }
 
-/*
-    // This function receives the five vectors created by
-    // _buildLinearSystem() and uses them to build a linear system with N
-    // unknonws (being N the number of points in the path). Solving the system
-    // finds the value for theta (departure angle) at each point
-    function _solve_for_thetas(A, B, C, D, R) {
-        var k, j, prev, post, L = R.length;
-
-        // create the empty matrix
-        var a = new Array(L), b = R;
-        for(k = 0; k < L; k ++) {
-            a[k] = new Array(L);
-            // dont forget to zero the array!
-            for (j = 0; j < L; j ++) {
-                a[k][j] = 0; 
-            }
-        }
-
-        for(k = 0; k < L; k ++) {
-            prev = (k-1+L)%L;  // "+L" is to make (prev>=0)
-            post = (k+1)%L;
-            a[k][prev] = A[k];
-            a[k][k]    = B[k]+C[k];
-            a[k][post] = D[k];
-        }
-
-        return solveLinearSystem(a, b, L, L);
-    }
-
-    // This function receives a path in which each point is "open", i.e. it
-    // does not specify any direction of departure or arrival at each node,
-    // and finds these directions in such a way which minimizes "mock
-    // curvature". The theory is from "The METAFONT book".
-    // 
-    // Basically it solves
-    // a linear system which finds all departure angles (theta), and from
-    // these and the turning angles at each point, the arrival angles (phi)
-    // can be obtained, since theta + phi + xi = 0  at each node/knot
-    function solve_angles(g) {
-        var k, L = g.nodes.length;
-
-        if (L < 2) {
-            console.log("Error: a path has less than 2 nodes...");
-            return;
-        }
-
-        var ABCDR = _buildLinearSystem(g);
-        var x = _solve_for_thetas(ABCDR[0], ABCDR[1], ABCDR[2], ABCDR[3], ABCDR[4]);
-        for (k = 0; k < L; k ++) {
-            g[k].theta = x[k];
-            g[k].phi = -g[k].theta - g[k].xi;
-        }
-    }
-*/
-
-
-    // From this path description this function computes the control points 
-    // for each knot and stores it in the path.
+    // this function computes the control points for each node
+    // and stores those in the path
     function solveFreePath(g) {
         var k, uv, N = g.nodes.length;
         var cyclic = _isCyclic(g);
