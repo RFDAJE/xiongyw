@@ -30,18 +30,19 @@ var jp = (function(){
     // export a JSON path into Asymptote
     // input: a path object
     // output: a string representing a path/guide in asy
-    function toAsy(p) {
+    function toAsy(P) {
+        var p = jsonClone(P);
         var i, e, N = p.nodes.length;
         var asy = "";
 
         function _node2Asy(n) {
-            return "(" + n.x.toFixed(3) + "," + (-n.y).toFixed(3) + ")";
+            return "(" + n.x.toFixed(3) + "," + n.y.toFixed(3) + ")";
         }
 
         function _dir(from, to) {
             var dx = to.x - from.x;
             var dy = to.y - from.y;
-            asy += "{" + dx + "," + dy +"}";
+            return "{" + dx + "," + dy +"}";
         }
 
         // 
@@ -85,18 +86,20 @@ var jp = (function(){
         e_ = p.nodes[0];
         if (e.conn === FREE_CONN) {
             _for_interior_node(_e, e, e_);
-            if (e_.conn === LINE_CONN) {
-                e.asy += ".." + _dir(e_, p.nodes[1]) + "cycle";
-            } else {
-                e.asy += "..cycle";
-            }
         } else if (e.conn === LINE_CONN) {
-            e.asy = _node2Asy(e) + "--cycle";
-        } else {
             e.asy = _node2Asy(e);
-        }
+        } 
 
-        return p.nodes.map(function(x){return x.asy+(x.conn?x.conn:"");}).join("");
+        asy = p.nodes.map(function(x){return x.asy+(x.conn?x.conn:"");}).join("");
+
+        // handle the cyclic case
+        if (e.conn === FREE_CONN) {
+            asy += "cycle"; // to add {dir} before cycle
+        } else if (e.conn === LINE_CONN) {
+            asy += "cycle";
+        } 
+
+        return asy;
     }
 
     function toSvg(p) {
@@ -197,7 +200,13 @@ var jp = (function(){
             }
         }
         if (sub.nodes.length > 0) {  // a path may have only one node
-            sub.dout = p.dout; // inherit "dout" if any
+            if (p.dout) {
+                 sub.dout = p.dout; // inherit "dout" if any
+            } else { // calc dout when applicable
+                if (cur_conn === FREE_CONN && p.nodes[0].conn === LINE_CONN) {
+                    sub.dout = {"x":(p.nodes[1].x - p.nodes[0].x), "y":(p.nodes[1].y - p.nodes[0].y)};
+                }
+            }
             subs.push(sub);
         }
 
@@ -275,7 +284,7 @@ var jp = (function(){
             });
         }
 
-        //console.log(arguments.callee.name, JSON.stringify(subs));
+        console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }
