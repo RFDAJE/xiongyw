@@ -94,7 +94,10 @@ var jp = (function(){
 
         // handle the cyclic case
         if (e.conn === FREE_CONN) {
-            asy += "cycle"; // to add {dir} before cycle
+            if(e_.conn === LINE_CONN) {
+                asy += _dir(p.nodes[0], p.nodes[1]);
+            }
+            asy += "cycle";
         } else if (e.conn === LINE_CONN) {
             asy += "cycle";
         } 
@@ -175,12 +178,13 @@ var jp = (function(){
         pre_conn = p.nodes[0].conn;
         for (i = 1; i < n; i ++) {
             cur_conn = p.nodes[i].conn;
+
             if (pre_conn === cur_conn) {
                 sub.nodes.push(jsonClone(p.nodes[i]));
             } else {
                 // previous subpath ends
                 sub.nodes.push(jsonClone(p.nodes[i]));
-                if (cur_conn === LINE_CONN) {
+                if (cur_conn === LINE_CONN) { // ..z--
                     // calculate dout: z_-z
                     if (i < n-1) {
                         sub.dout = {"x":(p.nodes[i+1].x - p.nodes[i].x), "y":(p.nodes[i+1].y - p.nodes[i].y)}; 
@@ -196,9 +200,11 @@ var jp = (function(){
                     // calcuate din: _z-z
                     sub.din = {"x":(p.nodes[i].x - p.nodes[i-1].x), "y":(p.nodes[i].y - p.nodes[i-1].y)};
                 }
-                pre_conn = cur_conn;
             }
+
+            pre_conn = cur_conn;
         }
+
         if (sub.nodes.length > 0) {  // a path may have only one node
             if (p.dout) {
                  sub.dout = p.dout; // inherit "dout" if any
@@ -256,6 +262,7 @@ var jp = (function(){
                 if (last_conn === first_conn && last_conn === cur_conn) { // a,h
                     // prepend last-sub to 1st-sub
                     subs[0].nodes = subs[N-1].nodes.concat(subs[0].nodes);
+                    subs[0].din = subs[N-1].din; // inherit the din, if any
                     subs.pop();  // remove the last-sub
                 } else if (first_conn === last_conn && first_conn !== cur_conn) { // c, f
                     // add a one segment sub
@@ -284,7 +291,7 @@ var jp = (function(){
             });
         }
 
-        console.log(arguments.callee.name, JSON.stringify(subs));
+        //console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }
