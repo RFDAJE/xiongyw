@@ -227,7 +227,7 @@ var jp = (function(){
             });
         }
 
-        console.log(arguments.callee.name, JSON.stringify(subs));
+        //console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }

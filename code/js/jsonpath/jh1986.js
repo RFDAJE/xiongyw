@@ -143,9 +143,8 @@ var jh = (function(){
     // A: matrix (an array of array, mxn, i.e. m rows and n columns)
     // b: vector (mx1)
     // m,n: size of the matrix
-    // known: a vector contains already known results (slots for unknown are null)
     // return: x, a vector (array of m elements)
-    function solveLinearSystem(A, b, m, n, known) {
+    function solveLinearSystem(A, b, m, n) {
         var i, j, k, u, maxi, tmp, pivot, sum;
         var M = [], x = [];
 
@@ -157,21 +156,6 @@ var jh = (function(){
             }
             row.push(b[i]);
             M.push(row);
-        }
-
-        //
-        // apply known
-        //
-        if (known) {
-            for (i = 0; i < m; i ++) {
-                if (known[i]) {
-                    for (j = 0; j < n; j ++) {
-                        M[i][j] = 0;
-                    }
-                    M[i][i] = 1;
-                    M[i][n] = known[i];
-                }
-            }
         }
 
         //
@@ -238,11 +222,6 @@ var jh = (function(){
         var b = [8,-11,-3];
         var x = solveLinearSystem(A,b,3,3); // x should be [2, 3, -0.999]
         console.log(x);
-
-        var known=[3,null,1];
-        x=solveLinearSystem(A,b,3,3,known); // x should be [3, 3.999, 1]
-        console.log(x);
-        
     }
 
     //
@@ -370,7 +349,7 @@ var jh = (function(){
             if (g.dout) {
                 g.nodes[N-1].arg_ = z.arg(g.dout);
                 g.nodes[N-1].xi = limitArg(g.nodes[N-1].arg_ - g.nodes[N-1]._arg);
-                console.log(arguments.callee.name, JSON.stringify(g));
+                //console.log(arguments.callee.name, JSON.stringify(g));
             } else {
                 g.nodes[N-1].arg_ = 0;
                 g.nodes[N-1].xi = 0;
@@ -609,7 +588,6 @@ var jh = (function(){
         var cyclic = _isCyclic(g);
         var Mb; // [M, b]
         var x; // theta vector
-        var known = new Array(N);
 
         if (!_isValid(g)) {
             console.log(arguments.callee.name, "invalid path");
@@ -621,22 +599,23 @@ var jh = (function(){
         Mb = _buildLinearSystem(g);
 
         //
-        // apply din/dout to find known theta(s).
+        // solve thetas for each node
+        //
+        x = solveLinearSystem(Mb[0], Mb[1], N, N);
+
+        
+        //
+        // apply din/dout after solve the equation (fixme: get it done before solve the equation)
         // this is appliable only when the path is open
         //
         if (!cyclic) {
             if (g.din) {
-                known[0] = - g.nodes[0].xi; // because phi=0, so theta = -xi.
+                x[0] = - g.nodes[0].xi; // because phi=0, so theta = -xi.
             }
             if (g.dout) {
-                known[N-1] = 0; // theta = 0
+                x[N-1] = 0; // theta = 0
             }
         }
-
-        //
-        // solve thetas for each node
-        //
-        x = solveLinearSystem(Mb[0], Mb[1], N, N, known);
 
         //
         // update theta/phi of each node
@@ -644,6 +623,7 @@ var jh = (function(){
         for (k = 0; k < N; k ++) {
             g.nodes[k].theta = x[k];
             g.nodes[k].phi = -g.nodes[k].theta - g.nodes[k].xi;
+            //console.log(k, "theta:", g.nodes[k].theta, "phi:", g.nodes[k].phi);
         }
 
         // 
@@ -669,6 +649,7 @@ var jh = (function(){
             var alpha = z0.alpha;
             var beta = z1.beta;
 
+            //console.log(arguments.callee.name, "theta:", theta, "phi:", phi);
             return _uv(z0, z1, theta, phi, alpha, beta);
         }
     }
