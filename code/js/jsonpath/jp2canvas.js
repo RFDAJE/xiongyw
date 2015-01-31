@@ -2,8 +2,6 @@ var j2c = (function(){
     var _ctx = null;
 
     // canvas context constants
-    var GRID_LINE_WIDTH = 0.2;
-    var GRID_STROKE_STYLE = "grey";
     var POLYGON_LINE_WIDTH = 1;
     var POLYGON_STROKE_STYLE = "red";
     var BEZIER_LINE_WIDTH = 3;
