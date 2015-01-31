@@ -7,8 +7,9 @@
         padding: 0px;
     }
 </style>
-    <script type="text/javascript" src="jh1986-test.js"></script>
     <script type="text/javascript" src="jsonpath.js"></script>
+    <script type="text/javascript" src="jh1986-test.js"></script>
+    <script type="text/javascript" src="jp2canvas.js"></script>
     <script type="text/javascript">
 
 
@@ -33,10 +34,6 @@
  * - read: http://www.williammalone.com/articles/create-html5-canvas-javascript-drawing-app/
  */
 
-// connection type
-var FREE_CURVE = "..";
-var STRAIGHT_LINE = "--";
-var OPEN_SEGMENT = null;
 
 // constants
 var CANVAS_WIDTH = 500;
@@ -64,8 +61,8 @@ var CURSUR_SIZE = 4;
 var CURSUR_STROKE_STYLE = "white";
 
 var g_paths = []; // an array of path
-var g_cur_path = getOneEmptyPath();  // the current path
-var g_cur_conn = FREE_CURVE; // the current conn type
+var g_cur_path = jp.newPath();  // the current path
+var g_cur_conn = jp.FREE_CONN; // the current conn type
 var g_cur_path_started = false;
 
 var img = new Image();
@@ -75,15 +72,6 @@ var start_btn, stop_btn, cycle_btn, undo_btn; // buttons
 //img.src = "http://upload.wikimedia.org/wikipedia/en/9/9f/Open_tv.png";
 //img.src = "test.png";
 
-// input: o, could be any json object
-function cloneJsonObject(o) {
-    return JSON.parse(JSON.stringify(o));
-}
-
-// return an empty path
-function getOneEmptyPath() {
-    return {"nodes":[]};
-}
 
 // get the current mouse position from the Canvas
 // and return a node representing it
@@ -94,14 +82,16 @@ function getOneEmptyPath() {
 // output: a node object
 function getNodeFromCanvas(ctx, e, conn) {
     var c = ctx.canvas; 
+    var n = jp.newNode();
 
     var bb = c.getBoundingClientRect(); 
 
     // Translate and scale mouse event coordinates to canvas coordinates
-    var x = (e.clientX-bb.left)*(c.width/bb.width);
-    var y = (e.clientY-bb.top)*(c.height/bb.height);
+    n.x = (e.clientX-bb.left)*(c.width/bb.width);
+    n.y = - (e.clientY-bb.top)*(c.height/bb.height); // convert to normal coordinates
+    n.conn = conn;
 
-    return {"x": x, "y": -y, "conn": conn};
+    return n;
 }
 
 // canvas hooks
@@ -178,12 +168,12 @@ function startCurrentPath() {
         // assumes that the current path ends, so we save it
         // before doing so, making sure the path is open.
         // note that a closed path is always triggered by button click.
-        g_cur_path.nodes[n-1].conn = OPEN_SEGMENT;
+        g_cur_path.nodes[n-1].conn = jp.OPEN_CONN;
         g_paths.push(g_cur_path);
     }
  
     // re-init the guide
-    g_cur_path = getOneEmptyPath();
+    g_cur_path = jp.newPath();
 //    displayCurrentPath();
     g_cur_path_started = true;
 }
@@ -191,11 +181,11 @@ function startCurrentPath() {
 function endCurrentPathAsOpened() {
     var n = g_cur_path.nodes.length;
     if (n > 0) {
-        g_cur_path.nodes[n-1].conn = OPEN_SEGMENT;
+        g_cur_path.nodes[n-1].conn = jp.OPEN_CONN;
         g_paths.push(g_cur_path);
     }
 
-    g_cur_path = getOneEmptyPath();
+    g_cur_path = jp.newPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -214,10 +204,10 @@ function endCurrentPathAsFreeClosed() {
         return;
     }
 
-    g_cur_path.nodes[n-1].conn = FREE_CURVE;
+    g_cur_path.nodes[n-1].conn = jp.FREE_CONN;
     g_paths.push(g_cur_path);
 
-    g_cur_path = getOneEmptyPath();
+    g_cur_path = jp.newPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -231,12 +221,12 @@ function endCurrentPathAsLineClosed() {
         return;
     }
 
-    var z0 = cloneJsonObject(g_cur_path.nodes[0]);
-    z0.conn = STRAIGHT_LINE;
+    var z0 = jp.jsonClone(g_cur_path.nodes[0]);
+    z0.conn = jp.LINE_CONN;
     g_cur_path.nodes.push(z0);
     g_paths.push(g_cur_path);
 
-    g_cur_path = getOneEmptyPath();
+    g_cur_path = jp.newPath();
     g_cur_path_started = false;
 
     outputResult();
@@ -260,14 +250,14 @@ function addDegradedSegment() {
     var n = g_cur_path.nodes.length;
     if (g_cur_path_started && n > 0) {
         var last = g_cur_path.nodes[n-1];
-        var dup = cloneJsonObject(last);
-        last.conn = STRAIGHT_LINE;
+        var dup = jp.jsonClone(last);
+        last.conn = jp.LINE_CONN;
         g_cur_path.nodes.push(dup);
     }
 }
 
 function onStraightConn () {
-    g_cur_conn = STRAIGHT_LINE;
+    g_cur_conn = jp.LINE_CONN;
     if (g_cur_path_started && g_cur_path.nodes.length > 0) {
         g_cur_path.nodes[g_cur_path.nodes.length-1].conn = g_cur_conn;
     }
@@ -276,7 +266,7 @@ function onStraightConn () {
 }
 
 function onFreeConn () {
-    g_cur_conn = FREE_CURVE;
+    g_cur_conn = jp.FREE_CONN;
     if (g_cur_path_started && g_cur_path.nodes.length > 0) {
         g_cur_path.nodes[g_cur_path.nodes.length-1].conn = g_cur_conn;
     }
@@ -284,47 +274,17 @@ function onFreeConn () {
 }
 
 function toggleCurrentConn () {
-    if (g_cur_conn === STRAIGHT_LINE) {
+    if (g_cur_conn === jp.LINE_CONN) {
         onFreeConn();
     } else {
         onStraightConn();
     }
 }
 
-//
-// export a JSON path into Asymptote
-// input: a path object
-// output: a string representing a path/guide in asy
-function jsonPath2Asy(p) {
-    var i, e, n = p.nodes.length;
-    var asy = "";
-
-    for(i = 0; i < n-1; i ++) {
-        var e = p.nodes[i];
-        asy += "(" + e.x.toFixed(3) + "," + e.y.toFixed(3) + ")" + e.conn;
-    }
-
-    // the last node
-    e = p.nodes[n-1];
-    asy += "(" + e.x.toFixed(3) + "," + e.y.toFixed(3) + ")";
-    if (e.conn === STRAIGHT_LINE) {
-        asy += "--cycle";
-    } else if (e.conn === FREE_CURVE) {
-        asy += "..cycle";
-    }
-    
-    return asy;
-}
-
-//function displayCurrentPath() {
-//    var ta =  document.getElementById("g_cur_path"); // textarea
-//    ta.value = JSON.stringify(g_cur_path, null, "  ");
-//}
-
 
 function outputResult() {
     
-    var asy = "guide[] gg = {" + g_paths.map(function(x){return jsonPath2Asy(x);}).join(",\r") + "};";
+    var asy = "guide[] gg = {" + g_paths.map(function(x){return jp.toAsy(x);}).join(",\r") + "};";
     var ta = document.getElementById("g_paths"); // textarea
     ta.value = asy;
     console.log(asy+"draw(gg);");
@@ -366,464 +326,20 @@ function drawImageAndGrid() {
     }
 }
 
-//
-// draw a free path: all segments are connected bezier curves
-// 
-function drawFreePath(P) {
-
-    // convert the new data structure into old now: to be removed in the end?
-    function _convert(P) {
-        var p = [];
-        p = P.nodes.map(function(e) { 
-            var n = [];
-            n[0]=e.x;
-            n[1]=e.y;
-            n.conn = e.conn;
-            return n;
-        });
-        p.cyclic = (P.nodes[P.nodes.length-1].conn === "..");
-
-        return p;
-    }
-
-    var u, v;
-
-    var p = _convert(P);
-
-
-    if (p.length < 2) {
-        return;
-    }
-
-    // get the control points
-//    jh.solve_angles(p);
-//    jh.find_control_points(p);
-
-    ctx.lineWidth = BEZIER_LINE_WIDTH;
-    ctx.strokeStyle = BEZIER_STROKE_STYLE;
-    ctx.beginPath();
-    ctx.moveTo(p[0][0], -p[0][1]);
-    u = p[0].u;
-    for(j = 1; j < p.length; j ++) {
-        v = p[j].v;
-        ctx.bezierCurveTo(u[0], -u[1], v[0], -v[1], p[j][0], -p[j][1]);
-        u = p[j].u;
-    }
-    if (p.cyclic) {
-        v = p[0].v;
-        ctx.bezierCurveTo(u[0], -u[1], v[0], -v[1], p[0][0], -p[0][1]);
-        ctx.closePath();
-    }
-    ctx.stroke();
-
-    //
-    // draw straight lines
-    //
-    if (p.length < 1) {
-        return;
-    }
-
-    ctx.lineWidth = POLYGON_LINE_WIDTH;
-    ctx.strokeStyle = POLYGON_STROKE_STYLE;
-    ctx.beginPath();
-    ctx.moveTo(p[0][0], -p[0][1]);
-    for(j = 1; j < p.length; j ++) {
-        ctx.lineTo(p[j][0], -p[j][1]);
-    }
-    if (p.cyclic) {
-        ctx.closePath();
-    }
-    ctx.stroke();
-}
-
-function test_drawFreePath() {
-
-    var p={"nodes":[ {"x":100,"y":100, "conn":".."},
-                     {"x":200,"y":100, "conn":".."},
-                     {"x":200,"y":200, "conn":".."}
-                   ]
-          };
-
-    drawFreePath(p);
-}
-
-//
-// draw a straight path: all segments are straight lines
-// 
-function drawStraightPath(p) {
-
-    var j, n = p.nodes.length;
-    if (n < 2) {
-        return;
-    }
-
-    ctx.lineWidth = BEZIER_LINE_WIDTH;
-    ctx.strokeStyle = BEZIER_STROKE_STYLE;
-    ctx.beginPath();
-    ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
-    for(j = 1; j < n; j ++) {
-        ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
-    }
-
-    // closeness of path/subpath is conveyed in its last node
-    if (p.nodes[n-1].conn === STRAIGHT_LINE) {
-        ctx.closePath();
-    }
-    ctx.stroke();
-}
-
-function test_drawStraightPath() {
-
-    var p = {"nodes":[ {"x":200,"y":100, "conn":"--"},
-                       {"x":300,"y":100, "conn":"--"},
-                       {"x":300,"y":200, "conn":"--"}
-                     ]
-            };
-
-    drawStraightPath(p);
-}
-
-
-//
-// divide a path into a subpaths, each subpath is either a continuous free curve segments,
-// or a continuous straightline segments; subpath type (curve or straight line) can be
-// determined by any segment of the subpath.
-
-// the json format of a subpath is the same as for a path.
-//
-// input: P, read-only
-// return: an array of subpath, that:
-//     1. within each subpath, the conn type of all segments are the same;
-//     2. if several free curve segments can be contained in a single subpath, 
-//        it should not be divided into multiple subpaths.
-//        note that it's possible that divided subpath is the same as the 
-//        original path, if it's not dividable.
-//     3. the closeness of subpath is indicated by the last node of the subpath:
-//        if it's null, it's open; otherwise it's closed. this also implies that,
-//        if a path is divided into more than 1 subpaths, all subpath must be open;
-//
-function divideOnePath(P) {
-
-    var i, n = P.nodes.length;
-    var p; 
-    var subs = [];  // array of subpath
-    var N; // subs.length;
-    var sub = getOneEmptyPath();  // the current subpath
-    var pre_conn, cur_conn, last_conn, first_conn;
-
-    if (n < 2) {
-        //console.log("divideOnePath(): too few nodes in the path!");
-        return [];
-    }
-
-    p = cloneJsonObject(P);
-
-    //
-    // making sure that each node has a proper connetor; 
-    //
-    for (i = 0; i < n-1; i ++) {
-        if (p.nodes[i].conn !== FREE_CURVE && 
-            p.nodes[i].conn !== STRAIGHT_LINE) {
-            console.log("divideOnePath(): invalid path!");
-            return;
-        }
-    }
-    // only the last node can have "null" connector    
-    if (p.nodes[n-1].conn !== FREE_CURVE && 
-        p.nodes[n-1].conn !== STRAIGHT_LINE && 
-        p.nodes[n-1].conn !== OPEN_SEGMENT) {
-            console.log("divideOnePath(): invalid path (last node)!");
-            return;
-    }
-
-    // 
-    // split straight line and curve into different subpaths, i.e., into subs[]
-    // to prevent circular reference, always clone nodes here!
-    //
-    subs=[];
-    sub=getOneEmptyPath();
-    sub.nodes.push(cloneJsonObject(p.nodes[0]));
-    pre_conn = p.nodes[0].conn;
-    for (i = 1; i < n; i ++) {
-        cur_conn = p.nodes[i].conn;
-        if (pre_conn === cur_conn) {
-            sub.nodes.push(cloneJsonObject(p.nodes[i]));
-        } else {
-            // previous subpath ends
-            sub.nodes.push(cloneJsonObject(p.nodes[i]));
-            subs.push(sub);
-            // start a new subpath with the current node
-            sub = getOneEmptyPath();
-            sub.nodes.push(cloneJsonObject(p.nodes[i]));
-            pre_conn = cur_conn;
-        }
-    }
-    if (sub.nodes.length > 0) {  // a path may have only one node
-        subs.push(sub);
-    }
-
-    N = subs.length;
-
-    //
-    // check the conn of the last node, which is stored in cur_conn now.
-    //
-    // if the path is open, we have already done;
-    // if the path is closed, we need to connect the 1st-sub and the last-sub somehow:
-    //
-    //   .-->[1st-sub] ... [last-sub]-->-.
-    //   |                               |
-    //    ------<-------------------<----
-    // 
-    // there are several cases:
-    // 
-    // 1. 1st-sub is the same as the last-sub, i.e., there is only one subpath 
-    //    (which is the original path), we are done;
-    // 2. otherwise, we have 8 possiblities, in terms of the conn type of (last-sub,last-node,1st-sub):
-    //    +----------+-----------+----------+-------------------------------+ 
-    //    | last-sub | last-node | 1st-sub  |     result                    |
-    //    +----------+-----------+----------+-------------------------------+ 
-    //  a |   --     |   --      |   --     |  prepend last-sub to 1st-sub  |
-    //  h |   ..     |   ..      |   ..     |  ditto                        |
-    //    +----------+-----------+----------+-------------------------------+ 
-    //  c |   --     |   ..      |   --     |  a new sub with one segment   |
-    //  f |   ..     |   --      |   ..     |  ditto                        |
-    //    +----------+-----------+----------+-------------------------------+ 
-    //  d |   --     |   ..      |   ..     |  prepend last-node to 1st-sub |
-    //  e |   ..     |   --      |   --     |  ditto                        |
-    //    +----------+-----------+----------+-------------------------------+ 
-    //  b |   --     |   --      |   ..     |  append z0 to last-sub        |
-    //  g |   ..     |   ..      |   --     |  ditto                        |
-    //    +----------+-----------+----------+-------------------------------+ 
-    //
-    if (cur_conn !== STRAIGHT_LINE && cur_conn !== FREE_CURVE) {
-        // it's a open path...we have already done!
-    } else { // it's a closed path
-        if (N === 1) {
-            // the subpath === the original path. we are also done!
-        } else {
-            // cur_conn: last-node
-            first_conn = subs[0].nodes[0].conn;  // first-sub
-            last_conn = subs[N-1].nodes[0].conn; // last-sub
-            
-            if (last_conn === first_conn && last_conn === cur_conn) { // a,h
-                // prepend last-sub to 1st-sub
-                subs[0].nodes = subs[N-1].nodes.concat(subs[0].nodes);
-                subs.pop();  // remove the last-sub
-            } else if (first_conn === last_conn && first_conn !== cur_conn) { // c, f
-                // add a one segment sub
-                sub = getOneEmptyPath();
-                sub.nodes.push(cloneJsonObject(p.nodes[n-1])); // last node
-                sub.nodes.push(cloneJsonObject(p.nodes[0])); // 1st node
-                subs.push(sub);
-            } else if (cur_conn === first_conn && cur_conn !== last_conn) { // d, e
-                // prepend last node to 1st sub
-                subs[0].nodes.unshift(cloneJsonObject(p.nodes[n-1]));
-            } else if (cur_conn === last_conn && cur_conn !== first_conn) { // b, g
-                // append z0 to last-sub
-                subs[N-1].nodes.push(cloneJsonObject(p.nodes[0]));  
-            } else {
-                console.log("it should be impossible...something wrong!");
-            }
-        }
-    }
-
-    // handle the closeness of each subpath
-    if (subs.length > 1) { // if (subs.length<=0), we are done already.
-        // making sure that each subpath is open
-        subs.map(function(sub){
-            var n = sub.nodes.length;
-            sub.nodes[n-1].conn = null;
-        });
-    }
-        
-    return subs;
-}
-
-// test cases
-function test_divideOnePath() {
-
-    var n, subs;
-
-    // test case: z0..z1--z2..z3--z3..z4--z5
-    var p={"nodes":[ {"x":0,"y":0, "conn":".."},
-                     {"x":1,"y":1, "conn":"--"},
-                     {"x":2,"y":2, "conn":".."},
-                     {"x":3,"y":3, "conn":"--"},
-                     {"x":3,"y":3, "conn":".."},
-                     {"x":4,"y":4, "conn":"--"},
-                     {"x":5,"y":5, "conn":null}
-                   ]
-          };
-
-    n = p.nodes.length;
-
-    // it should returns:
-    // - z0..z1
-    // - z1--z2
-    // - z2..z3
-    // - z3--z3
-    // - z3..z4
-    // - z4--z5
-
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-
-
-    //
-    // when the path is closed:
-    //
-    // if(z5.conn==="--"): "z4--z5" becomes "z4--z5--z0"
-    p.nodes[n-1].conn = "--";
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-    // if(z5.conn===".."): "z0..z1" becomes "z5..z0..z1"
-    p.nodes[n-1].conn = "..";
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-
-
-    //
-    // test case: z0..z1..z2..
-    //
-    var p={"nodes":[ {"x":0,"y":0, "conn":".."},
-                     {"x":1,"y":1, "conn":".."},
-                     {"x":2,"y":2, "conn":".."}
-                   ]
-          };
-
-    n = p.nodes.length;
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-
-    //
-    // test case: z0..z1..z2..z3..z0--
-    //
-    var p={"nodes":[ {"x":0,"y":0, "conn":".."},
-                     {"x":1,"y":1, "conn":".."},
-                     {"x":2,"y":2, "conn":".."},
-                     {"x":3,"y":3, "conn":".."},
-                     {"x":0,"y":0, "conn":"--"}
-                   ]
-          };
-
-    n = p.nodes.length;
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-    
-    //
-    // test case: z3..z0--z0..z1..z2..
-    //
-    var p={"nodes":[ {"x":3,"y":3, "conn":".."},
-                     {"x":0,"y":0, "conn":"--"},
-                     {"x":0,"y":0, "conn":".."},
-                     {"x":1,"y":1, "conn":".."},
-                     {"x":2,"y":2, "conn":".."}
-                   ]
-          };
-
-    n = p.nodes.length;
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-
-    //
-    // test case: z0--z1--z2--
-    //
-    var p={"nodes":[ {"x":0,"y":0, "conn":"--"},
-                     {"x":1,"y":1, "conn":"--"},
-                     {"x":2,"y":2, "conn":"--"}
-                   ]
-          };
-
-    n = p.nodes.length;
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-
-    //
-    // test case: z0..z1..z2--z3--
-    //
-    var p={"nodes":[ {"x":0,"y":0, "conn":".."},
-                     {"x":1,"y":1, "conn":".."},
-                     {"x":2,"y":2, "conn":"--"},
-                     {"x":3,"y":3, "conn":"--"},
-                   ]
-          };
-
-    n = p.nodes.length;
-    subs = divideOnePath(p);
-    console.log(arguments.callee.name, ":", JSON.stringify(subs));
-}
-
-
-//
-// draw straight lines (thiner) on top of bezier curves (thicker)
-// 
-function drawOnePath(P) {
-
-    var subs = divideOnePath(P);
-    //console.log("draw: subs.length:", subs.length);
-    subs.map(function(s){
-        if (s.nodes[0].conn === STRAIGHT_LINE) {
-            drawStraightPath(s);
-        } else {
-            drawFreePath(s);
-        }
-    });
-}
-
-function test_drawOnePath() {
-    var z0 = {x:100, y:100, conn:".."};
-    var z1 = {x:200, y:100, conn:".."};
-    var z2 = {x:200, y:200, conn:".."};
-    var z3 = {x:150, y:130, conn:".."};
-    var z00 = {x:100, y:100, conn:"--"};
-
-    var p = {"nodes":[ z0, z1, z2, z3, z00] };
-    drawOnePath(p);
-
-
-    var z22 = cloneJsonObject(z2);
-    z2.conn = "--";
-    var p2={"nodes":[ z0, z1, z2, z22, z3, z00] };
-    p2.nodes.map(function(n){ n.x += 200; }); // shift right
-    drawOnePath(p2);
-}
-
-function dotAllNodes() {
-    function _dot(x, y) {
-        // dot
-        ctx.beginPath(); 
-        ctx.arc(x, y, DOT_RADIUS, 0, Math.PI*2, true); 
-        ctx.fillStyle = DOT_FILL_STYLE; 
-        ctx.fill();
-
-        // cursor
-        ctx.beginPath();
-        ctx.lineWidth = CURSUR_LINE_WIDTH;
-        ctx.strokeStyle = CURSUR_STROKE_STYLE;
-        ctx.moveTo(x-CURSUR_SIZE, y);
-        ctx.lineTo(x+CURSUR_SIZE, y);
-        ctx.moveTo(x, y-CURSUR_SIZE);
-        ctx.lineTo(x, y+CURSUR_SIZE);
-        ctx.stroke();
-    }
-
-    function _dotPath(p) {
-        p.nodes.map(function(k){return _dot(k.x, -k.y);});
-    }
-
-    g_paths.map(function(p){return _dotPath(p);});
-    _dotPath(g_cur_path);
-}
 
 function redrawCanvas (){
 //    console.log("redrawCanvas...");
 
     ctx.clearRect(0, 0, c.width, c.height);
     drawImageAndGrid();
-    g_paths.map(function(x){return drawOnePath(x);});
-    drawOnePath(g_cur_path);
-    dotAllNodes();
+    
+    // draw the paths
+    g_paths.map(function(x){return j2c.drawOnePath(x);});
+    j2c.drawOnePath(g_cur_path);
 
+    // dot the paths
+    g_paths.map(function(x){return j2c.dotOnePath(x);});
+    j2c.dotOnePath(g_cur_path);
 }
 
 function handleFocus(e) {
@@ -885,6 +401,7 @@ function onLoad() {
 
 
     ctx = c.getContext('2d');
+    j2c.setContext(ctx);
 
     drawImageAndGrid();
 

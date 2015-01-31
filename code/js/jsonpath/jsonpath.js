@@ -344,41 +344,18 @@ var jp = (function(){
         console.log(arguments.callee.name, ":", JSON.stringify(subs));
     }
 
-
     function solvePath(P) {
-
-        // convert the new data structure into old now: to be removed in the end?
-        function _convert(P) {
-            var p = [];
-            p = P.nodes.map(function(e) { 
-                var n = [];
-                n[0]=e.x;
-                n[1]=e.y;
-                n.conn = e.conn;
-                return n;
-            });
-            p.cyclic = (P.nodes[P.nodes.length-1].conn === "..");
-            p.din = P.din;
-            p.dout = P.dout;
-
-            return p;
+        var SUBS = divideOnePath(P);
+        console.log(JSON.stringify(SUBS));
+        var i, N = SUBS.length;
+        for (i = 0; i < N; i ++) {
+            if (SUBS[i].nodes[0].conn === FREE_CONN) {
+                jh.solveFreePath(SUBS[i]);
+            }
         }
-
-        var u, v;
-
-        var p = _convert(P);
-
-
-        if (p.length < 2) {
-            return;
-        }
-
-        // get the control points
-//        jh.solve_angles(p);
-//        jh.find_control_points(p);
-
-        return p;
+        return SUBS;
     }
+
 
     function test_solvePath() {
         var P={"nodes":[ {"x":0,"y":0, "conn":".."},
@@ -388,10 +365,7 @@ var jp = (function(){
                        ]
               };
 
-        var SUBS = divideOnePath(P);
-        var subs = SUBS.map(function(P){ return solvePath(P);});
-
-        console.log(subs);
+        console.log(JSON.stringify(solvePath(P)));
     }
 
     function test() {

@@ -261,8 +261,8 @@ var jh = (function(){
         var t = {"x": cos(theta), "y": sin(theta)};  // exp(i*theta)
         var p = {"x": cos(-phi), "y": sin(-phi)};    // exp(-i*phi)
 
-        var u = z.sum(z0, z.prod(t,z.prod(l,[_f(theta,phi)/alpha,0])));
-        var v = z.sub(z1, z.prod(p,z.prod(l,[_f(phi,theta)/beta,0])));
+        var u = z.sum(z0, z.prod(t,z.prod(l,{"x":_f(theta,phi)/alpha,"y":0})));
+        var v = z.sub(z1, z.prod(p,z.prod(l,{"x":_f(phi,theta)/beta,"y":0})));
 
         return [u,v];
     }
@@ -390,67 +390,92 @@ var jh = (function(){
     // linear system which allows finding the right values of "theta" at
     // each point of the path (being "theta" the angle of departure of the
     // path at each point). 
-    // 
-    // Notes on the meaning of A/B/C/D/R:
-    // 
-    // Here the theta at each node are treated as unknown. for node k,
-    // its equation can be expressed as (denote theta[k-1], theta[k], 
-    // and theta[k+1] as _t, t, and t respectively):
-    //
-    // a*_t + (b+c)*t + d*t_ = r
-    // 
-    // where a/b/c/d/r for all nodes forms its own vector A/B/C/D/R 
-    // respectively.
-    //
-    // then A/B/C/D/R is used to form the tri-diagonal matrix 
-    // (http://en.wikipedia.org/wiki/Tridiagonal_matrix): 
-    // 
-    // | b+c d   ...a |
-    // | a b+c d  ... |
-    // | . a b+c d  . | * T[] = R[]
-    // |    ......    |
-    // | d......a b+c |
-    //
-    // The equations are from METAFONT book, page 131 in chapter 14.
-    // There are 4 equations:
-    //
-    // (*): theta+phi+xi=0
-    // (**): equation for interior nodes
-    // (***): equation for z0 if direction is not explicitly given
-    // (***'): equation for zn if direction is not explicitly given
-    //
-    // The last 3 equations can be expressed in the unified form:
-    // (theta: t, alpha: a, beta: b, length: l, turn angle: xi)
-    //
-    // A*_t + (B+C)*t + D*t_ = R, thus
-    //
-    // (**) for interior nodes:
-    //   A=X/_a
-    //   B=X*(3-1/_a)
-    //   C=Y*(3-1/b_)
-    //   D=Y/b_
-    //   R=-B*xi-D*xi_
-    // where X=b^2/l, Y=a^2/l_
-    // 
-    // (***) for the 1st node:
-    //   A=0
-    //   B=0
-    //   C=(1/b_-3)*X-1/a*Y
-    //   D=-1/b_*X+(1/a-3)*Y
-    //   R=-D*xi_
-    // where X=a^2, Y=curl_start*b_^2
-    //
-    // (***') for the last node:
-    //   A=1/_a*X+(3-1/b)*Y
-    //   B=(3-1/_a)*X+1/b*Y
-    //   C=0
-    //   D=0
-    //   R=-B*xi
-    // where X=b^2, Y=curl_end*_a^2
-    //
-    function _buildCoefficients(g) {
+    function _buildLinearSystem(g) {
         var i, n, N = g.nodes.length;
         var A=[], B=[], C=[], D=[], R=[];
+        // 
+        // Notes on the meaning of A/B/C/D/R:
+        // 
+        // Here the theta at each node are treated as unknown. for node k,
+        // its equation can be expressed as (denote theta[k-1], theta[k], 
+        // and theta[k+1] as _t, t, and t respectively):
+        //
+        // a*_t + (b+c)*t + d*t_ = r
+        // 
+        // where a/b/c/d/r for all nodes forms its own vector A/B/C/D/R 
+        // respectively.
+        //
+        // then A/B/C/D/R is used to form the tri-diagonal matrix 
+        // (http://en.wikipedia.org/wiki/Tridiagonal_matrix): 
+        // 
+        // | b+c d   ...a |
+        // | a b+c d  ... |
+        // | . a b+c d  . | * T[] = R[]
+        // |    ......    |
+        // | d......a b+c |
+        //
+        // The equations are from METAFONT book, page 131 in chapter 14.
+        // There are 4 equations:
+        //
+        // (*): theta+phi+xi=0
+        // (**): equation for interior nodes
+        // (***): equation for z0 if direction is not explicitly given
+        // (***'): equation for zn if direction is not explicitly given
+        //
+        // The last 3 equations can be expressed in the unified form:
+        // (theta: t, alpha: a, beta: b, length: l, turn angle: xi)
+        //
+        // A*_t + (B+C)*t + D*t_ = R, thus
+        //
+        // (**) for interior nodes:
+        //   A=X/_a
+        //   B=X*(3-1/_a)
+        //   C=Y*(3-1/b_)
+        //   D=Y/b_
+        //   R=-B*xi-D*xi_
+        // where X=b^2/l, Y=a^2/l_
+        // 
+        // (***) for the 1st node:
+        //   A=0
+        //   B=0
+        //   C=(1/b_-3)*X-1/a*Y
+        //   D=-1/b_*X+(1/a-3)*Y
+        //   R=-D*xi_
+        // where X=a^2, Y=curl_start*b_^2
+        //
+        // (***') for the last node:
+        //   A=1/_a*X+(3-1/b)*Y
+        //   B=(3-1/_a)*X+1/b*Y
+        //   C=0
+        //   D=0
+        //   R=-B*xi
+        // where X=b^2, Y=curl_end*_a^2
+        //
+
+        // input: _k : g[k-1]
+        //         k : g[k]  
+        //         k_: g[k+1]
+        //        idx: the idx for node "k"
+        // output: A/B/C/D/R is updated accordingly
+        function _for_interior_node2 (_k, k, k_, idx) {
+            //
+            // the original python code (seems not correct unless all alpha/beta are 1):
+            // 
+            //A.push(   _k.alpha  / (pow(k.beta,2)  * k._l));
+            //B.push((3-_k.alpha) / (pow(k.beta,2)  * k._l));
+            //C.push((3-k_.beta)  / (pow(k.alpha,2) * k.l_));
+            //D.push(   k_.beta   / (pow(k.alpha,2) * k.l_));
+            //R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
+            //
+
+            var X = pow(k.beta,2)/k._l;
+            var Y = pow(k.alpha,2)/k.l_;
+            A.push(X/_k.alpha);
+            B.push(X*(3-1/_k.alpha));
+            C.push(Y*(3-1/k_.beta));
+            D.push(Y/k_.beta);
+            R.push(-B[idx]*k.xi-D[idx]*k_.xi);
+        }
 
         //
         // traverse the path now...
@@ -514,30 +539,6 @@ var jh = (function(){
         return [matrix, R];
 
 
-        // input: _k : g[k-1]
-        //         k : g[k]  
-        //         k_: g[k+1]
-        //        idx: the idx for node "k"
-        // output: A/B/C/D/R is updated accordingly
-        function _for_interior_node2 (_k, k, k_, idx) {
-            //
-            // the original python code (seems not correct unless all alpha/beta are 1):
-            // 
-            //A.push(   _k.alpha  / (pow(k.beta,2)  * k._l));
-            //B.push((3-_k.alpha) / (pow(k.beta,2)  * k._l));
-            //C.push((3-k_.beta)  / (pow(k.alpha,2) * k.l_));
-            //D.push(   k_.beta   / (pow(k.alpha,2) * k.l_));
-            //R.push(-B[idx] * k.xi  - D[idx] * k_.xi);
-            //
-
-            var X = pow(k.beta,2)/k._l;
-            var Y = pow(k.alpha,2)/k.l_;
-            A.push(X/_k.alpha);
-            B.push(X*(3-1/_k.alpha));
-            C.push(Y*(3-1/k_.beta));
-            D.push(Y/k_.beta);
-            R.push(-B[idx]*k.xi-D[idx]*k_.xi);
-        }
 
         function _buildMatrix(A, B, C, D, R) {
             var k, j, prev, post, L = R.length;
@@ -564,7 +565,7 @@ var jh = (function(){
         }
     }
 
-    function test_buildCoefficients() {
+    function test_buildLinearSystem() {
         var g = {nodes: [
             {x:0,y:0, conn:".."},
             {x:100,y:0, conn:".."},
@@ -572,13 +573,13 @@ var jh = (function(){
             {x:50,y:50, conn:".."}]};
         _updateXiAndL(g);
         _checkCurlAlphaBeta(g);
-        var r = _buildCoefficients(g);
+        var r = _buildLinearSystem(g);
         console.log(arguments.callee.name, JSON.stringify(r));
     }
 
 /*
     // This function receives the five vectors created by
-    // _buildCoefficients() and uses them to build a linear system with N
+    // _buildLinearSystem() and uses them to build a linear system with N
     // unknonws (being N the number of points in the path). Solving the system
     // finds the value for theta (departure angle) at each point
     function _solve_for_thetas(A, B, C, D, R) {
@@ -622,27 +623,64 @@ var jh = (function(){
             return;
         }
 
-        var ABCDR = _buildCoefficients(g);
+        var ABCDR = _buildLinearSystem(g);
         var x = _solve_for_thetas(ABCDR[0], ABCDR[1], ABCDR[2], ABCDR[3], ABCDR[4]);
         for (k = 0; k < L; k ++) {
             g[k].theta = x[k];
             g[k].phi = -g[k].theta - g[k].xi;
         }
     }
+*/
 
 
-    // This function receives a path in which, for each point, the values
-    // of theta and phi (leave and enter directions) are known, either because
-    // they were previously stored in the structure, or because it was
-    // computed by function solve_angles(). 
-    //
     // From this path description this function computes the control points 
     // for each knot and stores it in the path.
-    function find_control_points(g) {
+    function solveFreePath(g) {
         var k, uv, N = g.nodes.length;
+        var cyclic = _isCyclic(g);
+        var Mb; // [M, b]
+        var x; // theta vector
 
-        if (!_isValid) {
+        if (!_isValid(g)) {
+            console.log(arguments.callee.name, "invalid path");
             return;
+        }
+
+        _updateXiAndL(g);
+        _checkCurlAlphaBeta(g);
+        Mb = _buildLinearSystem(g);
+
+        //
+        // todo: apply din/dout
+        //
+
+        //
+        // solve thetas for each node
+        //
+        x = solveLinearSystem(Mb[0], Mb[1], N, N);
+
+        //
+        // update theta/phi of each node
+        //
+        for (k = 0; k < N; k ++) {
+            g.nodes[k].theta = x[k];
+            g.nodes[k].phi = -g.nodes[k].theta - g.nodes[k].xi;
+        }
+
+        // 
+        // calculate u, v
+        //
+        // N nodes mean N-1 segments (if non-cyclic) and N segments (if cyclic).
+        for (k = 0; k < N-1; k ++) {
+            uv = _for_each_segment(g.nodes[k], g.nodes[k+1]);
+            g.nodes[k].u = uv[0]; 
+            g.nodes[k+1].v = uv[1];
+        }
+
+        if (_isCyclic(g)) {
+            uv = _for_each_segment(g.nodes[N-1], g.nodes[0]);
+            g.nodes[N-1].u = uv[0];
+            g.nodes[0].v = uv[1];
         }
 
         // return control points [u,v] for one segment betw z0..z1
@@ -654,45 +692,29 @@ var jh = (function(){
 
             return _uv(z0, z1, theta, phi, alpha, beta);
         }
-
-        // N nodes mean N-1 segments (if non-cyclic) and N segments (if cyclic).
-        for (k = 0; k < N-1; k ++) {
-            uv = _for_each_segment(g[k], g[k+1]);
-            g[k].u = uv[0]; // u
-            g[k+1].v = uv[1]; // v
-        }
-
-        if (g.cyclic) {
-            uv = _for_each_segment(g[N-1], g[0]);
-            g[N-1].u = uv[0];
-            g[0].v = uv[1];
-        }
     }
-*/
+
+    function test_solveFreePath() {
+        var g = {nodes: [
+            {x:0,y:0, conn:".."},
+            {x:100,y:0, conn:".."},
+            {x:100,y:100, conn:".."},
+            {x:50,y:50, conn:".."}]};
+
+        solveFreePath(g);
+        console.log(arguments.callee.name, JSON.stringify(g));
+    }
 
     function test () {
         //test_solveLinearSystem();
         //test_updateXiAndL();
-        test_buildCoefficients();
+        //test_buildLinearSystem();
+        test_solveFreePath();
     }
 
     return {
-        // methods
-//        "solve_angles": solve_angles, 
-//        "find_control_points": find_control_points,
+        "solveFreePath": solveFreePath,
         "test": test,
-        // constants
-        "DEFAULT_ALPHA": DEFAULT_ALPHA,
-        "DEFAULT_BETA": DEFAULT_BETA,
-        "DEFAULT_CURL_BEGIN": DEFAULT_BETA,
-        "DEFAULT_CURL_END": DEFAULT_BETA,
-        "conn": { // enum
-            "FREE_CURVE": FREE_CURVE,
-            "BOUNDED_CURVE": BOUNDED_CURVE,
-            "STRAIGHT_LINE": STRAIGHT_LINE,
-            "TENSE_LINE": TENSE_LINE,
-            "SPLICE": SPLICE
-        }
     };
 }());
 
