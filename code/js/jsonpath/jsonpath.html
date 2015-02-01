@@ -46,6 +46,9 @@ var RIGHT_KEY = 39;
 var DOWN_KEY = 40;
 var ENTER_KEY = 13; 
 var SHIFT_KEY = 16;
+var S_KEY = 83;
+var U_KEY = 85;
+var Z_KEY = 90;
 
 var GRID_LINE_WIDTH = 0.2;
 var GRID_STROKE_STYLE = "grey";
@@ -59,7 +62,7 @@ var img = new Image();
 var c, ctx; // canvas and its context
 
 //img.src = "http://upload.wikimedia.org/wikipedia/en/9/9f/Open_tv.png";
-//img.src = "test.png";
+img.src = "test.png";
 
 
 // get the current mouse position from the Canvas
@@ -445,11 +448,16 @@ function handleFocus(e) {
 function handleKeyDown(e) {
     console.log("key down:" + e.keyCode);
 
+    var key_id = e.keyCode || e.which;
+
     if (!g_cur_path_started) {
-        return true;
+        if (key_id === S_KEY) {
+            startPath();
+        } else {
+            return true;
+        }
     }
 
-    var key_id = e.keyCode || e.which;
 
     // todo: simulate mouse move event, pixel by pixel
     if (key_id === LEFT_KEY) {
@@ -460,6 +468,10 @@ function handleKeyDown(e) {
         // todo: simulate the click event
     } else if (key_id === SHIFT_KEY) { 
         toggleCurrentConn();
+    } else if (key_id === U_KEY) {  // undo point
+        undoPoint();
+    } else if (key_id === Z_KEY) {  // z--z
+        addDegradedSegment();
     } else {
         return true;
     }
@@ -524,6 +536,12 @@ function onLoad() {
 
     btnSelectFreeConn.onclick = onFreeConn;
     btnSelectLineConn.onclick = onStraightConn;
+
+    inFile = document.getElementById("pic");
+    inFile.onchange = function() { 
+        console.log(inFile.value);
+        img.src = getPath(inFile.value);
+    };
 }
 
 //
@@ -540,6 +558,8 @@ var btnAddZDashDashZ;
 var btnSelectFreeConn;
 var btnSelectLineConn;
 
+var inFile; 
+
 window.onload = onLoad;
 </script>
     </head>
@@ -552,8 +572,8 @@ window.onload = onLoad;
     <form>
     <input id="startPath" type="button" value="Start Path"/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input id="undoPoint" type="button" value="Undo Point"/>
-    <input id="addDegradedSegment" type="button" value="z--z"/>
+    <input id="undoPoint" type="button" value="Undo Point (u)"/>
+    <input id="addDegradedSegment" type="button" value="z--z (z)"/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Select connector:
     <input id="selectFreeConn" type="button" value=".."/>
@@ -569,6 +589,7 @@ window.onload = onLoad;
     <br>
     <input id="endPathWithDashDash2" type="button" value="End Path: close with --z0--"/>
     </form>
+    <form> <input type="file" name="pic" id="pic"/></form>
     <br>
     <!--textarea id="g_cur_path" rows="50" cols="50"></textarea>-->
     <textarea id="g_paths" rows="40" cols="100"></textarea>
