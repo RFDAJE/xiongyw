@@ -26,10 +26,14 @@ var jp = (function(){
                };
     }
 
-    function _dir(from, to) {
+    function _dirAsNode(from, to) {
         var dx = to.x - from.x;
         var dy = to.y - from.y;
-        return "{" + dx + "," + dy +"}";
+        if (dx === 0 && dy === 0) {
+            return null;
+        } else {
+            return {"x": dx, "y": dy};
+        }
     }
 
     //
@@ -43,6 +47,16 @@ var jp = (function(){
 
         function _node2Asy(n) {
             return "(" + n.x.toFixed(3) + "," + n.y.toFixed(3) + ")";
+        }
+
+        function _dir2Asy(from, to) {
+            var dx = to.x - from.x;
+            var dy = to.y - from.y;
+            if (dx === 0 && dy === 0) {
+                return "";
+            } else {
+                return "{" + dx + ", " + dy + "}";
+            }
         }
 
 
@@ -61,9 +75,9 @@ var jp = (function(){
         function _for_interior_node(_k, k, k_) {
             var asy = _node2Asy(k);
             if (_k.conn === LINE_CONN && k.conn === FREE_CONN) { // b
-                asy += _dir(_k, k);
+                asy += _dir2Asy(_k, k);
             } else if (_k.conn === FREE_CONN && k.conn === LINE_CONN) { // d
-                asy = _dir(k, k_) + asy;
+                asy = _dir2Asy(k, k_) + asy;
             }
             k.asy = asy;
         }
@@ -71,7 +85,7 @@ var jp = (function(){
         // the 1st node
         asy = _node2Asy(p.nodes[0]);
         if (p.nodes[0].conn === FREE_CONN && p.nodes[N-1].conn === LINE_CONN) { // din
-            asy += _dir(p.nodes[N-1], p.nodes[0]);
+            asy += _dir2Asy(p.nodes[N-1], p.nodes[0]);
         }
         p.nodes[0].asy = asy;
 
@@ -96,7 +110,7 @@ var jp = (function(){
         // handle the cyclic case
         if (e.conn === FREE_CONN) {
             if(e_.conn === LINE_CONN) {
-                asy += _dir(p.nodes[0], p.nodes[1]);
+                asy += _dir2Asy(p.nodes[0], p.nodes[1]);
             }
             asy += "cycle";
         } else if (e.conn === LINE_CONN) {
@@ -172,7 +186,7 @@ var jp = (function(){
         sub.nodes.push(jsonClone(p.nodes[0]));
         // determine "din"
         if (p.nodes[n-1] === LINE_CONN && p.nodes[0] === FREE_CONN) {
-            sub.din = {"x":(p.nodes[n-1].x - p.nodes[0].x), "y":(p.nodes[n-1].y - p.nodes[0].y)};
+            sub.din = _dirAsNode(p.nodes[0], p.nodes[n-1]);
         } else {
             sub.din = p.din; // inherite "din" if any
         }
@@ -188,9 +202,9 @@ var jp = (function(){
                 if (cur_conn === LINE_CONN) { // ..z--
                     // calculate dout: z_-z
                     if (i < n-1) {
-                        sub.dout = {"x":(p.nodes[i+1].x - p.nodes[i].x), "y":(p.nodes[i+1].y - p.nodes[i].y)}; 
+                        sub.dout = _dirAsNode(p.nodes[i], p.nodes[i+1]);
                     } else {
-                        sub.dout = {"x":(p.nodes[0].x - p.nodes[i].x), "y":(p.nodes[0].y - p.nodes[i].y)};
+                        sub.dout = _dirAsNode(p.nodes[i], p.nodes[0]);
                     }
                 }
                 subs.push(sub);
@@ -199,7 +213,7 @@ var jp = (function(){
                 sub.nodes.push(jsonClone(p.nodes[i]));
                 if (cur_conn === FREE_CONN) {
                     // calcuate din: _z-z
-                    sub.din = {"x":(p.nodes[i].x - p.nodes[i-1].x), "y":(p.nodes[i].y - p.nodes[i-1].y)};
+                    sub.din = _dirAsNode(p.nodes[i-1], p.nodes[i]);
                 }
             }
 
@@ -211,7 +225,7 @@ var jp = (function(){
                  sub.dout = p.dout; // inherit "dout" if any
             } else { // calc dout when applicable
                 if (cur_conn === FREE_CONN && p.nodes[0].conn === LINE_CONN) {
-                    sub.dout = {"x":(p.nodes[1].x - p.nodes[0].x), "y":(p.nodes[1].y - p.nodes[0].y)};
+                    sub.dout = _dirAsNode(p.nodes[0], p.nodes[1]);
                 }
             }
             subs.push(sub);
@@ -259,6 +273,7 @@ var jp = (function(){
                 // cur_conn: last-node
                 first_conn = subs[0].nodes[0].conn;  // first-sub
                 last_conn = subs[N-1].nodes[0].conn; // last-sub
+                //console.log(arguments.callee.name, last_conn, cur_conn, first_conn);
                 
                 if (last_conn === first_conn && last_conn === cur_conn) { // a,h
                     // prepend last-sub to 1st-sub
@@ -270,14 +285,14 @@ var jp = (function(){
                     sub = newPath();
                     sub.nodes.push(jsonClone(p.nodes[n-1])); // last node
                     sub.nodes.push(jsonClone(p.nodes[0])); // 1st node
-                    sub.din = _dir(g.nodes[n-2], g.nodes[n-1]);
-                    sub.dout = _dir(g.nodes[0], g.nodes[1]);
+                    sub.din = _dirAsNode(p.nodes[n-2], p.nodes[n-1]);
+                    sub.dout = _dirAsNode(p.nodes[0], p.nodes[1]);
                     subs.push(sub);
                 } else if (last_conn === FREE_CONN && cur_conn === LINE_CONN && first_conn === FREE_CONN) { // f: ..zn--z0..
                     // set dout of the last sub
-                    subs[N-1].dout = _dir(g.nodes[n-1], g.nodes[0]);
+                    subs[N-1].dout = _dirAsNode(p.nodes[n-1], p.nodes[0]);
                     // set din of the 1st sub
-                    subs[0].din = _dir(g.nodes[n-1], g.nodes[0]);
+                    subs[0].din = _dirAsNode(p.nodes[n-1], p.nodes[0]);
                     // add one line segment
                     sub = newPath();
                     sub.nodes.push(jsonClone(p.nodes[n-1])); // last node
@@ -286,9 +301,15 @@ var jp = (function(){
                 } else if (cur_conn === first_conn && cur_conn !== last_conn) { // d, e
                     // prepend last node to 1st sub
                     subs[0].nodes.unshift(jsonClone(p.nodes[n-1]));
-                } else if (cur_conn === last_conn && cur_conn !== first_conn) { // b, g
+                } else if (last_conn === LINE_CONN && cur_conn === LINE_CONN && first_conn === FREE_CONN) { // b: --zn--z0..
+                    // append z0 to last-sub
+                    subs[N-1].nodes.push(jsonClone(p.nodes[0])); 
+                    // set din of the 1st sub
+                    subs[0].din = _dirAsNode(p.nodes[n-1], p.nodes[0]);
+                } else if (last_conn === FREE_CONN && cur_conn === FREE_CONN && first_conn === LINE_CONN) { // g: ..zn..z0--
                     // append z0 to last-sub
                     subs[N-1].nodes.push(jsonClone(p.nodes[0]));  
+                    // set dout of the last sub: already done in previous steps
                 } else {
                     console.log("it should be impossible...something wrong!");
                 }
@@ -304,7 +325,7 @@ var jp = (function(){
             });
         }
 
-        console.log(arguments.callee.name, JSON.stringify(subs));
+        //console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }
