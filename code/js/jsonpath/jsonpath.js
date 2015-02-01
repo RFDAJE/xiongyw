@@ -26,6 +26,12 @@ var jp = (function(){
                };
     }
 
+    function _dir(from, to) {
+        var dx = to.x - from.x;
+        var dy = to.y - from.y;
+        return "{" + dx + "," + dy +"}";
+    }
+
     //
     // export a JSON path into Asymptote
     // input: a path object
@@ -39,11 +45,6 @@ var jp = (function(){
             return "(" + n.x.toFixed(3) + "," + n.y.toFixed(3) + ")";
         }
 
-        function _dir(from, to) {
-            var dx = to.x - from.x;
-            var dy = to.y - from.y;
-            return "{" + dx + "," + dy +"}";
-        }
 
         // 
         // _k: previous node
@@ -264,8 +265,20 @@ var jp = (function(){
                     subs[0].nodes = subs[N-1].nodes.concat(subs[0].nodes);
                     subs[0].din = subs[N-1].din; // inherit the din, if any
                     subs.pop();  // remove the last-sub
-                } else if (first_conn === last_conn && first_conn !== cur_conn) { // c, f
-                    // add a one segment sub
+                } else if (last_conn === LINE_CONN && cur_conn === FREE_CONN && first_conn === LINE_CONN) { // c: --zn..z0--
+                    // add a one segment sub with din/dout
+                    sub = newPath();
+                    sub.nodes.push(jsonClone(p.nodes[n-1])); // last node
+                    sub.nodes.push(jsonClone(p.nodes[0])); // 1st node
+                    sub.din = _dir(g.nodes[n-2], g.nodes[n-1]);
+                    sub.dout = _dir(g.nodes[0], g.nodes[1]);
+                    subs.push(sub);
+                } else if (last_conn === FREE_CONN && cur_conn === LINE_CONN && first_conn === FREE_CONN) { // f: ..zn--z0..
+                    // set dout of the last sub
+                    subs[N-1].dout = _dir(g.nodes[n-1], g.nodes[0]);
+                    // set din of the 1st sub
+                    subs[0].din = _dir(g.nodes[n-1], g.nodes[0]);
+                    // add one line segment
                     sub = newPath();
                     sub.nodes.push(jsonClone(p.nodes[n-1])); // last node
                     sub.nodes.push(jsonClone(p.nodes[0])); // 1st node
@@ -291,7 +304,7 @@ var jp = (function(){
             });
         }
 
-        //console.log(arguments.callee.name, JSON.stringify(subs));
+        console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }

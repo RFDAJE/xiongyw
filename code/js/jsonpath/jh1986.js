@@ -279,6 +279,16 @@ var jh = (function(){
         return true;
     }
 
+    // ignore din when its {0,0} 
+    function _hasDin(p) {
+        return (p.din && (!(p.din.x ===0 && p.din.y === 0)));
+    }
+
+    // ignore dout when its {0,0} 
+    function _hasDout(p) {
+        return (p.dout && (!(p.dout.x ===0 && p.dout.y === 0)));
+    }
+
     // check if the path is closed
     function _isCyclic(p) {
         var n = p.nodes.length;
@@ -320,7 +330,7 @@ var jh = (function(){
             g.nodes[0]._l = 0;
             g.nodes[0].l_ = z.mod(l_);
             g.nodes[0].arg_ = z.arg(l_);
-            if (g.din) {
+            if (_hasDin(g)) {
                 g.nodes[0]._arg = z.arg(g.din);
                 g.nodes[0].xi = limitArg(g.nodes[0].arg_ - g.nodes[0]._arg);
             } else {
@@ -342,7 +352,7 @@ var jh = (function(){
             g.nodes[N-1]._l = z.mod(_l);
             g.nodes[N-1]._arg = z.arg(_l);
             g.nodes[N-1].l_ = 0;
-            if (g.dout) {
+            if (_hasDout(g)) {
                 g.nodes[N-1].arg_ = z.arg(g.dout);
                 g.nodes[N-1].xi = limitArg(g.nodes[N-1].arg_ - g.nodes[N-1]._arg);
                 //console.log(arguments.callee.name, JSON.stringify(g));
@@ -473,7 +483,7 @@ var jh = (function(){
         // traverse the path now...
         //
         if (!_isCyclic(g)) {
-            if (g.din) { // already known: theta = -xi, because phi=0
+            if (_hasDin(g)) { // already known: theta = -xi, because phi=0
                 A.push(0);
                 B.push(0);
                 C.push(1);
@@ -501,7 +511,7 @@ var jh = (function(){
         }
 
         if (!_isCyclic(g)) {
-            if (g.dout) { // already known: theta=0, because phi=-xi;
+            if (_hasDout(g)) { // already known: theta=0, because phi=-xi;
                 A.push(0);
                 B.push(0);
                 C.push(1);
