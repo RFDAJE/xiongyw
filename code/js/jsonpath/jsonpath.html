@@ -36,8 +36,8 @@
 
 
 // constants
-var CANVAS_WIDTH = 500;
-var CANVAS_HEIGHT = 500;
+var CANVAS_WIDTH = 640;
+var CANVAS_HEIGHT = 640;
 var GRID_SIZE = 8;
 
 var LEFT_KEY = 37;
@@ -49,6 +49,8 @@ var SHIFT_KEY = 16;
 var S_KEY = 83;
 var U_KEY = 85;
 var Z_KEY = 90;
+var PLUS_KEY = 187;
+var MINUS_KEY = 189;
 
 var GRID_LINE_WIDTH = 0.2;
 var GRID_STROKE_STYLE = "grey";
@@ -57,6 +59,7 @@ var g_paths = []; // an array of path
 var g_cur_path = jp.newPath();  // the current path
 var g_cur_conn = jp.FREE_CONN; // the current conn type
 var g_cur_path_started = false;
+var g_canvas_scale_factor = 1;
 
 var img = new Image();
 var c, ctx; // canvas and its context
@@ -79,8 +82,8 @@ function getNodeFromCanvas(ctx, e, conn) {
     var bb = c.getBoundingClientRect(); 
 
     // Translate and scale mouse event coordinates to canvas coordinates
-    n.x = (e.clientX-bb.left)*(c.width/bb.width);
-    n.y = - (e.clientY-bb.top)*(c.height/bb.height); // convert to normal coordinates
+    n.x = (e.clientX-bb.left)*(c.width/bb.width) / g_canvas_scale_factor;
+    n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor; // convert to normal coordinates
     n.conn = conn;
 
     return n;
@@ -90,7 +93,7 @@ function getNodeFromCanvas(ctx, e, conn) {
 function onClick(e) {
     if (g_cur_path_started === true) {
         var node = getNodeFromCanvas(ctx, e, g_cur_conn);
-        //console.log(cur);
+        console.log(JSON.stringify(node));
         // preventing the two _adjacent_ nodes having the same position
         var n = g_cur_path.nodes.length;
         if (n > 1 && 
@@ -417,6 +420,16 @@ function drawImageAndGrid() {
     }
 }
 
+function scalePath(p, scale) {
+    //console.log("scale:", scale);
+    var P = jp.jsonClone(p);
+    var i;
+    for (i = 0; i < P.nodes.length; i ++) {
+        P.nodes[i].x *= scale;
+        P.nodes[i].y *= scale;
+    }
+    return P;
+}
 
 function redrawCanvas (){
 //    console.log("redrawCanvas...");
@@ -425,12 +438,12 @@ function redrawCanvas (){
     drawImageAndGrid();
     
     // draw the paths
-    g_paths.map(function(x){return j2c.drawOnePath(x);});
-    j2c.drawOnePath(g_cur_path);
+    g_paths.map(function(x){return j2c.drawOnePath(scalePath(x, g_canvas_scale_factor));});
+    j2c.drawOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
 
     // dot the paths
-    g_paths.map(function(x){return j2c.dotOnePath(x);});
-    j2c.dotOnePath(g_cur_path);
+    g_paths.map(function(x){return j2c.dotOnePath(scalePath(x, g_canvas_scale_factor));});
+    j2c.dotOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
 }
 
 function handleFocus(e) {
@@ -449,6 +462,14 @@ function handleKeyDown(e) {
     console.log("key down:" + e.keyCode);
 
     var key_id = e.keyCode || e.which;
+
+    if (key_id === PLUS_KEY) {  // +
+        g_canvas_scale_factor *= 1.2;
+        setCanvasSize(c);
+    } else if (key_id === MINUS_KEY) {  // -
+        g_canvas_scale_factor /= 1.2;
+        setCanvasSize(c);
+    }
 
     if (!g_cur_path_started) {
         if (key_id === S_KEY) {
@@ -479,13 +500,20 @@ function handleKeyDown(e) {
     return false;
 };
 
+function setCanvasSize(c) {
+    c.width = CANVAS_WIDTH * g_canvas_scale_factor;
+    c.height = CANVAS_HEIGHT * g_canvas_scale_factor;
+
+    redrawCanvas();
+}
 
 function onLoad() {
 
     c = document.getElementById("myCanvas");
 
-    c.width = CANVAS_WIDTH;
-    c.height = CANVAS_HEIGHT;
+    ctx = c.getContext('2d');
+    j2c.setContext(ctx);
+    setCanvasSize(c);
 
     // event hooks
     c.onclick = onClick;
@@ -500,10 +528,6 @@ function onLoad() {
 
 
 
-    ctx = c.getContext('2d');
-    j2c.setContext(ctx);
-
-    drawImageAndGrid();
 
     // set button callbacks
     btnStartPath = document.getElementById("startPath");
@@ -536,12 +560,6 @@ function onLoad() {
 
     btnSelectFreeConn.onclick = onFreeConn;
     btnSelectLineConn.onclick = onStraightConn;
-
-    inFile = document.getElementById("pic");
-    inFile.onchange = function() { 
-        console.log(inFile.value);
-        img.src = getPath(inFile.value);
-    };
 }
 
 //
@@ -558,7 +576,6 @@ var btnAddZDashDashZ;
 var btnSelectFreeConn;
 var btnSelectLineConn;
 
-var inFile; 
 
 window.onload = onLoad;
 </script>
@@ -589,9 +606,7 @@ window.onload = onLoad;
     <br>
     <input id="endPathWithDashDash2" type="button" value="End Path: close with --z0--"/>
     </form>
-    <form> <input type="file" name="pic" id="pic"/></form>
     <br>
-    <!--textarea id="g_cur_path" rows="50" cols="50"></textarea>-->
     <textarea id="g_paths" rows="40" cols="100"></textarea>
     </div>
     </body>

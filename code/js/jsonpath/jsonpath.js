@@ -41,11 +41,14 @@ var jp = (function(){
     // input: a path object
     // output: a string representing a path/guide in asy
     function toAsy(P) {
+        console.log(arguments.callee.name, "P:", JSON.stringify(P));
         var p = jsonClone(P);
+        console.log(arguments.callee.name, "cloned:", JSON.stringify(p));
         var i, e, N = p.nodes.length;
         var asy = "";
 
         function _node2Asy(n) {
+            console.log(arguments.callee.name, JSON.stringify(n));
             return "(" + n.x.toFixed(3) + "," + n.y.toFixed(3) + ")";
         }
 
@@ -73,6 +76,7 @@ var jp = (function(){
         // d | .. |  --      ..{dir}z
         // --+----+-----
         function _for_interior_node(_k, k, k_) {
+            console.log(arguments.callee.name);
             var asy = _node2Asy(k);
             if (_k.conn === LINE_CONN && k.conn === FREE_CONN) { // b
                 asy += _dir2Asy(_k, k);
@@ -96,24 +100,24 @@ var jp = (function(){
         //
         // the last node
         //
-        _e = p.nodes[N-2];
+        _e = p.nodes[N-2]; // may be null if N<=2
         e = p.nodes[N-1];
         e_ = p.nodes[0];
-        if (e.conn === FREE_CONN) {
+        if (N > 2 && e.conn === FREE_CONN) {
             _for_interior_node(_e, e, e_);
-        } else if (e.conn === LINE_CONN) {
+        } else {
             e.asy = _node2Asy(e);
-        } 
+        }
 
         asy = p.nodes.map(function(x){return x.asy+(x.conn?x.conn:"");}).join("");
 
         // handle the cyclic case
-        if (e.conn === FREE_CONN) {
+        if (p.nodes[N-1].conn === FREE_CONN) {
             if(e_.conn === LINE_CONN) {
                 asy += _dir2Asy(p.nodes[0], p.nodes[1]);
             }
             asy += "cycle";
-        } else if (e.conn === LINE_CONN) {
+        } else if (p.nodes[N-1].conn === LINE_CONN) {
             asy += "cycle";
         } 
 
