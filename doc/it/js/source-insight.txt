@@ -1,0 +1,8 @@
+Add the following regexp to customize the parsing for "method":
+
+- Option->Document Options
+- Language: javascript
+- custom tag type: method
+- custom pattern: ^\w*function\w+\([_a-zA-Z0-9]+\)\w*(
+
+This enables SI to list the private functions inside a IIFE function body.
