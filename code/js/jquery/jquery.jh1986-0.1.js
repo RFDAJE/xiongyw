@@ -41,6 +41,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //  A node z[k] can contain the following properties:
+//   - x
+//   - y
 //   - _l: |z[k]-z[k-1]|
 //   - l_: |z[k+1]-z[k]|
 //   - alpha: 
@@ -51,17 +53,28 @@
 //   - u: the 1st control point for z[k]..z[k+1]
 //   - v: the 2nd control point for z[k-1]..z[k]
 //
-var jh = (function(){
+
+//
+// how to write jquery plugin: http://learn.jquery.com/plugins/basic-plugin-creation/
+//
+(function (factory) {
+    "use strict";
+    if (typeof define === 'function' && define.amd) {
+        // using AMD
+        define("jh1986", ['jquery'], factory);
+    } else {
+        // no AMD; invoke directly
+        factory( (typeof(jQuery) != 'undefined') ? jQuery : window.Zepto );
+    }
+}(function($){
 
     "use strict";
 
     //
-    // constants
+    // constants: supported commands
     //
-    var DEFAULT_ALPHA = 1;  // alpha & beta are tensions, should be >3/4. the bigger the straighter the curve
-    var DEFAULT_BETA = 1;
-    var DEFAULT_CURL_BEGIN = 1;
-    var DEFAULT_CURL_END = 1;
+    var CMD_SOLVE_FREE_PATH = "solveFreePath";
+    var CMD_TEST = "test";
 
     //
     // path connectors, as defined in p127 of "The METAFONT book"
@@ -262,19 +275,19 @@ var jh = (function(){
         var i, n = p.nodes.length;
 
         if (n < 2) {
-            console.log("invalid path: too few nodes.");
+            console.log( "invalid path: too few nodes.");
             return false;
         }
 
         for (i = 0; i < n - 1; i ++) {
             if (p.nodes[i].conn !== FREE_CURVE) {
-                console.log("invalid conn type.");
+                console.log( "invalid conn type.");
                 return false;
             }
         }
 
         if (p.nodes[n-1].conn && p.nodes[n-1].conn !== FREE_CURVE) {
-            console.log("invalid conn type of the last node.");
+            console.log( "invalid conn type of the last node.");
             return false;
         }
 
@@ -299,13 +312,13 @@ var jh = (function(){
 
     function _checkCurlAlphaBeta(p) {
 
-        p.curl_begin = p.curl_begin || DEFAULT_CURL_BEGIN;
-        p.curl_end = p.curl_end || DEFAULT_CURL_END;
+        p.curl_begin = p.curl_begin || $.fn.jh1986.defaults.curl_begin;
+        p.curl_end = p.curl_end || $.fn.jh1986.defaults.curl_end;
 
         // the properties of each node
         p.nodes.forEach(function(n) {
-            n.alpha = n.alpha || DEFAULT_ALPHA;
-            n.beta = n.beta || DEFAULT_BETA;
+            n.alpha = n.alpha || $.fn.jh1986.defaults.alpha;
+            n.beta = n.beta || $.fn.jh1986.defaults.beta;
         });
     }
 
@@ -321,7 +334,7 @@ var jh = (function(){
 
         var i, N = g.nodes.length; 
         var cyclic = _isCyclic(g);
-        
+
         if (N < 2) {
             return;
         }
@@ -357,7 +370,7 @@ var jh = (function(){
             if (_hasDout(g)) {
                 g.nodes[N-1].arg_ = z.arg(g.dout);
                 g.nodes[N-1].xi = limitArg(g.nodes[N-1].arg_ - g.nodes[N-1]._arg);
-                //console.log(JSON.stringify(g));
+                //console.log( JSON.stringify(g));
             } else {
                 g.nodes[N-1].arg_ = 0;
                 g.nodes[N-1].xi = 0;
@@ -388,12 +401,12 @@ var jh = (function(){
         // 1. non-cyclic:
         var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100}]};
         _updateArgXiL(g);
-        console.log(JSON.stringify(g));
+        console.log( JSON.stringify(g));
 
         // 2. cyclic:
         var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100, conn:".."}]};
         _updateArgXiL(g);
-        console.log(JSON.stringify(g));
+        console.log( JSON.stringify(g));
 
     }
 
@@ -465,7 +478,7 @@ var jh = (function(){
         // where X=b^2, Y=curl_end*_a^2
         // if theta_n is known, then A=B=D=0,C=1, R=theta_n;
         //
-        
+
         // input: _k : g[k-1]
         //         k : g[k]  
         //         k_: g[k+1]
@@ -577,7 +590,7 @@ var jh = (function(){
         _updateArgXiL(g);
         _checkCurlAlphaBeta(g);
         var r = _buildLinearSystem(g);
-        console.log(JSON.stringify(r));
+        console.log( JSON.stringify(r));
     }
 
     // this function computes the control points for each node
@@ -589,7 +602,7 @@ var jh = (function(){
         var x; // theta vector
 
         if (!_isValid(g)) {
-            console.log("invalid path");
+            console.log( "invalid path");
             return;
         }
 
@@ -634,7 +647,7 @@ var jh = (function(){
             var alpha = z0.alpha;
             var beta = z1.beta;
 
-            //console.log("theta:", theta, "phi:", phi);
+            //console.log( "theta:", theta, "phi:", phi);
             return _uv(z0, z1, theta, phi, alpha, beta);
         }
     }
@@ -646,21 +659,39 @@ var jh = (function(){
             {x:100,y:100, conn:".."},
             {x:50,y:50, conn:".."}]};
 
-        solveFreePath(g);
+        //solveFreePath(g);
+        $(g).jh1986("solveFreePath");
         console.log(JSON.stringify(g));
     }
 
     function test () {
-        //test_solveLinearSystem();
-        //test_updateArgXiL();
-        //test_buildLinearSystem();
+        test_solveLinearSystem();
+        test_updateArgXiL();
+        test_buildLinearSystem();
         test_solveFreePath();
     }
 
-    return {
-        "solveFreePath": solveFreePath,
-        "test": test,
+    //
+    // finally, it's time to pollute the JQuery name space:
+    //
+    
+    $.fn.jh1986 = function(cmd, options){
+        if (cmd === CMD_SOLVE_FREE_PATH) {
+            solveFreePath(this[0], options);
+        } else if (cmd === CMD_TEST) {
+            test();
+        } else {
+            console.log(cmd + "is not supported!");
+        }
+        return this;
     };
-}());
 
+    $.fn.jh1986.defaults = {
+        alpha: 1,
+        beta: 1,
+        curl_begin: 1,
+        curl_end: 1
+    };
 
+    return this;
+}));
