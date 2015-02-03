@@ -45,12 +45,23 @@ var UP_KEY = 38;
 var RIGHT_KEY = 39;
 var DOWN_KEY = 40;
 var ENTER_KEY = 13; 
-var SHIFT_KEY = 16;
-var S_KEY = 83;
-var U_KEY = 85;
-var Z_KEY = 90;
-var PLUS_KEY = 187;
-var MINUS_KEY = 189;
+
+var SHIFT_KEY = 16; // toggle between .. and --
+var S_KEY = 83; // start path
+var U_KEY = 85; // undo
+var Z_KEY = 90; // add z--z
+var PLUS_KEY = 187; // scale up canvas
+var MINUS_KEY = 189; // scale down canvas
+var D_KEY = 68;  // dot nodes, or not
+var G_KEY = 71; // draw grid, or not
+var L_KEY = 76; // draw line, or not
+
+var P_KEY = 80;
+var KEY_0 = 48;
+var KEY_1 = 49;
+var KEY_2 = 50;
+var KEY_3 = 51;
+var KEY_4 = 52;
 
 var GRID_LINE_WIDTH = 0.2;
 var GRID_STROKE_STYLE = "grey";
@@ -64,9 +75,12 @@ var g_canvas_scale_factor = 1;
 var img = new Image();
 var c, ctx; // canvas and its context
 
-//img.src = "http://upload.wikimedia.org/wikipedia/en/9/9f/Open_tv.png";
+img.src = "http://shufa.supfree.net/k/126796.gif";
 //img.src = "test.png";
-
+var g_is_draw_grid = true; // draw grid or not
+var g_is_show_image = true;  // show the image background or not
+var g_is_dot_on_path = true; // do the nodes on path, or not
+var g_is_line_path = true; // draw lines connecting nodes on path
 
 // get the current mouse position from the Canvas
 // and return a node representing it
@@ -389,34 +403,38 @@ function drawImageAndGrid() {
     /*
      * draw the image, scale within the canvas size, as much as possible, but also keep the aspect ratio
      */
-    var img_ar = img.width / img.height;  // image aspect ratio
-    var can_ar = CANVAS_WIDTH / CANVAS_HEIGHT; // canvas aspect ratio
+    if (g_is_show_image) {
+        var img_ar = img.width / img.height;  // image aspect ratio
+        var can_ar = CANVAS_WIDTH / CANVAS_HEIGHT; // canvas aspect ratio
 
-    if(can_ar >= img_ar) {
-        ctx.drawImage(img, 0, 0, c.height * img_ar, c.height);
-    } else {
-        ctx.drawImage(img, 0, 0, c.width, c.width / img_ar);
+        if(can_ar >= img_ar) {
+            ctx.drawImage(img, 0, 0, c.height * img_ar, c.height);
+        } else {
+            ctx.drawImage(img, 0, 0, c.width, c.width / img_ar);
+        }
     }
     
 
     // draw the grid
-    ctx.lineWidth = GRID_LINE_WIDTH;
-    ctx.strokeStyle = GRID_STROKE_STYLE;
+    if (g_is_draw_grid) {
+        ctx.lineWidth = GRID_LINE_WIDTH;
+        ctx.strokeStyle = GRID_STROKE_STYLE;
 
-    // horizontal lines
-    for (var i = 0;i <= c.width / GRID_SIZE; i ++){
-	ctx.beginPath();
-	ctx.moveTo(0, i * GRID_SIZE);
-	ctx.lineTo(c.width, i * GRID_SIZE);
-	ctx.stroke();
-    }
-    
-    // vertical lines
-    for (var i = 0; i <= c.height / GRID_SIZE; i ++){
-	ctx.beginPath();
-	ctx.moveTo(i * GRID_SIZE, 0);
-	ctx.lineTo(i * GRID_SIZE, c.height);
-	ctx.stroke();
+        // horizontal lines
+        for (var i = 0;i <= c.width / GRID_SIZE; i ++){
+	    ctx.beginPath();
+	    ctx.moveTo(0, i * GRID_SIZE);
+	    ctx.lineTo(c.width, i * GRID_SIZE);
+	    ctx.stroke();
+        }
+        
+        // vertical lines
+        for (var i = 0; i <= c.height / GRID_SIZE; i ++){
+	    ctx.beginPath();
+	    ctx.moveTo(i * GRID_SIZE, 0);
+	    ctx.lineTo(i * GRID_SIZE, c.height);
+	    ctx.stroke();
+        }
     }
 }
 
@@ -438,12 +456,14 @@ function redrawCanvas (){
     drawImageAndGrid();
     
     // draw the paths
-    g_paths.map(function(x){return j2c.drawOnePath(scalePath(x, g_canvas_scale_factor));});
-    j2c.drawOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
+    g_paths.map(function(x){return j2c.drawOnePath(scalePath(x, g_canvas_scale_factor), g_is_line_path);});
+    j2c.drawOnePath(scalePath(g_cur_path, g_canvas_scale_factor), g_is_line_path);
 
     // dot the paths
-    g_paths.map(function(x){return j2c.dotOnePath(scalePath(x, g_canvas_scale_factor));});
-    j2c.dotOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
+    if (g_is_dot_on_path) {
+        g_paths.map(function(x){return j2c.dotOnePath(scalePath(x, g_canvas_scale_factor));});
+        j2c.dotOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
+    }
 }
 
 function handleFocus(e) {
@@ -463,12 +483,24 @@ function handleKeyDown(e) {
 
     var key_id = e.keyCode || e.which;
 
-    if (key_id === PLUS_KEY) {  // +
+    if (key_id === PLUS_KEY) {  // scale up canvas
         g_canvas_scale_factor *= 1.2;
         setCanvasSize(c);
-    } else if (key_id === MINUS_KEY) {  // -
+    } else if (key_id === MINUS_KEY) {  // scale down canvas
         g_canvas_scale_factor /= 1.2;
         setCanvasSize(c);
+    } else if (key_id === P_KEY) {  // image
+        g_is_show_image = !g_is_show_image;
+        redrawCanvas();
+    } else if (key_id === G_KEY) {  // grid
+        g_is_draw_grid = !g_is_draw_grid;
+        redrawCanvas();
+    } else if (key_id === D_KEY) {  // dot
+        g_is_dot_on_path = !g_is_dot_on_path;
+        redrawCanvas();
+    } else if (key_id === L_KEY) {  // line
+        g_is_line_path = !g_is_line_path;
+        redrawCanvas();
     }
 
     if (!g_cur_path_started) {
@@ -493,6 +525,16 @@ function handleKeyDown(e) {
         undoPoint();
     } else if (key_id === Z_KEY) {  // z--z
         addDegradedSegment();
+    } else if (key_id === KEY_0) {  // end path keep open
+        showEndPathKeepOpen();
+    } else if (key_id === KEY_1) {  // end path, cycle with ..
+        showEndPathCloseWithDotDot();
+    } else if (key_id === KEY_2) {  // end path, cycle with ..z0--
+        showEndPathCloseWithDotDot2();
+    } else if (key_id === KEY_3) {  // end path, cycle with --
+        showEndPathCloseWithDashDash();
+    } else if (key_id === KEY_4) {  // end path, cycle with --z0--
+        showEndPathCloseWithDashDash2();
     } else {
         return true;
     }
@@ -581,11 +623,28 @@ window.onload = onLoad;
 </script>
     </head>
     <body>
-    <div id="div1" style="float:left;">
+    <div id="div1">
     <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid green;"></canvas>
     </div>
+Fast keys:
+<ul>
+<li>p: toggle background image
+<li>g: toggle grid
+<li>d: toggle dots on path
+<li>l: toogle line betw nodes
+<li>+: scale up canvas
+<li>-: scale down canvas
+<li>s: start path
+<li>u: undo point
+<li>z: add z--z
+<li>0: end path keep open
+<li>1: cycle end path with ..
+<li>2: cycle end path with ..z0--
+<li>3: cycle end path with --
+<li>4: cycle end path with --z0--
+</ul>
 
-    <div id="div2" style="float:left;">
+    <div id="div2">
     <form>
     <input id="startPath" type="button" value="Start Path"/>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

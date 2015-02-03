@@ -19,7 +19,7 @@ var j2c = (function(){
     //
     // draw a free path: all segments are connected bezier curves
     // 
-    function drawFreePath(p) {
+    function drawFreePath(p, is_line_path) {
 
         var u, v;
         var N = p.nodes.length;
@@ -48,17 +48,19 @@ var j2c = (function(){
         //
         // draw straight lines
         //
-        _ctx.lineWidth = POLYGON_LINE_WIDTH;
-        _ctx.strokeStyle = POLYGON_STROKE_STYLE;
-        _ctx.beginPath();
-        _ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
-        for(j = 1; j < N; j ++) {
-            _ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
+        if (is_line_path) {
+            _ctx.lineWidth = POLYGON_LINE_WIDTH;
+            _ctx.strokeStyle = POLYGON_STROKE_STYLE;
+            _ctx.beginPath();
+            _ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
+            for(j = 1; j < N; j ++) {
+                _ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
+            }
+            if (p.nodes[N-1].conn === jp.FREE_CONN) { // cyclic
+                _ctx.closePath();
+            }
+            _ctx.stroke();
         }
-        if (p.nodes[N-1].conn === jp.FREE_CONN) { // cyclic
-            _ctx.closePath();
-        }
-        _ctx.stroke();
     }
 
     //
@@ -86,7 +88,8 @@ var j2c = (function(){
         _ctx.stroke();
     }
 
-    function drawOnePath(P) {
+    // is_line_path: optional, indicate whether or not draw lines connecting nodes
+    function drawOnePath(P, is_line_path) {
 
         var subs = jp.solvePath(P);
 
@@ -94,7 +97,7 @@ var j2c = (function(){
             if (s.nodes[0].conn === jp.LINE_CONN) {
                 drawStraightPath(s);
             } else {
-                drawFreePath(s);
+                drawFreePath(s, is_line_path);
             }
         });
     }
