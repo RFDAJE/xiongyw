@@ -329,7 +329,7 @@ var jp = (function(){
             });
         }
 
-        //console.log(arguments.callee.name, JSON.stringify(subs));
+        console.log(arguments.callee.name, JSON.stringify(subs));
 
         return subs;
     }
@@ -454,7 +454,8 @@ var jp = (function(){
         var i, N = SUBS.length;
         for (i = 0; i < N; i ++) {
             if (SUBS[i].nodes[0].conn === FREE_CONN) {
-                jh.solveFreePath(SUBS[i]);
+                //jh.solveFreePath(SUBS[i]);
+                jh("solveFreePath", SUBS[i]);
             }
         }
         return SUBS;

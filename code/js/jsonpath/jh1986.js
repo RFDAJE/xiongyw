@@ -1,7 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 // created(bruin, 2015-01-19)
-// last updated(bruin, 2015-01-31)
+// last updated(bruin, 2015-02-04)
 // email: sansidee at foxmail.com
 //
 // This "module" implements the algorithm described in the following paper: 
@@ -41,6 +40,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //  A node z[k] can contain the following properties:
+//   - x
+//   - y
 //   - _l: |z[k]-z[k-1]|
 //   - l_: |z[k+1]-z[k]|
 //   - alpha: 
@@ -51,90 +52,104 @@
 //   - u: the 1st control point for z[k]..z[k+1]
 //   - v: the 2nd control point for z[k-1]..z[k]
 //
-var jh = (function(){
+
+var jh = jh || (function (namespace) {
 
     "use strict";
 
     //
     // constants
     //
-    var DEFAULT_ALPHA = 1;  // alpha & beta are tensions, should be >3/4. the bigger the straighter the curve
-    var DEFAULT_BETA = 1;
-    var DEFAULT_CURL_BEGIN = 1;
-    var DEFAULT_CURL_END = 1;
+    var _jh, // the function to return
+        //
+        // supported commands
+        //
+        _commands = {
+            solveFreePath: "solveFreePath",
+            test: "test"
+        },
+        //
+        // defaults
+        //
+        _defaults = {
+            alpha: 1,
+            beta: 1,
+            curl_begin: 1,
+            curl_end: 1
+        },
+        //
+        // path connectors, as defined in p127 of "The METAFONT book"
+        //
+        FREE_CURVE = "..",
+        STRAIGHT_LINE = "--",
+        // the following are not supported
+        BOUNDED_CURVE = "...",
+        TENSE_LINE = "---",
+        SPLICE = "&",
 
-    //
-    // path connectors, as defined in p127 of "The METAFONT book"
-    //
-    var FREE_CURVE = "..";
-    var STRAIGHT_LINE = "--";
-    // the following are not supported
-    var BOUNDED_CURVE = "..."; 
-    var TENSE_LINE = "---";
-    var SPLICE = "&";
+        //
+        // make Math function names shorter
+        //
+        PI = Math.PI,
+        abs = Math.abs,
+        pow = Math.pow,
+        sqrt = Math.sqrt,
+        sin = Math.sin,
+        cos = Math.cos,
+        atan = Math.atan,
 
-    //
-    // make Math function names shorter
-    //
-    var PI = Math.PI;
-    var abs = Math.abs;
-    var pow = Math.pow;
-    var sqrt = Math.sqrt;
-    var sin = Math.sin;
-    var cos = Math.cos;
-    var atan = Math.atan;
-
-    //
-    // vector (complex number) arithmetics
-    //
-    var z = (function(){
-        function _sum(z0, z1) {
-            return {x:z0.x+z1.x, y:z0.y+z1.y};
-        }
-        function _sub(z0, z1) {
-            return {x:z0.x-z1.x, y:z0.y-z1.y};
-        }
-        function _prod(z0, z1) {
-            return {x:z0.x*z1.x-z0.y*z1.y, y:z0.x*z1.y+z0.y*z1.x};
-        }
-        function _mod(z) {
-            return sqrt(z.x*z.x + z.y*z.y);
-        }
-        function _arg(z) {
-            if (z.x == 0) {
-                if (z.y > 0) {
-                    return PI/2;
-                } else if (z.y < 0) {
-                    return -PI/2;
+        //
+        // vector (complex number) arithmetics
+        //
+        z = (function () {
+            function _sum(z0, z1) {
+                return {"x": z0.x + z1.x, "y": z0.y + z1.y};
+            }
+            function _sub(z0, z1) {
+                return {"x": z0.x - z1.x, "y": z0.y - z1.y};
+            }
+            function _prod(z0, z1) {
+                return {"x": z0.x * z1.x - z0.y * z1.y, "y": z0.x * z1.y + z0.y * z1.x};
+            }
+            function _mod(z) {
+                return sqrt(z.x * z.x + z.y * z.y);
+            }
+            function _arg(z) {
+                if (z.x === 0) {
+                    if (z.y > 0) {
+                        return PI / 2;
+                    } else if (z.y < 0) {
+                        return -PI / 2;
+                    } else {
+                        return 0; // ?
+                    }
                 } else {
-                    return 0; // ?
-                }
-            } else {
-                var arg = atan(abs(z.y/z.x));
-                if (z.x > 0) {
-                    return (z.y>0)? arg: -arg;
-                } else {
-                    return (z.y>0)? PI - arg: - PI  + arg;
+                    var arg = atan(abs(z.y / z.x));
+                    if (z.x > 0) {
+                        return (z.y > 0) ? arg : -arg;
+                    } else {
+                        return (z.y > 0) ? (PI - arg) : (-PI  + arg);
+                    }
                 }
             }
-        }
-        return {
-            "sum": _sum,
-            "sub": _sub,
-            "prod": _prod,
-            "mod": _mod,
-            "arg": _arg
-        };
-    }());
+            return {
+                "sum": _sum,
+                "sub": _sub,
+                "prod": _prod,
+                "mod": _mod,
+                "arg": _arg
+            };
+        }());
 
-    // limit angles within (-PI, PI]
+    // limit angles within (-PI, PI]; as noted in JH's paper, theoretically this is not 
+    // necessary. it's just a practical limitation.
     function limitArg(arg) {
-        arg = arg % (PI*2);
+        arg = arg % (PI * 2);
         if (arg > PI) {
-            arg = arg - PI*2;
+            arg = arg - PI * 2;
         }
         if (arg <= -PI) {
-            arg = arg + PI*2;
+            arg = arg + PI * 2;
         }
         return arg;
     }
@@ -147,13 +162,13 @@ var jh = (function(){
     // m,n: size of the matrix
     // return: x, a vector (array of m elements)
     function solveLinearSystem(A, b, m, n) {
-        var i, j, k, u, maxi, tmp, pivot, sum;
-        var M = [], x = [];
+        var i, j, k, u, maxi, tmp, pivot, sum,
+            M = [], x = [], row;
 
         // deep copy A and b into M as combined
-        for (i = 0; i < m; i ++) {
-            var row = [];
-            for (j = 0; j < n; j ++) {
+        for (i = 0; i < m; i++) {
+            row = [];
+            for (j = 0; j < n; j++) {
                 row.push(A[i][j]);
             }
             row.push(b[i]);
@@ -168,15 +183,15 @@ var jh = (function(){
         while (i < m && j < n) {
             // find pivot (i.e. its row index) in col j, starting from row i
             maxi = i;  // idx of the row whose column j is the max
-            for (k = i+1; k < m; k ++) {
+            for (k = i + 1; k < m; k++) {
                 if (abs(M[k][j]) > abs(M[maxi][j])) {
                     maxi = k;
                 }
             }
 
-            if (M[maxi][j] != 0) {
+            if (M[maxi][j] !== 0) {
                 // swap row maxi and i
-                if (maxi != i) { 
+                if (maxi !== i) {
                     tmp = M[maxi];
                     M[maxi] = M[i];
                     M[i] = tmp;
@@ -184,31 +199,31 @@ var jh = (function(){
                 pivot = M[i][j];
 
                 // divide i row by the pivot
-                for (k = 0; k < n + 1; k ++) {
+                for (k = 0; k < n + 1; k++) {
                     M[i][k] = M[i][k] / pivot;
                 }
                 // now the pivot M[i][j] = 1
 
                 // substract M[u][j] * row i from row u 
-                for (u = i+1; u < m; u ++) {
+                for (u = i + 1; u < m; u++) {
                     pivot = M[u][j];
-                    for (k = 0; k < n + 1; k ++) {
+                    for (k = 0; k < n + 1; k++) {
                         M[u][k] = M[u][k] - M[i][k] * pivot;
                     }
                 }
                 i = i + 1;
             }
-            j = j +1;
+            j = j + 1;
         }
 
         //
         // get the results
         //
-        if (m == n) {
-            x[m-1] = M[m-1][m];
-            for (i = m-2; i >=0; i --) {
+        if (m === n) {
+            x[m - 1] = M[m - 1][m];
+            for (i = m - 2; i >= 0; i--) {
                 sum = 0;
-                for (j = i+1; j < m; j ++) {
+                for (j = i + 1; j < m; j++) {
                     sum = sum + M[i][j] * x[j];
                 }
                 x[i] = M[i][m] - sum;
@@ -220,9 +235,9 @@ var jh = (function(){
 
     // test
     function test_solveLinearSystem() {
-        var A = [[2,1,-1],[-3,-1,2],[-2,1,2]];
-        var b = [8,-11,-3];
-        var x = solveLinearSystem(A,b,3,3); // x should be [2, 3, -0.999]
+        var A = [[2, 1, -1], [-3, -1, 2], [-2, 1, 2]],
+            b = [8, -11, -3],
+            x = solveLinearSystem(A, b, 3, 3); // x should be [2, 3, -0.999]
         console.log(x);
     }
 
@@ -233,9 +248,9 @@ var jh = (function(){
     // phi: arrival angle (in rad) at the second point z1, relative to z1-z0
     //
     function _f(theta, phi) {
-        var n = 2+sqrt(2)*(sin(theta)-sin(phi)/16)*(sin(phi)-sin(theta)/16)*(cos(theta)-cos(phi));
-        var m = 3*(1 + 0.5*(sqrt(5)-1)*cos(theta) + 0.5*(3-sqrt(5))*cos(phi));
-        return n/m;
+        var n = 2 + sqrt(2) * (sin(theta) - sin(phi) / 16) * (sin(phi) - sin(theta) / 16) * (cos(theta) - cos(phi)),
+            m = 3 * (1 + 0.5 * (sqrt(5) - 1) * cos(theta) + 0.5 * (3 - sqrt(5)) * cos(phi));
+        return n / m;
     }
 
     //
@@ -246,18 +261,18 @@ var jh = (function(){
         // u = z0+exp(i*theta)*(z1-z0)*f(theta,phi)/alpha
         // v = z1-exp(-i*phi)*(z1-z0)*f(phi,theta)/beta
 
-        var l = z.sub(z1, z0);  // l = z1-z0
-        var t = {"x": cos(theta), "y": sin(theta)};  // exp(i*theta)
-        var p = {"x": cos(-phi), "y": sin(-phi)};    // exp(-i*phi)
+        var l = z.sub(z1, z0),  // l = z1-z0
+            t = {"x": cos(theta), "y": sin(theta)},  // exp(i*theta)
+            p = {"x": cos(-phi), "y": sin(-phi)},    // exp(-i*phi)
 
-        var u = z.sum(z0, z.prod(t,z.prod(l,{"x":_f(theta,phi)/alpha,"y":0})));
-        var v = z.sub(z1, z.prod(p,z.prod(l,{"x":_f(phi,theta)/beta,"y":0})));
+            u = z.sum(z0, z.prod(t, z.prod(l, {"x": _f(theta, phi) / alpha, "y": 0}))),
+            v = z.sub(z1, z.prod(p, z.prod(l, {"x": _f(phi, theta) / beta, "y": 0})));
 
-        return [u,v];
+        return [u, v];
     }
 
     // check validity of a path
-    function _isValid(p) {
+    function _isPathValid(p) {
         // making sure each segment is a free curve segment
         var i, n = p.nodes.length;
 
@@ -266,14 +281,14 @@ var jh = (function(){
             return false;
         }
 
-        for (i = 0; i < n - 1; i ++) {
+        for (i = 0; i < n - 1; i++) {
             if (p.nodes[i].conn !== FREE_CURVE) {
                 console.log("invalid conn type.");
                 return false;
             }
         }
 
-        if (p.nodes[n-1].conn && p.nodes[n-1].conn !== FREE_CURVE) {
+        if (p.nodes[n - 1].conn && p.nodes[n - 1].conn !== FREE_CURVE) {
             console.log("invalid conn type of the last node.");
             return false;
         }
@@ -283,52 +298,69 @@ var jh = (function(){
 
     // ignore din when its {0,0} 
     function _hasDin(p) {
-        return (p.din && (!(p.din.x ===0 && p.din.y === 0)));
+        return (p.din && (p.din.x !== 0 || p.din.y !== 0));
     }
 
     // ignore dout when its {0,0} 
     function _hasDout(p) {
-        return (p.dout && (!(p.dout.x ===0 && p.dout.y === 0)));
+        return (p.dout && (p.dout.x !== 0 || p.dout.y !== 0));
     }
 
     // check if the path is closed
     function _isCyclic(p) {
         var n = p.nodes.length;
-        return ((n>1) && (p.nodes[n-1].conn === FREE_CURVE));
+        return ((n > 1) && (p.nodes[n - 1].conn === FREE_CURVE));
     }
 
     function _checkCurlAlphaBeta(p) {
 
-        p.curl_begin = p.curl_begin || DEFAULT_CURL_BEGIN;
-        p.curl_end = p.curl_end || DEFAULT_CURL_END;
+        p.curl_begin = p.curl_begin || _defaults.curl_begin;
+        p.curl_end = p.curl_end || _defaults.curl_end;
 
         // the properties of each node
-        p.nodes.forEach(function(n) {
-            n.alpha = n.alpha || DEFAULT_ALPHA;
-            n.beta = n.beta || DEFAULT_BETA;
+        p.nodes.forEach(function (n) {
+            n.alpha = n.alpha || _defaults.alpha;
+            n.beta = n.beta || _defaults.beta;
         });
     }
 
     //
     // g: a path
     // output: the following node properties are udpated:
+    //  "_arg": arg(z[k]-z[k-1])
+    //  "arg_": arg(z[k+1]-z[k])
     //  "xi": turning angle at z[k]
     //  "_l": |z[k]-z[k-1]|
     //  "l_": |z[k+1]-z[k]|
-    //  "_arg": arg(z[k]-z[k-1])
-    //  "arg_": arg(z[k+1]-z[k])
     function _updateArgXiL(g) {
 
-        var i, N = g.nodes.length; 
-        var cyclic = _isCyclic(g);
-        
+        var i, _l, l_,
+            N = g.nodes.length,
+            cyclic = _isCyclic(g),
+            _for_interior_node = function (_k, k, k_) {
+                // input: _k : g[k-1] : read-only
+                //         k : g[k]   : in and out. the l_/_l/xi properties of this node will be updated
+                //         k_: g[k+1] : read-only
+
+                var _l = z.sub(k, _k),
+                    l_ = z.sub(k_, k),
+                    _arg = z.arg(_l),
+                    arg_ = z.arg(l_);
+
+                k.l_ = z.mod(l_);
+                k._l = z.mod(_l);
+                k._arg = _arg;
+                k.arg_ = arg_;
+                k.xi = limitArg(arg_ - _arg);
+            };
+
         if (N < 2) {
             return;
         }
 
         // first node
         if (!cyclic) {
-            var l_ = z.sub(g.nodes[1], g.nodes[0]);
+            l_ = z.sub(g.nodes[1], g.nodes[0]);
             g.nodes[0]._l = 0;
             g.nodes[0].l_ = z.mod(l_);
             g.nodes[0].arg_ = z.arg(l_);
@@ -340,61 +372,45 @@ var jh = (function(){
                 g.nodes[0].xi = 0;
             }
         } else {
-            _for_interior_node(g.nodes[N-1], g.nodes[0], g.nodes[1]); 
+            _for_interior_node(g.nodes[N - 1], g.nodes[0], g.nodes[1]);
         }
 
         // middle nodes
-        for (i = 1; i < g.nodes.length-1; i ++) {
-            _for_interior_node(g.nodes[i-1], g.nodes[i], g.nodes[i+1]);
+        for (i = 1; i < g.nodes.length - 1; i++) {
+            _for_interior_node(g.nodes[i - 1], g.nodes[i], g.nodes[i + 1]);
         }
 
         // last node
         if (!cyclic) {
-            var _l = z.sub(g.nodes[N-1], g.nodes[N-2]);
-            g.nodes[N-1]._l = z.mod(_l);
-            g.nodes[N-1]._arg = z.arg(_l);
-            g.nodes[N-1].l_ = 0;
+            _l = z.sub(g.nodes[N - 1], g.nodes[N - 2]);
+            g.nodes[N - 1]._l = z.mod(_l);
+            g.nodes[N - 1]._arg = z.arg(_l);
+            g.nodes[N - 1].l_ = 0;
             if (_hasDout(g)) {
-                g.nodes[N-1].arg_ = z.arg(g.dout);
-                g.nodes[N-1].xi = limitArg(g.nodes[N-1].arg_ - g.nodes[N-1]._arg);
+                g.nodes[N - 1].arg_ = z.arg(g.dout);
+                g.nodes[N - 1].xi = limitArg(g.nodes[N - 1].arg_ - g.nodes[N - 1]._arg);
                 //console.log(JSON.stringify(g));
             } else {
-                g.nodes[N-1].arg_ = 0;
-                g.nodes[N-1].xi = 0;
+                g.nodes[N - 1].arg_ = 0;
+                g.nodes[N - 1].xi = 0;
             }
         } else {
-            _for_interior_node(g.nodes[N-2], g.nodes[N-1], g.nodes[0]);
-        }
-
-        // input: _k : g[k-1] : read-only
-        //         k : g[k]   : in and out. the l_/_l/xi properties of this node will be updated
-        //         k_: g[k+1] : read-only
-        function _for_interior_node (_k, k, k_) {
-
-            var _l = z.sub(k, _k);
-            var l_ = z.sub(k_, k);
-            var _arg = z.arg(_l);
-            var arg_ = z.arg(l_);
-
-            k.l_ = z.mod(l_);
-            k._l = z.mod(_l);
-            k._arg = _arg;
-            k.arg_ = arg_;
-            k.xi = limitArg(arg_ - _arg);
+            _for_interior_node(g.nodes[N - 2], g.nodes[N - 1], g.nodes[0]);
         }
     }
 
     function test_updateArgXiL() {
         // 1. non-cyclic:
-        var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100}]};
+        var g = {nodes: [{x: 0, y: 0, conn: ".."},
+                        {x: 100, y: 0, conn: ".."},
+                        {x: 100, y: 100}]};
         _updateArgXiL(g);
         console.log(JSON.stringify(g));
 
         // 2. cyclic:
-        var g = {nodes: [{x:0,y:0, conn:".."},{x:100,y:0, conn:".."},{x:100,y:100, conn:".."}]};
+        g.nodes[2].conn = "..";
         _updateArgXiL(g);
         console.log(JSON.stringify(g));
-
     }
 
     //
@@ -403,8 +419,11 @@ var jh = (function(){
     // each point of the path (being "theta" the angle of departure of the
     // path at each point). 
     function _buildLinearSystem(g) {
-        var i, k, n, N = g.nodes.length;
-        var A=[], B=[], C=[], D=[], R=[];
+        var i, k, n,
+            N = g.nodes.length,
+            curl, alpha_0, beta_1, beta_n, alpha_n_1,
+            X, Y,
+            A = [], B = [], C = [], D = [], R = [], matrix;
         // 
         // Notes on the meaning of A/B/C/D/R:
         // 
@@ -465,21 +484,45 @@ var jh = (function(){
         // where X=b^2, Y=curl_end*_a^2
         // if theta_n is known, then A=B=D=0,C=1, R=theta_n;
         //
-        
+
         // input: _k : g[k-1]
         //         k : g[k]  
         //         k_: g[k+1]
         //        idx: the idx for node "k"
         // output: A/B/C/D/R is updated accordingly
-        function _for_interior_node2 (_k, k, k_, idx) {
-            var X = pow(k.beta,2)/k._l;
-            var Y = pow(k.alpha,2)/k.l_;
-            A.push(X/_k.alpha);
-            B.push(X*(3-1/_k.alpha));
-            C.push(Y*(3-1/k_.beta));
-            D.push(Y/k_.beta);
-            R.push(-B[idx]*k.xi-D[idx]*k_.xi);
+        function _for_interior_node2(_k, k, k_, idx) {
+            var X = pow(k.beta, 2) / k._l,
+                Y = pow(k.alpha, 2) / k.l_;
+            A.push(X / _k.alpha);
+            B.push(X * (3 - 1 / _k.alpha));
+            C.push(Y * (3 - 1 / k_.beta));
+            D.push(Y / k_.beta);
+            R.push(-B[idx] * k.xi - D[idx] * k_.xi);
         }
+
+        function _buildMatrix(A, B, C, D, R) {
+            var k, j, prev, post, L = R.length,
+                a = [];
+
+            // initialize the matrix explicitly
+            for (k = 0; k < L; k++) {
+                a[k] = [];
+                for (j = 0; j < L; j++) {
+                    a[k][j] = 0;
+                }
+            }
+
+            for (k = 0; k < L; k++) {
+                prev = (k - 1 + L) % L;  // "+L" is to make (prev>=0)
+                post = (k + 1) % L;
+                a[k][prev] = A[k];
+                a[k][k] = B[k] + C[k];
+                a[k][post] = D[k];
+            }
+
+            return a;
+        }
+
 
         //
         // traverse the path now...
@@ -492,24 +535,24 @@ var jh = (function(){
                 D.push(0);
                 R.push(-g.nodes[0].xi);
             } else {
+                curl = g.curl_begin;
+                alpha_0 = g.nodes[0].alpha;
+                beta_1 = g.nodes[1].beta;
+                X = pow(alpha_0, 2);
+                Y = curl * pow(beta_1, 2);
                 A.push(0);
                 B.push(0);
-                var curl = g.curl_begin;
-                var alpha_0 = g.nodes[0].alpha;
-                var beta_1 = g.nodes[1].beta;
-                var X=pow(alpha_0,2);
-                var Y=curl*pow(beta_1,2);
-                C.push(((1/beta_1)-3)*X-1/alpha_0*Y);
-                D.push(-1/beta_1*X+(1/alpha_0-3)*Y);
-                R.push(-D[0]*g.nodes[1].xi);
+                C.push(((1 / beta_1) - 3) * X - 1 / alpha_0 * Y);
+                D.push(-1 / beta_1 * X + (1 / alpha_0 - 3) * Y);
+                R.push(-D[0] * g.nodes[1].xi);
             }
         } else {
-            _for_interior_node2(g.nodes[N-1], g.nodes[0], g.nodes[1], 0);
+            _for_interior_node2(g.nodes[N - 1], g.nodes[0], g.nodes[1], 0);
         }
 
-        // Equations 1 to N-1 
-        for (k = 1; k < N-1; k ++ ) {
-            _for_interior_node2(g.nodes[k-1], g.nodes[k], g.nodes[k+1], k);
+        // equations 1 to N-1 
+        for (k = 1; k < N - 1; k++) {
+            _for_interior_node2(g.nodes[k - 1], g.nodes[k], g.nodes[k + 1], k);
         }
 
         if (!_isCyclic(g)) {
@@ -521,74 +564,60 @@ var jh = (function(){
                 R.push(0);
             } else {
                 n = R.length;     // index to generate
+                curl = g.curl_end;
+                beta_n = g.nodes[n].beta;
+                alpha_n_1 = g.nodes[n - 1].alpha;
+                X = pow(beta_n, 2);
+                Y = curl * pow(alpha_n_1, 2);
+                A.push(1 / alpha_n_1 * X + (3 - 1 / beta_n) * Y);
+                B.push((3 - 1 / alpha_n_1) * X + 1 / beta_n * Y);
                 C.push(0);
                 D.push(0);
-                var curl = g.curl_end;
-                var beta_n = g.nodes[n].beta;
-                var alpha_n_1 = g.nodes[n-1].alpha;
-                var X=pow(beta_n,2);
-                var Y=curl*pow(alpha_n_1,2);
-                A.push(1/alpha_n_1*X+(3-1/beta_n)*Y);
-                B.push((3-1/alpha_n_1)*X+1/beta_n*Y);
-                C.push(0);
-                D.push(0);
-                R.push(-B[n]*g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
+                R.push(-B[n] * g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
             }
         } else {
-            _for_interior_node2(g.nodes[N-2], g.nodes[N-1], g.nodes[0], N-1);
+            _for_interior_node2(g.nodes[N - 2], g.nodes[N - 1], g.nodes[0], N - 1);
         }
 
-        var matrix = _buildMatrix(A, B, C, D, R);
+        matrix = _buildMatrix(A, B, C, D, R);
         return [matrix, R];
 
 
 
-        function _buildMatrix(A, B, C, D, R) {
-            var k, j, prev, post, L = R.length;
-
-            // create the empty matrix
-            var a = new Array(L);
-            for(k = 0; k < L; k ++) {
-                a[k] = new Array(L);
-                // need to init the array with zero!
-                for (j = 0; j < L; j ++) {
-                    a[k][j] = 0; 
-                }
-            }
-
-            for(k = 0; k < L; k ++) {
-                prev = (k-1+L)%L;  // "+L" is to make (prev>=0)
-                post = (k+1)%L;
-                a[k][prev] = A[k];
-                a[k][k]    = B[k]+C[k];
-                a[k][post] = D[k];
-            }
-
-            return a;
-        }
     }
 
     function test_buildLinearSystem() {
-        var g = {nodes: [
-            {x:0,y:0, conn:".."},
-            {x:100,y:0, conn:".."},
-            {x:100,y:100, conn:".."},
-            {x:50,y:50, conn:".."}]};
+        var r, g = {nodes: [
+            {x: 0, y: 0, conn: ".."},
+            {x: 100, y: 0, conn: ".."},
+            {x: 100, y: 100, conn: ".."},
+            {x: 50, y: 50, conn: ".."}]};
         _updateArgXiL(g);
         _checkCurlAlphaBeta(g);
-        var r = _buildLinearSystem(g);
+        r = _buildLinearSystem(g);
         console.log(JSON.stringify(r));
     }
 
     // this function computes the control points for each node
     // and stores those in the path
     function solveFreePath(g) {
-        var k, uv, N = g.nodes.length;
-        var cyclic = _isCyclic(g);
-        var Mb; // [M, b]
-        var x; // theta vector
+        var k, uv, N = g.nodes.length,
+            cyclic = _isCyclic(g),
+            Mb, // [M, b]
+            x; // theta vector
 
-        if (!_isValid(g)) {
+        // return control points [u,v] for one segment betw z0..z1
+        function _for_each_segment(z0, z1) {
+            var theta = z0.theta,
+                phi = z1.phi,
+                alpha = z0.alpha,
+                beta = z1.beta;
+
+            //console.log("theta:", theta, "phi:", phi);
+            return _uv(z0, z1, theta, phi, alpha, beta);
+        }
+
+        if (!_isPathValid(g)) {
             console.log("invalid path");
             return;
         }
@@ -605,7 +634,7 @@ var jh = (function(){
         //
         // update theta/phi of each node
         //
-        for (k = 0; k < N; k ++) {
+        for (k = 0; k < N; k++) {
             g.nodes[k].theta = x[k];
             g.nodes[k].phi = -g.nodes[k].theta - g.nodes[k].xi;
             //console.log(k, "theta:", g.nodes[k].theta, "phi:", g.nodes[k].phi);
@@ -615,52 +644,54 @@ var jh = (function(){
         // calculate u, v
         //
         // N nodes mean N-1 segments (if non-cyclic) and N segments (if cyclic).
-        for (k = 0; k < N-1; k ++) {
-            uv = _for_each_segment(g.nodes[k], g.nodes[k+1]);
-            g.nodes[k].u = uv[0]; 
-            g.nodes[k+1].v = uv[1];
+        for (k = 0; k < N - 1; k++) {
+            uv = _for_each_segment(g.nodes[k], g.nodes[k + 1]);
+            g.nodes[k].u = uv[0];
+            g.nodes[k + 1].v = uv[1];
         }
 
         if (_isCyclic(g)) {
-            uv = _for_each_segment(g.nodes[N-1], g.nodes[0]);
-            g.nodes[N-1].u = uv[0];
+            uv = _for_each_segment(g.nodes[N - 1], g.nodes[0]);
+            g.nodes[N - 1].u = uv[0];
             g.nodes[0].v = uv[1];
-        }
-
-        // return control points [u,v] for one segment betw z0..z1
-        function _for_each_segment(z0, z1) {
-            var theta = z0.theta;
-            var phi = z1.phi;
-            var alpha = z0.alpha;
-            var beta = z1.beta;
-
-            //console.log("theta:", theta, "phi:", phi);
-            return _uv(z0, z1, theta, phi, alpha, beta);
         }
     }
 
     function test_solveFreePath() {
         var g = {nodes: [
-            {x:0,y:0, conn:".."},
-            {x:100,y:0, conn:".."},
-            {x:100,y:100, conn:".."},
-            {x:50,y:50, conn:".."}]};
+            {x: 0, y: 0, conn: ".."},
+            {x: 100, y: 0, conn: ".."},
+            {x: 100, y: 100, conn: ".."},
+            {x: 50, y: 50, conn: ".."}]};
 
         solveFreePath(g);
         console.log(JSON.stringify(g));
     }
 
-    function test () {
+    function test() {
         //test_solveLinearSystem();
         //test_updateArgXiL();
-        //test_buildLinearSystem();
+        test_buildLinearSystem();
         test_solveFreePath();
     }
 
-    return {
-        "solveFreePath": solveFreePath,
-        "test": test,
+    //
+    // return the function
+    //
+    _jh = function (cmd, path, options) {
+        if (cmd === _commands.solveFreePath) {
+            solveFreePath(path, options);
+        } else if (cmd === _commands.test) {
+            test();
+        } else {
+            console.log(cmd + "is not supported!");
+        }
+        return this;
     };
-}());
 
+    if (namespace) {
+        namespace.jh = _jh;
+    }
 
+    return _jh;
+}((typeof (jQuery) !== 'undefined') ? jQuery.fn : window));
