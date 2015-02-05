@@ -463,21 +463,106 @@ var jp = (function(){
 
 
     function test_solvePath() {
-        var P={"nodes":[ {"x":0,"y":0, "conn":".."},
-                         {"x":100,"y":0, "conn":".."},
-                         {"x":100,"y":100, "conn":".."},
-                         {"x":50,"y":50, "conn":"--"},
-                       ]
+        var subs, 
+            // test case 1
+            //> path p=(0,0)..(50,50)..(100,0);
+            //> pair[] uv={postcontrol(p,0), precontrol(p,1), postcontrol(p,1), precontrol(p,2)};
+            //> write(uv);
+            //0:      (2.16840434497101e-15,27.6142374915397)
+            //1:      (22.3857625084603,50)
+            //2:      (77.6142374915397,50)
+            //3:      (100,27.6142374915397)
+            P = {"nodes": [
+                        {"x":0,"y":0, "conn":".."},
+                        {"x":50,"y":50, "conn":".."},
+                        {"x":100,"y":0, "conn":null}
+                ]};
+        subs = solvePath(P);
+        console.log("test case 1:");
+        subs.map(function(x){ printPath(x, 1);});
+        
+
+        // test case 2
+        //> path p = (0,0){1,0}..(100,100);
+        //> postcontrol(p,0);
+        //(55.2284749830793,4.33680868994202e-15)
+        //> precontrol(p,1)
+        //(100,44.7715250169207)        
+        P = {"nodes":[ {"x":0,"y":0, "conn":".."},
+                     {"x":100,"y":100, "conn":null}], 
+               "din":{"x": 1, "y": 0}
               };
 
-        console.log(JSON.stringify(solvePath(P)));
+        subs = solvePath(P);
+        console.log("test case 2:");
+        subs.map(function(x){ printPath(x, 2);});
+
+        // test case 3
+        //> path p = (0,0){1,-1}..(100,100)..(0,200);
+        //> pair[] uv={postcontrol(p,0), precontrol(p,1), postcontrol(p,1), precontrol(p,2)};
+        //> write(uv);
+        //0:      (40.9346811768585,-40.9346811768585)
+        //1:      (123.650365338479,11.7356349392319)
+        //2:      (86.9231718195579,148.803387171258)
+        //3:      (48.8033871712585,186.923171819558)
+        P = {"nodes":[ 
+                    {"x":0,"y":0, "conn":".."},
+                    {"x":100,"y":100, "conn":".."},
+                    {"x":0,"y":200, "conn":null}], 
+                   "din":{"x": 1, "y": -1}
+              };
+
+        subs = solvePath(P);
+        console.log("test case 3:");
+        subs.map(function(x){ printPath(x, 2);});
+        
+        // test case 4
+        //> path p = (0,0){1,-1}..(100,100)..{-1,-1}(0,200);
+        //> pair[] uv={postcontrol(p,0), precontrol(p,1), postcontrol(p,1), precontrol(p,2)};
+        //> write(uv);
+        //0:      (36.3197426537715,-36.3197426537715)
+        //1:      (100,14.1797820314778)
+        //2:      (100,185.820217968522)
+        //3:      (36.3197426537715,236.319742653771)        
+        P = {"nodes":[ 
+                    {"x":0,"y":0, "conn":".."},
+                    {"x":100,"y":100, "conn":".."},
+                    {"x":0,"y":200, "conn":null}], 
+                   "din":{"x": 1, "y": -1},
+                   "dout": {"x": -1, "y": -1}
+              };
+
+        subs = solvePath(P);
+        console.log("test case 4:");
+        subs.map(function(x){ printPath(x, 2);});
     }
+    
 
     function test() {
         //test_divideOnePath();
         test_solvePath();
     }
 
+    function printPath(p, precision) {
+        var i;
+            N=p.nodes.length;
+        if(typeof(precision) === "number") {
+            for (i = 0; i < N; i++) {
+                for (prop in p.nodes[i]) {
+                    if (p.nodes[i].hasOwnProperty(prop) && (typeof(p.nodes[i][prop]) === "number")) {
+                        p.nodes[i][prop] = Number(p.nodes[i][prop].toFixed(precision));
+                    }
+                    if (prop === "u" || prop === "v") {
+                        p.nodes[i][prop].x = Number(p.nodes[i][prop].x.toFixed(precision));
+                        p.nodes[i][prop].y = Number(p.nodes[i][prop].y.toFixed(precision));
+                    }
+                }
+            }
+        }
+        
+        console.log(JSON.stringify(p));
+    }
+    
     return {
         // methods
         "jsonClone": jsonClone,  // clone an object by "JSON.parse(JSON.stringify(o))"

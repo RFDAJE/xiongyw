@@ -393,6 +393,8 @@ var jh = jh || (function (namespace) {
             } else {
                 g.nodes[N - 1].arg_ = 0;
                 g.nodes[N - 1].xi = 0;
+                //g.nodes[N - 1].xi = g.nodes[N-2].xi; //fixme
+                //g.nodes[N - 1].arg_ = g.nodes[N-1]._arg + g.nodes[N-1].xi;
             }
         } else {
             _for_interior_node(g.nodes[N - 2], g.nodes[N - 1], g.nodes[0]);
@@ -513,8 +515,37 @@ var jh = jh || (function (namespace) {
             }
 
             for (k = 0; k < L; k++) {
-                prev = (k - 1 + L) % L;  // "+L" is to make (prev>=0)
-                post = (k + 1) % L;
+                //
+                // note: for each equation, its coefficients will be put into 
+                // its respective row (of the matrix) in the following order:
+                // - a
+                // - b+c
+                // - d
+                //
+                // if L=3, the matrix is:
+                //
+                // |b+c   d    a  | 
+                // |a     b+c  c  |
+                // |d     a    b+c|
+                //
+                // this means when L>=3, all coefficients have its own place (i.e., no overwritten).
+                //
+                // however, if L=2, the matrix should be:
+                //
+                // |b+c  d  |
+                // |a    b+c|
+                //
+                // so if we write "d" at last, the "a" will be overwirtten.
+                //
+                if (L <= 2) {
+					// the out of range coefficients will be safely ignored
+                    prev = k - 1;
+                    post = k + 1;
+                } else {
+                    prev = (k - 1 + L) % L;  // "+L" is to make (prev>=0)
+                    post = (k + 1) % L;
+                }
+
                 a[k][prev] = A[k];
                 a[k][k] = B[k] + C[k];
                 a[k][post] = D[k];
@@ -557,6 +588,7 @@ var jh = jh || (function (namespace) {
 
         if (!_isCyclic(g)) {
             if (_hasDout(g)) { // already known: theta=0, because phi=-xi;
+//              if (true) { // fixme
                 A.push(0);
                 B.push(0);
                 C.push(1);
@@ -573,6 +605,7 @@ var jh = jh || (function (namespace) {
                 B.push((3 - 1 / alpha_n_1) * X + 1 / beta_n * Y);
                 C.push(0);
                 D.push(0);
+                // fixme:
                 R.push(-B[n] * g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
             }
         } else {
