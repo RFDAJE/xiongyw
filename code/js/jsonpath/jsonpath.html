@@ -75,7 +75,7 @@ var g_canvas_scale_factor = 1;
 var img = new Image();
 var c, ctx; // canvas and its context
 
-img.src = "http://shufa.supfree.net/k/126796.gif";
+//img.src = "http://shufa.supfree.net/k/126796.gif";
 //img.src = "test.png";
 var g_is_draw_grid = true; // draw grid or not
 var g_is_show_image = true;  // show the image background or not
@@ -107,7 +107,7 @@ function getNodeFromCanvas(ctx, e, conn) {
 function onClick(e) {
     if (g_cur_path_started === true) {
         var node = getNodeFromCanvas(ctx, e, g_cur_conn);
-        console.log(JSON.stringify(node));
+        //console.log(JSON.stringify(node));
         // preventing the two _adjacent_ nodes having the same position
         var n = g_cur_path.nodes.length;
         if (n > 1 && 

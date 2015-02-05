@@ -87,6 +87,8 @@ var jh = jh || (function (namespace) {
         TENSE_LINE = "---",
         SPLICE = "&",
 
+        MINIMUM_NODE_NUM = 2, // at least two nodes for a path
+
         //
         // make Math function names shorter
         //
@@ -276,7 +278,7 @@ var jh = jh || (function (namespace) {
         // making sure each segment is a free curve segment
         var i, n = p.nodes.length;
 
-        if (n < 2) {
+        if (n < MINIMUM_NODE_NUM) {
             console.log("invalid path: too few nodes.");
             return false;
         }
@@ -354,7 +356,7 @@ var jh = jh || (function (namespace) {
                 k.xi = limitArg(arg_ - _arg);
             };
 
-        if (N < 2) {
+        if (N < MINIMUM_NODE_NUM) {
             return;
         }
 
@@ -393,8 +395,6 @@ var jh = jh || (function (namespace) {
             } else {
                 g.nodes[N - 1].arg_ = 0;
                 g.nodes[N - 1].xi = 0;
-                //g.nodes[N - 1].xi = g.nodes[N-2].xi; //fixme
-                //g.nodes[N - 1].arg_ = g.nodes[N-1]._arg + g.nodes[N-1].xi;
             }
         } else {
             _for_interior_node(g.nodes[N - 2], g.nodes[N - 1], g.nodes[0]);
@@ -537,7 +537,7 @@ var jh = jh || (function (namespace) {
                 //
                 // so if we write "d" at last, the "a" will be overwirtten.
                 //
-                if (L <= 2) {
+                if (L <= MINIMUM_NODE_NUM) {
 					// the out of range coefficients will be safely ignored
                     prev = k - 1;
                     post = k + 1;
@@ -588,7 +588,6 @@ var jh = jh || (function (namespace) {
 
         if (!_isCyclic(g)) {
             if (_hasDout(g)) { // already known: theta=0, because phi=-xi;
-//              if (true) { // fixme
                 A.push(0);
                 B.push(0);
                 C.push(1);
@@ -605,7 +604,6 @@ var jh = jh || (function (namespace) {
                 B.push((3 - 1 / alpha_n_1) * X + 1 / beta_n * Y);
                 C.push(0);
                 D.push(0);
-                // fixme:
                 R.push(-B[n] * g.nodes[n].xi);  // g.nodes[n].xi usually be zero, so effectively R[n]=0
             }
         } else {
@@ -727,4 +725,4 @@ var jh = jh || (function (namespace) {
     }
 
     return _jh;
-}((typeof (jQuery) !== 'undefined') ? jQuery.fn : window));
+}((typeof (jQuery) !== 'undefined') ? jQuery.fn : null));

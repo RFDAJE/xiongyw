@@ -150,10 +150,10 @@ var jp = (function(){
     function divideOnePath(P) {
 
         var i, n = P.nodes.length;
-        var p; 
+        var p, dout; 
         var subs = [];  // array of subpath
         var N; // subs.length;
-        var sub = newPath();  // the current subpath
+        var lastsub, sub = newPath();  // the current subpath
         var pre_conn, cur_conn, last_conn, first_conn;
 
         if (n < 2) {
@@ -224,15 +224,24 @@ var jp = (function(){
             pre_conn = cur_conn;
         }
 
-        if (sub.nodes.length > 0) {  // a path may have only one node
-            if (p.dout) {
-                 sub.dout = p.dout; // inherit "dout" if any
-            } else { // calc dout when applicable
-                if (cur_conn === FREE_CONN && p.nodes[0].conn === LINE_CONN) {
-                    sub.dout = _dirAsNode(p.nodes[0], p.nodes[1]);
-                }
+        //
+        // inherit "dout", if any, to appropirte subpath
+        //
+        dout = null;
+        if (p.dout) {
+             dout = p.dout; 
+        } else { 
+            if (cur_conn === FREE_CONN && p.nodes[0].conn === LINE_CONN) {
+                dout = _dirAsNode(p.nodes[0], p.nodes[1]);
             }
+        }
+
+        // here we add subpath even it's only has one node. will handle it in the next step
+        if (sub.nodes.length > 0) {
+            sub.dout = dout;
             subs.push(sub);
+        } else {
+            subs[subs.length - 1].dout = dout;
         }
 
         N = subs.length;
@@ -269,7 +278,11 @@ var jp = (function(){
         //    +----------+-----------+----------+-------------------------------+ 
         //
         if (cur_conn !== LINE_CONN && cur_conn !== FREE_CONN) {
-            // it's a open path...we have already done!
+            // it's a open path...we almost done...
+            lastsub = subs[subs.length - 1];
+            if (lastsub.nodes.length === 1 && lastsub.dout) {
+                subs[subs.length - 2].dout = lastsub.dout;
+            }
         } else { // it's a closed path
             if (N === 1) {
                 // the subpath === the original path. we are also done!
@@ -329,7 +342,11 @@ var jp = (function(){
             });
         }
 
-        console.log(arguments.callee.name, JSON.stringify(subs));
+        // debug info
+        console.log("original path:\n");
+        printPath(P, 0);
+        console.log("subpaths:\n");
+        subs.map(function(x){printPath(x,0);});
 
         return subs;
     }
@@ -477,8 +494,8 @@ var jp = (function(){
                         {"x":50,"y":50, "conn":".."},
                         {"x":100,"y":0, "conn":null}
                 ]};
-        subs = solvePath(P);
         console.log("test case 1:");
+        subs = solvePath(P);
         subs.map(function(x){ printPath(x, 1);});
         
 
@@ -493,8 +510,8 @@ var jp = (function(){
                "din":{"x": 1, "y": 0}
               };
 
-        subs = solvePath(P);
         console.log("test case 2:");
+        subs = solvePath(P);
         subs.map(function(x){ printPath(x, 2);});
 
         // test case 3
@@ -512,8 +529,8 @@ var jp = (function(){
                    "din":{"x": 1, "y": -1}
               };
 
-        subs = solvePath(P);
         console.log("test case 3:");
+        subs = solvePath(P);
         subs.map(function(x){ printPath(x, 2);});
         
         // test case 4
@@ -532,8 +549,8 @@ var jp = (function(){
                    "dout": {"x": -1, "y": -1}
               };
 
-        subs = solvePath(P);
         console.log("test case 4:");
+        subs = solvePath(P);
         subs.map(function(x){ printPath(x, 2);});
     }
     
@@ -541,11 +558,14 @@ var jp = (function(){
     function test() {
         //test_divideOnePath();
         test_solvePath();
+        test_checkPath();
     }
 
-    function printPath(p, precision) {
-        var i;
+    function printPath(P, precision) {
+        var i,
+            p = jsonClone(P);
             N=p.nodes.length;
+            
         if(typeof(precision) === "number") {
             for (i = 0; i < N; i++) {
                 for (prop in p.nodes[i]) {
@@ -559,8 +579,67 @@ var jp = (function(){
                 }
             }
         }
+
+        if (p.din) {
+            p.din.x = Number(p.din.x.toFixed(precision));
+            p.din.y = Number(p.din.y.toFixed(precision));
+        }
+        
+        if (p.dout) {
+            p.dout.x = Number(p.dout.x.toFixed(precision));
+            p.dout.y = Number(p.dout.y.toFixed(precision));
+        }
         
         console.log(JSON.stringify(p));
+    }
+
+    function isPathClosed(p) {
+        var n = p.nodes.length;
+        return ((n > 1) && (p.nodes[n - 1].conn === FREE_CONN || p.nodes[n - 1].conn === LINE_CONN));
+    }
+
+    // return a new path which is logically consistent
+    function checkPath(P) {
+        var i, 
+            N = P.nodes.length, 
+            p = jsonClone(P);
+        
+        if (isPathClosed(p)) {
+            delete p["din"];
+            delete p["dout"];
+        }
+
+        // if any two adjacent nodes has the same position, they must not form a free segment
+        for (i = 0; i < N - 1; i++) {
+            if (p.nodes[i].x === p.nodes[i + 1].x &&
+                p.nodes[i].y === p.nodes[i + 1].y &&
+                p.nodes[i].conn === FREE_CONN) {
+                
+                // remove the 1st one
+                p.nodes.splice(i, 1);
+
+                // start over again
+                N = p.nodes.length;
+                i = -1;
+                continue;
+            }
+        }
+        
+        return p;
+    }
+
+    function test_checkPath () {
+        var P = {"nodes":[ 
+                    {"x":0,"y":0, "conn":".."},
+                    {"x":0,"y":0, "conn":".."},
+                    {"x":0,"y":200, "conn":"--"}], 
+                   "din":{"x": 1, "y": -1},
+                   "dout": {"x": -1, "y": -1}
+              };
+        var p = checkPath(P);
+
+        console.log("before checkPath():", JSON.stringify(P));
+        console.log("after checkPath():", JSON.stringify(p));
     }
     
     return {
@@ -571,6 +650,9 @@ var jp = (function(){
         "toAsy": toAsy, // 
         "toSvg": toSvg,
         "solvePath": solvePath, // assign u,v values for all nodes of free curve segments
+        "printPath": printPath,
+        "checkPath": checkPath,
+        "isPathClosed": isPathClosed,
         // test method
         "test": test,
         //constants
