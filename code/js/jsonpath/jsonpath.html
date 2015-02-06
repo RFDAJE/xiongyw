@@ -602,6 +602,81 @@ function onLoad() {
 
     btnSelectFreeConn.onclick = onFreeConn;
     btnSelectLineConn.onclick = onStraightConn;
+
+
+    //
+    // drag and drop: 
+    // - http://www.thebuzzmedia.com/html5-drag-and-drop-and-file-api-tutorial/
+    // - http://stackoverflow.com/questions/3694631/html5-drag-and-drop-between-windows
+    //
+    var dropbox = document.getElementById("div1")
+
+    // init event handlers
+    dropbox.addEventListener("dragenter", dragEnter, false);
+    dropbox.addEventListener("dragexit", dragExit, false);
+    dropbox.addEventListener("dragover", dragOver, false);
+    dropbox.addEventListener("drop", dragDrop, false);
+}
+
+function noopHandler(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+}    
+
+function dragEnter(e) {
+    console.log("dragEnter");
+    noopHandler(e);
+}
+
+function dragExit(e) {
+    console.log("dragExit");
+    noopHandler(e);
+}
+
+function dragOver(e) {
+    console.log("dragOver");
+    noopHandler(e);
+}
+
+function dragDrop(evt) {
+    console.log("dragDrop");
+    noopHandler(evt);
+    var url = evt.dataTransfer.getData("Text");
+
+    if (url) {
+        console.log(url);
+        img.src = url;
+        redrawCanvas();
+    } else {
+
+        console.log("local file?");
+        var files = evt.dataTransfer.files;
+        var file, reader;
+        var count = files.length;
+
+        console.log("count:", count);
+
+        // Only call the handler if 1 or more files was dropped.
+        if (count > 0) {
+            file = files[0];
+            
+            console.log(file.name);
+            
+            reader = new FileReader();
+            
+            // init the reader event handlers
+            reader.onloadend = handleReaderLoadEnd;
+            
+            // begin the read operation
+            reader.readAsDataURL(file);
+        }
+    }
+}
+
+function handleReaderLoadEnd(evt) {
+    console.log("handleReaderLoadEnd()...", evt.target.result);
+    img.src = evt.target.result;
+    redrawCanvas();
 }
 
 //
