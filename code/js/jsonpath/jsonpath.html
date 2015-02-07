@@ -6,6 +6,14 @@
         margin: 0px;
         padding: 0px;
     }
+    #statusbar {
+	    position: fixed; 
+	    bottom: 0px; 
+	    left: 0px;
+	    background: lightgray;
+	    width: 2000px;
+	    height: 20px;
+    }
 </style>
     <script type="text/javascript" src="jsonpath.js"></script>
     <script type="text/javascript" src="jh1986.js"></script>
@@ -698,9 +706,11 @@ window.onload = onLoad;
 </script>
     </head>
     <body>
+    Welcome!<br>
     <div id="div1">
     <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid green;"></canvas>
     </div>
+    <div>
 Fast keys:
 <ul>
 <li>p: toggle background image
@@ -718,7 +728,7 @@ Fast keys:
 <li>3: cycle end path with --
 <li>4: cycle end path with --z0--
 </ul>
-
+</div>
     <div id="div2">
     <form>
     <input id="startPath" type="button" value="Start Path"/>
@@ -742,6 +752,12 @@ Fast keys:
     </form>
     <br>
     <textarea id="g_paths" rows="40" cols="100"></textarea>
+    </div>
+    <div id="menubar">
+    </div>
+    <div id="statusbar">&nbsp;
+    x:<input id="x" type="text"></input>
+    y:<input id="y" type="text"></input>
     </div>
     </body>
     </html>
