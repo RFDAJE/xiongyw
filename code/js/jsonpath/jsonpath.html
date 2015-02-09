@@ -103,13 +103,36 @@ function getNodeFromCanvas(ctx, e, conn) {
 
     var bb = c.getBoundingClientRect(); 
 
-    // Translate and scale mouse event coordinates to canvas coordinates
+    // Translate and scale mouse event coordinates to canvas coordinates,
+    // and also convert y into normal coordinates
     n.x = (e.clientX-bb.left)*(c.width/bb.width) / g_canvas_scale_factor;
-    n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor; // convert to normal coordinates
+    n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor + CANVAS_HEIGHT; // convert to normal coordinates
     n.conn = conn;
 
     return n;
 }
+
+// convert a path back to current canvas size/coordinates, prepared for draw on the current canvas
+function convertPath2Canvas(p) {
+
+    // convert Y into canvas coordinate
+    function cy(y) {
+        return -(y - CANVAS_HEIGHT) * g_canvas_scale_factor;
+    }
+
+    function cx(x) {
+        return x * g_canvas_scale_factor;
+    }
+    
+    var P = jp.jsonClone(p);
+    var i;
+    for (i = 0; i < P.nodes.length; i ++) {
+        P.nodes[i].x = cx(P.nodes[i].x);
+        P.nodes[i].y = cy(P.nodes[i].y);
+    }
+    return P;
+}
+
 
 // canvas hooks
 function onClick(e) {
@@ -173,8 +196,12 @@ function onMouseWheel(e) {
 }
 
 function onMouseLeave(e) {
-    //console.log("onMouseLeave: e=" + e);
+    console.log("onMouseLeave: e=" + e);
     redrawCanvas();
+}
+
+function onMouseEnter(e) {
+    console.log("onMouseEnter: e=" + e);
 }
 
 // button hooks
@@ -446,17 +473,6 @@ function drawImageAndGrid() {
     }
 }
 
-function scalePath(p, scale) {
-    //console.log("scale:", scale);
-    var P = jp.jsonClone(p);
-    var i;
-    for (i = 0; i < P.nodes.length; i ++) {
-        P.nodes[i].x *= scale;
-        P.nodes[i].y *= scale;
-    }
-    return P;
-}
-
 function redrawCanvas (){
 //    console.log("redrawCanvas...");
 
@@ -464,13 +480,13 @@ function redrawCanvas (){
     drawImageAndGrid();
     
     // draw the paths
-    g_paths.map(function(x){return j2c.drawOnePath(scalePath(x, g_canvas_scale_factor), g_is_line_path);});
-    j2c.drawOnePath(scalePath(g_cur_path, g_canvas_scale_factor), g_is_line_path);
+    g_paths.map(function(x){return j2c.drawOnePath(convertPath2Canvas(x), g_is_line_path);});
+    j2c.drawOnePath(convertPath2Canvas(g_cur_path), g_is_line_path);
 
     // dot the paths
     if (g_is_dot_on_path) {
-        g_paths.map(function(x){return j2c.dotOnePath(scalePath(x, g_canvas_scale_factor));});
-        j2c.dotOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
+        g_paths.map(function(x){return j2c.dotOnePath(convertPath2Canvas(x));});
+        j2c.dotOnePath(convertPath2Canvas(g_cur_path));
     }
 }
 
@@ -572,6 +588,7 @@ function onLoad() {
     c.onmousemove = onMouseMove;  // note that this is a closure
     c.onmousewheel = onMouseWheel;
     c.onmouseleave = onMouseLeave;
+    c.onmouseenter = onMouseEnter;
     c.addEventListener('mouseover',handleFocus,false);
     c.addEventListener('mouseout',handleFocus,false);
     c.addEventListener('keydown',handleKeyDown,false);

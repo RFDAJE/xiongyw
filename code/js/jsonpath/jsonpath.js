@@ -343,10 +343,10 @@ var jp = (function(){
         }
 
         // debug info
-        console.log("original path:\n");
-        printPath(P, 0);
-        console.log("subpaths:\n");
-        subs.map(function(x){printPath(x,0);});
+        //console.log("original path:\n");
+        //printPath(P, 0);
+        //console.log("subpaths:\n");
+        //subs.map(function(x){printPath(x,0);});
 
         return subs;
     }
