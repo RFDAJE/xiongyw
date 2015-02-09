@@ -4,6 +4,7 @@ var jp = (function(){
     var FREE_CONN = "..";
     var LINE_CONN = "--";
     var OPEN_CONN = null;
+    var DEFAULT_PRECISION = 3;
 
 
     // input: o, could be any json object
@@ -40,16 +41,17 @@ var jp = (function(){
     // export a JSON path into Asymptote
     // input: a path object
     // output: a string representing a path/guide in asy
-    function toAsy(P) {
+    function toAsy(P, precision) {
         console.log(arguments.callee.name, "P:", JSON.stringify(P));
         var p = jsonClone(P);
         console.log(arguments.callee.name, "cloned:", JSON.stringify(p));
         var i, e, N = p.nodes.length;
         var asy = "";
+        var prec = precision || DEFAULT_PRECISION;
 
         function _node2Asy(n) {
             console.log(arguments.callee.name, JSON.stringify(n));
-            return "(" + n.x.toFixed(3) + "," + n.y.toFixed(3) + ")";
+            return "(" + n.x.toFixed(prec) + "," + n.y.toFixed(prec) + ")";
         }
 
         function _dir2Asy(from, to) {

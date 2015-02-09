@@ -12,9 +12,14 @@
 	    left: 0px;
 	    background: lightgray;
 	    width: 2000px;
-	    height: 20px;
+	    height: 22px;
+    }
+    input[type=text] {
+    	border: inset;
+    	background: lightgray;
     }
 </style>
+	<script src="jquery-2.1.1.js"></script>
     <script type="text/javascript" src="jsonpath.js"></script>
     <script type="text/javascript" src="jh1986.js"></script>
     <script type="text/javascript" src="jp2canvas.js"></script>
@@ -47,6 +52,8 @@
 var CANVAS_WIDTH = 640;
 var CANVAS_HEIGHT = 640;
 var GRID_SIZE = 8;
+
+var PRECISION = 3;  // default number precision
 
 var LEFT_KEY = 37;
 var UP_KEY = 38;
@@ -109,6 +116,9 @@ function getNodeFromCanvas(ctx, e, conn) {
     n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor + CANVAS_HEIGHT; // convert to normal coordinates
     n.conn = conn;
 
+    $("#x").val(n.x.toFixed(PRECISION));
+    $("#y").val(n.y.toFixed(PRECISION));
+    
     return n;
 }
 
@@ -772,9 +782,11 @@ Fast keys:
     </div>
     <div id="menubar">
     </div>
-    <div id="statusbar">&nbsp;
-    x:<input id="x" type="text"></input>
-    y:<input id="y" type="text"></input>
+    <div id="statusbar">
+    <form>
+    <label>x:</label><input id="x" type="text" size="4" class="coord"></input>
+    <label>y:</label><input id="y" type="text" size="4"></input>
+    </form>
     </div>
     </body>
     </html>
