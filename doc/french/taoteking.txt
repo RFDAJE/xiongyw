@@ -885,7 +885,7 @@ Depuis la période Thaï-kang (l'an 280 après J.-C.) jusqu'à la fuite sur la r
 
 上德不德，是以有德；下德不失德，是以无德。上德无为而无以为；下德为之而有以为。上仁为之而无以为；上义为之而有以为。上礼为之而莫之应，则攘臂而扔之。故失道而后德，失德而后仁，失仁而后义，失义而后礼。夫礼者，忠信之薄，而乱之首。前识者，道之华，而愚之始。是以大丈夫处其厚，不居其薄；处其实，不居其华。故去彼取此。
 
-39
+39 昔之得一者
 
 Voici les choses qui jadis ont obtenu l'Unité[28].
 Le ciel est pur parce qu'il a obtenu l'Unité.
@@ -919,16 +919,21 @@ C'est une comparaison qui s'applique au Tao. Le Tao est sans nom et tous les êt
 De même, c'est la réunion et l'ensemble du peuple qui forment un prince ou un roi. « Prince, roi », sont des noms collectifs de peuple. Si vous faites abstraction du peuple, il n'y aura plus ni prince ni roi.
 Quelque beau que soit un char, il ne l'est devenu que par la réunion d'une multitude de petits matériaux. Quelque noble que soit un prince ou un roi, il n'a pu le devenir que par la réunion d'une foule d'hommes d'une basse condition.
 
-40
+昔之得一者，天得一以清，地得一以宁，神得一以灵，谷得一以盈，万物得一以生，侯王得一以为天下贞。其致之，天无以清将恐裂，地无以宁将恐废，神无以灵将恐歇，谷无以盈将恐竭，万物无以生将恐灭，侯王无以贵高将恐蹶。故贵以贱为本，高以下为基。是以侯王自称孤、寡、不谷。此非以贱为本邪？非乎！故致数舆无舆。不欲琭琭如玉，珞珞如石。
+
+40 反者道之动
 
 Le retour au non-être (produit) le mouvement[31] du Tao.
 La faiblesse est la fonction du Tao.
-Toutes les choses du monde sont nées de l'être ; l'être est né du non-être.
+Toutes les choses du monde sont nées de l'être; 
+  l'être est né du non-être.
 
 Notes du chapitre 40
 
 [31] Le mouvement du Tao, c'est-à-dire l'impulsion que le Tao donne aux êtres, a pour racine, pour origine, leur retour (au non-être). S'ils ne retournaient pas au non-être, (le Tao) ne pourrait les mettre en mouvement. Il faut qu'ils se condensent, qu'ils se resserrent (qu'ils décroissent), pour pouvoir atteindre ensuite toute la plénitude de leur développement. C'est pourquoi le retour au non-être permet au Tao de mettre les êtres en mouvement, c'est-à-dire de les faire renaître.
 Parmi tous les êtres de l'univers, il n'en est pas un seul qui n'ait besoin de retourner au non-être pour exister de nouveau. Ce n'est que lorsqu'ils sont rentrés dans un repos absolu, que le Tao les met de nouveau en mouvement et les ramène à la vie. Ainsi le repos est la base et le principe du mouvement.
+
+反者道之动，弱者道之用。天下万物生于有，有生于无。
 
 41 上士闻道
 
@@ -940,7 +945,7 @@ Quand les lettrés inférieurs ont entendu parler du Tao,
   ils le tournent en dérision. 
 S'ils ne le tournaient pas en dérision, 
   il ne mériterait pas le nom de Tao.
-C'est pourquoi les Anciens disaient :
+C'est pourquoi les Anciens disaient:
 Celui qui a l'intelligence du Tao paraît enveloppé de ténèbres.
 Celui qui est avancé dans le Tao ressemble à un homme arriéré.
 Celui qui est à la hauteur du Tao ressemble à un homme vulgaire.
@@ -958,13 +963,20 @@ Il sait prêter (secours aux êtres) et les conduire à la perfection.
 
 上士闻道，勤而行之；中士闻道，若存若亡；下士闻道，大笑之。不笑不足以为道。故建言有之：明道若昧，进道若退，夷道若纇。上德若谷；大白若辱；广德若不足；建德若偷；质真若渝。大方无隅；大器晚成；大音希声；大象无形；道隐无名。夫唯道，善贷且成。
 
-42
+42 道生一
 
-Le Tao a produit un ; un a produit deux[32] ; deux a produit trois[33] ; trois[34] a produit tous les êtres.
+Le Tao a produit un; 
+  un a produit deux[32]; 
+  deux a produit trois[33]; 
+  trois[34] a produit tous les êtres.
 Tous les êtres fuient le calme et cherchent le mouvement.
 Un souffle immatériel forme l'harmonie.
-Ce que les hommes détestent, c'est d'être orphelins, imparfaits, dénués de vertu, et cependant les rois s'appellent ainsi eux-mêmes[35].
-C'est pourquoi, parmi les êtres, les uns s'augmentent en se diminuant ; les autres se diminuent en s'augmentant.
+Ce que les hommes détestent, 
+  c'est d'être orphelins, imparfaits, dénués de vertu, 
+  et cependant les rois s'appellent ainsi eux-mêmes[35].
+C'est pourquoi, parmi les êtres, 
+  les uns s'augmentent en se diminuant; 
+  les autres se diminuent en s'augmentant.
 Ce que les hommes enseignent, je l'enseigne aussi.
 Les hommes violents et inflexibles n'obtiennent point une mort naturelle.
 Je veux prendre leur exemple pour la base de mes instructions.
@@ -979,11 +991,16 @@ Notes du chapitre 42
 
 [35] Ces noms que se donnent les rois sont des termes d'humilité. Si les princes et les rois ne s'abaissaient pas (littéralement « ne se diminuaient pas »), l'empire ne se soumettrait pas à eux. C'est pourquoi les empereurs Yao et Chun occupèrent le trône et le regardèrent comme s'il leur eût été étranger (ils oubliaient leur élévation) ; leurs bienfaits ont eu une étendue sans bornes, et jusqu'à aujourd'hui on célèbre leur vertu. Aussi quiconque s'abaisse est élevé par les hommes (littéralement « quiconque se diminue, les hommes l'augmentent »).
 
-43
+道生一，一生二，二生三，三生万物。万物负阴而抱阳，冲气以为和。人之所恶，唯孤寡不谷，而王公以为称。故物或损之而益，或益之而损。人之所教，我亦教之。强梁者不得其死，吾将以为教父。
 
-Les choses les plus molles du monde subjuguent les choses les plus dures du monde.
-Le non-être traverse les choses impénétrables[36]. C'est par là que je sais que le non-agir est utile.
-Dans l'univers, il y a bien peu d'hommes qui sachent instruire sans parler et tirer profit du non-agir[37].
+43 天下之至柔
+
+Les choses les plus molles du monde subjuguent 
+  les choses les plus dures du monde.
+Le non-être traverse les choses impénétrables[36]. 
+C'est par là que je sais que le non-agir est utile.
+Dans l'univers, il y a bien peu d'hommes qui sachent instruire 
+  sans parler et tirer profit du non-agir[37].
 
 Notes du chapitre 43
 
@@ -991,6 +1008,8 @@ Notes du chapitre 43
 
 [37] Littéralement : « L'instruction du non parler, l'utilité du non-agir, dans le monde peu d'hommes atteignent cela. »
 Les hommes ne savent pas enseigner les autres, parce qu'ils parlent. Alors ils se fient à leur prudence, s'estiment, se vantent et aiment à agir. Celui qui aime à agir est facile à renverser. On voit par là que l'instruction qu'accompagnent les paroles, la conduite qui se manifeste par l'action, sont des choses inutiles. D'où il résulte que, dans le monde, peu d'hommes sont en état d'instruire sans faire usage de la parole, et d'obtenir les avantages du non-agir.
+
+天下之至柔，驰骋天下之至坚。无有入无闲，吾是以知无为之有益。不言之教，无为之益，天下希及之。
 
 44
 
@@ -1016,7 +1035,7 @@ Celui qui est pur et tranquille devient le modèle de l'univers.
 46
 
 Lorsque le Tao régnait dans le monde, on renvoyait les chevaux pour cultiver les champs.
-Depuis quele Tao ne règne plus dans le monde, les chevaux de combat naissent sur les frontières.
+Depuis que le Tao ne règne plus dans le monde, les chevaux de combat naissent sur les frontières.
 Il n'y a pas de plus grand crime que de se livrer à ses désirs.
 Il n'y a pas de plus grand malheur que de ne pas savoir se suffire.
 Il n'y a pas de plus grande calamité que le désir d'acquérir.
