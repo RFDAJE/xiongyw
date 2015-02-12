@@ -70,6 +70,7 @@ var MINUS_KEY = 189; // scale down canvas
 var D_KEY = 68;  // dot nodes, or not
 var G_KEY = 71; // draw grid, or not
 var L_KEY = 76; // draw line, or not
+var R_KEY = 82;  // read a path 
 
 var P_KEY = 80;
 var KEY_0 = 48;
@@ -535,6 +536,13 @@ function handleKeyDown(e) {
     } else if (key_id === L_KEY) {  // line
         g_is_line_path = !g_is_line_path;
         redrawCanvas();
+    } else if (key_id === R_KEY) {  // read a path
+        var ta = document.getElementById("input_path");
+        console.log(ta.value);
+        var p = JSON.parse(ta.value);
+        p = jp.checkPath(p);
+        g_cur_path = p;
+        redrawCanvas();
     }
 
     if (!g_cur_path_started) {
@@ -779,6 +787,9 @@ Fast keys:
     </form>
     <br>
     <textarea id="g_paths" rows="40" cols="100"></textarea>
+    </div>
+    <div id="edit">
+    <textarea id="input_path" rows="10", cols="100"></textarea>
     </div>
     <div id="menubar">
     </div>
