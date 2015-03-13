@@ -1467,13 +1467,17 @@ C'est pourquoi le Saint dit : Celui qui supporte les opprobres du royaume devien
 Celui qui supporte les calamités du royaume devient le roi de l'empire.
 Les paroles droites paraissent contraires (à la raison).
 
-79
+79 和大怨
 
-Si vous voulez apaiser les grandes inimitiés des hommes[51], ils conserveront nécessairement un reste d'inimitié.
-Comment pourraient-ils devenir vertueux ?
-De là vient que le Saint garde la partie gauche du contrat[52] et ne réclame rien aux autres.
-C'est pourquoi celui qui a de la vertu songe à donner, celui qui est sans vertu songe à demander.
-Le ciel n'affectionne personne en particulier. Il donne constamment aux hommes vertueux.
+Si vous voulez apaiser les grandes inimitiés des hommes[51],
+  ils conserveront nécessairement un reste d'inimitié.
+Comment pourraient-ils devenir vertueux?
+De là vient que le Saint garde la partie gauche du contrat[52]
+  et ne réclame rien aux autres.
+C'est pourquoi celui qui a de la vertu songe à donner,
+  celui qui est sans vertu songe à demander.
+Le ciel n'affectionne personne en particulier.
+Il donne constamment aux hommes vertueux.
 
 Notes du chapitre 79
 
@@ -1482,7 +1486,9 @@ Notes du chapitre 79
 [52] Le mot kie désigne « une tablette de bois qui pouvait se diviser en deux parties ». On écrivait dessus toutes sortes de conventions, soit pour acheter, soit pour donner ou emprunter. Celui des contractants qui devait donner la chose qui était l'objet du contrat, gardait la partie gauche de cette tablette, et celui qui devait venir la réclamer prenait la partie droite. Quand ce dernier se présentait en tenant dans sa main la partie droite du contrat, celui qui avait la partie gauche les rapprochait l'une de l'autre, et, après avoir reconnu la correspondance exacte des lignes d'écriture et la coïncidence des dentelures des deux portions de la tablette (elles devaient s'adapter l'une à l'autre comme les tailles des boulangers, et les lettres qui y étaient gravées devaient se correspondre comme celles d'un billet de banque qu'on rapproche de la souche), il donnait l'objet réclamé sans faire aucune difficulté, et sans témoigner le plus léger doute sur les droits et la sincérité du demandeur.
 Lorsqu'on dit que le Saint garde la partie gauche du contrat, on entend qu'il ne réclame rien à personne, et qu'il attend que les autres viennent demander eux-mêmes ce qu'ils désirent de lui.
 
-80
+和大怨，必有余怨，安可以为善。是以圣人执左契，而不责于人。有德司契，无德司彻。天道无亲，常与善人。
+
+80 小国寡民
 
 (Si je gouvernais) un petit royaume et un peuple peu nombreux,
   n'eût-il des armes que pour dix ou cent hommes,
@@ -1506,6 +1512,8 @@ Notes du chapitre 80
 
 [53] Dans la Haute Antiquité, lorsque l'écriture n'était pas encore inventée, les hommes se servaient de cordelettes nouées pour communiquer leurs pensées. À cette époque, les mœurs étaient pures et simples, et, suivant les idées de Lao-tseu, elles n'avaient pas encore été altérées par les progrès des lumières. Dans la pensée de l'auteur, les mots « je ramènerais le peuple à l'usage des cordelettes nouées » signifient : « je ramènerais le peuple à sa simplicité primitive ».
 
+小国寡民，使有什伯之器而不用，使民重死而不远徙。虽有舟舆，无所乘之；虽有甲兵，无所陈之。使人复结绳而用之。甘其食，美其服，安其居，乐其俗。邻国相望，鸡犬之声相闻，民至老死，不相往来。
+
 81 信言不美
 
 Les paroles sincères ne sont pas élégantes;
@@ -1523,4 +1531,4 @@ Telle est la voie du ciel,
 Telle est la voie du Saint,
   qu'il agit et ne dispute point.
 
-
+信言不美，美言不信。善者不辩，辩者不善。知者不博，博者不知。圣人不积，既以为人己愈有，既以与人己愈多。天之道，利而不害；圣人之道，为而不争。
