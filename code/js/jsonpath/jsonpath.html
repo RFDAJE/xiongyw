@@ -6,7 +6,20 @@
         margin: 0px;
         padding: 0px;
     }
+    #statusbar {
+	    position: fixed; 
+	    bottom: 0px; 
+	    left: 0px;
+	    background: lightgray;
+	    width: 2000px;
+	    height: 22px;
+    }
+    input[type=text] {
+    	border: inset;
+    	background: lightgray;
+    }
 </style>
+	<script src="jquery-2.1.1.js"></script>
     <script type="text/javascript" src="jsonpath.js"></script>
     <script type="text/javascript" src="jh1986.js"></script>
     <script type="text/javascript" src="jp2canvas.js"></script>
@@ -40,6 +53,8 @@ var CANVAS_WIDTH = 640;
 var CANVAS_HEIGHT = 640;
 var GRID_SIZE = 8;
 
+var PRECISION = 3;  // default number precision
+
 var LEFT_KEY = 37;
 var UP_KEY = 38;
 var RIGHT_KEY = 39;
@@ -55,6 +70,7 @@ var MINUS_KEY = 189; // scale down canvas
 var D_KEY = 68;  // dot nodes, or not
 var G_KEY = 71; // draw grid, or not
 var L_KEY = 76; // draw line, or not
+var R_KEY = 82;  // read a path 
 
 var P_KEY = 80;
 var KEY_0 = 48;
@@ -95,13 +111,39 @@ function getNodeFromCanvas(ctx, e, conn) {
 
     var bb = c.getBoundingClientRect(); 
 
-    // Translate and scale mouse event coordinates to canvas coordinates
+    // Translate and scale mouse event coordinates to canvas coordinates,
+    // and also convert y into normal coordinates
     n.x = (e.clientX-bb.left)*(c.width/bb.width) / g_canvas_scale_factor;
-    n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor; // convert to normal coordinates
+    n.y = - (e.clientY-bb.top)*(c.height/bb.height) / g_canvas_scale_factor + CANVAS_HEIGHT; // convert to normal coordinates
     n.conn = conn;
 
+    $("#x").val(n.x.toFixed(PRECISION));
+    $("#y").val(n.y.toFixed(PRECISION));
+    
     return n;
 }
+
+// convert a path back to current canvas size/coordinates, prepared for draw on the current canvas
+function convertPath2Canvas(p) {
+
+    // convert Y into canvas coordinate
+    function cy(y) {
+        return -(y - CANVAS_HEIGHT) * g_canvas_scale_factor;
+    }
+
+    function cx(x) {
+        return x * g_canvas_scale_factor;
+    }
+    
+    var P = jp.jsonClone(p);
+    var i;
+    for (i = 0; i < P.nodes.length; i ++) {
+        P.nodes[i].x = cx(P.nodes[i].x);
+        P.nodes[i].y = cy(P.nodes[i].y);
+    }
+    return P;
+}
+
 
 // canvas hooks
 function onClick(e) {
@@ -165,8 +207,12 @@ function onMouseWheel(e) {
 }
 
 function onMouseLeave(e) {
-    //console.log("onMouseLeave: e=" + e);
+    console.log("onMouseLeave: e=" + e);
     redrawCanvas();
+}
+
+function onMouseEnter(e) {
+    console.log("onMouseEnter: e=" + e);
 }
 
 // button hooks
@@ -438,17 +484,6 @@ function drawImageAndGrid() {
     }
 }
 
-function scalePath(p, scale) {
-    //console.log("scale:", scale);
-    var P = jp.jsonClone(p);
-    var i;
-    for (i = 0; i < P.nodes.length; i ++) {
-        P.nodes[i].x *= scale;
-        P.nodes[i].y *= scale;
-    }
-    return P;
-}
-
 function redrawCanvas (){
 //    console.log("redrawCanvas...");
 
@@ -456,13 +491,13 @@ function redrawCanvas (){
     drawImageAndGrid();
     
     // draw the paths
-    g_paths.map(function(x){return j2c.drawOnePath(scalePath(x, g_canvas_scale_factor), g_is_line_path);});
-    j2c.drawOnePath(scalePath(g_cur_path, g_canvas_scale_factor), g_is_line_path);
+    g_paths.map(function(x){return j2c.drawOnePath(convertPath2Canvas(x), g_is_line_path);});
+    j2c.drawOnePath(convertPath2Canvas(g_cur_path), g_is_line_path);
 
     // dot the paths
     if (g_is_dot_on_path) {
-        g_paths.map(function(x){return j2c.dotOnePath(scalePath(x, g_canvas_scale_factor));});
-        j2c.dotOnePath(scalePath(g_cur_path, g_canvas_scale_factor));
+        g_paths.map(function(x){return j2c.dotOnePath(convertPath2Canvas(x));});
+        j2c.dotOnePath(convertPath2Canvas(g_cur_path));
     }
 }
 
@@ -500,6 +535,13 @@ function handleKeyDown(e) {
         redrawCanvas();
     } else if (key_id === L_KEY) {  // line
         g_is_line_path = !g_is_line_path;
+        redrawCanvas();
+    } else if (key_id === R_KEY) {  // read a path
+        var ta = document.getElementById("input_path");
+        console.log(ta.value);
+        var p = JSON.parse(ta.value);
+        p = jp.checkPath(p);
+        g_cur_path = p;
         redrawCanvas();
     }
 
@@ -564,6 +606,7 @@ function onLoad() {
     c.onmousemove = onMouseMove;  // note that this is a closure
     c.onmousewheel = onMouseWheel;
     c.onmouseleave = onMouseLeave;
+    c.onmouseenter = onMouseEnter;
     c.addEventListener('mouseover',handleFocus,false);
     c.addEventListener('mouseout',handleFocus,false);
     c.addEventListener('keydown',handleKeyDown,false);
@@ -602,6 +645,81 @@ function onLoad() {
 
     btnSelectFreeConn.onclick = onFreeConn;
     btnSelectLineConn.onclick = onStraightConn;
+
+
+    //
+    // drag and drop: 
+    // - http://www.thebuzzmedia.com/html5-drag-and-drop-and-file-api-tutorial/
+    // - http://stackoverflow.com/questions/3694631/html5-drag-and-drop-between-windows
+    //
+    var dropbox = document.getElementById("div1")
+
+    // init event handlers
+    dropbox.addEventListener("dragenter", dragEnter, false);
+    dropbox.addEventListener("dragexit", dragExit, false);
+    dropbox.addEventListener("dragover", dragOver, false);
+    dropbox.addEventListener("drop", dragDrop, false);
+}
+
+function noopHandler(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+}    
+
+function dragEnter(e) {
+    console.log("dragEnter");
+    noopHandler(e);
+}
+
+function dragExit(e) {
+    console.log("dragExit");
+    noopHandler(e);
+}
+
+function dragOver(e) {
+    console.log("dragOver");
+    noopHandler(e);
+}
+
+function dragDrop(evt) {
+    console.log("dragDrop");
+    noopHandler(evt);
+    var url = evt.dataTransfer.getData("Text");
+
+    if (url) {
+        console.log(url);
+        img.src = url;
+        redrawCanvas();
+    } else {
+
+        console.log("local file?");
+        var files = evt.dataTransfer.files;
+        var file, reader;
+        var count = files.length;
+
+        console.log("count:", count);
+
+        // Only call the handler if 1 or more files was dropped.
+        if (count > 0) {
+            file = files[0];
+            
+            console.log(file.name);
+            
+            reader = new FileReader();
+            
+            // init the reader event handlers
+            reader.onloadend = handleReaderLoadEnd;
+            
+            // begin the read operation
+            reader.readAsDataURL(file);
+        }
+    }
+}
+
+function handleReaderLoadEnd(evt) {
+    console.log("handleReaderLoadEnd()...", evt.target.result);
+    img.src = evt.target.result;
+    redrawCanvas();
 }
 
 //
@@ -623,9 +741,11 @@ window.onload = onLoad;
 </script>
     </head>
     <body>
+    Welcome!<br>
     <div id="div1">
     <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid green;"></canvas>
     </div>
+    <div>
 Fast keys:
 <ul>
 <li>p: toggle background image
@@ -643,7 +763,7 @@ Fast keys:
 <li>3: cycle end path with --
 <li>4: cycle end path with --z0--
 </ul>
-
+</div>
     <div id="div2">
     <form>
     <input id="startPath" type="button" value="Start Path"/>
@@ -667,6 +787,17 @@ Fast keys:
     </form>
     <br>
     <textarea id="g_paths" rows="40" cols="100"></textarea>
+    </div>
+    <div id="edit">
+    <textarea id="input_path" rows="10", cols="100"></textarea>
+    </div>
+    <div id="menubar">
+    </div>
+    <div id="statusbar">
+    <form>
+    <label>x:</label><input id="x" type="text" size="4" class="coord"></input>
+    <label>y:</label><input id="y" type="text" size="4"></input>
+    </form>
     </div>
     </body>
     </html>

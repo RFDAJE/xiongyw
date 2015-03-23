@@ -885,7 +885,7 @@ Depuis la période Thaï-kang (l'an 280 après J.-C.) jusqu'à la fuite sur la r
 
 上德不德，是以有德；下德不失德，是以无德。上德无为而无以为；下德为之而有以为。上仁为之而无以为；上义为之而有以为。上礼为之而莫之应，则攘臂而扔之。故失道而后德，失德而后仁，失仁而后义，失义而后礼。夫礼者，忠信之薄，而乱之首。前识者，道之华，而愚之始。是以大丈夫处其厚，不居其薄；处其实，不居其华。故去彼取此。
 
-39
+39 昔之得一者
 
 Voici les choses qui jadis ont obtenu l'Unité[28].
 Le ciel est pur parce qu'il a obtenu l'Unité.
@@ -919,18 +919,23 @@ C'est une comparaison qui s'applique au Tao. Le Tao est sans nom et tous les êt
 De même, c'est la réunion et l'ensemble du peuple qui forment un prince ou un roi. « Prince, roi », sont des noms collectifs de peuple. Si vous faites abstraction du peuple, il n'y aura plus ni prince ni roi.
 Quelque beau que soit un char, il ne l'est devenu que par la réunion d'une multitude de petits matériaux. Quelque noble que soit un prince ou un roi, il n'a pu le devenir que par la réunion d'une foule d'hommes d'une basse condition.
 
-40
+昔之得一者，天得一以清，地得一以宁，神得一以灵，谷得一以盈，万物得一以生，侯王得一以为天下贞。其致之，天无以清将恐裂，地无以宁将恐废，神无以灵将恐歇，谷无以盈将恐竭，万物无以生将恐灭，侯王无以贵高将恐蹶。故贵以贱为本，高以下为基。是以侯王自称孤、寡、不谷。此非以贱为本邪？非乎！故致数舆无舆。不欲琭琭如玉，珞珞如石。
+
+40 反者道之动
 
 Le retour au non-être (produit) le mouvement[31] du Tao.
 La faiblesse est la fonction du Tao.
-Toutes les choses du monde sont nées de l'être ; l'être est né du non-être.
+Toutes les choses du monde sont nées de l'être; 
+  l'être est né du non-être.
 
 Notes du chapitre 40
 
 [31] Le mouvement du Tao, c'est-à-dire l'impulsion que le Tao donne aux êtres, a pour racine, pour origine, leur retour (au non-être). S'ils ne retournaient pas au non-être, (le Tao) ne pourrait les mettre en mouvement. Il faut qu'ils se condensent, qu'ils se resserrent (qu'ils décroissent), pour pouvoir atteindre ensuite toute la plénitude de leur développement. C'est pourquoi le retour au non-être permet au Tao de mettre les êtres en mouvement, c'est-à-dire de les faire renaître.
 Parmi tous les êtres de l'univers, il n'en est pas un seul qui n'ait besoin de retourner au non-être pour exister de nouveau. Ce n'est que lorsqu'ils sont rentrés dans un repos absolu, que le Tao les met de nouveau en mouvement et les ramène à la vie. Ainsi le repos est la base et le principe du mouvement.
 
-41
+反者道之动，弱者道之用。天下万物生于有，有生于无。
+
+41 上士闻道
 
 Quand les lettrés supérieurs ont entendu parler du Tao, 
   ils le pratiquent avec zèle.
@@ -940,7 +945,7 @@ Quand les lettrés inférieurs ont entendu parler du Tao,
   ils le tournent en dérision. 
 S'ils ne le tournaient pas en dérision, 
   il ne mériterait pas le nom de Tao.
-C'est pourquoi les Anciens disaient :
+C'est pourquoi les Anciens disaient:
 Celui qui a l'intelligence du Tao paraît enveloppé de ténèbres.
 Celui qui est avancé dans le Tao ressemble à un homme arriéré.
 Celui qui est à la hauteur du Tao ressemble à un homme vulgaire.
@@ -958,13 +963,20 @@ Il sait prêter (secours aux êtres) et les conduire à la perfection.
 
 上士闻道，勤而行之；中士闻道，若存若亡；下士闻道，大笑之。不笑不足以为道。故建言有之：明道若昧，进道若退，夷道若纇。上德若谷；大白若辱；广德若不足；建德若偷；质真若渝。大方无隅；大器晚成；大音希声；大象无形；道隐无名。夫唯道，善贷且成。
 
-42
+42 道生一
 
-Le Tao a produit un ; un a produit deux[32] ; deux a produit trois[33] ; trois[34] a produit tous les êtres.
+Le Tao a produit un; 
+  un a produit deux[32]; 
+  deux a produit trois[33]; 
+  trois[34] a produit tous les êtres.
 Tous les êtres fuient le calme et cherchent le mouvement.
 Un souffle immatériel forme l'harmonie.
-Ce que les hommes détestent, c'est d'être orphelins, imparfaits, dénués de vertu, et cependant les rois s'appellent ainsi eux-mêmes[35].
-C'est pourquoi, parmi les êtres, les uns s'augmentent en se diminuant ; les autres se diminuent en s'augmentant.
+Ce que les hommes détestent, 
+  c'est d'être orphelins, imparfaits, dénués de vertu, 
+  et cependant les rois s'appellent ainsi eux-mêmes[35].
+C'est pourquoi, parmi les êtres, 
+  les uns s'augmentent en se diminuant; 
+  les autres se diminuent en s'augmentant.
 Ce que les hommes enseignent, je l'enseigne aussi.
 Les hommes violents et inflexibles n'obtiennent point une mort naturelle.
 Je veux prendre leur exemple pour la base de mes instructions.
@@ -979,11 +991,16 @@ Notes du chapitre 42
 
 [35] Ces noms que se donnent les rois sont des termes d'humilité. Si les princes et les rois ne s'abaissaient pas (littéralement « ne se diminuaient pas »), l'empire ne se soumettrait pas à eux. C'est pourquoi les empereurs Yao et Chun occupèrent le trône et le regardèrent comme s'il leur eût été étranger (ils oubliaient leur élévation) ; leurs bienfaits ont eu une étendue sans bornes, et jusqu'à aujourd'hui on célèbre leur vertu. Aussi quiconque s'abaisse est élevé par les hommes (littéralement « quiconque se diminue, les hommes l'augmentent »).
 
-43
+道生一，一生二，二生三，三生万物。万物负阴而抱阳，冲气以为和。人之所恶，唯孤寡不谷，而王公以为称。故物或损之而益，或益之而损。人之所教，我亦教之。强梁者不得其死，吾将以为教父。
 
-Les choses les plus molles du monde subjuguent les choses les pus dures du monde.
-Le non-être traverse les choses impénétrables[36]. C'est par là que je sais que le non-agir est utile.
-Dans l'univers, il y a bien peu d'hommes qui sachent instruire sans parler et tirer profit du non-agir[37].
+43 天下之至柔
+
+Les choses les plus molles du monde subjuguent 
+  les choses les plus dures du monde.
+Le non-être traverse les choses impénétrables[36]. 
+C'est par là que je sais que le non-agir est utile.
+Dans l'univers, il y a bien peu d'hommes qui sachent instruire 
+  sans parler et tirer profit du non-agir[37].
 
 Notes du chapitre 43
 
@@ -992,7 +1009,9 @@ Notes du chapitre 43
 [37] Littéralement : « L'instruction du non parler, l'utilité du non-agir, dans le monde peu d'hommes atteignent cela. »
 Les hommes ne savent pas enseigner les autres, parce qu'ils parlent. Alors ils se fient à leur prudence, s'estiment, se vantent et aiment à agir. Celui qui aime à agir est facile à renverser. On voit par là que l'instruction qu'accompagnent les paroles, la conduite qui se manifeste par l'action, sont des choses inutiles. D'où il résulte que, dans le monde, peu d'hommes sont en état d'instruire sans faire usage de la parole, et d'obtenir les avantages du non-agir.
 
-44
+天下之至柔，驰骋天下之至坚。无有入无闲，吾是以知无为之有益。不言之教，无为之益，天下希及之。
+
+44 名与身孰亲
 
 Qu'est-ce qui nous touche de plus près, de notre gloire ou de notre personne ?
 Qu'est-ce qui nous est le plus précieux, de notre personne ou de nos richesses ?
@@ -1003,50 +1022,89 @@ Celui qui sait se suffire est à l'abri du déshonneur.
 Celui qui sait s'arrêter ne périclite jamais.
 Il pourra subsister longtemps.
 
-45
+名与身孰亲，身与货孰多，得与亡孰病，是故甚爱必大费，多藏必厚亡，知足不辱，知止不殆，可以长久。
 
-(Le Saint) est grandement parfait, et il paraît plein d'imperfections ; ses ressources ne s'usent point.
-Il est grandement plein, et il paraît vide ; ses ressources ne s'épuisent point.
-Il est grandement droit, et il semble manquer de rectitude.
-Il est grandement ingénieux, et il paraît stupide.
-Il est grandement disert, et il paraît bègue.
-Le mouvement triomphe du froid ; le repos triomphe de la chaleur.
+45 大成若缺
+
+(Le Saint) est grandement parfait,
+  et il paraît plein d'imperfections;
+  ses ressources ne s'usent point.
+Il est grandement plein,
+  et il paraît vide;
+  ses ressources ne s'épuisent point.
+Il est grandement droit,
+  et il semble manquer de rectitude.
+Il est grandement ingénieux,
+  et il paraît stupide.
+Il est grandement disert,
+  et il paraît bègue.
+Le mouvement triomphe du froid; 
+  le repos triomphe de la chaleur.
 Celui qui est pur et tranquille devient le modèle de l'univers.
+
+大成若缺，其用不弊；大盈若冲，其用不穷。大直若屈，大巧若拙，大辩若讷。躁胜寒，静胜热。清静为天下正。
 
 46
 
-Lorsque le Tao régnait dans le monde, on renvoyait les chevaux pour cultiver les champs.
-Depuis quele Tao ne règne plus dans le monde, les chevaux de combat naissent sur les frontières.
+Lorsque le Tao régnait dans le monde,
+  on renvoyait les chevaux pour cultiver les champs.
+Depuis que le Tao ne règne plus dans le monde,
+  les chevaux de combat naissent sur les frontières.
 Il n'y a pas de plus grand crime que de se livrer à ses désirs.
 Il n'y a pas de plus grand malheur que de ne pas savoir se suffire.
 Il n'y a pas de plus grande calamité que le désir d'acquérir.
 Celui qui sait se suffire est toujours content de son sort.
 
-47
+天下有道，却走马以粪。 天下无道，戎马生于郊。 祸莫大于不知足；咎莫大于欲得。故知足之足，常足矣。
 
-Sans sortir de ma maison, je connais l'univers ; sans regarder par ma fenêtre, je découvre les voies du ciel.
-Plus l'on s'éloigne et moi l'on apprend[38].
-C'est pourquoi le sage arrive (où il veut) sans marcher ; il nomme les objets sans les voir, sans agir, il accomplit de grandes choses.
+47 不出户
+
+Sans sortir de ma maison, 
+  je connais l'univers;
+  sans regarder par ma fenêtre,
+  je découvre les voies du ciel.
+Plus l'on s'éloigne et moins l'on apprend[38].
+C'est pourquoi le sage arrive (où il veut) sans marcher;
+  il nomme les objets sans les voir;
+  sans agir, il accomplit de grandes choses.
 
 Notes du chapitre 47
 
-[38] Les hommes du monde sont aveuglés par l'intérêt et les passions. Ils s'élancent au-dehors pour les satisfaire. L'amour du lucre trouble leur prudence. C'est pourquoi, de jour en jour, ils s'éloignent davantage de leur nature. La poussière des passions s'épaissit davantage de jour en jour, et leur cœur s'obscurcit de plus en plus. C'est pourquoi, plus ils s'éloignent et plus leurs connaissances diminuent. Mais le saint homme reste calme et sans désirs ; il ne s'occupe point des choses sensibles, et, en restant en repos, il comprend tous les secrets de l'univers.
+[38] Les hommes du monde sont aveuglés par l'intérêt et les passions. Ils s'élancent au-dehors pour les satisfaire. L'amour du lucre trouble leur prudence. C'est pourquoi, de jour en jour, ils s'éloignent davantage de leur nature. La poussière des passions s'épaissit davantage de jour en jour, et leur cœur s'obscurcit de plus en plus. C'est pourquoi, plus ils s'éloignent et plus leurs connaissances diminuent. Mais le saint homme reste calme et sans désirs; il ne s'occupe point des choses sensibles, et, en restant en repos, il comprend tous les secrets de l'univers.
 
-48
+不出户，知天下；不窥牖，见天道。其出弥远，其知弥少。是以圣人不行而知，不见而名，不为而成。
+
+48 为学日益
 
 Celui qui se livre à l'étude augmente chaque jour (ses connaissances).
 Celui qui se livre au Tao diminue chaque jours (ses passions).
-Il les diminue et les diminue sans cesse jusqu'à ce qu'il soit arrivé au non-agir.
-Dès qu'il pratique le non-agir, il n'y a rien qui lui soit impossible.
-C'est toujours par le non-agir que l'on devient le maître de l'empire.
-Celui qui aime à agir est incapable de devenir le maître de l'empire.
+Il les diminue et les diminue sans cesse 
+  jusqu'à ce qu'il soit arrivé au non-agir.
+Dès qu'il pratique le non-agir, 
+  il n'y a rien qui lui soit impossible.
+C'est toujours par le non-agir que 
+  l'on devient le maître de l'empire.
+Celui qui aime à agir est incapable 
+  de devenir le maître de l'empire.
 
-49
+为学日益，为道日损，损之又损，以至于无为，无为而无不为。取天下常以无事，及其有事，不足以取天下。
 
-Le Saint n'a point de sentiments immuables. Il adopte les sentiments du peuple.
-Celui qui est vertueux, il le traite comme un homme vertueux, celui qui n'est pas vertueux, il le traite aussi comme un homme vertueux. C'est là le comble de la vertu.
-Celui qui est sincère, il le traite comme un homme sincère ; celui qui n'est pas sincère, il le traite aussi comme un homme sincère. C'est là le comble de la sincérité.
-Le Saint vivant dans le monde reste calme et tranquille, et conserve les mêmes sentiments pour tous.
+49 圣人无常心
+
+Le Saint n'a point de sentiments immuables.
+Il adopte les sentiments du peuple.
+Celui qui est vertueux, 
+  il le traite comme un homme vertueux, 
+  celui qui n'est pas vertueux, 
+  il le traite aussi comme un homme vertueux. 
+C'est là le comble de la vertu.
+Celui qui est sincère, 
+  il le traite comme un homme sincère;
+  celui qui n'est pas sincère,
+  il le traite aussi comme un homme sincère. 
+C'est là le comble de la sincérité.
+Le Saint vivant dans le monde reste calme et tranquille,
+  et conserve les mêmes sentiments pour tous.
 Les cent familles attachent sur lui leurs oreilles et leurs yeux.
 Le Saint regarde le peuple comme un enfant[39].
 
@@ -1054,6 +1112,8 @@ Notes du chapitre 49
 
 [39] Le peuple voyant que le Saint semble ne pas distinguer les bons des méchants, n'en peut sonder le motif et le regarde avec étonnement ; c'est pourquoi il attache sur lui ses oreilles et ses yeux. De son côté le Saint regarde le peuple comme un enfant. Il sait qu'il est dépourvu de connaissance comme un enfant. En effet, un enfant a des vues trop bornées pour comprendre la conduite d'un grand homme. De même le peuple ne saurait sonder et comprendre les voies du Saint.
 Le peuple admire les exemples du Saint, il écoute avidement ses paroles, il le contemple avec respect, il a confiance en lui, il l'aime comme un père et une mère. De son côté, le Saint craint de blesser le peuple, il le conserve avec sollicitude et le chérit comme un enfant qui vient de naître.
+
+圣人无常心，以百姓心为心。善者吾善之，不善者吾亦善之，德善。信者吾信之，不信者，吾亦信之，德信。圣人在天下歙歙，为天下浑其心，圣人皆孩之。
 
 50
 
@@ -1407,13 +1467,17 @@ C'est pourquoi le Saint dit : Celui qui supporte les opprobres du royaume devien
 Celui qui supporte les calamités du royaume devient le roi de l'empire.
 Les paroles droites paraissent contraires (à la raison).
 
-79
+79 和大怨
 
-Si vous voulez apaiser les grandes inimitiés des hommes[51], ils conserveront nécessairement un reste d'inimitié.
-Comment pourraient-ils devenir vertueux ?
-De là vient que le Saint garde la partie gauche du contrat52 et ne réclame rien aux autres.
-C'est pourquoi celui qui a de la vertu songe à donner, celui qui est sans vertu songe à demander.
-Le ciel n'affectionne personne en particulier. Il donne constamment aux hommes vertueux.
+Si vous voulez apaiser les grandes inimitiés des hommes[51],
+  ils conserveront nécessairement un reste d'inimitié.
+Comment pourraient-ils devenir vertueux?
+De là vient que le Saint garde la partie gauche du contrat[52]
+  et ne réclame rien aux autres.
+C'est pourquoi celui qui a de la vertu songe à donner,
+  celui qui est sans vertu songe à demander.
+Le ciel n'affectionne personne en particulier.
+Il donne constamment aux hommes vertueux.
 
 Notes du chapitre 79
 
@@ -1422,25 +1486,49 @@ Notes du chapitre 79
 [52] Le mot kie désigne « une tablette de bois qui pouvait se diviser en deux parties ». On écrivait dessus toutes sortes de conventions, soit pour acheter, soit pour donner ou emprunter. Celui des contractants qui devait donner la chose qui était l'objet du contrat, gardait la partie gauche de cette tablette, et celui qui devait venir la réclamer prenait la partie droite. Quand ce dernier se présentait en tenant dans sa main la partie droite du contrat, celui qui avait la partie gauche les rapprochait l'une de l'autre, et, après avoir reconnu la correspondance exacte des lignes d'écriture et la coïncidence des dentelures des deux portions de la tablette (elles devaient s'adapter l'une à l'autre comme les tailles des boulangers, et les lettres qui y étaient gravées devaient se correspondre comme celles d'un billet de banque qu'on rapproche de la souche), il donnait l'objet réclamé sans faire aucune difficulté, et sans témoigner le plus léger doute sur les droits et la sincérité du demandeur.
 Lorsqu'on dit que le Saint garde la partie gauche du contrat, on entend qu'il ne réclame rien à personne, et qu'il attend que les autres viennent demander eux-mêmes ce qu'ils désirent de lui.
 
-80
+和大怨，必有余怨，安可以为善。是以圣人执左契，而不责于人。有德司契，无德司彻。天道无亲，常与善人。
 
-(Si je gouvernais) un petit royaume et un peuple peu nombreux, n'eût-il des armes que pour dix ou cent hommes, je l'empêcherais de s'en servir.
-J'apprendrais au peuple à craindre la mort et à ne pas émigrer au loin.
-Quand il aurait des bateaux et des chars, il n'y monterait pas.
-Quand il aurait des cuirasses et des lances, il ne les porterait pas.
+80 小国寡民
+
+(Si je gouvernais) un petit royaume et un peuple peu nombreux,
+  n'eût-il des armes que pour dix ou cent hommes,
+  je l'empêcherais de s'en servir.
+J'apprendrais au peuple à craindre la mort et
+  à ne pas émigrer au loin.
+Quand il aurait des bateaux et des chars,
+  il n'y monterait pas.
+Quand il aurait des cuirasses et des lances,
+  il ne les porterait pas.
 Je le ferais revenir à l'usage des cordelettes nouées[53].
-Il savourerait sa nourriture, il trouverait de l'élégance dans ses vêtements, il se plairait dans sa demeure, il aimerait ses simples usages.
-Si un autres royaume se trouvait en face du mien, et que les cris des coqs et des chiens s'entendissent de l'un à l'autre, mon peuple arriverait à la vieillesse et à la mort sans avoir visité le peuple voisin.
+Il savourerait sa nourriture,
+  il trouverait de l'élégance dans ses vêtements, 
+  il se plairait dans sa demeure, 
+  il aimerait ses simples usages.
+Si un autres royaume se trouvait en face du mien,
+  et que les cris des coqs et des chiens s'entendissent de l'un à l'autre,
+  mon peuple arriverait à la vieillesse et à la mort sans avoir visité le peuple voisin.
 
 Notes du chapitre 80
 
 [53] Dans la Haute Antiquité, lorsque l'écriture n'était pas encore inventée, les hommes se servaient de cordelettes nouées pour communiquer leurs pensées. À cette époque, les mœurs étaient pures et simples, et, suivant les idées de Lao-tseu, elles n'avaient pas encore été altérées par les progrès des lumières. Dans la pensée de l'auteur, les mots « je ramènerais le peuple à l'usage des cordelettes nouées » signifient : « je ramènerais le peuple à sa simplicité primitive ».
 
-81
+小国寡民，使有什伯之器而不用，使民重死而不远徙。虽有舟舆，无所乘之；虽有甲兵，无所陈之。使人复结绳而用之。甘其食，美其服，安其居，乐其俗。邻国相望，鸡犬之声相闻，民至老死，不相往来。
 
-Les paroles sincères ne sont pas élégantes ; les paroles élégantes ne sont pas sincères.
-L'homme vertueux n'est pas disert ; celui qui est disert n'est pas vertueux.
-Celui qui connaît (le Tao) n'est pas savant ; celui qui est savant ne le connaît pas.
+81 信言不美
+
+Les paroles sincères ne sont pas élégantes;
+  les paroles élégantes ne sont pas sincères.
+L'homme vertueux n'est pas disert;
+  celui qui est disert n'est pas vertueux.
+Celui qui connaît (le Tao) n'est pas savant;
+  celui qui est savant ne le connaît pas.
 Le Saint n'accumule pas (les richesses).
-Plus il emploie (sa vertu) dans l'intérêt des hommes, et plus elle augmente.
-Plus il donne aux hommes et plus il s'enrichit. Telle est la voie du ciel, qu'il est utile aux êtres et ne leur nuit point. Telle est la voie du Saint, qu'il agit et ne dispute point.
+Plus il emploie (sa vertu) dans l'intérêt des hommes,
+  et plus elle augmente.
+Plus il donne aux hommes et plus il s'enrichit.
+Telle est la voie du ciel, 
+  qu'il est utile aux êtres et ne leur nuit point.
+Telle est la voie du Saint,
+  qu'il agit et ne dispute point.
+
+信言不美，美言不信。善者不辩，辩者不善。知者不博，博者不知。圣人不积，既以为人己愈有，既以与人己愈多。天之道，利而不害；圣人之道，为而不争。

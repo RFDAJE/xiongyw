@@ -155,3 +155,10 @@ cd src
  ./bootstrap-emacs
 make install
 
+- smbclient
+apt-get install cifs-utils
+
+bruin@d7:/tank$ cat ~/bin/smbmount.sh 
+#!/bin/bash
+sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tele /tele
+sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tank /tank

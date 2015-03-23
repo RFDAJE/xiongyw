@@ -31,16 +31,16 @@ var j2c = (function(){
         _ctx.lineWidth = BEZIER_LINE_WIDTH;
         _ctx.strokeStyle = BEZIER_STROKE_STYLE;
         _ctx.beginPath();
-        _ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
+        _ctx.moveTo(p.nodes[0].x, p.nodes[0].y);
         u = p.nodes[0].u;
         for(j = 1; j < N; j ++) {
             v = p.nodes[j].v;
-            _ctx.bezierCurveTo(u.x, -u.y, v.x, -v.y, p.nodes[j].x, -p.nodes[j].y);
+            _ctx.bezierCurveTo(u.x, u.y, v.x, v.y, p.nodes[j].x, p.nodes[j].y);
             u = p.nodes[j].u;
         }
         if (p.nodes[N-1].conn === jp.FREE_CONN) { // cyclic
             v = p.nodes[0].v;
-            _ctx.bezierCurveTo(u.x, -u.y, v.x, -v.y, p.nodes[0].x, -p.nodes[0].y);
+            _ctx.bezierCurveTo(u.x, u.y, v.x, v.y, p.nodes[0].x, p.nodes[0].y);
             _ctx.closePath();
         }
         _ctx.stroke();
@@ -52,9 +52,9 @@ var j2c = (function(){
             _ctx.lineWidth = POLYGON_LINE_WIDTH;
             _ctx.strokeStyle = POLYGON_STROKE_STYLE;
             _ctx.beginPath();
-            _ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
+            _ctx.moveTo(p.nodes[0].x, p.nodes[0].y);
             for(j = 1; j < N; j ++) {
-                _ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
+                _ctx.lineTo(p.nodes[j].x, p.nodes[j].y);
             }
             if (p.nodes[N-1].conn === jp.FREE_CONN) { // cyclic
                 _ctx.closePath();
@@ -76,9 +76,9 @@ var j2c = (function(){
         _ctx.lineWidth = BEZIER_LINE_WIDTH;
         _ctx.strokeStyle = BEZIER_STROKE_STYLE;
         _ctx.beginPath();
-        _ctx.moveTo(p.nodes[0].x, -p.nodes[0].y);
+        _ctx.moveTo(p.nodes[0].x, p.nodes[0].y);
         for(j = 1; j < n; j ++) {
-            _ctx.lineTo(p.nodes[j].x, -p.nodes[j].y);
+            _ctx.lineTo(p.nodes[j].x, p.nodes[j].y);
         }
 
         // closeness of path/subpath is conveyed in its last node
@@ -139,7 +139,7 @@ var j2c = (function(){
             _ctx.stroke();
         }
 
-        p.nodes.map(function(k){return _dot(k.x, -k.y);});
+        p.nodes.map(function(k){return _dot(k.x, k.y);});
     }
     
     function test() {
