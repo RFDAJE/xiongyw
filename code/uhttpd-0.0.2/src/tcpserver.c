@@ -33,11 +33,13 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/syscall.h> /* linux specific */
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
 #include "tcpserver.h"   
+#include "proc.h"
 
 #define BACKLOG       128      /* backlog for listen() */
 
@@ -291,10 +293,15 @@ static void s_daemonize(const char *pname,  /* process name */
     /* write pid to the lock file */
     sprintf(buf, "%6d\n", (int)getpid());
     write(fd, buf, strlen(buf));
+
+    /* add the "/tmp/proc/pid" directory */
+    sprintf(buf, "%d", (int)getpid());
+    //syslog(s_log_priority, buf);
+    tmp_proc_add(buf, "d", 0);
 }
 
 static void s_on_signal(int sig){
-
+    char buf[10];
     syslog(s_log_priority, "signal %d cought", sig);
 
     /*** remove the lock file: TBD */
@@ -312,6 +319,11 @@ static void s_on_signal(int sig){
 	(*s_clean_up)();
 
     closelog();
+    
+    /* remove "/tmp/proc/pid/" */
+    sprintf(buf, "%d", (int)getpid());
+    tmp_proc_rm(buf);
+    
     exit(sig);  
 }
 
@@ -325,6 +337,20 @@ static void* s_start_thread(int (*pfunc)(int sd)){
 #ifdef DEBUG
     syslog(s_log_priority, "tid[%5d] starts. (%d:%d)", (int)pthread_self(), s_ntotal, s_nidle);  
 #endif
+
+    /*
+     * /tmp/proc/pid/task/tid
+     */
+    char path[128], content[256];
+    /* dir */
+//    sprintf(path, "%d/task/%d", (int)getpid(), (int)pthread_self());
+    sprintf(path, "%d/task/%d", (int)getpid(), (int)syscall(SYS_gettid)); // linux specific
+    tmp_proc_add(path, "d", 0);
+    /* file */
+//    sprintf(path, "%d/task/%d/comm", (int)getpid(), (int)pthread_self());
+    sprintf(path, "%d/task/%d/comm", (int)getpid(), (int)syscall(SYS_gettid)); // linux specific
+    sprintf(content, "a work thread.");
+    tmp_proc_add(path, "f", content);
 
     for(;;){    
         clilen = sizeof(cliaddr);
@@ -364,6 +390,13 @@ static void* s_start_thread(int (*pfunc)(int sd)){
 #ifdef   DEBUG
             syslog(s_log_priority, "thread[%5d] will suicide, total=%4d, idle=%3d", (int)pthread_self(), s_ntotal, s_nidle);
 #endif
+
+            /*
+             * cleanup the /tmp/proc
+             */
+            sprintf(path, "%d/task/%d", (int)getpid(), (int)pthread_self());
+            tmp_proc_rm(path);
+
 
             pthread_exit(NULL);  /* all just return; ? */
         }

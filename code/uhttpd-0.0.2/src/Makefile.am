@@ -8,4 +8,4 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 bin_PROGRAMS=uhttpd
-uhttpd_SOURCES=uhttpd.h main.c get.h get.c readconf.h readconf.c util.h util.c tcpserver.h tcpserver.c response.h response.c urlencode.c
+uhttpd_SOURCES=uhttpd.h main.c get.h get.c readconf.h readconf.c util.h util.c tcpserver.h tcpserver.c response.h response.c urlencode.c proc.h proc.c
