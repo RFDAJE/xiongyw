@@ -1,4 +1,7 @@
+
 https://coderamp.wordpress.com/2013/10/26/webrtc-what-is-ice/
+
+http://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment
 
 WebRTC.. what is ICE?
 
