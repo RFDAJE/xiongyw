@@ -2365,7 +2365,10 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     len = strlen((const char*)(node->txt));
     p = txt;
     for(i = 0; i < len; i ++){
-        if(node->txt[i] == '\"' || node->txt[i] == '\\'){
+        if(node->txt[i] == '\"' || 
+           node->txt[i] == '\\' ||
+           node->txt[i] == '\r' ||
+           node->txt[i] == '\n'){
             *p = '\\';
             p += 1;
         }
