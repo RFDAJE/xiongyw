@@ -2365,14 +2365,24 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     len = strlen((const char*)(node->txt));
     p = txt;
     for(i = 0; i < len; i ++){
-        if(node->txt[i] == '\"' || 
-           node->txt[i] == '\\' ||
-           node->txt[i] == '\r' ||
-           node->txt[i] == '\n'){
+
+        // copy txt with some escape in javascript
+        if(node->txt[i] == '\"' || node->txt[i] == '\\') {
             *p = '\\';
             p += 1;
+            *p = node->txt[i];
+        } else if (node->txt[i] == '\r') {
+            *p = '\\';
+            p += 1;
+            *p = 'r';
+        } else if (node->txt[i] == '\n'){
+            *p = '\\';
+            p += 1;
+            *p = 'n';
+        } else {
+            *p = node->txt[i];
         }
-        *p = node->txt[i];
+
         p += 1;
     }
     *p = '\0';
