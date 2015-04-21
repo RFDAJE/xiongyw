@@ -273,6 +273,7 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
                 break;
             s_add_section_to_table(tbl, section_idx, section_size, p_sect);
             section_idx += 1;
+	    //free(p_sect);
         }
     } else {
         section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
