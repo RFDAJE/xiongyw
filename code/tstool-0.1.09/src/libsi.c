@@ -254,9 +254,14 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
         tbl->sections[i].size = 0;
     }
 
+
+// fixme:
+// 1. dedup sections: just memcmp(), not need sha1 digest. 
+// 2. memory leak: p_sect seems not freed.
+
     /* build the table by adding all sections */
-    if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
-//    if (1) {  // bruin, 2015-04-21
+//    if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
+    if (1) {  // bruin, 2015-04-21
 
         i = 0; // packet index to start with
         int section_idx = 0;
