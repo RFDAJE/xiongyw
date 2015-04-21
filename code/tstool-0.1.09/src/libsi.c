@@ -53,6 +53,7 @@ static int s_add_pid_node_to_list(PID_LIST* pid_list, PID_NODE* pid_node);
 
 static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data);
 static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8* ts, u8 packet_size, u8* last_section_nr, u8** pp);
+static u16 s_get_any_section_data(u16 pid, u8 table_id, PID_LIST* pid_list, int* packet_idx, u8 packet_size, u8* p_ts, u8** pp);
 
 static void s_add_otv_header(OTV_HEADER* header, TNODE* root);
 static void s_add_table(TABLE* tbl, TNODE* root);
@@ -254,19 +255,37 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
     }
 
     /* build the table by adding all sections */
-    section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-    if(section_size){
-        s_add_section_to_table(tbl, 0, section_size, p_sect);
-        for(i = 1; i <= last_section_number; i ++){
+    if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
+//    if (1) {  // bruin, 2015-04-21
+
+        i = 0; // packet index to start with
+        int section_idx = 0;
+        for (;;) {
             p_sect = 0;
-            section_size = s_get_section_data(pid, tbl->tid, (u8)i, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-            if(section_size)
-                s_add_section_to_table(tbl, (u8)i, section_size, p_sect);
+            section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
+            fprintf(stdout, "build_table(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
+            if (section_size == 0)
+                break;
+            s_add_section_to_table(tbl, section_idx, section_size, p_sect);
+            section_idx += 1;
+        }
+    } else {
+        section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
+        fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
+        if(section_size){
+            s_add_section_to_table(tbl, 0, section_size, p_sect);
+            for(i = 1; i <= last_section_number; i ++){
+                p_sect = 0;
+                section_size = s_get_section_data(pid, tbl->tid, (u8)i, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
+                fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
+                if(section_size)
+                    s_add_section_to_table(tbl, (u8)i, section_size, p_sect);
+            }
         }
     }
 
 	if(s_is_verbose){
-		fprintf(stdout, "done\n");
+		fprintf(stdout, "build_table(tid=%d): done\n", tbl->tid);
 		fflush(stdout);
 	}
 
@@ -1125,6 +1144,153 @@ static u16 s_get_section_data(u16           pid,                   /* --> */
 END:
     return section_size;
 }
+
+
+
+
+
+
+/*
+ * added(bruin, 2015-04-21): a copy of s_get_section_data(): 
+ *
+ * there is a hack to put multiple NIDs sections in NIT-A or NIT-O. this function
+ * is to get all sections from the pid list, regardless their section number.
+ *
+ * arguments:
+        pid(==>):            the pid of the section
+        table_id(==>):       the table_id of the section
+        pid_list(==>):       pid_list
+        packet_idx(<==>):     search from which packet, and return where we are now.
+        pp(<==): pointer to the pointer of the section data, (*pp) should be NULL. 
+
+    return: 
+        0: error or not found
+        others: size of the total section
+*/
+static u16 s_get_any_section_data(u16           pid,      /* --> */
+                     u8            table_id,              /* --> */
+                     PID_LIST*     pid_list,              /* --> */
+                     int*          packet_idx,            /* <--> */
+                     u8            packet_size,           /* --> */
+                     u8*           p_ts,                  /* --> */
+                     u8**          pp){                   /* <-- */
+
+#define MAX_SECT_BUF           4096
+    static u8 s_section_buf[MAX_SECT_BUF];
+
+    PID_NODE*        pid_node = 0;
+    int              i, j;
+    u16              section_size = 0;    /* total size */
+    u16              section_length = 0;  /* value in the section header */
+    int              first_packet_found = 0;
+    int              continuity_counter = 0;
+    PACKET_HEADER*   packet = 0;
+    PAT_SECT_HEADER* sect_head = 0;
+    int              sect_offset = 0;
+    u8*              p = 0;
+
+    //fprintf(stdout, "s_get_any_section_data() enter: tid=%d, packet_idx=%d\n", table_id, *packet_idx);
+    
+    /* sanity checks */
+    if(*pp || pid > PID_NUL) {
+        goto END;
+    }   
+    
+    if(table_id != TID_PMT && table_id != TID_AIT){
+        if(pid != get_pid_of_tid(table_id)) {
+            goto END;
+        }
+    }
+
+
+    /* locate the pid_node */
+    for(pid_node = pid_list->head; pid_node != 0; pid_node = pid_node->next) {
+        if(pid_node->pid == pid) {
+            break;
+        }
+    }
+
+    if(!pid_node) {  /* pid not found */
+        goto END;
+    }
+
+    //fprintf(stdout, "  s_get_any_section_data(): packet_idx=%d, packet_nr=%d\n", *packet_idx, pid_node->packet_nr);
+    
+    /* search the section in pid_node, from the packet_idx indicated */
+    for(i = *packet_idx; i < (int)(pid_node->packet_nr); i ++){
+
+        //fprintf(stdout, "  s_get_any_section_data(): i=%d\n", i);
+        
+        packet = get_packet_by_index(p_ts, pid_node->index[i], packet_size);
+        p = (u8*)packet;
+
+        /* for simplicity, we do not handle adaptation field at this moment */
+        if(!packet_payload_unit_start_indicator(p) || packet_adaptation_field_control(p) != 0x01)
+            continue;
+
+        /* use PAT_SECT_HEADER as generic section header at this point, except for TDT/TOT/RST */
+        sect_offset = TS_HEADER_LEN + 1 + p[4];  /* 1: pointer_field size; p[4]: pointer_field value */
+        for(; sect_offset < 188 - TS_HEADER_LEN - PAT_SECT_HEADER_LEN ;){
+            sect_head = (PAT_SECT_HEADER*)(p + sect_offset);
+            if(sect_head->table_id == table_id) {
+                first_packet_found = 1;
+                continuity_counter = packet_continuity_counter(p);
+                break;
+            }
+            sect_offset += 3 + sect_head->section_length_hi * 256 + sect_head->section_length_lo;
+        }
+
+        if(first_packet_found){
+            //fprintf(stdout, "  s_get_any_section_data(): first_packet_found\n");
+            break;
+        }
+    }
+
+    if(!first_packet_found) {
+        //fprintf(stdout, "  s_get_any_section_data(): !!!first_packet_found, i=%d\n", i);
+        goto END;
+    }
+
+    /* "i" is the fisrt packet index */
+    *packet_idx = i + 1; // advance it at least for i + 1
+    section_length = sect_head->section_length_hi * 256 + sect_head->section_length_lo;
+    section_size = section_length + 3;
+    if(sect_offset + section_size <= 188){
+        *pp = (u8*)sect_head;
+        goto END;
+    }
+    else{
+        int sect_size_in_current_packet = 188 - sect_offset;
+        int remain_sect_size = section_size - sect_size_in_current_packet;
+        int remain_packet_nr = (remain_sect_size - 1) / (188 - TS_HEADER_LEN) + 1;
+
+        if((i + 1 + remain_packet_nr) > (int)(pid_node->packet_nr)){
+            section_size = 0;
+            goto END;
+        }
+        else{
+            int copied_size;
+            /* copy the first packet data into buf */
+            memcpy(s_section_buf, sect_head, sect_size_in_current_packet);
+            copied_size = sect_size_in_current_packet;
+            for(j = 0; j < remain_packet_nr - 1; j ++){
+                p = (u8*)get_packet_by_index(p_ts, pid_node->index[i + 1 + j], packet_size);
+                memcpy(s_section_buf + copied_size, p + TS_HEADER_LEN, 188 - TS_HEADER_LEN);
+                copied_size += 188 - TS_HEADER_LEN;
+            }
+            p = (u8*)get_packet_by_index(p_ts, pid_node->index[i + 1 + j], packet_size);
+            memcpy(s_section_buf + copied_size, p + TS_HEADER_LEN, section_size - copied_size);
+            *pp = s_section_buf;
+            *packet_idx += j; // advance it for extra packets
+        }
+    }
+
+END:
+
+    //fprintf(stdout, "s_get_any_section_data() leaving: section_size=%d\n", section_size);
+    return section_size;
+}
+
 
 static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data){
 
