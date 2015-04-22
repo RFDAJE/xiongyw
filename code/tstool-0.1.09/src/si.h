@@ -246,6 +246,14 @@ typedef unsigned int                            u32;
 #define STREAMTYPE_13818_C                      0x0c
 #define STREAMTYPE_13818_D                      0x0d
 #define STREAMTYPE_13818_AUX                    0x0e
+/* added(bruin, 2015-04-22) */
+#define STREAMTYPE_AAC_AUDIO                    0x0f
+#define STREAMTYPE_MPEG4_AUDIO                  0x11
+#define STREAMTYPE_H264_VIDEO                   0x1b
+#define STREAMTYPE_AVS_VIDEO                    0x42
+#define STREAMTYPE_AC3_AUDIO                    0x81
+#define STREAMTYPE_DTS_AUDIO                    0x82
+
 /* 0x00, 0x0f - 0x7f are iso/iec 13818-1 reserved */
 /* 0x80 - 0xFF: user private */
 

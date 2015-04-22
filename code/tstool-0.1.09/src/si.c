@@ -220,6 +220,13 @@ static const char s_stream_type_0x0b_name[] = "iso/iec 13818-6 type b";
 static const char s_stream_type_0x0c_name[] = "iso/iec 13818-6 type c";
 static const char s_stream_type_0x0d_name[] = "iso/iec 13818-6 type d";
 static const char s_stream_type_0x0e_name[] = "iso/iec 13818-1 auxiliary";
+/* added(bruin, 2015-04-22) */
+static const char s_stream_type_0x0f_name[] = "aac audio";
+static const char s_stream_type_0x11_name[] = "mpeg4 audio";
+static const char s_stream_type_0x1b_name[] = "h264 video";
+static const char s_stream_type_0x42_name[] = "avs video";
+static const char s_stream_type_0x81_name[] = "ac3 audio";
+static const char s_stream_type_0x82_name[] = "dts audio";
 static const char s_stream_type_user_private[] = "user private";
 
 
@@ -574,6 +581,19 @@ const char* get_stream_type_name_by_id(u8 type_id){
             return s_stream_type_0x0d_name;
         case STREAMTYPE_13818_AUX:
             return s_stream_type_0x0e_name;
+        /* added(bruin, 2015-04-22) */
+        case STREAMTYPE_AAC_AUDIO:
+            return s_stream_type_0x0f_name;
+        case STREAMTYPE_MPEG4_AUDIO:
+            return s_stream_type_0x11_name;
+        case STREAMTYPE_H264_VIDEO:
+            return s_stream_type_0x1b_name;
+        case STREAMTYPE_AVS_VIDEO:
+            return s_stream_type_0x42_name;
+        case STREAMTYPE_AC3_AUDIO:
+            return s_stream_type_0x81_name;
+        case STREAMTYPE_DTS_AUDIO:
+            return s_stream_type_0x82_name;
         default:
             if(type_id == 0 || (type_id >= 0x0f && type_id <= 0x7f))
                 return s_stream_type_0x00_name; /* reserved */
