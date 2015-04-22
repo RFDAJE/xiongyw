@@ -51,7 +51,7 @@ static int s_add_packet_to_pid_list(PID_LIST* pid_list, u16 pid, int packet_inde
 static int s_add_packet_to_pid_node(PID_NODE* pid_node, int packet_index);
 static int s_add_pid_node_to_list(PID_LIST* pid_list, PID_NODE* pid_node);
 
-static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data);
+static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup);
 static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8* ts, u8 packet_size, u8* last_section_nr, u8** pp);
 static u16 s_get_any_section_data(u16 pid, u8 table_id, PID_LIST* pid_list, int* packet_idx, u8 packet_size, u8* p_ts, u8** pp);
 
@@ -224,7 +224,7 @@ int delete_pid_list(PID_LIST* pid_list){
 TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size){
     
     TABLE* tbl;
-    u8     *p_sect = 0;
+    u8     *p_sect = 0; // don't need to free this. it's either from a static variable, or from the ts mmap area.
     u8     last_section_number;
     u16    section_size; 
     int    i;
@@ -255,12 +255,8 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
     }
 
 
-// fixme:
-// 1. dedup sections: just memcmp(), not need sha1 digest. 
-// 2. memory leak: p_sect seems not freed.
-
     /* build the table by adding all sections */
-//    if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
+    //if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
     if (1) {  // bruin, 2015-04-21
 
         i = 0; // packet index to start with
@@ -268,24 +264,24 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
         for (;;) {
             p_sect = 0;
             section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
-            fprintf(stdout, "build_table(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
+            //fprintf(stdout, "build_table(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
             if (section_size == 0)
                 break;
-            s_add_section_to_table(tbl, section_idx, section_size, p_sect);
-            section_idx += 1;
-	    //free(p_sect);
+            if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
+                section_idx += 1;
+            }
         }
     } else {
         section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-        fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
+        //fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
         if(section_size){
-            s_add_section_to_table(tbl, 0, section_size, p_sect);
+            s_add_section_to_table(tbl, 0, section_size, p_sect, 0);
             for(i = 1; i <= last_section_number; i ++){
                 p_sect = 0;
                 section_size = s_get_section_data(pid, tbl->tid, (u8)i, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-                fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
+                //fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
                 if(section_size)
-                    s_add_section_to_table(tbl, (u8)i, section_size, p_sect);
+                    s_add_section_to_table(tbl, (u8)i, section_size, p_sect, 0);
             }
         }
     }
@@ -1298,16 +1294,35 @@ END:
 }
 
 
-static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data){
+/* return 1 for error, 0 for ok (added) */
+/* dedup: 1 for dedup, otherwise no dedup */
+static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup){
+    int i;
 
+    if (!data || size <= 0) {
+        return 1;
+    }
+    
+    /*
+     * added(bruin, 2015-04-22):
+     * dedup the section that if there is an identical section, don't add again
+     */
+    if (dedup == 1) {
+        for (i = 0; i < tbl->section_nr; i ++) {
+            if (memcmp(tbl->sections[i].data, data, size) == 0) {
+                return 1;
+            }
+        }
+    }
+    
     tbl->sections[tbl->section_nr].index = index;
     tbl->sections[tbl->section_nr].size = size;
     if(!(tbl->sections[tbl->section_nr].data = (u8*)malloc(size)))
-        return 0;
+        return 1;
     memcpy(tbl->sections[tbl->section_nr].data, data, size);
 
     tbl->section_nr ++;
-    return 1;
+    return 0;
 }
 
 
