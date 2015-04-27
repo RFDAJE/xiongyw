@@ -56,7 +56,8 @@ set initrd_kernel(dta) $initrd_kernel(pre)
 set initrd_kernel_linkup(2t) "eth0: link up,"
 set initrd_kernel_linkup(3p) "eth2: link up,"
 set initrd_kernel_linkup(tch7356) "eth0: Link is up,"
- 
+set initrd_kernel_linkup(dta) "eth0: link up,"
+set initrd_kernel_linkup(pre) $initrd_kernel_linkup(dta)
 
 # cfe commands
 set cfe_startup(2t) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M mtdparts=spi0.0:64K@2304K(mfr)ro,64K(mbox);brcmnand.0:0xDA00000@0x2600000(rootfs)'\""
@@ -64,12 +65,14 @@ set cfe_startup(3p) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mt
 #set cfe_startup(tch7356) "setenv -p STARTUP \"load -raw -z nandflash0.slot1: -addr=80001000 -max=16777216 'ubiroot rw bmem=110M@146M bmem=122M@512M';go 0x80001400\""
 set cfe_startup(tch7356) "setenv -p STARTUP \"load -raw -z nandflash0.slot1: -addr=80001000 -max=16777216 'ubiroot rw bmem=110M@146M bmem=128M@512M';go 0x80001400\""
 set cfe_startup(dta) "setenv -p STARTUP \"boot -z -elf nandflash0.RootFS: 'mtdparts=brcmnand.0:5M(kernel),-(RootFS) ubi.mtd=RootFS rootfstype=ubifs root=ubi0:RootFS rw bmem=96M@160M bmem=156M@512M'\""
-set cfe_startup(dta) $cfe_startup(pre)
+set cfe_startup(pre) $cfe_startup(dta)
 
 
 set cfe_ifconfig(2t) "ifconfig eth0 -auto"   ;# "MULTITV" port on rear panel
 set cfe_ifconfig(3p) "ifconfig eth1 -auto"   ;# usb2rj45 port on front panel
 set cfe_ifconfig(tch7356) $cfe_ifconfig(2t)
+set cfe_ifconfig(dta) "ifconfig eth0 -auto"
+set cfe_ifconfig(pre) $cfe_ifconfig(dta)
 
 set cfe_flash_kernel(2t) "flash -noheader ${tftp}:${images_path(2t)}\/${kernel_name(2t)} nandflash0.opentv"
 set cfe_flash_kernel(3p) "flash -noheader ${tftp}:${images_path(3p)}\/${kernel_name(3p)} nandflash0.opentv"
@@ -82,15 +85,16 @@ set cfe_flash_kernel(pre) $cfe_flash_kernel(dta)
 set cfe_boot_initrd(2t) "boot -elf ${tftp}:${initrd_kernel(2t)} 'bmem=192M@64M mtdparts=brcmnand.0:0xDA00000@0x2600000(rootfs)'"
 set cfe_boot_initrd(3p) "boot -elf ${tftp}:${initrd_kernel(3p)} 'bmem=192M@64M'"
 set cfe_boot_initrd(tch7356) "boot -elf -z ${tftp}:${initrd_kernel(tch7356)} 'bmem=10M@512M'"
-set cfe_boot_initrd(dta) "boot -z -elf ${tftp}:vmlinuz-initrd-7584a0 'mtdparts=brcmnand.0:5M(Kernel),-(RootFS) bmem=12M@244M bmem=10M@512M'"
+set cfe_boot_initrd(dta) "boot -z -elf ${tftp}:${initrd_kernel(dta)} 'mtdparts=brcmnand.0:5M(Kernel),-(RootFS) bmem=12M@244M bmem=10M@512M'"
 set cfe_boot_initrd(pre) $cfe_boot_initrd(dta)
 
 # stbutil cmd
 set stbutil(2t) "stbutil -a 2 ${tftp}:${images_path(2t)}"
 set stbutil(3p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
 set stbutil(tch7356) "stbutil -a 2 ${tftp}:${images_path(tch7356)}"
-set stbutil(dta) "stbutil -a 2 ${tftp}:${images_path(dta)}"
-set stbutil(pre) $stbutil(dta)
+set stbutil(dta) "stbutil -a 3 ${tftp}:${images_path(dta)}"
+set stbutil(pre) "stbutil -a 2 ${tftp}:${images_path(dta)}"
+
 
 set stbutil_done "Finished writing rootfs to flash."
 
