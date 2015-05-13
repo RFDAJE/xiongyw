@@ -123,6 +123,7 @@ typedef unsigned int                            u32;
 #define DESC_SMOOTHING_BUFFER                   0x10
 #define DESC_STD                                0x11
 #define DESC_IBP                                0x12
+#define DESC_CAROUSEL_IDENTIFIER                0x13 // 2015-05-13
 
 /* dvb-si */
 #define DESC_NETWORK_NAME                       0x40
@@ -242,7 +243,7 @@ typedef unsigned int                            u32;
 #define STREAMTYPE_13818_DSMCC                  0x08
 #define STREAMTYPE_ITU_222_1                    0x09
 #define STREAMTYPE_13818_A                      0x0a
-#define STREAMTYPE_13818_B                      0x0b
+#define STREAMTYPE_13818_B                      0x0b // DSM-CC DC/OC stream: http://www.interactivetvweb.org/tutorials/dtv_intro/dsmcc/service_information
 #define STREAMTYPE_13818_C                      0x0c
 #define STREAMTYPE_13818_D                      0x0d
 #define STREAMTYPE_13818_AUX                    0x0e

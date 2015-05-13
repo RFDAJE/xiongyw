@@ -95,6 +95,8 @@ static const char s_desc_0x0f_name[] = "private_data_indicator_descriptor";
 static const char s_desc_0x10_name[] = "smoothing_buffer_descriptor";
 static const char s_desc_0x11_name[] = "std_descritpor";
 static const char s_desc_0x12_name[] = "ibp_descriptor";
+/* added(bruin, 2015-05-13): carousel_identifier_descriptor 0x13 in PMT for DSM-CC DC/OC */
+static const char s_desc_0x13_name[] = "carousel_identifier_descriptor";
 
 /* 0x19-0x3f are iso/iec 13818-1 reserved */
 static const char s_desc_0x13_name[] = "reserved_descriptor";
@@ -216,7 +218,7 @@ static const char s_stream_type_0x07_name[] = "iso/iec 13522 mheg";
 static const char s_stream_type_0x08_name[] = "iso/iec 13818-1 dsm cc";
 static const char s_stream_type_0x09_name[] = "itu-t rec h.222.1";
 static const char s_stream_type_0x0a_name[] = "iso/iec 13818-6 type a";
-static const char s_stream_type_0x0b_name[] = "iso/iec 13818-6 type b";
+static const char s_stream_type_0x0b_name[] = "iso/iec 13818-6 type b (dsm-cc dc/oc)";
 static const char s_stream_type_0x0c_name[] = "iso/iec 13818-6 type c";
 static const char s_stream_type_0x0d_name[] = "iso/iec 13818-6 type d";
 static const char s_stream_type_0x0e_name[] = "iso/iec 13818-1 auxiliary";
@@ -423,6 +425,8 @@ const char* get_desc_name_by_id(u8 desc_id){
             return s_desc_0x11_name;
         case 0x12:
             return s_desc_0x12_name;
+        case 0x13:
+            return s_desc_0x13_name;
 
         case 0x40:
             return s_desc_0x40_name;

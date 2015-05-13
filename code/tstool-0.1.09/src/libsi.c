@@ -31,7 +31,7 @@
 
 #define TXT_BUF_SIZE   4096
 #define PRINTABLE_CODE(x)   (((x >= 0x20) && (x <= 0x7e))? x : '.')
-
+#define UIMSBF32(p)  ((((unsigned int)p[0]) << 24) + (((unsigned int)p[1]) << 16) + (((unsigned int)p[2]) << 8) + p[3])
 /*--------------------------------------------------------------------+
  | static variables                                                   |
  +--------------------------------------------------------------------*/
@@ -2961,6 +2961,9 @@ static int s_parse_descriptors_loop(u8* p, int loop_len, TNODE* root){
             case DESC_IBP:
                 s_parse_desc_ibp(p, n2);
                 break;
+            case DESC_CAROUSEL_IDENTIFIER: // 2015-05-13
+                s_parse_desc_carousel_identifier(p, n2);
+                break;
             case DESC_NETWORK_NAME:
                 s_parse_desc_network_name(p, n2);
                 break;
@@ -3649,6 +3652,18 @@ static void s_parse_desc_ibp(u8 *p, TNODE* root){
     tnode_attach(root, node);
 }
 
+// 2015-05-13, PMT ES loop for dsm-cc dc/oc carousel, tr101202, table 4.17
+static void s_parse_desc_carousel_identifier(u8 *p, TNODE* root){
+    TNODE  *node;
+    char   txt[TXT_BUF_SIZE + 1];
+    int i, len;
+
+    // carousel_id
+    node = tnode_new(NODE_TYPE_DEFAULT);
+    snprintf(txt, TXT_BUF_SIZE, "carousel_id: 0x%08x(%d)", UIMSBF32(p), UIMSBF32(p));
+    node->txt = strdup(txt);
+    tnode_attach(root, node);
+}
 
 static void s_parse_desc_network_name(u8 *p, TNODE* root){
     TNODE  *node;
