@@ -99,7 +99,7 @@ static const char s_desc_0x12_name[] = "ibp_descriptor";
 static const char s_desc_0x13_name[] = "carousel_identifier_descriptor";
 
 /* 0x19-0x3f are iso/iec 13818-1 reserved */
-static const char s_desc_0x13_name[] = "reserved_descriptor";
+static const char s_desc_0x19_name[] = "reserved_descriptor";
 static const char s_desc_0x3f_name[] = "reserved_descriptor";
 
 /* dvb-si descriptors, section 6, table 12 of A038 rev1 */

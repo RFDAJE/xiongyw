@@ -31,6 +31,7 @@
 
 #define TXT_BUF_SIZE   4096
 #define PRINTABLE_CODE(x)   (((x >= 0x20) && (x <= 0x7e))? x : '.')
+#define UIMSBF16(p)  ((((unsigned int)p[0]) << 8) + p[1])
 #define UIMSBF32(p)  ((((unsigned int)p[0]) << 24) + (((unsigned int)p[1]) << 16) + (((unsigned int)p[2]) << 8) + p[3])
 /*--------------------------------------------------------------------+
  | static variables                                                   |
@@ -103,6 +104,7 @@ static void s_parse_desc_extended_event(u8* p, TNODE* root);
 static void s_parse_desc_frequency_list(u8* p, TNODE* root);
 static void s_parse_desc_hierarchy(u8* p, TNODE* root);
 static void s_parse_desc_ibp(u8* p, TNODE* root);
+static void s_parse_desc_carousel_identifier(u8* p, TNODE* root);
 static void s_parse_desc_iso639_language(u8* p, TNODE* root);
 static void s_parse_desc_linkage(u8* p, TNODE* root);
 static void s_parse_desc_local_time_offset(u8* p, TNODE* root);
@@ -3655,14 +3657,103 @@ static void s_parse_desc_ibp(u8 *p, TNODE* root){
 // 2015-05-13, PMT ES loop for dsm-cc dc/oc carousel, tr101202, table 4.17
 static void s_parse_desc_carousel_identifier(u8 *p, TNODE* root){
     TNODE  *node;
+    TNODE  *fs; // format specifier node
     char   txt[TXT_BUF_SIZE + 1];
-    int i, len;
+    int i, len, desc_len;
 
+    desc_len = p[1];
+    p += 2; // skip the descriptor tag and descriptor len
+    
     // carousel_id
     node = tnode_new(NODE_TYPE_DEFAULT);
     snprintf(txt, TXT_BUF_SIZE, "carousel_id: 0x%08x(%d)", UIMSBF32(p), UIMSBF32(p));
     node->txt = strdup(txt);
     tnode_attach(root, node);
+
+    // FormatId
+    node = tnode_new(NODE_TYPE_DEFAULT);
+    snprintf(txt, TXT_BUF_SIZE, "FormatId: 0x%02x(%d)", p[4], p[4]);
+    node->txt = strdup(txt);
+    tnode_attach(root, node);
+
+    if(p[4] == 0x1) {
+        // FormatSpecifier
+        fs = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "FormatSpecifier");
+        fs->txt = strdup(txt);
+        tnode_attach(root, fs);
+        
+        // ModuleVersion
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "ModuleVersion: 0x%02x(%d)", p[5], p[5]);
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 6;
+        
+        // ModuleId
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "ModuleId: 0x%04x(%d)", UIMSBF16(p), UIMSBF16(p));
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 2;
+        
+        // BlockSize
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "BlockSize: 0x%04x(%d)", UIMSBF16(p), UIMSBF16(p));
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 2;        
+        
+        // ModuleSize
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "ModuleSize: 0x%08x(%d)", UIMSBF32(p), UIMSBF32(p));
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 4;
+        
+        // CompressionMethod
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "CompressionMethod: 0x%02x(%d)", p[0], p[0]);
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 1;
+        
+        // OriginalSize
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "OriginalSize: 0x%08x(%d)", UIMSBF32(p), UIMSBF32(p));
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 4;
+        
+        // Timeout
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "Timeout: 0x%02x(%d) seconds", p[0], p[0]);
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        p += 1;
+        
+        // ObjectKeyLength
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        snprintf(txt, TXT_BUF_SIZE, "ObjectKeySize: 0x%02x(%d) bytes", p[0], p[0]);
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+        
+        // ObjectKeyData
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        len = snprintf(txt, TXT_BUF_SIZE, "ObjectKeyData(hex): ");
+        for(i = 0; i < p[0]; i ++)
+            len += snprintf(txt + len, TXT_BUF_SIZE - len, "%02x ", p[1 + i]);
+        node->txt = strdup(txt);
+        tnode_attach(fs, node);
+    } else {
+        // FormatSpecifier
+        node = tnode_new(NODE_TYPE_DEFAULT);
+        len = snprintf(txt, TXT_BUF_SIZE, "FormatSpecifier(hex): ");
+        for(i = 0; i < desc_len - 5; i ++)
+            len += snprintf(txt + len, TXT_BUF_SIZE - len, "%02x ", p[5 + i]);
+        node->txt = strdup(txt);
+        tnode_attach(root, node);
+    }
 }
 
 static void s_parse_desc_network_name(u8 *p, TNODE* root){
