@@ -524,9 +524,9 @@ int main(int argc, char* argv[]){
 		struct stat dir_stat;
 		int         c;
 		if(stat(s_save_as_dir, &dir_stat) || !(dir_stat.st_mode & S_IFDIR)){
-			fprintf(stderr, "%s does not exist, create it or not (y/n)?", s_save_as_dir);
+			fprintf(stderr, "%s does not exist, create it or not (Y/n)?", s_save_as_dir);
 			c = getchar();
-			if(c == 'y' || c == 'Y'){ 
+			if(c == 'y' || c == 'Y' || c == '\n'){ 
 				if(mkdir(s_save_as_dir, 0777)){
 					fprintf(stderr, "can not create directory %s, abort.\n", s_save_as_dir);
 					cleanup_and_exit(1);

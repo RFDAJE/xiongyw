@@ -222,8 +222,13 @@ int delete_pid_list(PID_LIST* pid_list){
 }
 
 
-
-TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size){
+/*
+ * create a table for pid/id, by collecting all sections for that table.
+ *
+ * TODO: create subtables between table and sections?
+ *
+ */
+TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size){
     
     TABLE* tbl;
     u8     *p_sect = 0; // don't need to free this. it's either from a static variable, or from the ts mmap area.
@@ -266,7 +271,7 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
         for (;;) {
             p_sect = 0;
             section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
-            //fprintf(stdout, "build_table(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
+            //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
             if (section_size == 0)
                 break;
             if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
@@ -275,13 +280,13 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
         }
     } else {
         section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-        //fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
+        //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
         if(section_size){
             s_add_section_to_table(tbl, 0, section_size, p_sect, 0);
             for(i = 1; i <= last_section_number; i ++){
                 p_sect = 0;
                 section_size = s_get_section_data(pid, tbl->tid, (u8)i, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-                //fprintf(stdout, "build_table(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
+                //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
                 if(section_size)
                     s_add_section_to_table(tbl, (u8)i, section_size, p_sect, 0);
             }
@@ -289,7 +294,7 @@ TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size
     }
 
 	if(s_is_verbose){
-		fprintf(stdout, "build_table(tid=%d): done\n", tbl->tid);
+		fprintf(stdout, "build_table_with_sections(tid=%d): done\n", tbl->tid);
 		fflush(stdout);
 	}
 
@@ -367,6 +372,14 @@ int set_ait_list_by_pmts(TABLE** tbl_pmts, int pmt_nr, AIT_LIST* ait_list){
             p +=  (PMT_SECT_HEADER_LEN + program_info_length);
             
             g = 0; /* data range guard */
+            
+            /*
+             * ETSI TS 102 809 V1.1.1 (2010-01):
+             * 5.3.5.1 Application signalling descriptor
+             *  The application_signalling_descriptor is defined for use in the elementary stream loop of the PMT where the
+             *  stream_type of the elementary stream is 0x05. It identifies that the elementary stream carries an Application
+             *  Information Table.
+             */
             for(k = 0; g < es_loop_length; k ++){ /* k: es index, g: data range guard */
 
                 int g2;
@@ -539,21 +552,21 @@ TSR_RESULT* build_tsr_result(const char* file_path, u8* file_data, u32 file_size
 		fprintf(stdout, "building tables...\n");
 		fflush(stdout);
 	}
-    result->tbl_pat         = build_table(get_pid_of_tid(TID_PAT), TID_PAT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_cat         = build_table(get_pid_of_tid(TID_CAT), TID_CAT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_nit_act     = build_table(get_pid_of_tid(TID_NIT_ACT), TID_NIT_ACT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_nit_oth     = build_table(get_pid_of_tid(TID_NIT_OTH), TID_NIT_OTH, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_bat         = build_table(get_pid_of_tid(TID_BAT), TID_BAT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_sdt_act     = build_table(get_pid_of_tid(TID_SDT_ACT), TID_SDT_ACT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_sdt_oth     = build_table(get_pid_of_tid(TID_SDT_OTH), TID_SDT_OTH, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_eit_act     = build_table(get_pid_of_tid(TID_EIT_ACT), TID_EIT_ACT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_eit_oth     = build_table(get_pid_of_tid(TID_EIT_OTH), TID_EIT_OTH, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_eit_act_sch = build_table(get_pid_of_tid(TID_EIT_ACT_SCH), TID_EIT_ACT_SCH, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_eit_oth_sch = build_table(get_pid_of_tid(TID_EIT_OTH_SCH), TID_EIT_OTH_SCH, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_tdt         = build_table(get_pid_of_tid(TID_TDT), TID_TDT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_tot         = build_table(get_pid_of_tid(TID_TOT), TID_TOT, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_rst         = build_table(get_pid_of_tid(TID_RST), TID_RST, result->pid_list, result->ts_data, result->packet_size);
-    result->tbl_st          = build_table(get_pid_of_tid(TID_ST), TID_ST, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_pat         = build_table_with_sections(get_pid_of_tid(TID_PAT), TID_PAT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_cat         = build_table_with_sections(get_pid_of_tid(TID_CAT), TID_CAT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_nit_act     = build_table_with_sections(get_pid_of_tid(TID_NIT_ACT), TID_NIT_ACT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_nit_oth     = build_table_with_sections(get_pid_of_tid(TID_NIT_OTH), TID_NIT_OTH, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_bat         = build_table_with_sections(get_pid_of_tid(TID_BAT), TID_BAT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_sdt_act     = build_table_with_sections(get_pid_of_tid(TID_SDT_ACT), TID_SDT_ACT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_sdt_oth     = build_table_with_sections(get_pid_of_tid(TID_SDT_OTH), TID_SDT_OTH, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_eit_act     = build_table_with_sections(get_pid_of_tid(TID_EIT_ACT), TID_EIT_ACT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_eit_oth     = build_table_with_sections(get_pid_of_tid(TID_EIT_OTH), TID_EIT_OTH, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_eit_act_sch = build_table_with_sections(get_pid_of_tid(TID_EIT_ACT_SCH), TID_EIT_ACT_SCH, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_eit_oth_sch = build_table_with_sections(get_pid_of_tid(TID_EIT_OTH_SCH), TID_EIT_OTH_SCH, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_tdt         = build_table_with_sections(get_pid_of_tid(TID_TDT), TID_TDT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_tot         = build_table_with_sections(get_pid_of_tid(TID_TOT), TID_TOT, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_rst         = build_table_with_sections(get_pid_of_tid(TID_RST), TID_RST, result->pid_list, result->ts_data, result->packet_size);
+    result->tbl_st          = build_table_with_sections(get_pid_of_tid(TID_ST), TID_ST, result->pid_list, result->ts_data, result->packet_size);
     
     /* 1.5. set pmt_list and tables */
     if(result->tbl_pat->section_nr)
@@ -561,7 +574,7 @@ TSR_RESULT* build_tsr_result(const char* file_path, u8* file_data, u32 file_size
     if(result->pmt_list.pmt_nr){
         result->tbl_pmts = (TABLE**)malloc(sizeof(TABLE*) * result->pmt_list.pmt_nr);
         for(i = 0; i < result->pmt_list.pmt_nr; i ++){
-            result->tbl_pmts[i] = build_table(result->pmt_list.pmt_pid[i], TID_PMT, result->pid_list, result->ts_data, result->packet_size);
+            result->tbl_pmts[i] = build_table_with_sections(result->pmt_list.pmt_pid[i], TID_PMT, result->pid_list, result->ts_data, result->packet_size);
         }
     }
     else{
@@ -575,7 +588,7 @@ TSR_RESULT* build_tsr_result(const char* file_path, u8* file_data, u32 file_size
     if(result->ait_list.ait_nr){
         result->tbl_aits = (TABLE**)malloc(sizeof(TABLE*) * result->ait_list.ait_nr);
         for(i = 0; i < result->ait_list.ait_nr; i ++){
-            result->tbl_aits[i] = build_table(result->ait_list.ait_pid[i], TID_AIT, result->pid_list, result->ts_data, result->packet_size);
+            result->tbl_aits[i] = build_table_with_sections(result->ait_list.ait_pid[i], TID_AIT, result->pid_list, result->ts_data, result->packet_size);
         }
     }
     else{

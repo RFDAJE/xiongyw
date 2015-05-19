@@ -47,9 +47,40 @@ typedef struct{
     int size;       /* total section size */
 }SECTION;
 
+/*
+ * The structure of subtables:
+ *
+ * Each DVB-SI table is identified by a unique table ID. 
+ * 
+ * Tables are made up of subtables. A subtable typically describes one object in a table. For
+ * example, a Network Information SubTable (NIST) describes a particular network and a
+ * Bouquet Association SubTable (BAST) describes a single bouquet.
+ * 
+ * Each subtable has the same table ID as its table. Depending on the table ID, up to three
+ * more IDs uniquely identify the subtable. For example, all BASTs have a table ID of 0x4A,
+ * and each individual BAST is identified by its own unique bouquet ID. The NIT needs
+ * only a table ID of 0x40 to differentiate it from all other incoming tables (no further IDs
+ * are needed), while an EIST requires four: a table ID, an original network ID, a transport
+ * stream ID, and a service ID.
+ * 
+ * The information in the subtable may be augmented by descriptors. 
+ */
+typedef struct{
+    u8  idx;
+    u8  sect_nr;  // number of sections
+    SECTION* sects; // sections in order
+}SUBTBL;
+
+#define MAX_SUBTBL_NR      64
 #define MAX_SECTION_NR    256
 typedef struct{
     u8        tid;
+    
+    /* subtables */
+    u8        subtbl_nr;
+    SUBTBL    subtbls[MAX_SUBTBL_NR];
+    
+    /* sections */
     u8        section_nr;
     SECTION   sections[MAX_SECTION_NR];
 }TABLE;
@@ -138,7 +169,7 @@ extern "C"{
 PID_LIST* build_pid_list(u8* ts, u32 packet_nr, u8 packet_size);
 int delete_pid_list(PID_LIST* pid_list);
 
-TABLE* build_table(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size);
+TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size);
 int delete_table(TABLE* tbl);
 
 int set_pmt_list_by_pat_sect(SECTION* pat_sect, PMT_LIST* pmt_list);
