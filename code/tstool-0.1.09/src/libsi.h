@@ -1,3 +1,22 @@
+/*
+** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
+**  
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+** 
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+** 
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software 
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+
 #ifndef __LIBSI_H__
 #define __LIBSI_H__
 
@@ -41,11 +60,6 @@ typedef struct{
 }PID_LIST;
 
 
-typedef struct{
-    u8  index;      /* section index */
-    u8  *data;      /* the whole section data */
-    int size;       /* total section size */
-}SECTION;
 
 /*
  * The structure of subtables:
@@ -65,14 +79,25 @@ typedef struct{
  * 
  * The information in the subtable may be augmented by descriptors. 
  */
+#define MAX_SUBTBL_NR      64   /* max nr of subtables in a table */
+#define MAX_SECTION_NR    256   /* max nr of sections in a table */
+
+typedef struct{
+    u8  index;      /* section index */
+    u8  *data;      /* the whole section data */
+    int size;       /* size of *data */
+}SECTION;
+
 typedef struct{
     u8  idx;
+    u8  *data;      /* the whole subtable */
+    int size;       /* size of *data */
+    
+    // the sections for that subtable
     u8  sect_nr;  // number of sections
     SECTION* sects; // sections in order
 }SUBTBL;
 
-#define MAX_SUBTBL_NR      64
-#define MAX_SECTION_NR    256
 typedef struct{
     u8        tid;
     

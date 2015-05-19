@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,6 +233,7 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
     TABLE* tbl;
     u8     *p_sect = 0; // don't need to free this. it's either from a static variable, or from the ts mmap area.
     u8     last_section_number;
+    int    section_idx = 0;
     u16    section_size; 
     int    i;
 
@@ -250,49 +251,44 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
 	}
     
     /* allocate table and init it */
-    if(!(tbl = (TABLE*)malloc(sizeof(TABLE))))
+    if (!(tbl = (TABLE*)malloc(sizeof(TABLE)))) {
         return 0;
-
-    tbl->tid = tid;
-    tbl->section_nr = 0;
-    for(i = 0; i < MAX_SECTION_NR; i ++){
-        tbl->sections[i].index = 0;
-        tbl->sections[i].data = 0;
-        tbl->sections[i].size = 0;
-    }
-
-
-    /* build the table by adding all sections */
-    //if (tbl->tid == TID_NIT_ACT || tbl->tid == TID_NIT_OTH) {  // bruin, 2015-04-21
-    if (1) {  // bruin, 2015-04-21
-
-        i = 0; // packet index to start with
-        int section_idx = 0;
-        for (;;) {
-            p_sect = 0;
-            section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
-            //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, i=%d\n", tbl->tid, section_size, i);
-            if (section_size == 0)
-                break;
-            if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
-                section_idx += 1;
-            }
-        }
     } else {
-        section_size = s_get_section_data(pid, tbl->tid, 0, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-        //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, section_number=0, last_section_number=%d\n", tbl->tid, section_size, last_section_number);
-        if(section_size){
-            s_add_section_to_table(tbl, 0, section_size, p_sect, 0);
-            for(i = 1; i <= last_section_number; i ++){
-                p_sect = 0;
-                section_size = s_get_section_data(pid, tbl->tid, (u8)i, pid_list, p_ts, packet_size, &last_section_number, &p_sect);
-                //fprintf(stdout, "build_table_with_sections(tid=%d): section_size=%d, section_number=%d, last_section_number=%d\n", tbl->tid, section_size, i, last_section_number);
-                if(section_size)
-                    s_add_section_to_table(tbl, (u8)i, section_size, p_sect, 0);
-            }
+
+        tbl->tid = tid;
+        
+        tbl->subtbl_nr = 0;
+        for (i = 0; i < MAX_SUBTBL_NR; i ++) {
+            tbl->subtbls[i].idx = -1;
+            tbl->subtbls[i].data = 0;
+            tbl->subtbls[i].size = -1;
+        }
+        
+        tbl->section_nr = 0;
+        for (i = 0; i < MAX_SECTION_NR; i ++){
+            tbl->sections[i].index = -1;
+            tbl->sections[i].data = 0;
+            tbl->sections[i].size = -1;
         }
     }
 
+    /* adding all sections for the table */
+    i = 0; // packet index to start with
+    for (;;) {
+        p_sect = 0;
+        section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
+        if (section_size == 0)
+            break;
+        if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
+            section_idx += 1;
+        }
+    }
+
+    /* todo: build subtables from sections */
+
+
+
+    
 	if(s_is_verbose){
 		fprintf(stdout, "build_table_with_sections(tid=%d): done\n", tbl->tid);
 		fflush(stdout);

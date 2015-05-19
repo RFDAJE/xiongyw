@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -819,7 +819,7 @@ static void show_help(void){
 "                   the option argument\n"
 "\n");
 
-	fprintf(stderr, "Report bugs to <xiongyw@hotmail.com>\n");
+	fprintf(stderr, "Report bugs to <5070319@qq.com>\n");
 }
 
 static void show_version(void){

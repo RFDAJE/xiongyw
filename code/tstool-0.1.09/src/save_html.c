@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2328,8 +2328,8 @@ int save_as_html(TSR_RESULT* result){
 					"<hr><address><small>Generated on %s  by "
 					"<a href=\"http://tstool.sourceforge.net\" target=_blank>"
 					"<img src='./images/tstool.gif' border=0></a> (version %s) "
-					"written by <a href=\"mailto:xiongyw@hotmail.com\">Yuwu (Bruin) Xiong</a>,"
-					"&copy;&nbsp;2002-2004</small></address></body></html>",
+					"written by <a href=\"mailto:5070319@qq.com\">Yuwu Xiong</a>,"
+					"&copy;&nbsp;2002-2015</small></address></body></html>",
 					PACKAGE, result->file_path,
 					ctime(&ltime), VERSION);
 		fclose(fp);

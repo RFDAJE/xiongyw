@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -655,7 +655,10 @@ u16 get_pid_of_tid(u8 tid){
             pid = PID_RST;
             break;
 
-        case TID_PMT:    /* pmt table not supported by this routine */
+        case TID_PMT:    /* PIDs for these tables are not unique from tid */
+        case TID_AIT:
+        case TID_DSM_CC_UNM:
+        case TID_DSM_CC_DDM:
         default:
             pid = PID_NUL + 1;
             break;
