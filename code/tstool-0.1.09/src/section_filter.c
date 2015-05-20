@@ -26,13 +26,14 @@
 
 #define SETUP_SECT_FILETER(filter, field, value) STMT(\
     filter.value.field = value; \
-    filter.mask.field = -1; )
+    filter.mask.field = -1; \
+    )
 
 /*
- * added(bruin, 2015-05-19): subtable extra ids (to be verified):
+ * added(bruin, 2015-05-19): subtable extra ids:
  *
  *       | table_id_extension |
- *       |    (16 bit)        | after the generic section header
+ *       |    (16 bit)        | payload part
  * ------+--------------------+---------------------------------------
  *  NIT  |  network id        |
  * ------+--------------------+---------------------------------------
@@ -58,12 +59,112 @@
  * ------+--------------------+---------------------------------------
  */
 
+#define SETUP_SECT_FILTER_4_NIT_ACT(filter, nid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	// todo: if nid==0, not check nid \
+	SETUP_SECT_FILETER(filter, table_id, TID_NIT_ACT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
+	) 
 
-//int section_filter_setup_for_nit(SECT_FILTER* filter, u16 nid)
-//{
-//}
+#define SETUP_SECT_FILTER_4_NIT_OTH(filter, nid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	// todo: if nid==0, not check nid \
+	SETUP_SECT_FILETER(filter, table_id, TID_NIT_OTH); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_BAT(filter, bid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_BAT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (bid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (bid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_SDT_ACT(filter, onid, tsid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_SDT_ACT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (onid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_SDT_OTH(filter, onid, tsid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_SDT_OTH); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (onid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_EIT_ACT(filter, onid, tsid, svcid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_EIT_ACT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_EIT_OTH(filter, onid, tsid, svcid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_EIT_OTH); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_EIT_ACT_SCH(filter, onid, tsid, svcid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_EIT_ACT_SCH); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_EIT_OTH_SCH(filter, onid, tsid, svcid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_EIT_OTH_SCH); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
+	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
+	) 
 
 
+#define SETUP_SECT_FILTER_4_PAT(filter, tsid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_PAT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_PMT(filter, progid) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_PMT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (progid >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (progid & 0x00ff)); \
+	) 
+
+#define SETUP_SECT_FILTER_4_AIT(filter, apptype) STMT( \
+	memset(&filter, 0, sizeof(SECT_FILTER)); \
+	SETUP_SECT_FILETER(filter, table_id, TID_AIT); \
+	SETUP_SECT_FILETER(filter, table_id_extension_hi, (apptype >> 8)); \
+	SETUP_SECT_FILETER(filter, table_id_extension_lo, (apptype & 0x00ff)); \
+	) 
 
 
 /*

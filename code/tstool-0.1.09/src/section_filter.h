@@ -28,7 +28,6 @@ typedef struct {
     PRIV_SECT_HEADER mask;
 } SECT_FILTER;
 
-int section_filter_setup_for_nit();
 
 #endif 
 
