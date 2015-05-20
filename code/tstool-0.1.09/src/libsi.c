@@ -235,6 +235,7 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
     u8     last_section_number;
     int    section_idx = 0;
     u16    section_size; 
+    PRIV_SECT_HEADER *sect_hdr;
     int    i;
 
     /* sanity checks */
@@ -284,7 +285,24 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
         }
     }
 
-    /* todo: build subtables from sections */
+    /* 
+     * build subtables from sections: 
+     * - start from 1st section (i.e., section_number=0) until last_section_number, to form a complete subtable; 
+     * - incomplete subtable is discarded.
+     *
+     * outline of the idea:
+     * for each section where section_number=0
+     *    - determine the subtbl id combination according to tid
+     *    - find out all sections with the same subtbl id combination
+     *    - asmbler the those sections into a subtbl
+     */
+    for (i = 0; i < tbl->section_nr; i ++) {
+        if (tbl->sections[i].size >= PRIVATE_SECT_HEADER_LEN) {
+            sect_hdr = (PRIV_SECT_HEADER*)(tbl->sections[i].data);
+            if (sect_hdr->section_number == 0) {
+            }
+        }
+    }
 
 
 

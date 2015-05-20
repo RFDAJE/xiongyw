@@ -819,7 +819,7 @@ static void show_help(void){
 "                   the option argument\n"
 "\n");
 
-	fprintf(stderr, "Report bugs to <5070319@qq.com>\n");
+	fprintf(stderr, "Please report bugs to Yuwu Xiong <5070319@qq.com>\n");
 }
 
 static void show_version(void){

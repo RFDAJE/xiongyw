@@ -76,11 +76,10 @@ typedef struct{
 #endif
 }PACKET_HEADER;
 
-
 /*
  * added(bruin, 2015-05-19): generic private section header
  */
-#define PRIVATE_SECT_HEADER_LEN               8
+#define PRIVATE_SECT_HEADER_LEN               (8 + 4)
 typedef struct{
 #ifdef WORDS_BIGENDIAN
     u8 table_id                             :8;
@@ -95,6 +94,7 @@ typedef struct{
     u8 current_next_indicator               :1;
     u8 section_number                       :8;
     u8 last_section_number                  :8;
+    u8 payload_bytes[4]; // 4 bytes payload may be used for filtering sections
 #else
     u8 table_id                             :8;
     u8 section_length_hi                    :4;
@@ -108,38 +108,9 @@ typedef struct{
     u8                                      :2;
     u8 section_number                       :8;
     u8 last_section_number                  :8;
+    u8 payload_bytes[4];
 #endif
 }PRIV_SECT_HEADER;
-
-/*
- * added(bruin, 2015-05-19): subtable extra ids (to be verified):
- *
- *       | table_id_extension |
- *       |    (16 bit)        | after the generic section header
- * ------+--------------------+---------------------------------------
- *  NIT  |  network id        |
- * ------+--------------------+---------------------------------------
- *  BAT  |  bouquet id        |
- * ------+--------------------+---------------------------------------
- *  SDT  |  ts id             | onid (16bit)
- * ------+--------------------+---------------------------------------
- *  EIT  |  svc id            | tsid (16bit) + onid (16bit)
- * ------+--------------------+---------------------------------------
- *
- * ------+--------------------+---------------------------------------
- *  PAT  |  ts id             |
- * ------+--------------------+---------------------------------------
- *  PMT  |  prog_nr           |
- * ------+--------------------+---------------------------------------
- *  AIT  |  app_type          |
- * ------+--------------------+---------------------------------------
- *
- * ------+--------------------+---------------------------------------
- * DSM-CC| transaction id     | if tid=0x3B
- * ------+--------------------+---------------------------------------
- * DSM-CC| module id          | if tid=0x3C
- * ------+--------------------+---------------------------------------
- */
 
 
 /* NIT section header */
