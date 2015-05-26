@@ -33,17 +33,17 @@ typedef struct{
 }OTV_HEADER;                
 
 
+
+#define PID_NODE_ALLOC_INCREMENTAL_STEP         32
+
 /* struct to hold packets of same pid */
-
-#define PID_NODE_STEP         32
-
 typedef struct _PID_NODE{
 
     /* elementary data */
 
     u16     pid;
     u32     packet_nr;
-    u32     size;       /* increase by PID_NODE_STEP */
+    u32     size;       /* increase by PID_NODE_ALLOC_INCREMENTAL_STEP */
     u32     *index;     /* array of index of each packet of the pid */
     u8      stream_type;
 
@@ -79,34 +79,33 @@ typedef struct{
  * 
  * The information in the subtable may be augmented by descriptors. 
  */
-#define MAX_SUBTBL_NR      64   /* max nr of subtables in a table */
-#define MAX_SECTION_NR    256   /* max nr of sections in a table */
+#define MAX_SUBTBL_NR      256   /* max nr of unique subtables in a table to parse */
+#define MAX_SECTION_NR     512   /* max nr of unique sections in a table to parse */
 
 typedef struct{
     u8  index;      /* section index */
-    u8  *data;      /* the whole section data */
-    int size;       /* size of *data */
+    u8  *data;      /* the whole section data, starting from "table_id" */
+    int size;       /* size of data, should equal to "section_length + 3" */
 }SECTION;
 
 typedef struct{
-    u8  idx;
     u8  *data;      /* the whole subtable */
     int size;       /* size of *data */
     
     // the sections for that subtable
     u8  sect_nr;  // number of sections
-    SECTION* sects; // sections in order
+    SECTION* sects[256]; // a subtable can have maximumly 256 sections
 }SUBTBL;
 
 typedef struct{
     u8        tid;
     
     /* subtables */
-    u8        subtbl_nr;
+    int       subtbl_nr;
     SUBTBL    subtbls[MAX_SUBTBL_NR];
     
     /* sections */
-    u8        section_nr;
+    int       section_nr;
     SECTION   sections[MAX_SECTION_NR];
 }TABLE;
 

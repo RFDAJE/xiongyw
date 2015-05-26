@@ -668,6 +668,36 @@ u16 get_pid_of_tid(u8 tid){
 }
 
 
+int get_minimum_section_size_by_tid(u8 tid)
+{
+    switch(tid){
+        case TID_SDT_ACT:
+        case TID_SDT_OTH:
+            return (PRIVATE_SECT_HEADER_LEN + 2);
+            
+         case TID_EIT_ACT:
+         case TID_EIT_OTH:
+         case TID_EIT_ACT_SCH:
+         case TID_EIT_OTH_SCH:
+             return (PRIVATE_SECT_HEADER_LEN + 4);
+
+         case TID_PAT: 
+         case TID_CAT:
+         case TID_PMT:
+         case TID_TDT:
+         case TID_TOT:
+         case TID_RST: // to be checked
+         case TID_AIT:
+         case TID_DSM_CC_UNM:
+         case TID_DSM_CC_DDM:
+         case TID_NIT_ACT:
+         case TID_NIT_OTH:
+         case TID_BAT:
+         default:
+                return PRIVATE_SECT_HEADER_LEN;
+    }
+}
+
 
 
 const char* get_frame_rate_by_code(u8 code){ 

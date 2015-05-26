@@ -27,6 +27,7 @@
 
 #include "si.h"
 #include "tree.h"
+#include "section_filter.h"
 #include "libsi.h"
 
 #define TXT_BUF_SIZE   4096
@@ -224,9 +225,6 @@ int delete_pid_list(PID_LIST* pid_list){
 
 /*
  * create a table for pid/id, by collecting all sections for that table.
- *
- * TODO: create subtables between table and sections?
- *
  */
 TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, u8 packet_size){
     
@@ -236,7 +234,7 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
     int    section_idx = 0;
     u16    section_size; 
     PRIV_SECT_HEADER *sect_hdr;
-    int    i;
+    int    i, j;
 
     /* sanity checks */
     if(pid > PID_NUL)
@@ -260,7 +258,6 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
         
         tbl->subtbl_nr = 0;
         for (i = 0; i < MAX_SUBTBL_NR; i ++) {
-            tbl->subtbls[i].idx = -1;
             tbl->subtbls[i].data = 0;
             tbl->subtbls[i].size = -1;
         }
@@ -273,18 +270,22 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
         }
     }
 
-    /* adding all sections for the table */
+    /* adding unique sections for the table */
     i = 0; // packet index to start with
-    for (;;) {
+    for (section_idx = 0;section_idx < MAX_SECTION_NR;) {
         p_sect = 0;
         section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
         if (section_size == 0)
             break;
         if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
             section_idx += 1;
+            if (section_idx >= MAX_SECTION_NR) {
+                fprintf(stderr, "The number of unique sections (pid=0x%04x, tid=0x%02x) in this stream is greater than %d.", pid, tid, MAX_SECTION_NR);
+            }
         }
     }
 
+#if (0)
     /* 
      * build subtables from sections: 
      * - start from 1st section (i.e., section_number=0) until last_section_number, to form a complete subtable; 
@@ -296,16 +297,66 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
      *    - find out all sections with the same subtbl id combination
      *    - asmbler the those sections into a subtbl
      */
+if (tid == TID_SDT_ACT) {
+    fprintf(stdout, "tbl->section_nr = %d\n", tbl->section_nr);
     for (i = 0; i < tbl->section_nr; i ++) {
-        if (tbl->sections[i].size >= PRIVATE_SECT_HEADER_LEN) {
+        if (tbl->sections[i].size >= get_minimum_section_size_by_tid(tid)) {
             sect_hdr = (PRIV_SECT_HEADER*)(tbl->sections[i].data);
             if (sect_hdr->section_number == 0) {
+                SECT_FILTER fil;
+                u8 ver; 
+                u16 onid, tsid, svcid;
+                switch (tid) {
+                    case TID_SDT_ACT:
+                        onid = ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_lo;
+                        tsid = ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_lo;
+                        ver = sect_hdr->version_number;
+                        SETUP_SECT_FILTER_4_SDT_ACT(fil, onid,tsid,ver);
+                        break;
+                    default:
+                        break;
+                }
+
+                /*
+                 * collect all sections
+                 */
+                // first search the 2nd half
+                for (j = i; j < tbl->section_nr; j ++) {
+                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
+                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
+                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
+                    }
+                }
+                // second search the 1st half
+                for (j = 0; j < i; j ++) {
+                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
+                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
+                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
+                    }
+                }
+
+                // debug
+                fprintf(stdout, "subtbl_nr = %d, sect_nr = %d\n", tbl->subtbl_nr, tbl->subtbls[tbl->subtbl_nr].sect_nr);
+                for(j = 0; j < tbl->subtbls[tbl->subtbl_nr].sect_nr; j ++) {
+                    sect_hdr = (PRIV_SECT_HEADER*)(tbl->subtbls[tbl->subtbl_nr].sects[j]->data);
+                    fprintf(stdout, "  %d: section_number=%d, last_section_number=%d, version_number=%d, size=%d\n", 
+                        j,
+                        sect_hdr->section_number,
+                        sect_hdr->last_section_number,
+                        sect_hdr->version_number,
+                        tbl->subtbls[tbl->subtbl_nr].sects[j]->size);
+                }
+                /*
+                 * assemble sections into subtbls
+                 */
+
+                
+                tbl->subtbl_nr += 1;
             }
         }
     }
-
-
-
+}
+#endif
     
 	if(s_is_verbose){
 		fprintf(stdout, "build_table_with_sections(tid=%d): done\n", tbl->tid);
@@ -930,7 +981,7 @@ static PID_NODE* s_create_pid_node(u16 pid){
     pid_node->pid = pid;
     pid_node->packet_nr = 0;
     pid_node->stream_type = 0;
-    pid_node->size = PID_NODE_STEP; 
+    pid_node->size = PID_NODE_ALLOC_INCREMENTAL_STEP; 
     pid_node->index = (u32*)malloc(sizeof(u32) * pid_node->size);
     if(!pid_node->index){
         free(pid_node);
@@ -959,7 +1010,7 @@ static int s_add_packet_to_pid_node(PID_NODE* pid_node, int packet_index){
     pid_node->packet_nr ++;
 
     if(pid_node->packet_nr == pid_node->size){
-        pid_node->size += PID_NODE_STEP;
+        pid_node->size += PID_NODE_ALLOC_INCREMENTAL_STEP;
         pid_node->index = (u32*)realloc(pid_node->index, sizeof(u32) * pid_node->size);
         if(!pid_node->index)
             return 0;

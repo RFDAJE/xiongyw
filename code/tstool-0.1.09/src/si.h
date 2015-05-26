@@ -79,7 +79,7 @@ typedef struct{
 /*
  * added(bruin, 2015-05-19): generic private section header
  */
-#define PRIVATE_SECT_HEADER_LEN               (8 + 4)
+#define PRIVATE_SECT_HEADER_LEN               (8)  // 4 bytes payload is not counted
 typedef struct{
 #ifdef WORDS_BIGENDIAN
     u8 table_id                             :8;
@@ -884,6 +884,7 @@ const char* get_application_type_by_code(u16 type);
 const char* get_application_control_code_name(u16 application_type, u8 control_code);
 
 u16 get_pid_of_tid(u8 tid);
+int get_minimum_section_size_by_tid(u8 tid);  // 2015-05-26
 
 const char* get_mhp_desc_name_by_id(u8 desc_id);
 
