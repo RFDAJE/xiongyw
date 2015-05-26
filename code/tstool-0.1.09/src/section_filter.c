@@ -22,150 +22,6 @@
 #include "si.h"
 #include "section_filter.h"
 
-#define STMT(stuff)            do { stuff } while(0)
-
-#define SETUP_SECT_FILETER(filter, field, value) STMT(\
-    filter.value.field = value; \
-    filter.mask.field = -1; \
-    )
-
-/*
- * added(bruin, 2015-05-19): subtable extra ids:
- *
- *       | table_id_extension |
- *       |    (16 bit)        | payload part
- * ------+--------------------+---------------------------------------
- *  NIT  |  network id        |
- * ------+--------------------+---------------------------------------
- *  BAT  |  bouquet id        |
- * ------+--------------------+---------------------------------------
- *  SDT  |  ts id             | onid (16bit)
- * ------+--------------------+---------------------------------------
- *  EIT  |  svc id            | tsid (16bit) + onid (16bit)
- * ------+--------------------+---------------------------------------
- *
- * ------+--------------------+---------------------------------------
- *  PAT  |  ts id             |
- * ------+--------------------+---------------------------------------
- *  PMT  |  prog_nr           |
- * ------+--------------------+---------------------------------------
- *  AIT  |  app_type          |
- * ------+--------------------+---------------------------------------
- *
- * ------+--------------------+---------------------------------------
- * DSM-CC| transaction id     | if tid=0x3B
- * ------+--------------------+---------------------------------------
- * DSM-CC| module id          | if tid=0x3C
- * ------+--------------------+---------------------------------------
- */
-
-#define SETUP_SECT_FILTER_4_NIT_ACT(filter, nid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	// todo: if nid==0, not check nid \
-	SETUP_SECT_FILETER(filter, table_id, TID_NIT_ACT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_NIT_OTH(filter, nid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	// todo: if nid==0, not check nid \
-	SETUP_SECT_FILETER(filter, table_id, TID_NIT_OTH); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_BAT(filter, bid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_BAT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (bid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (bid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_SDT_ACT(filter, onid, tsid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_SDT_ACT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (onid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_SDT_OTH(filter, onid, tsid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_SDT_OTH); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (onid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_EIT_ACT(filter, onid, tsid, svcid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_EIT_ACT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_EIT_OTH(filter, onid, tsid, svcid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_EIT_OTH); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_EIT_ACT_SCH(filter, onid, tsid, svcid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_EIT_ACT_SCH); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_EIT_OTH_SCH(filter, onid, tsid, svcid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_EIT_OTH_SCH); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (svcid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (svcid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[0], (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[1], (tsid & 0x00ff)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[2], (onid >> 8)); \
-	SETUP_SECT_FILETER(filter, payload_bytes[3], (onid & 0x00ff)); \
-	) 
-
-
-#define SETUP_SECT_FILTER_4_PAT(filter, tsid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_PAT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (tsid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (tsid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_PMT(filter, progid) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_PMT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (progid >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (progid & 0x00ff)); \
-	) 
-
-#define SETUP_SECT_FILTER_4_AIT(filter, apptype) STMT( \
-	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	SETUP_SECT_FILETER(filter, table_id, TID_AIT); \
-	SETUP_SECT_FILETER(filter, table_id_extension_hi, (apptype >> 8)); \
-	SETUP_SECT_FILETER(filter, table_id_extension_lo, (apptype & 0x00ff)); \
-	) 
-
 
 /*
  * compare *buf with *value, masking out bit indicated in *mask.
@@ -189,4 +45,78 @@ int filter_buffer(u8* value, u8* buf, u8* mask, int len)
 
     return 0;
 }
+
+
+#if (0)
+    /* 
+     * build subtables from sections: 
+     * - start from 1st section (i.e., section_number=0) until last_section_number, to form a complete subtable; 
+     * - incomplete subtable is discarded.
+     *
+     * outline of the idea:
+     * for each section where section_number=0
+     *    - determine the subtbl id combination according to tid
+     *    - find out all sections with the same subtbl id combination
+     *    - asmbler the those sections into a subtbl
+     */
+if (tid == TID_SDT_ACT) {
+    fprintf(stdout, "tbl->section_nr = %d\n", tbl->section_nr);
+    for (i = 0; i < tbl->section_nr; i ++) {
+        if (tbl->sections[i].size >= get_minimum_section_size_by_tid(tid)) {
+            sect_hdr = (PRIV_SECT_HEADER*)(tbl->sections[i].data);
+            if (sect_hdr->section_number == 0) {
+                SECT_FILTER fil;
+                u8 ver; 
+                u16 onid, tsid, svcid;
+                switch (tid) {
+                    case TID_SDT_ACT:
+                        onid = ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_lo;
+                        tsid = ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_lo;
+                        ver = sect_hdr->version_number;
+                        SETUP_SECT_FILTER_4_SDT_ACT(fil, onid,tsid,ver);
+                        break;
+                    default:
+                        break;
+                }
+
+                /*
+                 * collect all sections
+                 */
+                // first search the 2nd half
+                for (j = i; j < tbl->section_nr; j ++) {
+                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
+                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
+                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
+                    }
+                }
+                // second search the 1st half
+                for (j = 0; j < i; j ++) {
+                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
+                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
+                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
+                    }
+                }
+
+                // debug
+                fprintf(stdout, "subtbl_nr = %d, sect_nr = %d\n", tbl->subtbl_nr, tbl->subtbls[tbl->subtbl_nr].sect_nr);
+                for(j = 0; j < tbl->subtbls[tbl->subtbl_nr].sect_nr; j ++) {
+                    sect_hdr = (PRIV_SECT_HEADER*)(tbl->subtbls[tbl->subtbl_nr].sects[j]->data);
+                    fprintf(stdout, "  %d: section_number=%d, last_section_number=%d, version_number=%d, size=%d\n", 
+                        j,
+                        sect_hdr->section_number,
+                        sect_hdr->last_section_number,
+                        sect_hdr->version_number,
+                        tbl->subtbls[tbl->subtbl_nr].sects[j]->size);
+                }
+                /*
+                 * assemble sections into subtbls
+                 */
+
+                
+                tbl->subtbl_nr += 1;
+            }
+        }
+    }
+}
+#endif
 

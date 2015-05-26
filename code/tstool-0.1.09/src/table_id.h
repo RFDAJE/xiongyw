@@ -48,6 +48,20 @@
                                                 /* 0x4b to 0x4d: reserved */
 #define TID_EIT_ACT                             0x4e
 #define TID_EIT_OTH                             0x4f
+/* 
+ * added(bruin, 2015-05-26): notes about section/segment for EIT-S: 
+ *
+ * - Each subtable can maximumly has 256 sections, each of which can be 4KiB in size
+ * - Each subtable can maximumly convey EIT-S for 4 days (for one service)
+ * - For broadcasting more than 4-day EIT-S, use multiple subtables, i.e., multiple table_ids. 
+ *   e.g., for 7-day EIT-S, use two tables: 4-day in table_id 0x50 (or 0x60), 3-day in 0x51(0x61).
+ * - EIT-S is grouped into segments, each of which convey EIT-S for 3 hours
+ * - 4-day (4*24 hours) requires 4*24/3=32 segments
+ * - If evenly divided, 256 sections for 32 segments means each segment (3-hour) can use upto 8 sections.
+ * - EIT-S subtable can use discontinous section_numbers between segments, while sections for the same segment
+ *   should be still continuous. Typically segments start from a section with its section_number equals to i*8, 
+ *   where i=(0..31).
+ */
 #define TID_EIT_ACT_SCH                         0x50 /* to 0x5f */
 #define TID_EIT_OTH_SCH                         0x60 /* to 0x6f */
 #define TID_TDT                                 0x70

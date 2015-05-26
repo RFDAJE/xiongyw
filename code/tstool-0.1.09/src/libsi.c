@@ -53,7 +53,8 @@ static int s_add_packet_to_pid_list(PID_LIST* pid_list, u16 pid, int packet_inde
 static int s_add_packet_to_pid_node(PID_NODE* pid_node, int packet_index);
 static int s_add_pid_node_to_list(PID_LIST* pid_list, PID_NODE* pid_node);
 
-static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup);
+//static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup);
+static int s_add_section_to_table(TABLE* tbl, int size, u8 *data, int dedup);
 static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8* ts, u8 packet_size, u8* last_section_nr, u8** pp);
 static u16 s_get_any_section_data(u16 pid, u8 table_id, PID_LIST* pid_list, int* packet_idx, u8 packet_size, u8* p_ts, u8** pp);
 
@@ -255,108 +256,21 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
     } else {
 
         tbl->tid = tid;
-        
-        tbl->subtbl_nr = 0;
-        for (i = 0; i < MAX_SUBTBL_NR; i ++) {
-            tbl->subtbls[i].data = 0;
-            tbl->subtbls[i].size = -1;
-        }
-        
         tbl->section_nr = 0;
-        for (i = 0; i < MAX_SECTION_NR; i ++){
-            tbl->sections[i].index = -1;
-            tbl->sections[i].data = 0;
-            tbl->sections[i].size = -1;
-        }
+		tbl->array_size = SECTION_ALLOC_INCREMENTAL_STEP;
+		tbl->sections = (SECTION*)malloc(sizeof(SECTION) * SECTION_ALLOC_INCREMENTAL_STEP);
     }
 
     /* adding unique sections for the table */
     i = 0; // packet index to start with
-    for (section_idx = 0;section_idx < MAX_SECTION_NR;) {
+    for (;;) {
         p_sect = 0;
         section_size = s_get_any_section_data(pid, tbl->tid, pid_list, &i, packet_size, p_ts, &p_sect);
         if (section_size == 0)
             break;
-        if(0 == s_add_section_to_table(tbl, section_idx, section_size, p_sect, 1)){
-            section_idx += 1;
-            if (section_idx >= MAX_SECTION_NR) {
-                fprintf(stderr, "The number of unique sections (pid=0x%04x, tid=0x%02x) in this stream is greater than %d.", pid, tid, MAX_SECTION_NR);
-            }
-        }
+        s_add_section_to_table(tbl, section_size, p_sect, 1); // fixme: check return value
     }
 
-#if (0)
-    /* 
-     * build subtables from sections: 
-     * - start from 1st section (i.e., section_number=0) until last_section_number, to form a complete subtable; 
-     * - incomplete subtable is discarded.
-     *
-     * outline of the idea:
-     * for each section where section_number=0
-     *    - determine the subtbl id combination according to tid
-     *    - find out all sections with the same subtbl id combination
-     *    - asmbler the those sections into a subtbl
-     */
-if (tid == TID_SDT_ACT) {
-    fprintf(stdout, "tbl->section_nr = %d\n", tbl->section_nr);
-    for (i = 0; i < tbl->section_nr; i ++) {
-        if (tbl->sections[i].size >= get_minimum_section_size_by_tid(tid)) {
-            sect_hdr = (PRIV_SECT_HEADER*)(tbl->sections[i].data);
-            if (sect_hdr->section_number == 0) {
-                SECT_FILTER fil;
-                u8 ver; 
-                u16 onid, tsid, svcid;
-                switch (tid) {
-                    case TID_SDT_ACT:
-                        onid = ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->original_network_id_lo;
-                        tsid = ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_hi * 256 + ((SDT_SECT_HEADER*)sect_hdr)->transport_stream_id_lo;
-                        ver = sect_hdr->version_number;
-                        SETUP_SECT_FILTER_4_SDT_ACT(fil, onid,tsid,ver);
-                        break;
-                    default:
-                        break;
-                }
-
-                /*
-                 * collect all sections
-                 */
-                // first search the 2nd half
-                for (j = i; j < tbl->section_nr; j ++) {
-                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
-                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
-                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
-                    }
-                }
-                // second search the 1st half
-                for (j = 0; j < i; j ++) {
-                    if (0 == filter_buffer(&fil.value, tbl->sections[j].data, &fil.mask, get_minimum_section_size_by_tid(tid))) {
-                        tbl->subtbls[tbl->subtbl_nr].sects[tbl->subtbls[tbl->subtbl_nr].sect_nr] = tbl->sections + j;
-                        tbl->subtbls[tbl->subtbl_nr].sect_nr += 1;
-                    }
-                }
-
-                // debug
-                fprintf(stdout, "subtbl_nr = %d, sect_nr = %d\n", tbl->subtbl_nr, tbl->subtbls[tbl->subtbl_nr].sect_nr);
-                for(j = 0; j < tbl->subtbls[tbl->subtbl_nr].sect_nr; j ++) {
-                    sect_hdr = (PRIV_SECT_HEADER*)(tbl->subtbls[tbl->subtbl_nr].sects[j]->data);
-                    fprintf(stdout, "  %d: section_number=%d, last_section_number=%d, version_number=%d, size=%d\n", 
-                        j,
-                        sect_hdr->section_number,
-                        sect_hdr->last_section_number,
-                        sect_hdr->version_number,
-                        tbl->subtbls[tbl->subtbl_nr].sects[j]->size);
-                }
-                /*
-                 * assemble sections into subtbls
-                 */
-
-                
-                tbl->subtbl_nr += 1;
-            }
-        }
-    }
-}
-#endif
     
 	if(s_is_verbose){
 		fprintf(stdout, "build_table_with_sections(tid=%d): done\n", tbl->tid);
@@ -378,6 +292,8 @@ int delete_table(TABLE* tbl){
         if(tbl->sections[i].data)
             free(tbl->sections[i].data);
     }
+
+	free(tbl->sections);
 
     free(tbl);
     tbl = 0;
@@ -1376,7 +1292,7 @@ END:
 
 /* return 1 for error, 0 for ok (added) */
 /* dedup: 1 for dedup, otherwise no dedup */
-static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup){
+static int s_add_section_to_table(TABLE* tbl, int size, u8 *data, int dedup){
     int i;
 
     if (!data || size <= 0) {
@@ -1395,13 +1311,22 @@ static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int 
         }
     }
     
-    tbl->sections[tbl->section_nr].index = index;
     tbl->sections[tbl->section_nr].size = size;
     if(!(tbl->sections[tbl->section_nr].data = (u8*)malloc(size)))
         return 1;
     memcpy(tbl->sections[tbl->section_nr].data, data, size);
 
     tbl->section_nr ++;
+	// increment the array size if necessary
+	if (tbl->section_nr == tbl->array_size) {
+		tbl->array_size += SECTION_ALLOC_INCREMENTAL_STEP;
+		tbl->sections = (SECTION*)realloc(tbl->sections, sizeof(SECTION) * tbl->array_size);
+		if (!tbl->sections) {
+			fprintf(stderr, "fatal: realloc() for sections failed. array_size=%d\n", tbl->array_size);
+			return 1;
+		}
+	}
+	
     return 0;
 }
 
@@ -1478,9 +1403,9 @@ static void s_add_table(TABLE* tbl, TNODE* root){
     
     for(i = 0; i < tbl->section_nr; i ++){
         sect_root = tnode_new(NODE_TYPE_SECTION);
-        snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", tbl->sections[i].index);
+        snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", i);
         sect_root->txt = strdup(txt);
-        sect_root->tag = (u32)(&(tbl->sections[i]));
+        sect_root->tag = (long)(&(tbl->sections[i]));
         tnode_attach(tbl_root, sect_root);
         
         switch(tbl->tid){
@@ -1554,9 +1479,9 @@ static void s_add_tables(TABLE** tbl, TNODE* root, PID_LIST* pid_list, void* tbl
 
             for(j = 0; j < tbl[i]->section_nr; j ++){
                 sect_root = tnode_new(NODE_TYPE_SECTION);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", tbl[i]->sections[j].index);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", j);
                 sect_root->txt = strdup(txt);
-                sect_root->tag = (u32)(&(tbl[i]->sections[j]));
+                sect_root->tag = (long)(&(tbl[i]->sections[j]));
                 tnode_attach(tbl_root, sect_root);
 
                 s_parse_sect_pmt(sect_root, tbl[i], j, pid_list);
@@ -1587,9 +1512,9 @@ static void s_add_tables(TABLE** tbl, TNODE* root, PID_LIST* pid_list, void* tbl
 
             for(j = 0; j < tbl[i]->section_nr; j ++){
                 sect_root = tnode_new(NODE_TYPE_SECTION);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", tbl[i]->sections[j].index);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", j);
                 sect_root->txt = strdup(txt);
-                sect_root->tag = (u32)(&(tbl[i]->sections[j]));
+                sect_root->tag = (long)(&(tbl[i]->sections[j]));
                 tnode_attach(tbl_root, sect_root);
 
                 s_parse_sect_ait(sect_root, tbl[i], j, pid_list);

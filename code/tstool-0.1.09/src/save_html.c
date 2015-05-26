@@ -2344,7 +2344,7 @@ int save_as_html(TSR_RESULT* result){
     s_output_tree(fp, result->root, result);
 
     /* init the tree */
-    fprintf(fp, "tree_init(N%08x);\n", (u32)(result->root));
+    fprintf(fp, "tree_init(N%0*x);\n", sizeof(long) * 2, (long)(result->root));
     
     fclose(fp);
 
@@ -2387,7 +2387,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     }
     *p = '\0';
 
-    fprintf(fp, "N%08x=new Node(\"%08x\", \"%s\", %d, \"\");\n", (u32)node, (u32)node, txt, node->type);
+    fprintf(fp, "N%0*x=new Node(\"%0*x\", \"%s\", %d, \"\");\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)node, txt, node->type);
 
 	if(node->type == NODE_TYPE_PACKET)
 		s_output_packet(result, node);
@@ -2397,7 +2397,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     if(NULL != (kid = node->kid)){
         while(kid){
             s_output_tree(fp, kid, result);
-            fprintf(fp, "N%08x.add_kid(N%08x);\n", (u32)node, (u32)kid);
+            fprintf(fp, "N%0*x.add_kid(N%0*x);\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)kid);
             kid = kid->sib;
         }
     }
@@ -2413,7 +2413,7 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	int               nBytePerLine = 8, nRows, len, n, i, j;
 	u8*               p;
 
-	sprintf(filename, "packets/P%08x.html", (u32)node);
+	sprintf(filename, "packets/P%0*x.html", sizeof(long) * 2, (long)node);
 	fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
@@ -2496,13 +2496,13 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 
 	pSect = (SECTION*)node->tag;
 
-	sprintf(filename, "sections/S%08x.html", (u32)node);
+	sprintf(filename, "sections/S%0*x.html", sizeof(long) * 2, (long)node);
 	fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
 
 	/* section info */
-	fprintf(fp, "Section index: %d\nsection data size: %d\n\n\n", pSect->index, pSect->size);
+	fprintf(fp, "Section: \nsection data size: %d\n\n\n", pSect->size);
 
 	/* section hex */
 	p = pSect->data;
