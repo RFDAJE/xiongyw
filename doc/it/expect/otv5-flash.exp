@@ -15,6 +15,7 @@ set REBOOT_LOG(3p) $REBOOT_LOG(2t)            ;# net 3p, humax 7430
 set REBOOT_LOG(tch7356) "BCM97356B2 CFE v.*"  ;# movistar black box (w/ internal 500G HDD and 2 sat tuners)
 set REBOOT_LOG(pre) "BCM97584A1, CFE core v*" ;# TBC-Phase 1: Premium 
 set REBOOT_LOG(dta) $REBOOT_LOG(pre)          ;# TBC-Phase 1: DTA
+set REBOOT_LOG(sam7231) "BCM97231B2 CFE v*"   ;# samsung 7231, starhub, PV box (not DV)
 
 set CFE_PROMPT "CFE> "
 set LNX_PROMPT "# "
@@ -24,40 +25,37 @@ set CFE_SUCCESS "*** command status = 0"
 
 set tftp  10.12.6.250      ;# assume using the same tftp server
 
-set supported_models [list 2t 3p tch7356 dta pre]
+set supported_models [list 2t 3p tch7356 dta pre sam7231]
 
 # rootfs image path, relative to /tftpboot
 set images_path(2t) "humax7430/hnb100/p2/BLD_2_2"
 set images_path(3p) "humax7430/hnb200/p2/BLD_2_1"
 set images_path(tch7356) "tch7356/released"
-set images_path(tch7356) "tch7356/20140704-qa"
-set images_path(tch7356) "tch7356/20140728-14"
-set images_path(tch7356) "tch7356/20140729-10"
-set images_path(tch7356) "tch7356/20140729-15"
-set images_path(tch7356) "tch7356/512bld19-1"
-set images_path(tch7356) "tch7356/20140917-13"
-set images_path(tch7356) "tch7356/20141022-15"
-set images_path(tch7356) "tch7356/513bld5"
+set images_path(tch7356) "tch7356/20150512-11"
 set images_path(pre) "tbc-p1"
 set images_path(dta) "tbc-p1"
+set images_path(sam7231) "sam7231/vtv"
 
 set kernel_name(2t) "vmlinuz-main"
 set kernel_name(3p) $kernel_name(2t)
 set kernel_name(tch7356) "vmlinuz.bin"
 set kernel_name(dta) "vmlinuz-main-dta"
 set kernel_name(pre) "vmlinuz-main-pre"
-
+set kernel_name(sam7231) "vmlinuz-main"
+                
 set initrd_kernel(2t) "humax7430/vmlinuz-initrd-humax-7430"
 set initrd_kernel(3p) $initrd_kernel(2t)
 set initrd_kernel(tch7356) "tch7356/vmlinuz-initrd-7346b0"
 set initrd_kernel(pre) "tbc-p1/vmlinuz-initrd-7584a0"
 set initrd_kernel(dta) $initrd_kernel(pre)
+set initrd_kernel(sam7231) "sam7231/vmlinuz-initrd-7231b0_PV"
 
 set initrd_kernel_linkup(2t) "eth0: link up,"
 set initrd_kernel_linkup(3p) "eth2: link up,"
 set initrd_kernel_linkup(tch7356) "eth0: Link is up,"
 set initrd_kernel_linkup(dta) "eth0: link up,"
 set initrd_kernel_linkup(pre) $initrd_kernel_linkup(dta)
+set initrd_kernel_linkup(sam7231) "Processing /etc/profile... Done" ;# it does not use network, only USB...
 
 # cfe commands
 set cfe_startup(2t) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mtd=0 root=ubi0:rootfs rootfstype=ubifs rw bmem=192M@64M bmem=512M@512M mtdparts=spi0.0:64K@2304K(mfr)ro,64K(mbox);brcmnand.0:0xDA00000@0x2600000(rootfs)'\""
@@ -66,20 +64,21 @@ set cfe_startup(3p) "setenv -p STARTUP \"boot -z -elf nandflash0.opentv: 'ubi.mt
 set cfe_startup(tch7356) "setenv -p STARTUP \"load -raw -z nandflash0.slot1: -addr=80001000 -max=16777216 'ubiroot rw bmem=110M@146M bmem=128M@512M';go 0x80001400\""
 set cfe_startup(dta) "setenv -p STARTUP \"boot -z -elf nandflash0.RootFS: 'mtdparts=brcmnand.0:5M(kernel),-(RootFS) ubi.mtd=RootFS rootfstype=ubifs root=ubi0:RootFS rw bmem=96M@160M bmem=156M@512M'\""
 set cfe_startup(pre) $cfe_startup(dta)
-
+set cfe_startup(sam7231) "setenv -p STARTUP \"boot -elf -z TNand0.appsw: -addr=80001000 -max=16777216 'mtdparts=brcmnand.0:256M@256M(mtd) ubi.mtd=1,2048 root=ubi0:rootfs rootfstype=ubifs rw bmem=156M@100M bmem=275M@512M';go 0x80001400\""
 
 set cfe_ifconfig(2t) "ifconfig eth0 -auto"   ;# "MULTITV" port on rear panel
 set cfe_ifconfig(3p) "ifconfig eth1 -auto"   ;# usb2rj45 port on front panel
 set cfe_ifconfig(tch7356) $cfe_ifconfig(2t)
 set cfe_ifconfig(dta) "ifconfig eth0 -auto"
 set cfe_ifconfig(pre) $cfe_ifconfig(dta)
+set cfe_ifconfig(sam7231) "ifconfig eth0 -auto"  ;# LAN port
 
 set cfe_flash_kernel(2t) "flash -noheader ${tftp}:${images_path(2t)}\/${kernel_name(2t)} nandflash0.opentv"
 set cfe_flash_kernel(3p) "flash -noheader ${tftp}:${images_path(3p)}\/${kernel_name(3p)} nandflash0.opentv"
 set cfe_flash_kernel(tch7356) "flash -noheader ${tftp}:${images_path(tch7356)}\/${kernel_name(tch7356)} nandflash0.slot1"
 set cfe_flash_kernel(dta) "flash -noheader ${tftp}:${images_path(pre)}\/${kernel_name(pre)} nandflash0.RootFS"
 set cfe_flash_kernel(pre) $cfe_flash_kernel(dta)
-
+set cfe_flash_kernel(sam7231) "flash -noheader ${tftp}:${images_path(sam7231)}\/${kernel_name(sam7231)} TNand0.appsw"
 
 
 set cfe_boot_initrd(2t) "boot -elf ${tftp}:${initrd_kernel(2t)} 'bmem=192M@64M mtdparts=brcmnand.0:0xDA00000@0x2600000(rootfs)'"
@@ -87,14 +86,15 @@ set cfe_boot_initrd(3p) "boot -elf ${tftp}:${initrd_kernel(3p)} 'bmem=192M@64M'"
 set cfe_boot_initrd(tch7356) "boot -elf -z ${tftp}:${initrd_kernel(tch7356)} 'bmem=10M@512M'"
 set cfe_boot_initrd(dta) "boot -z -elf ${tftp}:${initrd_kernel(dta)} 'mtdparts=brcmnand.0:5M(Kernel),-(RootFS) bmem=12M@244M bmem=10M@512M'"
 set cfe_boot_initrd(pre) $cfe_boot_initrd(dta)
-
+set cfe_boot_initrd(sam7231) "boot -z -elf ${tftp}:${initrd_kernel(sam7231)}"
+                    
 # stbutil cmd
 set stbutil(2t) "stbutil -a 2 ${tftp}:${images_path(2t)}"
 set stbutil(3p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
 set stbutil(tch7356) "stbutil -a 2 ${tftp}:${images_path(tch7356)}"
 set stbutil(dta) "stbutil -a 3 ${tftp}:${images_path(dta)}"
 set stbutil(pre) "stbutil -a 2 ${tftp}:${images_path(dta)}"
-
+set stbutil(sam7231) "secutil 1"   ;# it only supports reading from USB!!!
 
 set stbutil_done "Finished writing rootfs to flash."
 
@@ -103,6 +103,7 @@ set flash_boot_time(3p)      $flash_boot_time(2t)
 set flash_boot_time(tch7356) $flash_boot_time(2t)
 set flash_boot_time(dta)     60
 set flash_boot_time(pre)     60
+set flash_boot_time(sam7231) 60
 
 set logfile ~/otv5-flash.log
 
