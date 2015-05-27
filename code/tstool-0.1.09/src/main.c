@@ -53,7 +53,7 @@ typedef struct{
 	PID_PAIR_NODE* head;
 }PID_PAIR_LIST;
 
-#define MEM_STEP  1000000
+#define MAX_TS_SIZE  (500*1024*1024)  // 500MiB should be bigger enough
 
 static void process_args(int argc, char* argv[]);
 static void process_change_pid_arg(const char *change_pid_arg, PID_PAIR_LIST* list);
@@ -67,6 +67,7 @@ static int s_is_show_version = 0;
 static int s_is_verbose = 0;
 static int s_is_204to188 = 0;
 static int s_is_188to204 = 0;
+static int s_is_slim = 0; // remove video/audio/null pids
 static int s_is_change_pid = 0;
 static char* s_change_pid_arg = 0;
 static int s_is_delete_pid = 0;
@@ -83,11 +84,11 @@ static char* s_input_file = 0;
 static char s_cwd[FILENAME_MAX + 1]; /* current work dir */
 static struct stat s_input_stat; /* stat of input file */
 static int s_input_fd = - 1;     /* descriptor of input file */
+static int s_ts_size;  // the size of the ts to be analyzed (mmapped).
 static u8* s_p_input_file = 0;   /* point to begining of input file memory */
 static TSR_RESULT* s_result = 0; /* analysis result */
-#if (0)
-	int            alloc_size;
-#endif
+
+static char s_optstring[] = "hVv12lc:d:e:fo:s:";
 
 static struct option const s_long_options[] = {
 	{"help",     no_argument,       0, 'h'},
@@ -96,6 +97,7 @@ static struct option const s_long_options[] = {
 
 	{"204to188", no_argument,       0, '1'}, 
 	{"188to204", no_argument,       0, '2'}, 
+    {"slim",     no_argument,       0, 'l'}, 
 	{"change",   required_argument, 0, 'c'},
 	{"delete",   required_argument, 0, 'd'},
 	{"extract",  required_argument, 0, 'e'},
@@ -107,9 +109,10 @@ static struct option const s_long_options[] = {
 	{0, 0, 0, 0}
 };
 
+
 int main(int argc, char* argv[]){
 
-
+        
 	process_args(argc, argv);
 
 
@@ -141,52 +144,20 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 
-#if (1)
+    s_ts_size = s_input_stat.st_size;
+#if (0)    
+    if (ts_size > MAX_TS_SIZE) {
+        ts_size = MAX_TS_SIZE;
+    }
+#endif
+
 	/* mmap the whole file */
-	if((s_p_input_file = (u8*)mmap(0, s_input_stat.st_size, PROT_READ, MAP_SHARED, s_input_fd, 0)) == MAP_FAILED){
+	if((s_p_input_file = (u8*)mmap(0, s_ts_size, PROT_READ, MAP_SHARED, s_input_fd, 0)) == MAP_FAILED){
 		fprintf(stderr, "mmap file %s failed, errno=%d, abort.\n", s_input_file, errno); 
 		cleanup_and_exit(1);
 	}
-#endif
 
-#if(0)
-	/* allocate memory to store the file content */
-	alloc_size = s_input_stat.st_size;
-	s_p_input_file = (u8*)malloc(alloc_size);
-	if(s_p_input_file == NULL){
-		fprintf(stderr, "no enough memory for the whole file (size=%d), try the biggist possible...\n", alloc_size);
-		fflush(stderr);
-		/* try memory sizes 1M lesser each time, until success */ 
-		for(alloc_size -= MEM_STEP; alloc_size > 0; alloc_size -= MEM_STEP){
-			fprintf(stdout, "try malloc %d bytes...", alloc_size);
-			fflush(stdout);
-			s_p_input_file = (u8*)malloc(alloc_size);
-			if(s_p_input_file){
-				fprintf(stdout, "done: only %d bytes of the ts file will be processed", alloc_size);
-				fflush(stdout);
-				break;
-			}
-			fprintf(stdout, "failed\n");
-			fflush(stdout);
-		}
-		if(s_p_input_file == NULL){
-			fprintf(stderr, "system memory is less than %d, i am giving up...\n", alloc_size);
-			cleanup_and_exit(1);
-		}
-	}
-
-	/* read the file into memory */ 
-	fprintf(stdout, "reading file into memory...");
-	fflush(stdout);
-	if(read(s_input_fd, s_p_input_file, alloc_size) != alloc_size){
-		fprintf(stderr, "reading file error, errno = %d, abort.\n", errno);
-		cleanup_and_exit(1);
-	}
-	fprintf(stdout, "done\n");
-	fflush(stdout);
-#endif
-
-    s_result = build_tsr_result(s_input_file, s_p_input_file, s_input_stat.st_size, s_is_verbose);
+    s_result = build_tsr_result(s_input_file, s_p_input_file, s_ts_size, s_is_verbose);
 
 	if(!s_result){
 		fprintf(stderr, "build_tsr_result() failed, abort.\n"); 
@@ -270,6 +241,64 @@ int main(int argc, char* argv[]){
 	}
 
 
+    /*** slim */
+	if (s_is_slim) {
+
+		FILE*         fpo;
+		int           i;
+        u8*           p;
+        PID_NODE*     pid_node;
+        u16           pid;
+        int           keep = 1;
+
+		if(!s_is_output_file || !s_output_file){
+			fprintf(stderr, "slim: output file not specified, do nothing.\n");
+			cleanup_and_exit(1); 
+		}
+
+		if((fpo = fopen(s_output_file, "wb")) == NULL){
+			fprintf(stderr, "slim: can't open output file %s for writing, errno=%d, abort.\n", s_output_file, errno);
+			cleanup_and_exit(1);
+		}
+
+        for (i = 0; i < s_result->packet_nr; i ++) {
+            p = s_result->ts_data + s_result->packet_size * i;
+            keep = 1;
+            pid = packet_pid(p);
+
+            if (pid == PID_NUL) {
+                keep = 0;
+            } else {
+            	for (pid_node = s_result->pid_list->head; pid_node != 0; pid_node = pid_node->next) {
+                        if (pid_node->pid == pid && 
+                           ((pid_node->stream_type == STREAMTYPE_11172_AUDIO) ||
+                            (pid_node->stream_type == STREAMTYPE_11172_VIDEO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_13818_AUDIO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_13818_VIDEO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_H264_VIDEO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_AAC_AUDIO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_AC3_AUDIO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_AVS_VIDEO) ||                       
+                            (pid_node->stream_type == STREAMTYPE_MPEG4_AUDIO))) {
+                            keep = 0;
+                            break;
+                    }
+                }
+            }
+                    
+            if(!keep){
+                continue;
+            }
+
+            fwrite(p, s_result->packet_size, 1, fpo);
+        }
+
+		fclose(fpo);
+
+		fprintf(stdout, "slim: saved to %s successfully!\n", s_output_file); 
+		
+		cleanup_and_exit(0);
+	}
 
 	/*** change pid(s) */
 
@@ -415,9 +444,6 @@ int main(int argc, char* argv[]){
 	}
 
 
-
-
-	
 	/*** extract pid(s) */
 
 	if(s_is_extract_pid){
@@ -557,7 +583,7 @@ static void process_args(int argc, char* argv[]){
 	}
 
 	for(;;){
-		c =  getopt_long(argc, argv, "hVv12c:d:e:fo:s:", s_long_options, &option_index);
+		c =  getopt_long(argc, argv, s_optstring, s_long_options, &option_index);
 		if(c == - 1)
 			break;
 		switch(c){
@@ -576,6 +602,9 @@ static void process_args(int argc, char* argv[]){
 			case '2': 
 				s_is_188to204 = 1; 
 				break;
+            case 'l':
+                s_is_slim = 1;
+                break;
 			case 'c': 
 				s_is_change_pid = 1; 
 				s_change_pid_arg = optarg;
@@ -793,6 +822,7 @@ static void show_help(void){
 "                   as specified by -o option, then exit\n"
 "  -2, --188to204   change packet size from 188 to 204 bytes, save new ts\n"
 "                   as specified by -o option, then exit\n"
+"  -l, --slim       remove audio/video/null pids, and save into a new file\n"
 "  -c, --change     change pid(s) according to the option argument, save new\n"
 "                   ts as specified by -o option, then exit. the argument\n"
 "                   format is 'old_pid:new_pid[,old_pid:new_pid]', the pid\n"
@@ -835,7 +865,7 @@ static void cleanup_and_exit(int exit_code){
 		free(s_p_input_file);
 #endif
 	if(s_p_input_file)
-		munmap(s_p_input_file, s_input_stat.st_size);
+		munmap(s_p_input_file, s_ts_size);
 	if(s_input_fd != - 1)
 		close(s_input_fd);
 	exit(exit_code);

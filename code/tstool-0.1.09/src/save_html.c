@@ -2410,7 +2410,7 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	char              filename[64];
 	FILE*             fp;
 	PACKET_HEADER*    pHeader;
-	int               nBytePerLine = 8, nRows, len, n, i, j;
+	int               nBytePerLine = 16, nRows, len, n, i, j;
 	u8*               p;
 
 	sprintf(filename, "packets/P%0*x.html", sizeof(long) * 2, (long)node);
