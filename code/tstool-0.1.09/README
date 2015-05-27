@@ -7,3 +7,7 @@ For building and installation instructions please see the INSTALL file.
 
 - build for debug, do:
 ./configure  CFLAGS="-g -O0"
+
+- debug:
+gdb --args tstool xxx.ts, or
+ddd ---debugger "gdb --args tstool xxx.ts"
