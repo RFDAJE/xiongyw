@@ -53,3 +53,7 @@ git remote set-url origin git@github.com:xiongyw/xiongyw.git
 6. tutorial:
 
 http://lostechies.com/joshuaflanagan/2010/09/03/use-gitk-to-understand-git/
+
+7. tips
+"git add -nu" at root dir is simpler than "git diff --name-only".
+"git add -u" at a source dir to add all modifications of the tracked files. 
