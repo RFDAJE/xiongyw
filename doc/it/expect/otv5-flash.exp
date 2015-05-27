@@ -94,7 +94,7 @@ set stbutil(3p) "stbutil -a 2 ${tftp}:${images_path(3p)}"
 set stbutil(tch7356) "stbutil -a 2 ${tftp}:${images_path(tch7356)}"
 set stbutil(dta) "stbutil -a 3 ${tftp}:${images_path(dta)}"
 set stbutil(pre) "stbutil -a 2 ${tftp}:${images_path(dta)}"
-set stbutil(sam7231) "secutil 1"   ;# it only supports reading from USB!!!
+set secutil(sam7231) "secutil"   ;# it only supports reading from USB!!!
 
 set stbutil_done "Finished writing rootfs to flash."
 
@@ -276,6 +276,23 @@ proc run_stbutil { model } {
     return 0
 }
 
+# flash rootfs by running "secutil"
+proc run_secutil { model } {
+    if { ![is_in_shell] } {
+        puts "Please make sure the box booted into linux console."
+        return 1
+    }
+
+    standby 5
+
+    my_send_user "Run stbutil for flashing the rootfs..."
+    send $::secutil($model)\r
+    expect "Selection:"
+    send "1\r"
+    expect $::LNX_PROMPT
+    return 0
+}
+
 proc boot_from_flash { model } {
 
     if { ![is_in_cfe] && ![is_in_shell] } {
@@ -421,7 +438,12 @@ proc flash { model } {
     standby 5
     cfe_boot_from_initrd $model
     standby 5
-    run_stbutil $model
+
+    if { [string compare $model "sam7231"] == 0 } {
+	run_secutil $model
+    } else {
+        run_stbutil $model
+    }
     standby 5
     boot_from_flash $model
 
