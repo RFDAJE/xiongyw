@@ -87,8 +87,16 @@ typedef struct{
 }SECTION;
 
 typedef struct{
-    u8        tid;
-    /* sections */
+    /*
+     * table id: for EIT-S, use the first tid to represent the whole range:
+     *  - TID_EIT_ACT_SCH (0x50) represent 0x50 - 0x5f (TID_EIT_ACT_SCH_LAST)
+     *  - TID_EIT_OTH_SCH (0x60) represent 0x50 - 0x6f (TID_EIT_OTH_SCH_LAST)
+     */
+    u8        tid;  
+    
+    /* 
+     * sections: dynamically allocated
+     */
 	int       array_size; // allocated size
     int       section_nr;
     SECTION*  sections;
