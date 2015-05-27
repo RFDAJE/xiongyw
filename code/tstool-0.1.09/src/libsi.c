@@ -1369,7 +1369,9 @@ static void s_add_table(TABLE* tbl, TNODE* root){
     int    i;
     TNODE  *tbl_root, *sect_root;
     char   txt[TXT_BUF_SIZE + 1];
-    
+
+	NIT_SECT_HEADER* nit_sec_hdr;
+	SDT_SECT_HEADER* sdt_sec_hdr;
     EIT_SECT_HEADER* eit_sec_hdr;
 
     if(!tbl || !root || tbl->tid == TID_PMT || tbl->tid == TID_AIT)
@@ -1431,9 +1433,28 @@ static void s_add_table(TABLE* tbl, TNODE* root){
                 s_parse_sect_cat(sect_root, tbl, i); break;
             case TID_NIT_ACT:
             case TID_NIT_OTH:
+                /* replace the description for the section root node */
+                nit_sec_hdr = (NIT_SECT_HEADER*)(tbl->sections[i].data);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION: network-id=0x%04x, version=%2d, section-number=%d/%d", 
+                    nit_sec_hdr->network_id_hi * 256 + nit_sec_hdr->network_id_lo,
+                    nit_sec_hdr->version_number,
+                    nit_sec_hdr->section_number, 
+                    nit_sec_hdr->last_section_number);
+                free(sect_root->txt);
+                sect_root->txt = strdup(txt);
                 s_parse_sect_nit(sect_root, tbl, i); break;
             case TID_SDT_ACT:
             case TID_SDT_OTH:
+                /* replace the description for the section root node */
+                sdt_sec_hdr = (SDT_SECT_HEADER*)(tbl->sections[i].data);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION: onid.tsid=0x%04x.%04x, version=%2d, section-number=%d/%d", 
+                    sdt_sec_hdr->original_network_id_hi * 256 + sdt_sec_hdr->original_network_id_lo,
+                    sdt_sec_hdr->transport_stream_id_hi * 256 + sdt_sec_hdr->transport_stream_id_lo,
+                    sdt_sec_hdr->version_number,
+                    sdt_sec_hdr->section_number, 
+                    sdt_sec_hdr->last_section_number);
+                free(sect_root->txt);
+                sect_root->txt = strdup(txt);
                 s_parse_sect_sdt(sect_root, tbl, i); break;
             case TID_BAT:
                 s_parse_sect_bat(sect_root, tbl, i); break;
@@ -1443,12 +1464,12 @@ static void s_add_table(TABLE* tbl, TNODE* root){
             case TID_EIT_OTH_SCH:
                 /* replace the description for the section root node */
                 eit_sec_hdr = (EIT_SECT_HEADER*)(tbl->sections[i].data);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: tid=%d, ver=%d, %d.%d.%d, %d/%d/%d", 
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(tid=0x%02x): svc=(0x%04x.%04x.%04x), version=%2d, section-number=%d/%d/%d", 
                     eit_sec_hdr->table_id,
-                    eit_sec_hdr->version_number,
                     eit_sec_hdr->original_network_id_hi * 256 + eit_sec_hdr->original_network_id_lo,
                     eit_sec_hdr->transport_stream_id_hi * 256 + eit_sec_hdr->transport_stream_id_lo,
                     eit_sec_hdr->service_id_hi * 256 + eit_sec_hdr->service_id_lo,
+                    eit_sec_hdr->version_number,
                     eit_sec_hdr->section_number, 
                     eit_sec_hdr->segment_last_section_number, 
                     eit_sec_hdr->last_section_number);
