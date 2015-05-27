@@ -2506,7 +2506,7 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 
 
 	/* section info: print more info for EIT sections */
-    if (tid >= TID_EIT_ACT && tid <= TID_EIT_OTH_SCH_LAST) {
+        if (tid >= TID_EIT_ACT && tid <= TID_EIT_OTH_SCH_LAST) {
             eit_sec_hdr = (EIT_SECT_HEADER*)(pSect->data);
             fprintf(fp, "Section: \n");
             fprintf(fp, "  section data size (including table_id): %d\n", pSect->size);
