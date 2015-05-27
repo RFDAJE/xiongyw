@@ -2491,22 +2491,43 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 	char              filename[64];
 	FILE*             fp;
 	SECTION*          pSect;
-	int               nBytePerLine = 8, nRows, len, n, i, j;
+    EIT_SECT_HEADER*  eit_sec_hdr;
+	int               nBytePerLine = 16, nRows, len, n, i, j;
 	u8*               p;
+    u8                tid; // table id
 
 	pSect = (SECTION*)node->tag;
+    tid = ((PRIV_SECT_HEADER*)(pSect->data))->table_id;
 
 	sprintf(filename, "sections/S%0*x.html", sizeof(long) * 2, (long)node);
-	fp = fopen(filename, "wt");
+    fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
 
-	/* section info */
-	fprintf(fp, "Section: \nsection data size: %d\n\n\n", pSect->size);
 
+	/* section info: print more info for EIT sections */
+    if (tid >= TID_EIT_ACT && tid <= TID_EIT_OTH_SCH_LAST) {
+            eit_sec_hdr = (EIT_SECT_HEADER*)(pSect->data);
+            fprintf(fp, "Section: \n");
+            fprintf(fp, "  section data size (including table_id): %d\n", pSect->size);
+            fprintf(fp, "  table_id=0x%02x(%d)\n", tid, tid);
+            fprintf(fp, "  version_number=0x%02x(%d)\n", eit_sec_hdr->version_number, eit_sec_hdr->version_number);
+            fprintf(fp, "  onid.tsid.svcid=0x%04x.%04x.%04x(%d.%d.%d)\n",  
+                eit_sec_hdr->original_network_id_hi * 256 + eit_sec_hdr->original_network_id_lo,
+                eit_sec_hdr->transport_stream_id_hi * 256 + eit_sec_hdr->transport_stream_id_lo,
+                eit_sec_hdr->service_id_hi * 256 + eit_sec_hdr->service_id_lo,
+                eit_sec_hdr->original_network_id_hi * 256 + eit_sec_hdr->original_network_id_lo,
+                eit_sec_hdr->transport_stream_id_hi * 256 + eit_sec_hdr->transport_stream_id_lo,
+                eit_sec_hdr->service_id_hi * 256 + eit_sec_hdr->service_id_lo);
+            fprintf(fp, "  section_number=0x%02x(%d)\n",  eit_sec_hdr->section_number, eit_sec_hdr->section_number);
+            fprintf(fp, "  segment_last_section_number=0x%02x(%d)\n",  eit_sec_hdr->segment_last_section_number, eit_sec_hdr->segment_last_section_number);
+            fprintf(fp, "  last_section_number=0x%02x(%d)\n\n\n",  eit_sec_hdr->last_section_number, eit_sec_hdr->last_section_number);
+    } else {
+            fprintf(fp, "Section: \nsection data size: %d\n\n\n", pSect->size);
+    }
+    
 	/* section hex */
 	p = pSect->data;
-
 
 	nRows = (pSect->size - 1) / nBytePerLine + 1;
 

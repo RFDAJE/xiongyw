@@ -618,6 +618,11 @@ u16 get_pid_of_tid(u8 tid){
 
     int pid;
 
+    // table id for EIT-S is a range...so handle it specially here
+    if (tid >= TID_EIT_ACT_SCH && tid <= TID_EIT_OTH_SCH_LAST) {
+        return PID_EIT;
+    }
+    
     switch(tid){
 
         case TID_PAT:
@@ -641,8 +646,6 @@ u16 get_pid_of_tid(u8 tid){
         
         case TID_EIT_ACT:
         case TID_EIT_OTH:
-        case TID_EIT_ACT_SCH:
-        case TID_EIT_OTH_SCH:
             pid = PID_EIT;
             break;
         

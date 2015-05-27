@@ -62,8 +62,12 @@
  *   should be still continuous. Typically segments start from a section with its section_number equals to i*8, 
  *   where i=(0..31).
  */
+ 
 #define TID_EIT_ACT_SCH                         0x50 /* to 0x5f */
+#define TID_EIT_ACT_SCH_LAST                    0x5f
 #define TID_EIT_OTH_SCH                         0x60 /* to 0x6f */
+#define TID_EIT_OTH_SCH_LAST                    0x6f
+
 #define TID_TDT                                 0x70
 #define TID_RST                                 0x71
 #define TID_ST                                  0x72

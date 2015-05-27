@@ -1151,12 +1151,10 @@ END:
 /*
  * added(bruin, 2015-04-21): a copy of s_get_section_data(): 
  *
- * there is a hack to put multiple NIDs sections in NIT-A or NIT-O. this function
- * is to get all sections from the pid list, regardless their section number.
  *
  * arguments:
         pid(==>):            the pid of the section
-        table_id(==>):       the table_id of the section
+        table_id(==>):       the table_id of the section. For EIT-S, pass in the first TID meaning the full TID range.
         pid_list(==>):       pid_list
         packet_idx(<==>):     search from which packet, and return where we are now.
         pp(<==): pointer to the pointer of the section data, (*pp) should be NULL. 
@@ -1186,6 +1184,7 @@ static u16 s_get_any_section_data(u16           pid,      /* --> */
     PAT_SECT_HEADER* sect_head = 0;
     int              sect_offset = 0;
     u8*              p = 0;
+    u8               tid_start, tid_end; // for EIT-S, which has a range of tids.
 
     //fprintf(stdout, "s_get_any_section_data() enter: tid=%d, packet_idx=%d\n", table_id, *packet_idx);
     
@@ -1212,9 +1211,23 @@ static u16 s_get_any_section_data(u16           pid,      /* --> */
         goto END;
     }
 
+    // convert table_id into a range
+    if (table_id == TID_EIT_ACT_SCH) {
+        tid_start = TID_EIT_ACT_SCH;
+        tid_end = TID_EIT_ACT_SCH_LAST;
+    } else if (table_id == TID_EIT_OTH_SCH) {
+        tid_start = TID_EIT_OTH_SCH;
+        tid_end = TID_EIT_OTH_SCH_LAST;
+    } else {
+        tid_start = table_id;
+        tid_end = table_id;
+    }
+
     //fprintf(stdout, "  s_get_any_section_data(): packet_idx=%d, packet_nr=%d\n", *packet_idx, pid_node->packet_nr);
     
-    /* search the section in pid_node, from the packet_idx indicated */
+    /* 
+     * search the section in pid_node, from the packet_idx indicated 
+     */
     for(i = *packet_idx; i < (int)(pid_node->packet_nr); i ++){
 
         //fprintf(stdout, "  s_get_any_section_data(): i=%d\n", i);
@@ -1230,7 +1243,8 @@ static u16 s_get_any_section_data(u16           pid,      /* --> */
         sect_offset = TS_HEADER_LEN + 1 + p[4];  /* 1: pointer_field size; p[4]: pointer_field value */
         for(; sect_offset < 188 - TS_HEADER_LEN - PAT_SECT_HEADER_LEN ;){
             sect_head = (PAT_SECT_HEADER*)(p + sect_offset);
-            if(sect_head->table_id == table_id) {
+//            if(sect_head->table_id == table_id) {
+            if(sect_head->table_id >= tid_start && sect_head->table_id <= tid_end) {
                 first_packet_found = 1;
                 continuity_counter = packet_continuity_counter(p);
                 break;
@@ -1355,6 +1369,8 @@ static void s_add_table(TABLE* tbl, TNODE* root){
     int    i;
     TNODE  *tbl_root, *sect_root;
     char   txt[TXT_BUF_SIZE + 1];
+    
+    EIT_SECT_HEADER* eit_sec_hdr;
 
     if(!tbl || !root || tbl->tid == TID_PMT || tbl->tid == TID_AIT)
         return;
@@ -1425,6 +1441,19 @@ static void s_add_table(TABLE* tbl, TNODE* root){
             case TID_EIT_OTH:
             case TID_EIT_ACT_SCH:
             case TID_EIT_OTH_SCH:
+                /* replace the description for the section root node */
+                eit_sec_hdr = (EIT_SECT_HEADER*)(tbl->sections[i].data);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION: tid=%d, ver=%d, %d.%d.%d, %d/%d/%d", 
+                    eit_sec_hdr->table_id,
+                    eit_sec_hdr->version_number,
+                    eit_sec_hdr->original_network_id_hi * 256 + eit_sec_hdr->original_network_id_lo,
+                    eit_sec_hdr->transport_stream_id_hi * 256 + eit_sec_hdr->transport_stream_id_lo,
+                    eit_sec_hdr->service_id_hi * 256 + eit_sec_hdr->service_id_lo,
+                    eit_sec_hdr->section_number, 
+                    eit_sec_hdr->segment_last_section_number, 
+                    eit_sec_hdr->last_section_number);
+                free(sect_root->txt);
+                sect_root->txt = strdup(txt);
                 s_parse_sect_eit(sect_root, tbl, i); break;
             case TID_TDT:
                 s_parse_sect_tdt(sect_root, tbl, i); break;
