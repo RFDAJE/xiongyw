@@ -59,6 +59,7 @@ static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8
 static u16 s_get_any_section_data(u16 pid, u8 table_id, PID_LIST* pid_list, int* packet_idx, u8 packet_size, u8* p_ts, u8** pp);
 
 static void s_add_otv_header(OTV_HEADER* header, TNODE* root);
+static long s_get_table_section_size_sum(TABLE* tbl);
 static void s_add_table(TABLE* tbl, TNODE* root);
 static void s_add_tables(TABLE** tbl, TNODE* root, PID_LIST* pid_list, void* tbl_list);
 static void s_add_pids(TSR_RESULT* result, TNODE* root, int max_packet);
@@ -1320,11 +1321,13 @@ static int s_add_section_to_table(TABLE* tbl, int size, u8 *data, int dedup){
     if (dedup == 1) {
         for (i = 0; i < tbl->section_nr; i ++) {
             if (memcmp(tbl->sections[i].data, data, size) == 0) {
+				tbl->sections[i].repeat ++;
                 return 1;
             }
         }
     }
     
+    tbl->sections[tbl->section_nr].repeat = 1;
     tbl->sections[tbl->section_nr].size = size;
     if(!(tbl->sections[tbl->section_nr].data = (u8*)malloc(size)))
         return 1;
@@ -1363,12 +1366,23 @@ static void s_add_otv_header(OTV_HEADER* header, TNODE* root){
     }
 }
 
+static long s_get_table_section_size_sum(TABLE* tbl) 
+{
+	int i;
+	long sum = 0;
+	for (i = 0; i < tbl->section_nr; i ++)
+		sum += tbl->sections[i].size;
+
+	return sum;
+}
+	
 
 /* attach SI table (except pmt/ait) parsing result to "root" node */
 static void s_add_table(TABLE* tbl, TNODE* root){
     int    i;
     TNODE  *tbl_root, *sect_root;
     char   txt[TXT_BUF_SIZE + 1];
+	long   sum;
 
 	NIT_SECT_HEADER* nit_sec_hdr;
 	SDT_SECT_HEADER* sdt_sec_hdr;
@@ -1376,7 +1390,9 @@ static void s_add_table(TABLE* tbl, TNODE* root){
 
     if(!tbl || !root || tbl->tid == TID_PMT || tbl->tid == TID_AIT)
         return;
-    
+
+	sum = s_get_table_section_size_sum(tbl);
+	
     tbl_root = tnode_new(NODE_TYPE_TABLE);
     switch(tbl->tid){
         case TID_PAT:
@@ -1388,19 +1404,31 @@ static void s_add_table(TABLE* tbl, TNODE* root){
         case TID_NIT_OTH:
             tbl_root->txt = strdup("NIT OTHER"); break;
         case TID_SDT_ACT:
-            tbl_root->txt = strdup("SDT ACTUAL"); break;
+			snprintf(txt, TXT_BUF_SIZE, "SDT ACTUAL (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_SDT_OTH:
-            tbl_root->txt = strdup("SDT OTHER"); break;
+			snprintf(txt, TXT_BUF_SIZE, "SDT OTHER (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_BAT:
             tbl_root->txt = strdup("BAT"); break;
         case TID_EIT_ACT:
-            tbl_root->txt = strdup("EIT ACTUAL"); break;
+			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_EIT_OTH:
-            tbl_root->txt = strdup("EIT OTHER"); break;
+			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_EIT_ACT_SCH:
-            tbl_root->txt = strdup("EIT ACTUAL SCHEDULE"); break;
+			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL SCHEDULE (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_EIT_OTH_SCH:
-            tbl_root->txt = strdup("EIT OTHER SCHEDULE"); break;
+			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER SCHEDULE (%d sections, %d bytes)", tbl->section_nr, sum);
+            tbl_root->txt = strdup(txt); 
+			break;
         case TID_TDT:
             tbl_root->txt = strdup("TDT"); break;
         case TID_TOT:
@@ -1421,7 +1449,7 @@ static void s_add_table(TABLE* tbl, TNODE* root){
     
     for(i = 0; i < tbl->section_nr; i ++){
         sect_root = tnode_new(NODE_TYPE_SECTION);
-        snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", i);
+        snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): %d", tbl->sections[i].repeat, i);
         sect_root->txt = strdup(txt);
         sect_root->tag = (long)(&(tbl->sections[i]));
         tnode_attach(tbl_root, sect_root);
@@ -1435,7 +1463,8 @@ static void s_add_table(TABLE* tbl, TNODE* root){
             case TID_NIT_OTH:
                 /* replace the description for the section root node */
                 nit_sec_hdr = (NIT_SECT_HEADER*)(tbl->sections[i].data);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: network-id=0x%04x, version=%2d, section-number=%d/%d", 
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): network-id=0x%04x, version=%2d, section-number=%d/%d", 
+					tbl->sections[i].repeat,
                     nit_sec_hdr->network_id_hi * 256 + nit_sec_hdr->network_id_lo,
                     nit_sec_hdr->version_number,
                     nit_sec_hdr->section_number, 
@@ -1447,7 +1476,8 @@ static void s_add_table(TABLE* tbl, TNODE* root){
             case TID_SDT_OTH:
                 /* replace the description for the section root node */
                 sdt_sec_hdr = (SDT_SECT_HEADER*)(tbl->sections[i].data);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: onid.tsid=0x%04x.%04x, version=%2d, section-number=%d/%d", 
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): onid.tsid=0x%04x.%04x, version=%2d, section-number=%d/%d", 
+					tbl->sections[i].repeat,
                     sdt_sec_hdr->original_network_id_hi * 256 + sdt_sec_hdr->original_network_id_lo,
                     sdt_sec_hdr->transport_stream_id_hi * 256 + sdt_sec_hdr->transport_stream_id_lo,
                     sdt_sec_hdr->version_number,
@@ -1464,7 +1494,8 @@ static void s_add_table(TABLE* tbl, TNODE* root){
             case TID_EIT_OTH_SCH:
                 /* replace the description for the section root node */
                 eit_sec_hdr = (EIT_SECT_HEADER*)(tbl->sections[i].data);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION(tid=0x%02x): svc=(0x%04x.%04x.%04x), version=%2d, section-number=%d/%d/%d", 
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): tid=0x%02x, svc=(0x%04x.%04x.%04x), version=%2d, section-number=%d/%d/%d", 
+					tbl->sections[i].repeat,
                     eit_sec_hdr->table_id,
                     eit_sec_hdr->original_network_id_hi * 256 + eit_sec_hdr->original_network_id_lo,
                     eit_sec_hdr->transport_stream_id_hi * 256 + eit_sec_hdr->transport_stream_id_lo,
@@ -1529,7 +1560,7 @@ static void s_add_tables(TABLE** tbl, TNODE* root, PID_LIST* pid_list, void* tbl
 
             for(j = 0; j < tbl[i]->section_nr; j ++){
                 sect_root = tnode_new(NODE_TYPE_SECTION);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", j);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): %d", tbl[i]->sections[j].repeat, j);
                 sect_root->txt = strdup(txt);
                 sect_root->tag = (long)(&(tbl[i]->sections[j]));
                 tnode_attach(tbl_root, sect_root);
@@ -1562,7 +1593,7 @@ static void s_add_tables(TABLE** tbl, TNODE* root, PID_LIST* pid_list, void* tbl
 
             for(j = 0; j < tbl[i]->section_nr; j ++){
                 sect_root = tnode_new(NODE_TYPE_SECTION);
-                snprintf(txt, TXT_BUF_SIZE, "SECTION: %d", j);
+                snprintf(txt, TXT_BUF_SIZE, "SECTION(+%d): %d", tbl[i]->sections[j].repeat, j);
                 sect_root->txt = strdup(txt);
                 sect_root->tag = (long)(&(tbl[i]->sections[j]));
                 tnode_attach(tbl_root, sect_root);

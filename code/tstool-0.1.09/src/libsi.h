@@ -84,6 +84,7 @@ typedef struct{
 typedef struct{
     u8   *data;      /* the whole section data, starting from "table_id" */
     int  size;       /* size of data, should equal to "section_length + 3" */
+	int  repeat;     /* repeat count of the same section in the stream */
 }SECTION;
 
 typedef struct{
