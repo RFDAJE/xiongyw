@@ -64,7 +64,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_uhttpd_OBJECTS = main.$(OBJEXT) get.$(OBJEXT) readconf.$(OBJEXT) \
 	util.$(OBJEXT) tcpserver.$(OBJEXT) response.$(OBJEXT) \
-	urlencode.$(OBJEXT)
+	urlencode.$(OBJEXT) proc.$(OBJEXT)
 uhttpd_OBJECTS = $(am_uhttpd_OBJECTS)
 uhttpd_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -171,7 +171,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-uhttpd_SOURCES = uhttpd.h main.c get.h get.c readconf.h readconf.c util.h util.c tcpserver.h tcpserver.c response.h response.c urlencode.c
+uhttpd_SOURCES = uhttpd.h main.c get.h get.c readconf.h readconf.c util.h util.c tcpserver.h tcpserver.c response.h response.c urlencode.c proc.h proc.c
 all: all-am
 
 .SUFFIXES:
