@@ -14,7 +14,7 @@ set verbose_flag  0
 
 proc cmd {} { 
     set CTRLZ  \032 
-    send_user "command (g,p,? for more): " 
+    send_user "command (g,p,c,v,~,? for more): " 
     expect_user  { 
         g  get_main 
         p  put_main 
@@ -281,8 +281,10 @@ proc put {infile outfile} {
     log_user 1
 }
 
-spawn -noecho $env(SHELL) 
+;# spawn a new shell
+spawn -noecho $env(SHELL) --norc
+
 send_user "Once logged in, cd to directory to transfer to/from and press: ~~\n" 
-send_user "One moment ... \n" 
+
 interact ~~ cmd
 
