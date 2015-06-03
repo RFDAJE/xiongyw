@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2015 Yuwu Xiong <5070319@qq.com>
+** Copyright (C) 2015 Yuwu Xiong <sansidee@foxmail.com>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
 
 	/* get the file stat */
 	if(stat(s_input_file, &s_input_stat)){
-		fprintf(stderr, "stat(%s) failed, errno=%d, abort.\n", s_input_file, errno);
+		fprintf(stderr, "stat(%s) failed, errno=%d(%s), abort.\n", s_input_file, errno, strerror(errno));
 		exit(1);
 	}
 
@@ -849,7 +849,7 @@ static void show_help(void){
 "                   the option argument\n"
 "\n");
 
-	fprintf(stderr, "Please report bugs to Yuwu Xiong <5070319@qq.com>\n");
+	fprintf(stderr, "Please report bugs to Yuwu Xiong <sansidee@foxmail.com>\n");
 }
 
 static void show_version(void){

@@ -1,4 +1,4 @@
-# Copyright (C) 2004 Yuwu (Bruin) Xiong <xiongyw@hotmail.com>
+# Copyright (C) 2015 Yuwu Xiong <sansidee@foxmail.com>
 #  
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without 
