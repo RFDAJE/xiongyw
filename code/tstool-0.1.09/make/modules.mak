@@ -1,22 +1,20 @@
-# Note: 'modules' contains a list of directory names of the modules,
-#   the directories is relative to $(srcroot). e.g.:
 #
-#   modules := main
-#   modules += util
-#   modules += util/submodule
+# Note: 'modules' contains a list of absolute directory 
+# paths, all the source files under that directory is
+# considered belongs to that module 
 #
 
 #-----------------------------------------
-# SDK
+#  modules, a simple variable
 #-----------------------------------------
-
 modules := $(PKG_ROOT)/src
+#modules += 
 
 
 
 
 #-----------------------------------------
-# includes
+# include_dirs, a simple variable
 #-----------------------------------------
 
 include_dirs := $(modules)
