@@ -215,6 +215,7 @@ $(out_dirs):
 	$(MD) $@
 
 $(executable): $(objects)
+	@printf "#\n# Linking '$@' ...\n#\n"
 	$(CC) $^ -o $@
 
 
