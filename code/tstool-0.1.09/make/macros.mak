@@ -23,9 +23,9 @@ endef
 	
 # --------------------------------------
 # generate rules for each module in the module list
-# $(call all-module-rules,module_dir_list,out_root,pkg_root,src_name,lib_name)
+# $(call all-module-rules,module_dir_list,out_root,pkg_root,src_name,lib_name,local_mak)
 define all-module-rules
-	$(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5))
+	$(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6))
 endef
 
 # insert (by eval) rules for each source of a module, and add the source
@@ -35,9 +35,9 @@ endef
 # read that (-include), and the 'local.mk' can define 'local_exclude"
 # to list names of source files to be excluded in the compilation.
 #
-# $(call one-module-rules,module_root_path, out_root, pkg_root, src_name, lib_name)
+# $(call one-module-rules,module_root_path,out_root,pkg_root,src_name,lib_name,local_mak)
 define one-module-rules
-	$(eval -include $1/local.mak)
+	$(eval -include $1/$6)
 	$(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
 
 	$(eval local_exclude := $(addprefix $1/,$(local_exclude)))

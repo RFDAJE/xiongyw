@@ -2,7 +2,7 @@
 # non-recursive make project 
 #
 # created(bruin, 2011-11-28)
-# last updated: 2012-06-19
+# last updated: 2015-06-09
 #
 # reference: 
 #   [1] http://oreilly.com/catalog/make3/book/index.csp "Managing Projects with GNU Make", 3rd, Robert Mecklenburg
@@ -43,21 +43,47 @@
 # - both varialbes and macro/function calls are referenced by parenthesis: $()
 # --------------------------------------------------------------------
 
+# --------------------------------------------------------------------
+# how it works (overview)
+# --------------------------------------------------------------------
+# 1. "module.mak":
+#    - lists all module directories into a simple variable "modules";
+#    - lists all include directories into a simple variable "include_dirs".
+# 2. macro "all-module-rules" takes "modules" variable, and: 
+#    - scans all source files under each module, excluding sources 
+#      specified in local makefile of each module, resulting in a simple
+#      variable "sources" which lists all source files;
+#    - gives a library name for each module, resulting in a simple variable 
+#      "libraries" which lists all libraries;
+#    - creates rules for generating each library.
+# 3. macro "compile-rule" takes "sources", and:
+#    - generates compiling rules for each source file, the command part
+#      of the rule (rule recipe) generates both obj and depend file, the
+#      latter is -included if already generated
+# 
+# so roughly:
+#
+# 1. module.mak -> $(modules), $(include_dirs)  
+# 2. $(modules) -> $(sources), $(libraries)
+# 3. $(sources) -> rules for generating $(objects) & $(depends)
+# 
+# note that $(objects) and $(depends) are recursive variables, meaning
+# that they are not expanded until it's used (in the second phase after
+# the depend graph are built).
+# --------------------------------------------------------------------
+
+
+
 # --------------------------------------
 # Remove all built-in rules.
 # --------------------------------------
 #
 #.SUFFIXES:
-
+#
 #ifeq ($(filter "r",$(MAKEFLAGS)),)
 #	MAKEFLAGS += r
 #endif
-
-#
-# Variables can be expanded by using either parentheses or curly braces. 
-# Some people use ${} for variable reference and $() for function calls, 
-# similar to the way the shell uses them. ([1] p41)
-#
+# --------------------------------------
 
 
 ### -------------------------------------------------------------
@@ -108,9 +134,9 @@ sources    :=
 libraries  := 
 
 
-# ######################################
-# these are macros, usually no change
-# ######################################
+# ##########################################
+# these are macros, usually no customization
+# ##########################################
 include macros.mak
 
 
@@ -146,7 +172,6 @@ depends = $(patsubst %.o,%.d,$(objects))
 
 
 
-
 # This is to prevent gmake treats the first target (appears when
 # generate module rules) as the default target
 all:
@@ -154,9 +179,8 @@ all:
 # --------------------------------------
 # here goes the bulk part of our rules! 
 # --------------------------------------
-$(eval $(call all-module-rules,$(modules),$(OUT_ROOT),$(PKG_ROOT),sources,libraries,local.mk))
+$(eval $(call all-module-rules,$(modules),$(OUT_ROOT),$(PKG_ROOT),sources,libraries,local.mak))
 $(eval $(call compile-rules,$(sources),$(OUT_ROOT),$(PKG_ROOT)))
-
 
 
 
