@@ -5,8 +5,8 @@
 # last updated: 2012-06-19
 #
 # reference: 
-#   1. http://oreilly.com/catalog/make3/book/index.csp "Managing Projects with GNU Make", 3rd, Robert Mecklenburg
-#   2. http://aegis.sf.net/auug97.pdf "Recursive Make Considered Harmful", Peter Miller
+#   [1] http://oreilly.com/catalog/make3/book/index.csp "Managing Projects with GNU Make", 3rd, Robert Mecklenburg
+#   [2] http://aegis.sf.net/auug97.pdf "Recursive Make Considered Harmful", Peter Miller
 # ---------------------------------------------------------------------------------------
 
 
@@ -30,6 +30,22 @@
 #   6. misc: support jobs, help, silent/verbose, etc
 # --------------------------------------
 
+# --------------------------------------
+# Remove all built-in rules.
+# --------------------------------------
+#
+#.SUFFIXES:
+
+#ifeq ($(filter "r",$(MAKEFLAGS)),)
+#	MAKEFLAGS += r
+#endif
+
+#
+# Variables can be expanded by using either parentheses or curly braces. 
+# Some people use ${} for variable reference and $() for function calls, 
+# similar to the way the shell uses them. ([1] p41)
+#
+
 
 ### -------------------------------------------------------------
 ### --         determine the build platform           
@@ -52,12 +68,13 @@ endif
 ifdef WINDOWS
 	$(error Host platform is not supported!)   
 else
-	CC      := gcc
+	CC     := gcc
 	CP     := cp
 	MD     := mkdir -p
 	RM     := rm -rf
-	ECHO    := echo
+	ECHO   := echo
 endif
+
 
 # --------------------------------------
 # these are simple variables
@@ -128,19 +145,33 @@ $(eval $(call compile-rules,$(sources)))
 
 
 # --------------------------------------
-#  regular targets
+#  targets, arranged in top-down order
 # --------------------------------------
 
 
-.PHONY: all clean help chkdir
-	
-all: chkdir $(objects)
-	$(CC) $(objects) -o $(OUT_ROOT)/$(executable)
+#
+# Tells make that the following targets do not represent files
+# (and make treats phony targets as always out of date).
+#
+.PHONY: all clean help
 
-	
-chkdir: $(out_dirs)
+
+#
+# There is no command for this phony target, thus this phony target 
+# just serves as an improvement of "User Interface" ([1] p15)
+#
+all: $(out_dirs) $(OUT_ROOT)/$(executable)
+
 $(out_dirs):
 	$(MD) $@
+
+$(OUT_ROOT)/$(executable): $(objects)
+	$(CC) $^ -o $@
+
+
+#
+# rules for $(objects) are generated above
+#
 
 clean:
 ifdef WINDOWS
@@ -157,6 +188,19 @@ help:
 
 
 
+#
+# ([1] pp56-57): make will try to include the $(depends) the 1st time;
+# if not available, it will continoue (w/ warning because of '-' sign).
+# Then if it notices there are rules for generating $(depends), so it will:
+#  - evaluates those rules to get $(depends) generated, and
+#  - starts from scratch by rereading the whole makefiles again.
+#
+# However, restarting make is not necessary ([1] pp150-152). So:
+#  - $(depends) are generated at the same time as $(objects), 
+#  - no rules for $(depends)
+# thus make cannot find rules for $(depends), which will only be read
+# by make the next time invoked.
+#
 ifneq "$(MAKECMDGOALS)" "clean"
   -include $(depends)
 endif

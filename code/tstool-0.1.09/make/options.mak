@@ -1,6 +1,6 @@
 
 
-# this is for compiler
+# this is for preprocessor
 CPPFLAGS := $(addprefix -I ,$(include_dirs))
 # this is for make to find include files when checking dependencies. really needed?
 #vpath %.h $(include_dirs)

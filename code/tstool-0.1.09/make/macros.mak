@@ -71,6 +71,7 @@ define one-compile-rule
 	$(eval tmp_dep := $(patsubst %.o,%.d,$(tmp_obj)))
 
 	$(eval $(tmp_obj): $(tmp_src)
+	  @printf "#\n# Building $(tmp_obj) ... \n#\n"
 	  $(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $(CFLAGS) $(CPPFLAGS) $$<
 	  $(CC) $(CFLAGS) $(CPPFLAGS) -o $$@ $$<
          )
