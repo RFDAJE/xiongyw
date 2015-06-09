@@ -3,9 +3,9 @@
 # --------------------------------------
 
 # get objects path from sources path
-# $(call srcs-to-objs,srcs)
+# $(call srcs-to-objs,srcs,out_root)
 define srcs-to-objs 
-	$(addprefix $(OUT_ROOT)/, \
+	$(addprefix $2/, \
 	$(patsubst $(PKG_ROOT)/%,%,\
 	$(patsubst %.cpp,%.o,$(filter %.cpp,$1)) \
 	$(patsubst %.c,%.o,$(filter %.c,$1))     \
@@ -13,16 +13,16 @@ define srcs-to-objs
 endef
 
 # --------------------------------------
-# $(call module-to-lib module-path)
+# $(call module-to-lib module_path out_root)
 define module-to-lib
-	$(addprefix $(OUT_ROOT)/,$(patsubst $(PKG_ROOT)/%,%/$(notdir $1).a,$1))
+	$(addprefix $2/,$(patsubst $(PKG_ROOT)/%,%/$(notdir $1).a,$1))
 endef
 	
 # --------------------------------------
 # generate rules for each module in the module list
-# $(call all-module-rules,module-dir-list)
+# $(call all-module-rules,module_dir_list, out_root, src_name, lib_name)
 define all-module-rules
-	$(foreach module,$1,$(call one-module-rules,$(module)))
+	$(foreach module,$1,$(call one-module-rules,$(module), $2, $3, $4))
 endef
 
 # auto insert (by eval) rules for each module, also updating 
@@ -31,20 +31,20 @@ endef
 # if there is a 'local.mk' under the module directory, also
 # read that (-include), and the 'local.mk' can define 'local_exclude"
 # to list names of source files to be excluded in the compilation.
-# $(call one-module-rules,module-root-path)
+#
+# $(call one-module-rules,module_root_path, out_root, src_name, lib_name)
 define one-module-rules
-	$(eval -include $1/local.mk)
+	$(eval -include $1/local.mak)
 	$(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
 
 	$(eval local_exclude := $(addprefix $1/,$(local_exclude)))
 	$(eval module_src := $(filter-out $(local_exclude),$(module_src)))
 
-	$(eval module_obj := $(call srcs-to-objs,$(module_src)))
-	$(eval module_lib := $(call module-to-lib,$1))
+	$(eval module_obj := $(call srcs-to-objs,$(module_src), $2))
+	$(eval module_lib := $(call module-to-lib,$1, $2))
 	
-	sources += $(module_src)
-
-	libraries += $(module_lib)
+	$(eval $3 += $(module_src))
+	$(eval $4 += $(module_lib))
 
 	$(eval $(module_lib): $(module_obj)
 	  $(AR) rv $$@ $$^
@@ -53,9 +53,9 @@ endef
 
 
 # --------------------------------------
-# $(call compile-rules, src-list)
+# $(call compile-rules, src_list, out_root)
 define compile-rules
-	$(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f)),$(f)))
+	$(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f), $2),$(f)))
 endef
 
 # generate rules for each source file. 

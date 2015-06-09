@@ -80,14 +80,15 @@ endif
 # these are simple variables
 # --------------------------------------
 
+#
+# use absolute paths
+#
+PKG_ROOT   := $(shell pwd)/..
+OUT_ROOT   := $(shell pwd)/out
 
-PKG_NAME := tstool
-PKG_ROOT := ..
-OUT_ROOT := out
-
+executable := $(OUT_ROOT)/tstool
 sources    :=
 libraries  := 
-executable := tstool
 
 
 # ######################################
@@ -123,7 +124,7 @@ endif
 # --------------------------------------
 # these are recursive variables
 # --------------------------------------
-objects = $(call srcs-to-objs, $(sources))
+objects = $(call srcs-to-objs, $(sources), $(OUT_ROOT))
 depends = $(patsubst %.o,%.d,$(objects))
 
 
@@ -133,12 +134,11 @@ depends = $(patsubst %.o,%.d,$(objects))
 # generate module rules) as the default target
 all:
 
-
 # --------------------------------------
 # here goes the bulk part of our rules! 
 # --------------------------------------
-$(eval $(call all-module-rules,$(modules)))
-$(eval $(call compile-rules,$(sources)))
+$(eval $(call all-module-rules,$(modules), $(OUT_ROOT), sources, libraries, local.mk))
+$(eval $(call compile-rules,$(sources), $(OUT_ROOT)))
 
 
 
@@ -160,12 +160,12 @@ $(eval $(call compile-rules,$(sources)))
 # There is no command for this phony target, thus this phony target 
 # just serves as an improvement of "User Interface" ([1] p15)
 #
-all: $(out_dirs) $(OUT_ROOT)/$(executable)
+all: $(out_dirs) $(executable)
 
 $(out_dirs):
 	$(MD) $@
 
-$(OUT_ROOT)/$(executable): $(objects)
+$(executable): $(objects)
 	$(CC) $^ -o $@
 
 
