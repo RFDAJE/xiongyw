@@ -67,6 +67,9 @@ endef
 #   source; also note that the dependencies are generated at the same time when objects are generated,
 #   i.e., in "Tromey's Way" ([1], pp150-154, with small variance). 
 #   the net result is that we do not have pattern rules but all explicit rules which are auto-generated.
+#
+# note that $(CC), $(CFLAGS) and $(CPPFLAGS) expansion are deferred by $$ ([1], p84). This allow altering them
+# in the scenario when used as target-specfic variables ([1], p50).
 # $(call one-compile-rule,obj,src)
 define one-compile-rule
 	$(eval tmp_obj := $1)
@@ -75,7 +78,7 @@ define one-compile-rule
 
 	$(eval $(tmp_obj): $(tmp_src)
 	  @printf "#\n# Building $(tmp_obj) ... \n#\n"
-	  $(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $(CFLAGS) $(CPPFLAGS) $$<
-	  $(CC) $(CFLAGS) $(CPPFLAGS) -o $$@ $$<
+	  $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
+	  $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
          )
 endef

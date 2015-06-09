@@ -1,7 +1,12 @@
 
 
 # this is for preprocessor
-CPPFLAGS := $(addprefix -I ,$(include_dirs))
+CPPFLAGS = $(addprefix -I ,$(include_dirs))
+#
+# source file level debug flags
+#
+CPPFLAGS += -DHAVE_CONFIG_H   # autotools compatible
+
 # this is for make to find include files when checking dependencies. really needed?
 #vpath %.h $(include_dirs)
 
@@ -12,7 +17,7 @@ CPPFLAGS := $(addprefix -I ,$(include_dirs))
 # [-x c]: sources in C language
 #CFLAGS := -x c 
 # [-c]: compile only
-CFLAGS += -c 
+CFLAGS = -c 
 
 # [-Wall]: enable all warnings
 CFLAGS += -Wall 
@@ -26,17 +31,12 @@ CFLAGS += -Wundef
 
 # [-g]: produce debug info, should be turn off for release build
 #CFLAGS += -g  
-# [-ggdb]: produce debugging information for use by GDB. is it applicable here?
+# [-ggdb]: produce debugging information for use by GDB. 
 #CFLAGS += -ggdb
 # [-O2]: Optimize even more than [-O] or [-O1]. better turn it off for debug build.
-CFLAGS += -O2
+#CFLAGS += -O2
 
 
-#
-# source file level debug flags
-#
-CFLAGS += -DHAVE_CONFIG_H   # autotools compatible
-CFLAGS += -DDEBUG
 
 #########################################################
 # options used for linking: 

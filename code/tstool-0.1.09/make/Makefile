@@ -128,6 +128,9 @@ endif
 #
 PKG_ROOT   := $(shell pwd)/..
 OUT_ROOT   := $(shell pwd)/out
+ifeq "$(MAKECMDGOALS)" "debug"
+  OUT_ROOT := $(OUT_ROOT)/debug
+endif
 
 executable := $(OUT_ROOT)/tstool
 sources    :=
@@ -194,14 +197,19 @@ $(eval $(call compile-rules,$(sources),$(OUT_ROOT),$(PKG_ROOT)))
 # Tells make that the following targets do not represent files
 # (and make treats phony targets as always out of date).
 #
-.PHONY: all clean help
+.PHONY: all debug clean help
 
 
 #
 # There is no command for this phony target, thus this phony target 
 # just serves as an improvement of "User Interface" ([1] p15)
 #
+all: CFLAGS += -O2
 all: $(out_dirs) $(executable)
+
+debug: CFLAGS += -O0 -g -ggdb
+debug: $(out_dirs) $(executable)
+
 
 $(out_dirs):
 	$(MD) $@
