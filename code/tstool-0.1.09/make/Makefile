@@ -30,6 +30,19 @@
 #   6. misc: support jobs, help, silent/verbose, etc
 # --------------------------------------
 
+# --------------------------------------------------------------------
+# variable naming conventions ([1] pp41-42)
+# --------------------------------------------------------------------
+# - variables representing constatns a user might want to customize
+#   on the command line or in the environ are written in all uppercase, 
+#   and words are separated by underscore. e.g., OUT_ROOT
+# - variables that appear only in makefile are all lowercase with words
+#   separated by underscore. e.g., module_src
+# - macro/function names are all small case with words separated 
+#   by dash. e.g., compile-rules
+# - both varialbes and macro/function calls are referenced by parenthesis: $()
+# --------------------------------------------------------------------
+
 # --------------------------------------
 # Remove all built-in rules.
 # --------------------------------------
@@ -83,6 +96,10 @@ endif
 #
 # use absolute paths
 #
+# PKG_ROOT is use to "mask out" the relative path of each source file;
+# The relative path of each source is appended to OUT_ROOT to form 
+# the absolute path for it's corresponding object file.
+#
 PKG_ROOT   := $(shell pwd)/..
 OUT_ROOT   := $(shell pwd)/out
 
@@ -124,7 +141,7 @@ endif
 # --------------------------------------
 # these are recursive variables
 # --------------------------------------
-objects = $(call srcs-to-objs, $(sources), $(OUT_ROOT))
+objects = $(call srcs-to-objs, $(sources),$(OUT_ROOT),$(PKG_ROOT))
 depends = $(patsubst %.o,%.d,$(objects))
 
 
@@ -137,8 +154,8 @@ all:
 # --------------------------------------
 # here goes the bulk part of our rules! 
 # --------------------------------------
-$(eval $(call all-module-rules,$(modules), $(OUT_ROOT), sources, libraries, local.mk))
-$(eval $(call compile-rules,$(sources), $(OUT_ROOT)))
+$(eval $(call all-module-rules,$(modules),$(OUT_ROOT),$(PKG_ROOT),sources,libraries,local.mk))
+$(eval $(call compile-rules,$(sources),$(OUT_ROOT),$(PKG_ROOT)))
 
 
 
