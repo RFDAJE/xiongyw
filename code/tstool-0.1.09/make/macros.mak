@@ -73,14 +73,18 @@ endef
 # in the scenario when used as target-specfic variables ([1], p50).
 # $(call one-compile-rule,obj,src)
 define one-compile-rule
-    $(eval tmp_obj := $1)
-    $(eval tmp_src := $2)
-    $(eval tmp_dep := $(patsubst %.o,%.d,$(tmp_obj)))
+    $(eval tmp_obj := $1
+           tmp_src := $2
+           tmp_dep := $(patsubst %.o,%.d,$(tmp_obj))
+     )
 
-	# note: first char on the rule recipe lines must be TAB!
+	# fixme: if let the following rule be evaluated by the eval above, the rule for the last 
+	# source file will not be generated! so we do it in two evals...why?
+	
+  	# note: first char on the rule recipe lines must be TAB!
     $(eval $(tmp_obj): $(tmp_src)
-	    @printf "#\n# Building $(tmp_obj) ... \n#\n"
-	    $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
-	    $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
+	           $$(info "#\n# Building $(tmp_obj) ... \n#\n")
+	           $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
+	           $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
      )
 endef
