@@ -8,24 +8,24 @@
 # get objects path from sources path
 # $(call srcs-to-objs,abs_srcs,out_root,pkg_root)
 define srcs-to-objs 
-	$(addprefix $2/, \
-	$(patsubst $3/%,%,\
-	$(patsubst %.cpp,%.o,$(filter %.cpp,$1)) \
-	$(patsubst %.c,%.o,$(filter %.c,$1))     \
-	$(patsubst %.S,%.o,$(filter %.S,$1)))) 
+    $(addprefix $2/, \
+    $(patsubst $3/%,%,\
+    $(patsubst %.cpp,%.o,$(filter %.cpp,$1)) \
+    $(patsubst %.c,%.o,$(filter %.c,$1))     \
+    $(patsubst %.S,%.o,$(filter %.S,$1)))) 
 endef
 
 # --------------------------------------
 # $(call module-to-lib,module_path,out_root,pkg_root)
 define module-to-lib
-	$(addprefix $2/,$(patsubst $3/%,%/$(notdir $1).a,$1))
+    $(addprefix $2/,$(patsubst $3/%,%/$(notdir $1).a,$1))
 endef
-	
+    
 # --------------------------------------
 # generate rules for each module in the module list
 # $(call all-module-rules,module_dir_list,out_root,pkg_root,src_name,lib_name,local_mak)
 define all-module-rules
-	$(eval $(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6)))
+    $(eval $(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6)))
 endef
 
 # insert (by eval) rules for each source of a module, and add the source
@@ -37,28 +37,29 @@ endef
 #
 # $(call one-module-rules,module_root_path,out_root,pkg_root,src_name,lib_name,local_mak)
 define one-module-rules
-	$(eval -include $1/$6)
-	$(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
+    $(eval -include $1/$6)
+    $(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
 
-	$(eval local_exclude := $(addprefix $1/,$(local_exclude)))
-	$(eval module_src := $(filter-out $(local_exclude),$(module_src)))
+    $(eval local_exclude := $(addprefix $1/,$(local_exclude)))
+    $(eval module_src := $(filter-out $(local_exclude),$(module_src)))
 
-	$(eval module_obj := $(call srcs-to-objs,$(module_src),$2,$3))
-	$(eval module_lib := $(call module-to-lib,$1,$2,$3))
-	
-	$(eval $4 += $(module_src))
-	$(eval $5 += $(module_lib))
+    $(eval module_obj := $(call srcs-to-objs,$(module_src),$2,$3))
+    $(eval module_lib := $(call module-to-lib,$1,$2,$3))
+    
+    $(eval $4 += $(module_src))
+    $(eval $5 += $(module_lib))
 
-	$(eval $(module_lib): $(module_obj)
-	  $(AR) rv $$@ $$^
-         )
+	# note: first char on the rule recipe lines must be TAB!
+    $(eval $(module_lib): $(module_obj)
+	    $(AR) rv $$@ $$^
+     )
 endef
 
 
 # --------------------------------------
 # $(call compile-rules,src_list,out_root,pkg_root)
 define compile-rules
-	$(eval $(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f),$2,$3),$(f))))
+    $(eval $(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f),$2,$3),$(f))))
 endef
 
 # generate rules for each source file. 
@@ -72,13 +73,14 @@ endef
 # in the scenario when used as target-specfic variables ([1], p50).
 # $(call one-compile-rule,obj,src)
 define one-compile-rule
-	$(eval tmp_obj := $1)
-	$(eval tmp_src := $2)
-	$(eval tmp_dep := $(patsubst %.o,%.d,$(tmp_obj)))
+    $(eval tmp_obj := $1)
+    $(eval tmp_src := $2)
+    $(eval tmp_dep := $(patsubst %.o,%.d,$(tmp_obj)))
 
-	$(eval $(tmp_obj): $(tmp_src)
-	  @printf "#\n# Building $(tmp_obj) ... \n#\n"
-	  $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
-	  $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
-         )
+	# note: first char on the rule recipe lines must be TAB!
+    $(eval $(tmp_obj): $(tmp_src)
+	    @printf "#\n# Building $(tmp_obj) ... \n#\n"
+	    $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
+	    $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
+     )
 endef
