@@ -35,23 +35,28 @@ endef
 # read that (-include), and the 'local.mk' can define 'local_exclude"
 # to list names of source files to be excluded in the compilation.
 #
+# notes about $$ ([1] p84): the argument to eval is expanded twice: once when make 
+# prepares the argument list for eval, and once again by eval.
+# the solution is either calling eval separately for the rule, or defer the expansion 
+# by using double dollars $$.
+#
 # $(call one-module-rules,module_root_path,out_root,pkg_root,src_name,lib_name,local_mak)
 define one-module-rules
-    $(eval -include $1/$6)
-    $(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
+    $(eval -include $1/$6
+           module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S)
 
-    $(eval local_exclude := $(addprefix $1/,$(local_exclude)))
-    $(eval module_src := $(filter-out $(local_exclude),$(module_src)))
+           local_exclude := $(addprefix $1/,$$(local_exclude))
+           module_src := $(filter-out $$(local_exclude),$$(module_src))
 
-    $(eval module_obj := $(call srcs-to-objs,$(module_src),$2,$3))
-    $(eval module_lib := $(call module-to-lib,$1,$2,$3))
+           module_obj := $(call srcs-to-objs,$$(module_src),$2,$3)
+           module_lib := $(call module-to-lib,$1,$2,$3)
     
-    $(eval $4 += $(module_src))
-    $(eval $5 += $(module_lib))
+           $4 += $$(module_src)
+           $5 += $$(module_lib)
 
-	# note: first char on the rule recipe lines must be TAB!
-    $(eval $(module_lib): $(module_obj)
-	    $(AR) rv $$@ $$^
+ 	       # note: first char on the rule recipe lines must be TAB!
+           $$(module_lib): $$(module_obj)
+	           $(AR) rv $$@ $$^
      )
 endef
 
@@ -76,13 +81,9 @@ define one-compile-rule
     $(eval tmp_obj := $1
            tmp_src := $2
            tmp_dep := $(patsubst %.o,%.d,$(tmp_obj))
-     )
 
-	# fixme: if let the following rule be evaluated by the eval above, the rule for the last 
-	# source file will not be generated! so we do it in two evals...why?
-	
-  	# note: first char on the rule recipe lines must be TAB!
-    $(eval $(tmp_obj): $(tmp_src)
+           # note: first char on the rule recipe lines must be TAB!	
+           $$(tmp_obj): $$(tmp_src)
 	           $$(info "#\n# Building $(tmp_obj) ... \n#\n")
 	           $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
 	           $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
