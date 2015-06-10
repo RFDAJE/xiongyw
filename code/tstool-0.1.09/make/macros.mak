@@ -25,7 +25,7 @@ endef
 # generate rules for each module in the module list
 # $(call all-module-rules,module_dir_list,out_root,pkg_root,src_name,lib_name,local_mak)
 define all-module-rules
-	$(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6))
+	$(eval $(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6)))
 endef
 
 # insert (by eval) rules for each source of a module, and add the source
@@ -58,7 +58,7 @@ endef
 # --------------------------------------
 # $(call compile-rules,src_list,out_root,pkg_root)
 define compile-rules
-	$(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f),$2,$3),$(f)))
+	$(eval $(foreach f,$1,$(call one-compile-rule,$(call srcs-to-objs,$(f),$2,$3),$(f))))
 endef
 
 # generate rules for each source file. 

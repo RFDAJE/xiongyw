@@ -182,8 +182,8 @@ all:
 # --------------------------------------
 # here goes the bulk part of our rules! 
 # --------------------------------------
-$(eval $(call all-module-rules,$(modules),$(OUT_ROOT),$(PKG_ROOT),sources,libraries,local.mak))
-$(eval $(call compile-rules,$(sources),$(OUT_ROOT),$(PKG_ROOT)))
+$(call all-module-rules,$(modules),$(OUT_ROOT),$(PKG_ROOT),sources,libraries,local.mak)
+$(call compile-rules,$(sources),$(OUT_ROOT),$(PKG_ROOT))
 
 
 
