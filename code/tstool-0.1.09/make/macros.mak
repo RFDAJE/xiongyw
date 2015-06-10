@@ -84,7 +84,9 @@ define one-compile-rule
 
            # note: first char on the rule recipe lines must be TAB!	
            $$(tmp_obj): $$(tmp_src)
-	           $$(info "#\n# Building $(tmp_obj) ... \n#\n")
+	           $$(info #)
+	           $$(info # Building $(tmp_obj) ... )
+	           $$(info #)
 	           $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
 	           $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
      )
