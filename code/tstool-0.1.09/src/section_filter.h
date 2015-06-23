@@ -68,7 +68,6 @@ typedef struct {
 
 #define SETUP_SECT_FILTER_4_NIT_ACT(filter, nid, ver) STMT( \
 	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	// todo: if nid==0, not check nid \
 	SETUP_SECT_FILETER(filter, table_id, TID_NIT_ACT); \
 	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
 	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
@@ -77,7 +76,6 @@ typedef struct {
 
 #define SETUP_SECT_FILTER_4_NIT_OTH(filter, nid, ver) STMT( \
 	memset(&filter, 0, sizeof(SECT_FILTER)); \
-	// todo: if nid==0, not check nid \
 	SETUP_SECT_FILETER(filter, table_id, TID_NIT_OTH); \
 	SETUP_SECT_FILETER(filter, table_id_extension_hi, (nid >> 8)); \
 	SETUP_SECT_FILETER(filter, table_id_extension_lo, (nid & 0x00ff)); \
