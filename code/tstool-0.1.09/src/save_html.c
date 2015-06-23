@@ -30,6 +30,14 @@
 #include <time.h>
 #include "save_html.h"
 
+/*
+ * FIELD_WIDTH: for printf( "%0*lx"... ), sizeof() type is size_t
+ * gcc:
+ *   on 32-bit Linux: sizeof(long)=sizeof(int)=4, FIELD_WIDTH=8
+ *   on 64-bit Linux: sizeof(long)=8, FIELD_WIDTH=16
+ */
+#define FIELD_WIDTH    ((int)(sizeof(long)*2))  
+
 void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result);
 void s_output_packet(TSR_RESULT* result, TNODE* node);
 void s_output_section(TSR_RESULT* result, TNODE* node);
@@ -2380,7 +2388,7 @@ int save_as_html(TSR_RESULT* result){
     s_output_tree(fp, result->root, result);
 
     /* init the tree */
-    fprintf(fp, "tree_init(N%0*lx);\n", sizeof(long) * 2, (long)result->root);
+    fprintf(fp, "tree_init(N%0*lx);\n", FIELD_WIDTH, (long)result->root);
     
     fclose(fp);
 
@@ -2423,7 +2431,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     }
     *p = '\0';
 
-    fprintf(fp, "N%0*lx=new Node(\"%0*lx\", \"%s\", %d, \"\");\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)node, txt, node->type);
+    fprintf(fp, "N%0*lx=new Node(\"%0*lx\", \"%s\", %d, \"\");\n", FIELD_WIDTH, (long)node, FIELD_WIDTH, (long)node, txt, node->type);
 
 	if(node->type == NODE_TYPE_PACKET)
 		s_output_packet(result, node);
@@ -2433,7 +2441,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     if(NULL != (kid = node->kid)){
         while(kid){
             s_output_tree(fp, kid, result);
-            fprintf(fp, "N%0*lx.add_kid(N%0*lx);\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)kid);
+            fprintf(fp, "N%0*lx.add_kid(N%0*lx);\n", FIELD_WIDTH, (long)node, FIELD_WIDTH, (long)kid);
             kid = kid->sib;
         }
     }
@@ -2449,7 +2457,7 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	int               nBytePerLine = 16, nRows, len, n, i, j;
 	u8*               p;
 
-	sprintf(filename, "packets/P%0*lx.html", sizeof(long) * 2, (long)node);
+	sprintf(filename, "packets/P%0*lx.html", FIELD_WIDTH, (long)node);
 	fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
