@@ -2454,7 +2454,7 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	char              filename[64];
 	FILE*             fp;
 	PACKET_HEADER*    pHeader;
-	int               nBytePerLine = 16, nRows, len, n, i, j;
+	int               nBytePerLine = 16, nRows, n, i, j;
 	u8*               p;
 
 	sprintf(filename, "packets/P%0*lx.html", FIELD_WIDTH, (long)node);
@@ -2488,7 +2488,6 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	nRows = (result->packet_size - 1) / nBytePerLine + 1;
 
 	p = (u8*)pHeader;
-	len = 0;
 	for(i = 0; i < nRows - 1; i ++){
 		/* offset */
 		fprintf(fp, "%04x  ", i * nBytePerLine); 
@@ -2536,14 +2535,14 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 	FILE*             fp;
 	SECTION*          pSect;
     EIT_SECT_HEADER*  eit_sec_hdr;
-	int               nBytePerLine = 16, nRows, len, n, i, j;
+	int               nBytePerLine = 16, nRows, n, i, j;
 	u8*               p;
     u8                tid; // table id
 
 	pSect = (SECTION*)node->tag;
     tid = ((PRIV_SECT_HEADER*)(pSect->data))->table_id;
 
-	sprintf(filename, "sections/S%0*lx.html", sizeof(long) * 2, (long)node);
+	sprintf(filename, "sections/S%0*lx.html", FIELD_WIDTH, (long)node);
     fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
@@ -2575,7 +2574,6 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 
 	nRows = (pSect->size - 1) / nBytePerLine + 1;
 
-	len = 0;
 	for(i = 0; i < nRows - 1; i ++){
 		/* offset */
 		fprintf(fp, "%04x  ", i * nBytePerLine); 
