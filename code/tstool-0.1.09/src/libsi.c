@@ -1174,7 +1174,7 @@ static u16 s_get_any_section_data(u16           pid,      /* --> */
     u16              section_size = 0;    /* total size */
     u16              section_length = 0;  /* value in the section header */
     int              first_packet_found = 0;
-    int              continuity_counter = 0;
+    //int              continuity_counter = 0;
     PACKET_HEADER*   packet = 0;
     PAT_SECT_HEADER* sect_head = 0;
     int              sect_offset = 0;
@@ -1241,7 +1241,7 @@ static u16 s_get_any_section_data(u16           pid,      /* --> */
 //            if(sect_head->table_id == table_id) {
             if(sect_head->table_id >= tid_start && sect_head->table_id <= tid_end) {
                 first_packet_found = 1;
-                continuity_counter = packet_continuity_counter(p);
+                //continuity_counter = packet_continuity_counter(p);
                 break;
             }
             sect_offset += 3 + sect_head->section_length_hi * 256 + sect_head->section_length_lo;
