@@ -780,13 +780,13 @@ void summarize_result(FILE* fp, TSR_RESULT* result){
 	fprintf(fp, "  file size: %d\n", result->file_size);
 	if(result->is_otv_header){
 		fprintf(fp, "  opentv header exists, size: %d\n", 
-				result->ts_data - result->file_data);
+				(int)(result->ts_data - result->file_data));
 		fprintf(fp, "  ts data size: %d\n", result->ts_size);
 	}
 	else{
 		if(result->ts_data != result->file_data){
 			fprintf(fp, "  broken packet found at head, size: %d\n", 
-					result->ts_data - result->file_data);
+					(int)(result->ts_data - result->file_data));
 		}
 	}
 	fprintf(fp, "  packet size: %d\n", result->packet_size);
