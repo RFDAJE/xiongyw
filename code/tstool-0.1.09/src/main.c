@@ -309,7 +309,14 @@ int main(int argc, char* argv[]){
 		PID_PAIR_LIST  list = {0, NULL};
 		int            i, match;
 		unsigned short old_pid = 0, new_pid = 0;
+#ifdef NO_STRICT_ALIASING // gcc: -fno-strict-aliasing
 		unsigned char  packet[204];
+#else
+        union {
+            unsigned char packet[204];
+            PACKET_HEADER hdr;
+        } u_packet;
+#endif
 		unsigned char* p;
 
 		process_change_pid_arg(s_change_pid_arg, &list);
@@ -348,10 +355,18 @@ int main(int argc, char* argv[]){
 				}
 			}
 			if(match){
+#ifdef NO_STRICT_ALIASING // gcc: -fno-strict-aliasing
 				memcpy(packet, p, s_result->packet_size);
-				((PACKET_HEADER*)packet)->pid_hi = new_pid / 256;
+				((PACKET_HEADER*)packet)->pid_hi 
+                    = new_pid / 256;
 				((PACKET_HEADER*)packet)->pid_lo = new_pid % 256;
 				fwrite(packet, s_result->packet_size, 1, fpo);
+#else
+                memcpy(u_packet.packet, p, s_result->packet_size);
+                u_packet.hdr.pid_hi = new_pid / 256;
+                u_packet.hdr.pid_lo = new_pid % 256;
+                fwrite(u_packet.packet, s_result->packet_size, 1, fpo);
+#endif
 			}
 			else{
 				fwrite(p, s_result->packet_size, 1, fpo);
@@ -572,6 +587,8 @@ int main(int argc, char* argv[]){
 	}
 
 	cleanup_and_exit(0);
+
+    return 0; // just eliminate gcc warning
 }
 
 static void process_args(int argc, char* argv[]){

@@ -2380,7 +2380,7 @@ int save_as_html(TSR_RESULT* result){
     s_output_tree(fp, result->root, result);
 
     /* init the tree */
-    fprintf(fp, "tree_init(N%0*x);\n", sizeof(long) * 2, (long)(result->root));
+    fprintf(fp, "tree_init(N%0*lx);\n", sizeof(long) * 2, (long)result->root);
     
     fclose(fp);
 
@@ -2423,7 +2423,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     }
     *p = '\0';
 
-    fprintf(fp, "N%0*x=new Node(\"%0*x\", \"%s\", %d, \"\");\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)node, txt, node->type);
+    fprintf(fp, "N%0*lx=new Node(\"%0*lx\", \"%s\", %d, \"\");\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)node, txt, node->type);
 
 	if(node->type == NODE_TYPE_PACKET)
 		s_output_packet(result, node);
@@ -2433,7 +2433,7 @@ void s_output_tree(FILE* fp, TNODE* node, TSR_RESULT* result){
     if(NULL != (kid = node->kid)){
         while(kid){
             s_output_tree(fp, kid, result);
-            fprintf(fp, "N%0*x.add_kid(N%0*x);\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)kid);
+            fprintf(fp, "N%0*lx.add_kid(N%0*lx);\n", sizeof(long) * 2, (long)node, sizeof(long) * 2, (long)kid);
             kid = kid->sib;
         }
     }
@@ -2449,14 +2449,14 @@ void s_output_packet(TSR_RESULT* result, TNODE* node){
 	int               nBytePerLine = 16, nRows, len, n, i, j;
 	u8*               p;
 
-	sprintf(filename, "packets/P%0*x.html", sizeof(long) * 2, (long)node);
+	sprintf(filename, "packets/P%0*lx.html", sizeof(long) * 2, (long)node);
 	fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
 
 	/* packet header info */
 	pHeader = (PACKET_HEADER*)(result->ts_data + node->tag * result->packet_size);
-	fprintf(fp, "TS packet %d header(first 4 bytes):\n\n"
+	fprintf(fp, "TS packet %ld header(first 4 bytes):\n\n"
 				 "sync byte(8)                    : 0x%02x\n"
 				 "transport error indicator(1)    : 0x%01x\n"
 				 "payload unit start indicator(1) : 0x%01x\n"
@@ -2535,7 +2535,7 @@ void s_output_section(TSR_RESULT* result, TNODE* node){
 	pSect = (SECTION*)node->tag;
     tid = ((PRIV_SECT_HEADER*)(pSect->data))->table_id;
 
-	sprintf(filename, "sections/S%0*x.html", sizeof(long) * 2, (long)node);
+	sprintf(filename, "sections/S%0*lx.html", sizeof(long) * 2, (long)node);
     fp = fopen(filename, "wt");
 
 	fprintf(fp, "<html><head><style>BODY {background-color: white; font-family: courier new; font-size: 10pt;}</style></head><body><pre>");
