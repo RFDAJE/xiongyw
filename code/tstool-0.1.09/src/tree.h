@@ -56,7 +56,7 @@ typedef struct _TNODE{
 	node_type_t      type;
 	long             tag;   /* for NODE_TYPE_PACKET, it's the packet index;
 	                           for NODE_TYPE_SECTION, it's the pointer to the SECTION (that why it's long--for safe cast) */  
-	u8*              txt;   /* null terminated string */
+	char*            txt;   /* null terminated string */
 }TNODE;
 
 

@@ -55,7 +55,7 @@ static int s_add_pid_node_to_list(PID_LIST* pid_list, PID_NODE* pid_node);
 
 //static int s_add_section_to_table(TABLE* tbl, u8 index, int size, u8 *data, int dedup);
 static int s_add_section_to_table(TABLE* tbl, int size, u8 *data, int dedup);
-static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8* ts, u8 packet_size, u8* last_section_nr, u8** pp);
+//static u16 s_get_section_data(u16 pid, u8 tid, u8 section_nr, PID_LIST* list, u8* ts, u8 packet_size, u8* last_section_nr, u8** pp);
 static u16 s_get_any_section_data(u16 pid, u8 table_id, PID_LIST* pid_list, int* packet_idx, u8 packet_size, u8* p_ts, u8** pp);
 
 static void s_add_otv_header(OTV_HEADER* header, TNODE* root);
@@ -232,11 +232,8 @@ TABLE* build_table_with_sections(u16 pid, u8 tid, PID_LIST* pid_list, u8* p_ts, 
     
     TABLE* tbl;
     u8     *p_sect = 0; // don't need to free this. it's either from a static variable, or from the ts mmap area.
-    u8     last_section_number;
-    int    section_idx = 0;
     u16    section_size; 
-    PRIV_SECT_HEADER *sect_hdr;
-    int    i, j;
+    int    i;
 
     /* sanity checks */
     if(pid > PID_NUL)
@@ -1033,6 +1030,7 @@ static int s_add_packet_to_pid_list(PID_LIST* pid_list, u16 pid, int packet_inde
         0: error or not found
         others: size of the total section
 */
+#if (0)
 static u16 s_get_section_data(u16           pid,                   /* --> */
                      u8            table_id,              /* --> */
                      u8            section_number,        /* --> */
@@ -1143,11 +1141,7 @@ static u16 s_get_section_data(u16           pid,                   /* --> */
 END:
     return section_size;
 }
-
-
-
-
-
+#endif
 
 /*
  * added(bruin, 2015-04-21): a copy of s_get_section_data(): 
@@ -1349,7 +1343,7 @@ static int s_add_section_to_table(TABLE* tbl, int size, u8 *data, int dedup){
 
 
 static void s_add_otv_header(OTV_HEADER* header, TNODE* root){
-    u8*    p;
+    char*  p;
     TNODE  *otv_root, *node;
 
     otv_root = tnode_new(NODE_TYPE_OTV_HINFO);
@@ -1404,29 +1398,29 @@ static void s_add_table(TABLE* tbl, TNODE* root){
         case TID_NIT_OTH:
             tbl_root->txt = strdup("NIT OTHER"); break;
         case TID_SDT_ACT:
-			snprintf(txt, TXT_BUF_SIZE, "SDT ACTUAL (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "SDT ACTUAL (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_SDT_OTH:
-			snprintf(txt, TXT_BUF_SIZE, "SDT OTHER (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "SDT OTHER (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_BAT:
             tbl_root->txt = strdup("BAT"); break;
         case TID_EIT_ACT:
-			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_EIT_OTH:
-			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_EIT_ACT_SCH:
-			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL SCHEDULE (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "EIT ACTUAL SCHEDULE (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_EIT_OTH_SCH:
-			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER SCHEDULE (%d sections, %d bytes)", tbl->section_nr, sum);
+			snprintf(txt, TXT_BUF_SIZE, "EIT OTHER SCHEDULE (%d sections, %ld bytes)", tbl->section_nr, sum);
             tbl_root->txt = strdup(txt); 
 			break;
         case TID_TDT:
