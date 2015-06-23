@@ -114,6 +114,12 @@ else
 	ECHO   := echo
 endif
 
+### -------------------------------------------------------------
+### --  verbose: make V=1 xxx
+### -------------------------------------------------------------
+ifndef V
+	QUIET := @
+endif
 
 # --------------------------------------
 # these are simple variables
@@ -218,7 +224,7 @@ $(executable): $(objects)
 	$(info #)
 	$(info # Linking $@ ...)
 	$(info #)
-	$(CC) $^ -o $@
+	$(QUIET)$(CC) $^ -o $@
 
 
 #

@@ -56,7 +56,7 @@ define one-module-rules
 
  	       # note: first char on the rule recipe lines must be TAB!
            $$(module_lib): $$(module_obj)
-	           $(AR) rv $$@ $$^
+	           $(QUIET)$(AR) rv $$@ $$^
      )
 endef
 
@@ -74,20 +74,20 @@ endef
 #   i.e., in "Tromey's Way" ([1], pp150-154, with small variance). 
 #   the net result is that we do not have pattern rules but all explicit rules which are auto-generated.
 #
-# note that $(CC), $(CFLAGS) and $(CPPFLAGS) expansion are deferred by $$ ([1], p84). This allow altering them
-# in the scenario when used as target-specfic variables ([1], p50).
+# Also note that $(CC), $(CFLAGS) and $(CPPFLAGS) expansion are deferred by $$ ([1], p84). This allow altering them
+#   in the scenario when used as target-specfic variables ([1], p50). 
+# Note again: the temp variables (tmp_obj/tmp_src/tmp_dep) are not working as expected due to the twice-expansion 
+#   behavior (at argument expansion time of the eval call, those values are either empty or values of the previous loop).
 # $(call one-compile-rule,obj,src)
 define one-compile-rule
-    $(eval tmp_obj := $1
-           tmp_src := $2
-           tmp_dep := $(patsubst %.o,%.d,$(tmp_obj))
+    $(eval #tmp_obj := $1
+           #tmp_src := $2
+           #tmp_dep := $(patsubst %.o,%.d,$1)
 
-           # note: first char on the rule recipe lines must be TAB!	
-           $$(tmp_obj): $$(tmp_src)
+           $1: $2
 	           $$(info #)
-	           $$(info # Building $(tmp_obj) ... )
-	           $$(info #)
-	           $$(CC) -MM  -MF $(tmp_dep) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
-	           $$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
+	           $$(info # Building $1 ... )
+	           $$(QUIET)$$(CC) -MM  -MF $(patsubst %.o,%.d,$1) -MP -MT $$@ $$(CFLAGS) $$(CPPFLAGS) $$<
+	           $$(QUIET)$$(CC) $$(CFLAGS) $$(CPPFLAGS) -o $$@ $$<
      )
 endef
