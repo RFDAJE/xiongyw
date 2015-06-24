@@ -33,9 +33,9 @@
 # --------------------------------------------------------------------
 # variable naming conventions ([1] pp41-42)
 # --------------------------------------------------------------------
-# - variables representing constatns a user might want to customize
+# - variables representing constants a user might want to customize
 #   on the command line or in the environ are written in all uppercase, 
-#   and words are separated by underscore. e.g., OUT_ROOT
+#   with underscore as word-separator. e.g., OUT_ROOT
 # - variables that appear only in makefile are all lowercase with words
 #   separated by underscore. e.g., module_src
 # - macro/function names are all small case with words separated 

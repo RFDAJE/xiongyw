@@ -28,34 +28,39 @@ define all-module-rules
     $(eval $(foreach module,$1,$(call one-module-rules,$(module),$2,$3,$4,$5,$6)))
 endef
 
-# insert (by eval) rules for each source of a module, and add the source
+# Insert (by eval) rules for each source of a module, and add the source
 # and module lib to specified variable.
 #
-# if there is a 'local.mk' under the module directory, also
+# If there is a 'local.mk' under the module directory, also
 # read that (-include), and the 'local.mk' can define 'local_exclude"
 # to list names of source files to be excluded in the compilation.
 #
-# notes about $$ ([1] p84): the argument to eval is expanded twice: once when make 
+# Notes about $$ ([1] p84): the argument to eval is expanded twice: once when make 
 # prepares the argument list for eval, and once again by eval.
-# the solution is either calling eval separately for the rule, or defer the expansion 
-# by using double dollars $$.
+#
+# If using a single eval call to encapsulate multiple lines, the temp variables are
+# expanded at arguments preparation time "at once" (not sequentially), so if there are
+# dependencies among those temp variables, the result will be not expected.
+#
+# The solution are, depending on the use case:
+#  - calling eval separately for each line/rule
+#  - not use temp variables
+#  - defer the expansion by using double dollars $$
 #
 # $(call one-module-rules,module_root_path,out_root,pkg_root,src_name,lib_name,local_mak)
 define one-module-rules
-    $(eval -include $1/$6
-           module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S)
+    $(eval -include $1/$6)
+    $(eval module_src := $(wildcard $1/*.c) $(wildcard $1/*.cpp) $(wildcard $1/*.S))
+    $(eval local_exclude := $(addprefix $1/,$(local_exclude)))
+    $(eval module_src := $(filter-out $(local_exclude),$(module_src)))
+    $(eval module_obj := $(call srcs-to-objs,$(module_src),$2,$3))
+    $(eval module_lib := $(call module-to-lib,$1,$2,$3))
 
-           local_exclude := $(addprefix $1/,$$(local_exclude))
-           module_src := $(filter-out $$(local_exclude),$$(module_src))
+	$(eval    
+           $4 += $(module_src)
+           $5 += $(module_lib)
 
-           module_obj := $(call srcs-to-objs,$$(module_src),$2,$3)
-           module_lib := $(call module-to-lib,$1,$2,$3)
-    
-           $4 += $$(module_src)
-           $5 += $$(module_lib)
-
- 	       # note: first char on the rule recipe lines must be TAB!
-           $$(module_lib): $$(module_obj)
+           $(module_lib): $(module_obj)
 	           $(QUIET)$(AR) rv $$@ $$^
      )
 endef
@@ -76,8 +81,7 @@ endef
 #
 # Also note that $(CC), $(CFLAGS) and $(CPPFLAGS) expansion are deferred by $$ ([1], p84). This allow altering them
 #   in the scenario when used as target-specfic variables ([1], p50). 
-# Note again: the temp variables (tmp_obj/tmp_src/tmp_dep) are not working as expected due to the twice-expansion 
-#   behavior (at argument expansion time of the eval call, those values are either empty or values of the previous loop).
+#
 # $(call one-compile-rule,obj,src)
 define one-compile-rule
     $(eval #tmp_obj := $1
