@@ -41,3 +41,5 @@ cat 1 > /proc/sys/net/ipv4/ip_forward
 sudo iptables -t nat -I PREROUTING -p tcp --dport 2222 -j REDIRECT --to-port 22
 sudo iptables -t nat -I OUTPUT -p tcp -o lo --dport 2222 -j REDIRECT --to-ports 22
 
+# make rules persistent: https://wiki.debian.org/iptables
+
