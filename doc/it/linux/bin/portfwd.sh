@@ -6,7 +6,7 @@ polipo proxyAddress="0.0.0.0" socksParentProxy=localhost:9999 daemonise=true dis
 
 
 
-# aws ubuntu instance has polipo daemon setup by default. only need to update the config:
+# install polipo daemon by "apt-get install polipo". then update the config:
 ubuntu@ip-172-31-9-247:~/work/xiongyw/doc/it/linux/bin$ cat /etc/polipo/config
 # This file only needs to list configuration variables that deviate
 # from the default values.  See /usr/share/doc/polipo/examples/config.sample
@@ -26,3 +26,18 @@ dnsQueryIPv6 = no
 sudo /etc/init.d/polipo restart
 
 # then configure the proxy for browser to aws-instance:8123 for surfing
+
+
+
+
+# Port forward to a port on the same machine
+#   http://askubuntu.com/questions/104824/port-forward-to-a-port-on-the-same-machine
+# IT blocks outgoing traffic targetting port 22...so change the default 22 of sshd to 2222 on the public server
+#
+# [ssh client]  ---->[IT firewall] ----> [public server: 2222 -> 22(sshd)]
+#
+# the 2nd rule is for ssh from the same host running sshd
+cat 1 > /proc/sys/net/ipv4/ip_forward
+sudo iptables -t nat -I PREROUTING -p tcp --dport 2222 -j REDIRECT --to-port 22
+sudo iptables -t nat -I OUTPUT -p tcp -o lo --dport 2222 -j REDIRECT --to-ports 22
+
