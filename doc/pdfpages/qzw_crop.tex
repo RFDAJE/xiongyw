@@ -1,0 +1,71 @@
+%% http://tex.stackexchange.com/questions/25806/how-can-i-crop-included-pdf-documents
+
+\documentclass{minimal}
+\usepackage{pdfpages}
+\usepackage[papersize={10cm,10cm}, 
+ left=5mm,
+ right=5mm,
+ top=5mm,
+ bottom=5mm,]{geometry}
+\usepackage{ifthen}
+
+\newcounter{pg}
+\begin{document}
+\setcounter{pg}{1}
+%% my pdf file has 30 pages:
+%% my pdf file has size 210 x 297 mm: (0,0) at the lower-left corner.
+%% qzw.pdf: pagesize=27.94cm*43.18cm, each char is a square of 47.2mm,  each char is spaced by 0.4mm. 8 rows * 4 columns
+%% viewport=left bottom right top
+%% 
+%% js code for generating the coordinates:
+%% var bc=47.2,gap=0.4;
+%% var rows=8, cols=4;
+%% var startx=189.0, starty=357.6;
+%% 
+%% var i,j, left, bottom;
+%% 
+%% for(i=0; i < cols; i ++) {
+%%    left = startx - i * (bc + gap);
+%%    for(j=0; j < rows; j ++) {
+%%        bottom = starty - j * (bc + gap);
+%%        console.log("\\includepdf[pages=\\thepg, viewport=%.1fmm %.1fmm %.1fmm %.1fmm,clip=true]{qzw.pdf}\r", left, bottom, left + bc, bottom + bc);
+%%    }
+%% }
+
+\whiledo{\value{pg}<33}{%
+\includepdf[pages=\thepg, viewport=189mm 357.6mm 236.2mm 404.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 310mm 236.2mm 357.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 262.4mm 236.2mm 309.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 214.8mm 236.2mm 262mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 167.2mm 236.2mm 214.4mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 119.6mm 236.2mm 166.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 72mm 236.2mm 119.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=189mm 24.4mm 236.2mm 71.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 357.6mm 188.6mm 404.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 310mm 188.6mm 357.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 262.4mm 188.6mm 309.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 214.8mm 188.6mm 262mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 167.2mm 188.6mm 214.4mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 119.6mm 188.6mm 166.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 72mm 188.6mm 119.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=141.4mm 24.4mm 188.6mm 71.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 357.6mm 141mm 404.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 310mm 141mm 357.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 262.4mm 141mm 309.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 214.8mm 141mm 262mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 167.2mm 141mm 214.4mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 119.6mm 141mm 166.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 72mm 141mm 119.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=93.8mm 24.4mm 141mm 71.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 357.6mm 93.4mm 404.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 310mm 93.4mm 357.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 262.4mm 93.4mm 309.6mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 214.8mm 93.4mm 262mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 167.2mm 93.4mm 214.4mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 119.6mm 93.4mm 166.8mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 72mm 93.4mm 119.2mm,clip=true]{qzw.pdf}
+\includepdf[pages=\thepg, viewport=46.2mm 24.4mm 93.4mm 71.6mm,clip=true]{qzw.pdf}
+\addtocounter{pg}{1}
+}%
+\includepdf[pages=32, viewport=130mm 45mm 180mm 390mm,clip=true]{qzw.pdf}
+\end{document}
