@@ -1,0 +1,1 @@
+C:\"Program Files (x86)"\Git\bin\ssh -C -L localhost:8080:localhost:8123 -i d:\aws.pem ubuntu@ec2-52-24-55-12.us-west-2.compute.amazonaws.com
