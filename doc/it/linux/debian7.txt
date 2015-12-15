@@ -182,3 +182,17 @@ Debian 8.2:
   docker run ocrmypdf --help
   
 - apt-get install scantailor pdftk texlive asymptote libtiff-tools
+
+- samba server config
+  /etc/samba/smb.conf:
+  [homes]
+        comment = Home Directories
+        valid users = bruin
+        read only = No
+        create mask = 0700
+        directory mask = 0700
+
+  testparm
+  smbpasswd -a bruin
+  /etc/init.d/smbd reload
+
