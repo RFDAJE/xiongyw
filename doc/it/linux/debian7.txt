@@ -163,3 +163,22 @@ bruin@d7:/tank$ cat ~/bin/smbmount.sh
 #!/bin/bash
 sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tele /tele
 sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tank /tank
+
+
+
+
+
+
+Debian 8.2:
+
+- docker: https://docs.docker.com/linux/step_one/
+  wget -qO- https://get.docker.com/ | sh
+  sudo usermod -aG docker bruin
+  docker run hello-world
+
+- OCRmyPDF: https://github.com/jbarlow83/OCRmyPDF
+  docker pull jbarlow83/ocrmypdf
+  docker tag jbarlow83/ocrmypdf ocrmypdf
+  docker run ocrmypdf --help
+  
+- apt-get install scantailor pdftk texlive asymptote libtiff-tools
