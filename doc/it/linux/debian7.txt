@@ -180,6 +180,7 @@ Debian 8.2:
   docker pull jbarlow83/ocrmypdf
   docker tag jbarlow83/ocrmypdf ocrmypdf
   docker run ocrmypdf --help
+  docker run -v "$(pwd):/home/docker" ocrmypdf input.pdf output.pdf -l chi_sim
   
 - apt-get install scantailor pdftk texlive asymptote libtiff-tools
 
@@ -196,3 +197,6 @@ Debian 8.2:
   smbpasswd -a bruin
   /etc/init.d/smbd reload
 
+- tesseract-ocr
+  apt-get install tesseract-ocr
+  apt-get install tesseract-ocr-chi-sim
