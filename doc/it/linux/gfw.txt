@@ -1,13 +1,3 @@
-firefox: sshd+autoproxy
+add the following line into .bashrc:
 
-bruin@u1304:~$ cat sshd.sh
-#!/bin/bash
-# 2: ssh-2
-# 4: ipv4
-# C: compression
-# f: background
-# N: just port forwarding, no cmd
-# D: binding to localhost:7070
-
-ssh -24CfN -D 7070 xiongyw@216.194.70.6
-
+tmux new-session -s "gfw" -d "ssh -C -L localhost:8080:localhost:8123 -i ~/aws.pem ubuntu@ec2-52-24-55-12.us-west-2.compute.amazonaws.com"
