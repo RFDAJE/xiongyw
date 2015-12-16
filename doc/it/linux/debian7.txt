@@ -197,6 +197,24 @@ Debian 8.2:
   smbpasswd -a bruin
   /etc/init.d/smbd reload
 
++ Searchable pdf: http://fransdejonge.com/2014/10/fixing-up-scanned-pdfs-with-scan-tailor/
+
 - tesseract-ocr
   apt-get install tesseract-ocr
   apt-get install tesseract-ocr-chi-sim
+
+  tesseract -l chi_sim input.tif out hocr
+
+- hocr2pdf
+  apt-get install exactimage
+
+- pdfsandwich: http://www.tobias-elze.de/pdfsandwich/
+  sudo dpkg -i pdfsandwich_0.1.0_amd64.deb  # There will be an error message. Ignore it and proceed!
+  sudo apt-get -fy install
+
+  
+   pdfsandwich -lang chi_sim -resolution 600 input.pdf -o output600dpi.pdf
+
+- parallel
+ sudo apt-get install parallel
+ parallel pdfsandwich -lang chi_sim -resolution 600 -o {.}-600dpi.pdf {} ::: *.pdf
