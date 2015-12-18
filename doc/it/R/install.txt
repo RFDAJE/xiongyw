@@ -1,0 +1,70 @@
+ - R: https://cran.r-project.org/bin/linux/debian/
+   /etc/apt/sources.list: deb http://mirrors.tuna.tsinghua.edu.cn/CRAN/bin/linux/debian jessie-cran3/
+   sudo apt-key adv --keyserver keys.gnupg.net --recv-key 381BA480
+   apt-get update
+   apt-get install r-base r-base-dev
+
+- RStudio: http://www.jason-french.com/blog/2013/03/11/installing-r-in-linux/
+   wget https://download1.rstudio.org/rstudio-0.99.489-amd64.deb
+   sudo dpkg -i rstudio-0.99.489-amd64.deb
+   sudo apt-get -fy install
+
+   $ rstudio
+   chooseCRANmirror()
+   pkgs <- c("ggplot2", "ggmap", "dplyr", "tidyr", "maps", "mapdata", "maptools", "rgdal", "rgeos", "tmap", "RgoogleMaps", "dismo")
+   install.packages(pkgs)
+   update.packages(ask=F)
+
+- install rgdal: http://stackoverflow.com/questions/12141422/error-gdal-config-not-found
+  sudo apt-get install apt-file
+  apt-file update
+  apt-file search gdal-config
+  sudo apt-get install libgdal-dev
+  apt-file search proj_api.h
+  sudo apt-get install libproj-dev
+
+  in R: install.packages("rgdal")
+
+  
+- set repository permenantly
+  cat ~/.Rprofile
+  options(repos=structure(c(CRAN="http://mirrors.tuna.tsinghua.edu.cn/CRAN/")))
+
+  check in R: > options("repos")
+
+- set http proxy
+  vi ~/.Renviron
+  http_proxy=http://localhost:8080/
+
+  test:
+> require(RgoogleMaps)
+> options(internet.info=0)
+> getGeoCode("beijing")
+     lat       lon 
+ 39.90421 116.40739 
+There were 17 warnings (use warnings() to see them)
+> warnings()
+Warning messages:
+1: In readLines(con) : using HTTP proxy 'http://localhost:8080/'
+2: In readLines(con) : connected to 'localhost' on port 8080.
+3: In readLines(con) :
+  -> (Proxy) GET http://maps.google.com/maps/api/geocode/json?sensor=false&address=beijing HTTP/1.0
+Host: maps.google.com
+Pragma: no-cache
+User-Agent: R (3.2.3 x86_64-pc-linux-gnu x86_64 linux-gnu)
+
+4: In readLines(con) : <- HTTP/1.1 200 OK
+5: In readLines(con) : <- Content-Length: 1534
+6: In readLines(con) : <- Date: Fri, 18 Dec 2015 11:59:32 GMT
+7: In readLines(con) : <- Expires: Sat, 19 Dec 2015 11:59:32 GMT
+8: In readLines(con) : <- Cache-Control: public
+9: In readLines(con) : <- Content-Type: application/json; charset=UTF-8
+10: In readLines(con) : <- Access-Control-Allow-Origin: *
+11: In readLines(con) : <- Server: mafe
+12: In readLines(con) : <- X-XSS-Protection: 1; mode=block
+13: In readLines(con) : <- X-Frame-Options: SAMEORIGIN
+14: In readLines(con) : <- Accept-Ranges: none
+15: In readLines(con) : <- Vary: Accept-Language,Accept-Encoding
+16: In readLines(con) : <- Connection: close
+17: In readLines(con) : Code 200, content-type 'application/json; charset=UTF-8'
+> 

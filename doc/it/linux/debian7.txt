@@ -197,22 +197,6 @@ Debian 8.2:
   smbpasswd -a bruin
   /etc/init.d/smbd reload
 
-- R: https://cran.r-project.org/bin/linux/debian/
-  /etc/apt/sources.list: deb http://mirrors.tuna.tsinghua.edu.cn/CRAN/bin/linux/debian jessie-cran3/
-  sudo apt-key adv --keyserver keys.gnupg.net --recv-key 381BA480
-  apt-get update
-  apt-get install r-base r-base-dev
-  
-- RStudio: http://www.jason-french.com/blog/2013/03/11/installing-r-in-linux/
-  wget https://download1.rstudio.org/rstudio-0.99.489-amd64.deb
-  sudo dpkg -i rstudio-0.99.489-amd64.deb
-  sudo apt-get -fy install
-
-  $ rstudio
-  chooseCRANmirror()
-  pkgs <- c("ggplot2", "ggmap", "dplyr", "tidyr", "maps", "mapdata", "maptools", "rgdal", "rgeos", "tmap")
-  install.packages(pkgs)
-  update.packages(ask=F)
   
 + Searchable pdf: http://fransdejonge.com/2014/10/fixing-up-scanned-pdfs-with-scan-tailor/
 
