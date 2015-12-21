@@ -15,6 +15,15 @@
    install.packages(pkgs)
    update.packages(ask=F)
 
+- RStudio Server (free version): https://www.rstudio.com/products/rstudio/download-server/
+
+  $ sudo apt-get install gdebi-core
+  $ wget https://download2.rstudio.org/rstudio-server-0.99.489-amd64.deb
+  $ sudo gdebi rstudio-server-0.99.489-amd64.deb
+  
+  ..ethen access at http://xxx:8787/ 
+
+
 - install rgdal: http://stackoverflow.com/questions/12141422/error-gdal-config-not-found
   sudo apt-get install apt-file
   apt-file update
