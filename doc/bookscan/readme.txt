@@ -11,7 +11,9 @@ note that as the page 2 mobile distance changes during the process, need to make
 
 - renaming files in page order: use the script "order.sh", customize the "pages" variable first.
 
+- remove blank pages, if applicable
+
 - tif2pdf: use the script "tiff2pdf.sh"
 
-- pdfsandwich with parallel:
-  parallel pdfsandwich -lang eng+chi_sim -resolution 600 -o {.}.pdf {} ::: *.pdf
+- OCR: pdfsandwich with parallel:
+  parallel -j 2 pdfsandwich -lang eng+chi_sim -resolution 600 -o {.}.pdf {} ::: *.pdf
