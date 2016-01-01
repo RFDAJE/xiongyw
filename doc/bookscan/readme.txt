@@ -11,9 +11,13 @@ note that as the page 2 mobile distance changes during the process, need to make
 
 - renaming files in page order: use the script "order.sh", customize the "pages" variable first.
 
-- remove blank pages, if applicable
+- remove blank pages, if applicable. sort file names by "ls *.tif|sort -k1.1n"
 
 - tif2pdf: use the script "tiff2pdf.sh"
 
-- OCR: pdfsandwich with parallel:
+- OCR: pdfsandwich with parallel (excluding pages with color/grey pictures):
   parallel -j 2 pdfsandwich -lang eng+chi_sim -resolution 600 -o {.}.pdf {} ::: *.pdf
+
+- cat PDFs into a book: using pdfpages.tex
+
+
