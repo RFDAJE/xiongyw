@@ -13,7 +13,15 @@ note that as the page 2 mobile distance changes during the process, need to make
 
 - remove blank pages, if applicable. sort file names by "ls *.tif|sort -k1.1n"
 
-- tif2pdf: use the script "tiff2pdf.sh"
+- change pictures into bw: tiff2bw input.tif output.tif
+
+- tif2pdf: use the script "tiff2pdf.sh": 
+
+for f in *.tif; do
+  tiff2pdf -o ${f%tif}pdf $f
+done
+
+for bw pictures, add "-j -q 50" to reduce the size of the pdf
 
 - OCR: pdfsandwich with parallel (excluding pages with color/grey pictures):
   parallel -j 2 pdfsandwich -lang eng+chi_sim -resolution 600 -o {.}.pdf {} ::: *.pdf
