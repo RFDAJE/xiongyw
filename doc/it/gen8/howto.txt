@@ -3,3 +3,13 @@
   229.94=193.19(G1610T/4G)+4.2(packing)+32.55(DHL shipping)
 
 2. Shipped to home on 2016-01-13 by EMS.
+
+3. perchase iLO adv license: 32CRX-V7BXC-D2MZN-L2DYZ-LZ88W
+
+4. mac@:
+adapter 1 - iLO    : 3c:a8:2a:a0:52:0a
+adapter 2 - port 1 : 3c:a8:2a:a0:52:08
+adapter 2 - port 2 : 3c:a8:2a:a0:52:09
+
+5. enable SATA AHCI:
+   RBSU -> System Options -> SATA Controller Options -> Embedded SATA configuration -> Enable SATA AHCI Support
