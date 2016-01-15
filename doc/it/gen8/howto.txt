@@ -13,3 +13,15 @@ adapter 2 - port 2 : 3c:a8:2a:a0:52:09
 
 5. enable SATA AHCI:
    RBSU -> System Options -> SATA Controller Options -> Embedded SATA configuration -> Enable SATA AHCI Support
+
+6. disable VID (virtual install disk): 
+
+
+lsblk
+$sudo apt-get install acpi lm-sensors stress minidlna aira2 hdparm iftop git
+$sensors
+$sudo hdparm -tT --direct /dev/sda1
+$sudo iftop -i eth0
+
+aria2 web interface: https://github.com/ziahamza/webui-aria2 
+$aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all
