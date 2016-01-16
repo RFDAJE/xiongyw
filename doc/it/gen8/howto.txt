@@ -51,3 +51,9 @@ bruin@gen8:~/data/xiongyw/doc/it/gen8$ sudo hdparm -tT --direct /dev/sda /dev/sd
 9. 
 aria2 web interface: https://github.com/ziahamza/webui-aria2 
 $aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all
+
+10. boot from 5th sata
+http://www.newsmth.net/nForum/#!article/DigiHome/419729
+
+（sudo grub-install -vs --boot-directory=/media/xxxxx /dev/sdx; sudo grub-mkconfig -o /media/xxxxx/grub/grub.cfg）
+
