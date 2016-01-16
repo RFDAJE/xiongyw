@@ -16,6 +16,15 @@ adapter 2 - port 2 : 3c:a8:2a:a0:52:09
 
 6. disable VID (virtual install disk): 
 
+7. HP Management Component Pack: https://downloads.linux.hpe.com/SDR/project/mcp/
+
+bruin@gen8:~$ cat /etc/apt/sources.list.d/mcp.list
+# HP Management Component Pack
+deb http://downloads.linux.hpe.com/SDR/repo/mcp jessie/current non-free
+
+$apt-get install hp-ams
+
+
 
 lsblk
 $sudo apt-get install acpi lm-sensors stress minidlna aira2 hdparm iftop git
