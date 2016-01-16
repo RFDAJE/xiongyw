@@ -25,12 +25,29 @@ deb http://downloads.linux.hpe.com/SDR/repo/mcp jessie/current non-free
 $apt-get install hp-ams
 
 
-
+8.
 lsblk
 $sudo apt-get install acpi lm-sensors stress minidlna aira2 hdparm iftop git
 $sensors
-$sudo hdparm -tT --direct /dev/sda1
 $sudo iftop -i eth0
 
+bruin@gen8:~/data/xiongyw/doc/it/gen8$ lsblk -o NAME,TYPE,MOUNTPOINT,MODEL
+NAME   TYPE MOUNTPOINT       MODEL
+sda    disk                  ST3250318AS
+├─sda1 part /
+├─sda2 part
+└─sda5 part [SWAP]
+sdb    disk /home/bruin/data WDC WD5000AADS-0
+bruin@gen8:~/data/xiongyw/doc/it/gen8$
+bruin@gen8:~/data/xiongyw/doc/it/gen8$ sudo hdparm -tT --direct /dev/sda /dev/sdb
+/dev/sda:
+ Timing O_DIRECT cached reads:   240 MB in  2.00 seconds = 119.94 MB/sec
+ Timing O_DIRECT disk reads: 368 MB in  3.01 seconds = 122.37 MB/sec
+
+/dev/sdb:
+ Timing O_DIRECT cached reads:   512 MB in  2.00 seconds = 255.40 MB/sec
+ Timing O_DIRECT disk reads: 252 MB in  3.01 seconds =  83.71 MB/sec
+
+9. 
 aria2 web interface: https://github.com/ziahamza/webui-aria2 
 $aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all
