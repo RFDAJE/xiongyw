@@ -61,7 +61,7 @@ sudo apt-get install vim
 rm /bin/sh
 ls -s /bin/bash /bin/sh
 ```
-* misc pkgs: `$sudo apt-get install apt-file build-essential acpi lm-sensors stress hdparm iftop htop iotop util-linux gparted zip unzip git minidlna aria2 samba tmux`
+* misc pkgs: `$sudo apt-get install apt-file build-essential acpi lm-sensors stress hdparm iftop htop iotop util-linux gparted zip unzip dos2unix git minidlna aria2 samba tmux`
 * x:  `$sudo apt-get install xorg gnome xfonts-wqy ttf-wqy-zenhei`
 
 * chrome:
@@ -90,7 +90,7 @@ gfw
 
 
 Samba
------------
+-----
 1. samba server config in `/etc/samba/smb.conf`:
 ```
   [homes]
@@ -100,13 +100,37 @@ Samba
         create mask = 0700
         directory mask = 0700
 ```
+```
   testparm
   smbpasswd -a bruin
   /etc/init.d/smbd reload
-
+```
 2. samba client
+```
 $sudo apt-get install cifs-utils
 $sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tele /tele
+```
+
+uhttpd
+------
+```
+$ cat /etc/uhttpd
+listen_ip     0.0.0.0
+listen_port   80
+max_idle      5
+min_idle      5
+max_sessions  5
+work_dir      /home/bruin
+lock_file     /home/bruin/uhttpd.80.lock
+# virtual host: domain_name root_dir default_file log_file
+vhost         192.168.100.19 /home/bruin index.html /home/bruin/uhttpd.80.log
+
+$ tail /etc/rc.local
+# By default this script does nothing.
+/usr/local/bin/uhttpd
+exit 0
+
+```
 
 Minidlna
 --------
