@@ -147,6 +147,14 @@ $ sudo /etc/init.d/minidlna restart
 
 Transmission
 ------------
+sudo apt-get install transmission transmission-cli transmission-daemon
+
+
+/etc/transmission-daemon/settings.json:
+"dht-enabled": false,
+"rpc-whitelist-enabled": false,
+rpc-authentication-required": false
+
 
 Aria2
 -----
