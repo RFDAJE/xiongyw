@@ -155,6 +155,12 @@ sudo apt-get install transmission transmission-cli transmission-daemon
 "rpc-whitelist-enabled": false,
 rpc-authentication-required": false
 
+/etc/sysctl.conf:
+net.core.rmem_default = 8388608
+net.core.wmem_default = 8388608
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216 
+
 
 Aria2
 -----
