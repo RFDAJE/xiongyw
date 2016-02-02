@@ -153,7 +153,11 @@ sudo apt-get install transmission transmission-cli transmission-daemon
 /etc/transmission-daemon/settings.json:
 "dht-enabled": false,
 "rpc-whitelist-enabled": false,
-rpc-authentication-required": false
+"rpc-authentication-required": false
+"download-dir": xxx
+
+/etc/init.d/transmission-daemon reload
+
 
 /etc/sysctl.conf:
 net.core.rmem_default = 8388608
