@@ -1,9 +1,9 @@
 /* created(bruin, 2007-03-01): draw family lineage diagram.
    - build the family tree in memory firstly
    - draw the diagram for the tree
-   
+
    last updated(bruin, 2015-06-22): xelatex and utf-8
-   
+
    usage: "asy -f pdf family-utf8.asy" under windows
  */
 
@@ -58,63 +58,105 @@ struct person{
 	bool     sex;   /* true for male */
 	string   surname;
 	string   given_name;
-	string   born_at;           
+  string   nick_name;
+	string   born_at;
 	string   dead_at;
 
 	person   dad;    /* null if unknown */
 	person   mom;    /* null if unknown */
-	person   sps;    /* spouse; null if none or unknown */
+
+  /* one may have multiple spouses */
+	person[] sps;
+
 	person   kid;    /* first child; null if leaf */
 	person   lsib;   /* left sibling; null if first kid */
 	person   rsib;   /* right sibling; null if last kid */
-	
+
+  void info() {
+		write("------------------");
+		write("姓名: " + this.surname + " " + this.given_name);
+		write("性别: " + (this.sex? "男" : "女"));
+		write("生卒: " + this.born_at + "-" + this.dead_at);
+		write("父亲: " + ((this.dad != null)? this.dad.surname + " " + this.dad.given_name : ""));
+		write("母亲: " + ((this.mom != null)? this.mom.surname + " " + this.mom.given_name : ""));
+
+      for (int i = 0; i < this.sps.length; ++ i) {
+        if (this.sex) {
+          write("妻子: " + this.sps[i].surname + " " + this.sps[i].given_name);
+        } else {
+          write("丈夫: " + this.sps[i].surname + " " + this.sps[i].given_name);
+        }
+     }
+
+		write("长子: " + ((this.kid != null)? this.kid.surname + " " + this.kid.given_name : ""));
+	}
+
 
 	/* default constructor for person */
-	static person person(bool   sex, 
-	                     string surname, 
-	                     string given_name, 
-	                     string born_at, 
-	                     string dead_at){
+	static person person(bool   sex,
+	                     string surname,
+	                     string given_name,
+	                     string born_at,
+	                     string dead_at,
+	                     string nick_name = ""){
 		person p = new person;
 		p.sex = sex;
 		p.surname = surname;
 		p.given_name = given_name;
+		p.nick_name = nick_name;
 		p.born_at = born_at;
 		p.dead_at = dead_at;
-		
+
 		p.dad = null;
 		p.mom = null;
-		p.sps = null;
+		p.sps = new person[]{};
 		p.kid = null;
 		p.lsib = null;
 		p.rsib = null;
-		
+
 		return p;
 	}
 
-	/* make these two person as spouse of each other */
-	bool marry(person p){
-	
-		if(this.sex == p.sex)
-			return false;
-		
-		this.sps = p;
-		p.sps = this;	
-		
+	/* A.marry(B)  is not necessarily meaning B.marry(A) because the order may differ... but if "uni" == true, then
+   * it means A and B are both married once (with each other), i.e., A.marry(B) implies B.marry(A). so a single call
+   * is enough; otherwise, multiple calls may needed.
+   *
+   * usage: if A marries both B and C in such an order, call it as:
+   *   A.marry(B, C);
+   */
+	bool marry(bool uni = true...person[] p){
+
+		//if(this.sex == p.sex)
+		//	return false;
+
+    if (uni == true) {
+		  this.sps[0] = p[0];
+		  p[0].sps[0] = this;
+    } else {
+      this.sps = p;
+    }
+
 		return true;
 	}
 
 	/* mom gives birth to the kid */
 	bool give_birth(person kid,            /* the kid to be born */
-	                person lsib=null){     /* the left sibling of this kid; null if the 1st kid */
-	                
+	                person lsib = null,    /* the left sibling of this kid; null if the 1st kid */
+                  person dad = null){    /* the kid's father, null means the first (or the only) husband */
 	    if(this.sex != false)
-	    	return false;       
-	    	
+	    	return false;
+
 		kid.mom = this;
-		kid.dad = this.sps;
+    //this.info();
+    //kid.info();
+    if (dad == null) {
+		   kid.dad = this.sps[0];
+    }
+    else {
+       kid.dad = dad;
+    }
 		kid.lsib = lsib;
-		
+
 		if(kid.lsib != null){
 			lsib.rsib = kid;
 		}
@@ -124,34 +166,21 @@ struct person{
 			if(kid.dad != null)
 				kid.dad.kid = kid;
 		}
-		
+
 		return true;
 	}
-	
-	void info(){
-		write("------------------");
-		write("姓名: " + this.surname + " " + this.given_name);
-		write("性别: " + (this.sex? "男" : "女"));
-		write("生卒: " + this.born_at + "-" + this.dead_at);
-		write("父亲: " + ((this.dad != null)? this.dad.surname + " " + this.dad.given_name : ""));
-		write("母亲: " + ((this.mom != null)? this.mom.surname + " " + this.mom.given_name : ""));
-		if(this.sex)
-			write("妻子: " + ((this.sps != null)? this.sps.surname + " " + this.sps.given_name : ""));
-		else
-			write("丈夫: " + ((this.sps != null)? this.sps.surname + " " + this.sps.given_name : ""));
-		write("长子: " + ((this.kid != null)? this.kid.surname + " " + this.kid.given_name : ""));
-	}	
+
 };
 
 picture draw_person(person p){
 	picture pic;
 
-	label(pic, 
-	    //minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox["+format("%d", (int)width)+"bp][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width), 
-	     minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox[\textwidth][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width), 
-	      (0, 0), 
+	label(pic,
+	    //minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox["+format("%d", (int)width)+"bp][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width),
+	     minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox[\textwidth][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width),
+	      (0, 0),
 	      name_pen,
-	      NoFill); 
+	      NoFill);
 	      //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
 
 	return pic;
@@ -184,34 +213,51 @@ picture draw_tree(person root){
 	person kid;
 
 	if(root != null){
-	
+
+
 		self = draw_person(root);
 		attach(pic, self.fit(), (0, 0), se);
 
-		if(root.sps != null && root.sps.surname != "~"){
+/*
+		if(root.sps != null && root.sps.surname != unknown){  // not draw person with unknown surname
 			spouse = draw_person(root.sps);
 			attach(pic, spouse.fit(), (0, -pic_size(self).y - 3), se);
 		}
+*/
+
+   /* draw all spouses in order, under "self" */
+   real v_offset = pic_size(self).y + 3;
+   //root.info();
+   //write(root.sps.length);
+   for (int i = 0; i < root.sps.length; ++ i) {
+     // don't draw spouse with unknown surname
+     if (root.sps[i].surname == unknown) continue;
+
+     spouse = draw_person(root.sps[i]);
+     attach(pic, spouse.fit(), (0, - v_offset), se);
+     v_offset += pic_size(spouse).y + 3;
+   }
+
 
 		real xgap = width*2;
 		real ygap = 0;
 		for(kid = root.kid; kid != null; kid = kid.rsib){
 
-			/* draw connection lines */			
+			/* draw connection lines */
 			pair self_right = (pic_size(self).x + 2, -pic_size(self).y/3);
 			pair middle = self_right + (width/2, 0);
 			draw(pic, self_right--middle--(middle+(0,ygap))--(self_right+(width - 4,ygap)), line_pen);
-			
+
 			/* draw kid pic and attach it */
 			picture k = draw_tree(kid);
 			attach(pic, k.fit(), (xgap, ygap), se);
-			
-			
+
+
 			ygap -= pic_size(k).y + 6;
 		}
 
 	}
-	
+
 	return pic;
 }
 
@@ -237,10 +283,12 @@ person female_unknown = person.person(false, unknown, unknown, unknown, unknown 
 /* 人员 */
 
 person xiong_jiasong  = person.person(true,  "熊", "家松",       question, question);
+person xiong_jiasong_wife  = person.person(false, unknown, unknown, unknown, unknown );
 person xiong_cheng_x  = person.person(false, "熊", "承□",       question, question);
 person xiong_chengbin = person.person(true,  "熊", "承斌",       "1911.07.12",   "1999");
 person wen_bishou     = person.person(true,  "文", "必寿",       question, question);
 person wen_changxiang = person.person(true,  "文", "昌祥",       question, "");
+person wen_changxiang_wife  = person.person(false, unknown, unknown, unknown, unknown );
 person wen_x          = person.person(false, "文", "□□",       question, "");
 person wen_weixing    = person.person(true,  "文", "卫星",       question, "");
 person wen_x1         = person.person(true,  "□", "□□",       question, "");  /* 性别亦不清楚 */
@@ -249,28 +297,28 @@ person wen_x3         = person.person(true,  "□", "□□",       question, ""
 person yan_xiangxiao  = person.person(false, "严", "相孝",       "1911.07.20",   "1995");
 person xiong_zuxin    = person.person(true,  "熊", "祖鑫",       "1944.01.25",   "");
 person wang_fuying    = person.person(false, "王", "福英",       "1946.03.19",   "");
-person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   "");
-person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   "");
+person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   "", nick_name="大红");
+person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   "", nick_name="小红");
 person tian_aigu      = person.person(false, "田", "爱姑",       "1971.12.14",   "");
-person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   "");
+person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   "", nick_name="秋秋");
 person chen_juan      = person.person(false, "陈", "娟",         "1972.11.11",   "");
-person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   "");
+person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   "", nick_name="元元");
 
 /* 关系 */
 
-xiong_jiasong.marry(female_unknown);
-xiong_jiasong.sps.give_birth(xiong_cheng_x);
-xiong_jiasong.sps.give_birth(xiong_chengbin, xiong_cheng_x);
+xiong_jiasong.marry(xiong_jiasong_wife);
+xiong_jiasong_wife.give_birth(xiong_cheng_x);
+xiong_jiasong_wife.give_birth(xiong_chengbin, xiong_cheng_x);
 
 wen_bishou.marry(xiong_cheng_x);
 xiong_cheng_x.give_birth(wen_changxiang);
 xiong_cheng_x.give_birth(wen_x, wen_changxiang);
 
-wen_changxiang.marry(female_unknown);
-wen_changxiang.sps.give_birth(wen_weixing);
-wen_changxiang.sps.give_birth(wen_x1, wen_weixing);
-wen_changxiang.sps.give_birth(wen_x2, wen_x1);
-wen_changxiang.sps.give_birth(wen_x3, wen_x2);
+wen_changxiang.marry(wen_changxiang_wife);
+wen_changxiang_wife.give_birth(wen_weixing);
+wen_changxiang_wife.give_birth(wen_x1, wen_weixing);
+wen_changxiang_wife.give_birth(wen_x2, wen_x1);
+wen_changxiang_wife.give_birth(wen_x3, wen_x2);
 
 xiong_chengbin.marry(yan_xiangxiao);
 yan_xiangxiao.give_birth(xiong_zuxin); /* not really, but adopted */
@@ -291,66 +339,70 @@ chen_juan.give_birth(xiong_kaiyuan);
 /* 人员 */
 
 person wang_rixi      = person.person(true,  "王", "日熙",       question, question);
+person wang_rixi_wife = person.person(false,  unknown, unknown,       question, question);
 person wang_yuenan    = person.person(true,  "王", "月南",       question, question);
+person wang_yuenan_wife = person.person(false,  unknown, unknown,       question, question);
 person wang_yueying   = person.person(false, "王", "月英",       question, question);
 person wang_yuehai    = person.person(true,  "王", "月海",       question, question);
 person wang_yueping   = person.person(true,  "王", "月平",       question, "1948");
-person wang_reyang    = person.person(true,  "王", "□□",       question, question); // 王月英的丈夫，也姓王，二羊村 
+person wang_reyang    = person.person(true,  "王", "□□",       question, question); // 王月英的丈夫，也姓王，二羊村
 person han_xinxiu     = person.person(false, "韩", "新秀",       "1915.09.27", "1991.08.18");
 person shi_shixiang   = person.person(true,  "石", "世祥",       question, "1974");   // 韩新秀的第二个丈夫，和韩无后
 person wang_liansheng = person.person(true,  "王", "连生",       question, question);
+person wang_liansheng_wife = person.person(false,  unknown, unknown,       question, question);
 person wang_chuanxi   = person.person(true,  "王", "传熙",       "1936",   "");
 person zhou_yinlan    = person.person(false, "周", "引兰",       question, "");
 person wang_fuen      = person.person(true,  "王", "福恩",       question, "");
 person sheng_guoying  = person.person(false, "盛", "国银",       question, "");
 person wang_qilin     = person.person(true,  "王", "齐林",       question, question);
+person shen_yulan     = person.person(false, "沈", "玉兰",       question, unknown);
 person wang_qifa      = person.person(true,  "王", "齐发",       question, "");
 person wang_lachun    = person.person(true,  "王", "腊春",       question, "2005");
 person wang_silin     = person.person(true,  "王", "四林",       question, "");
-person wang_chunqing  = person.person(true,  "王", "春清",       "1958",   "");
+person wang_chunqing  = person.person(true,  "王", "春清",       "1958",   "", nick_name="春清");
 person wang_yunxiang  = person.person(false, "王", "运香",       "1961",   "");
-person wang_yuzhen    = person.person(false, "王", "玉珍",       "1963",   "");
+person wang_yuzhen    = person.person(false, "王", "先秀",       "1963",   "", nick_name="玉珍");
 person zhou_chijun    = person.person(true,  "周", "赤军",       "1963",   "");
-person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   "");
-person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   "");
+person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   "", nick_name="云珍");
+person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   "", nick_name="想清");
 person hu_aiqiong     = person.person(false, "胡", "爱琼",       question, "");
-person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   "");
+person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   "", nick_name="大兵");
 person deng_quanbin   = person.person(false, "邓", "全斌",       question, "");
-person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   "");
+person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   "", nick_name="小兵");
 person tao_weijun     = person.person(false, "陶", "卫军",       question, "");
-person wang_qiyu      = person.person(true,  "王", "齐禹",       "1971",   "");
+person wang_qiyu      = person.person(true,  "王", "齐禹",       "1972.1.14",   "", nick_name="三兵");
 person wang_haiyan    = person.person(true,  "王", "海燕",       question, "");
-person wang_dahong    = person.person(false, "王", "□□",       question, "");
-person wang_xiaohong  = person.person(false, "王", "□□",       question, "");
+person wang_dahong    = person.person(false, "王", "□□",       question, "", nick_name="大红");
+person wang_xiaohong  = person.person(false, "王", "□□",       question, "", nick_name="小红");
 person wang_cuie      = person.person(false, "王", "翠娥",       "1985",   "");
 person wang_cong      = person.person(false, "王", "聪",         "1987",   "");
 person wang_li        = person.person(false, "王", "丽",         "1990",   "");
 person wang_gongbao   = person.person(true,  "王", "功宝",       "1995",   "");
-person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   "");
-person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   "");
-person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   "");
+person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   "", nick_name="qiangqiang");
+person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   "", nick_name="mingming");
+person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   "", nick_name="linlin");
 
 /* 关系 */
 
-wang_rixi.marry(female_unknown);
-wang_rixi.sps.give_birth(wang_yuenan);
-wang_rixi.sps.give_birth(wang_yueying, wang_yuenan);
-wang_rixi.sps.give_birth(wang_yuehai, wang_yueying);
-wang_rixi.sps.give_birth(wang_yueping, wang_yuehai);
+wang_rixi.marry(wang_rixi_wife);
+wang_rixi_wife.give_birth(wang_yuenan);
+wang_rixi_wife.give_birth(wang_yueying, wang_yuenan);
+wang_rixi_wife.give_birth(wang_yuehai, wang_yueying);
+wang_rixi_wife.give_birth(wang_yueping, wang_yuehai);
 
-wang_yuenan.marry(female_unknown);
-wang_yuenan.sps.give_birth(wang_liansheng);
+wang_yuenan.marry(wang_yuenan_wife);
+wang_yuenan_wife.give_birth(wang_liansheng);
 
-wang_liansheng.marry(female_unknown);
-wang_liansheng.sps.give_birth(wang_qilin);
-wang_liansheng.sps.give_birth(wang_qifa, wang_qilin);
-wang_liansheng.sps.give_birth(wang_lachun, wang_qifa);
-wang_liansheng.sps.give_birth(wang_silin, wang_lachun);
+wang_liansheng.marry(wang_liansheng_wife);
+wang_liansheng_wife.give_birth(wang_qilin);
+wang_liansheng_wife.give_birth(wang_qifa, wang_qilin);
+wang_liansheng_wife.give_birth(wang_lachun, wang_qifa);
+wang_liansheng_wife.give_birth(wang_silin, wang_lachun);
 
-wang_qilin.marry(female_unknown);
-wang_qilin.sps.give_birth(wang_dahong);
-wang_qilin.sps.give_birth(wang_xiaohong, wang_dahong);
-wang_qilin.sps.give_birth(wang_haiyan, wang_xiaohong);
+wang_qilin.marry(shen_yulan);
+shen_yulan.give_birth(wang_dahong);
+shen_yulan.give_birth(wang_xiaohong, wang_dahong);
+shen_yulan.give_birth(wang_haiyan, wang_xiaohong);
 
 wang_yueying.marry(wang_reyang);
 wang_yueying.give_birth(wang_chuanxi);
@@ -372,10 +424,10 @@ wang_yuzhen.give_birth(zhou_xiang);
 
 wang_xiankui.marry(hu_aiqiong);
 
-wang_yueping.marry(han_xinxiu);
+wang_yueping.marry(uni=false, han_xinxiu);
+han_xinxiu.marry(uni=false, wang_yueping, shi_shixiang);
 han_xinxiu.give_birth(wang_fuen);
 han_xinxiu.give_birth(wang_fuying, wang_fuen);
-//han_xinxiu.marry(shi_shixiang);
 
 wang_fuen.marry(sheng_guoying);
 sheng_guoying.give_birth(shi_hebin);
@@ -399,15 +451,20 @@ person zhao_fu_x      = person.person(false, "赵", "复□",       "1932",   "2
 person zhao_fuxiang   = person.person(true,  "赵", "复祥",       "1934",   "");
 person qin_qianan     = person.person(false, "秦", "前安",       question, "");
 person zhao_fulong    = person.person(true,  "赵", "复龙",       "1940",   "");
+person zhao_fulong_wife    = person.person(false,  unknown, unknown,       question,   "");
 person zhao_fucai     = person.person(true,  "赵", "复才",       "1944",   "");
 person zhao_xiangui   = person.person(false, "赵", "贤贵",       question, "");
 person liu_jincheng   = person.person(true,  "柳", "金成",       question, "");
 person zhao_xianchun  = person.person(true,  "赵", "贤春",       question, "");
+person zhao_xianchun_wife  = person.person(false,  unknown, unknown,      question, "");
 person zhao_xianbing  = person.person(true,  "赵", "贤兵",       question, "");
+person zhao_xianbing_wife  = person.person(false,  unknown, unknown,      question, "");
 person zhao_xianhong  = person.person(false, "赵", "贤红",       question, "");
 person zhao_x0        = person.person(false, "赵", "贤□",       question, "");
 person zhao_xianneng  = person.person(true,  "赵", "贤能",       question, "");
+person zhao_xianneng_wife  = person.person(false,  unknown, unknown,      question, "");
 person zhao_xianbing2 = person.person(true,  "赵", "贤兵",       question, "");
+person zhao_xianbing2_wife  = person.person(false,  unknown, unknown,      question, "");
 person liu_jun        = person.person(true,  "柳", "军",         question, "");
 person zhao_liang     = person.person(true,  "赵", "亮",         question, "");
 person zhao_rong      = person.person(false, "赵", "蓉",         question, "");
@@ -430,28 +487,28 @@ qin_qianan.give_birth(zhao_xianchun, zhao_xiangui);
 qin_qianan.give_birth(zhao_xianbing, zhao_xianchun);
 qin_qianan.give_birth(zhao_xianhong, zhao_xianbing);
 
-zhao_fulong.marry(female_unknown);
-zhao_fulong.sps.give_birth(zhao_x0);
-zhao_fulong.sps.give_birth(zhao_xianneng, zhao_x0);
-zhao_fulong.sps.give_birth(zhao_xianbing2, zhao_xianneng);
+zhao_fulong.marry(zhao_fulong_wife);
+zhao_fulong_wife.give_birth(zhao_x0);
+zhao_fulong_wife.give_birth(zhao_xianneng, zhao_x0);
+zhao_fulong_wife.give_birth(zhao_xianbing2, zhao_xianneng);
 
 zhao_xiangui.marry(liu_jincheng);
 zhao_xiangui.give_birth(liu_jun);
 
-zhao_xianchun.marry(female_unknown);
-zhao_xianchun.sps.give_birth(zhao_liang);
-zhao_xianchun.sps.give_birth(zhao_rong, zhao_liang);
+zhao_xianchun.marry(zhao_xianchun_wife);
+zhao_xianchun_wife.give_birth(zhao_liang);
+zhao_xianchun_wife.give_birth(zhao_rong, zhao_liang);
 
-zhao_xianbing.marry(female_unknown);
-zhao_xianbing.sps.give_birth(zhao_na);
-zhao_xianbing.sps.give_birth(zhao_heng, zhao_na);
+zhao_xianbing.marry(zhao_xianbing_wife);
+zhao_xianbing_wife.give_birth(zhao_na);
+zhao_xianbing_wife.give_birth(zhao_heng, zhao_na);
 
-zhao_xianneng.marry(female_unknown);
-zhao_xianneng.sps.give_birth(zhao_x1);
-zhao_xianneng.sps.give_birth(zhao_x2, zhao_x1);
+zhao_xianneng.marry(zhao_xianneng_wife);
+zhao_xianneng_wife.give_birth(zhao_x1);
+zhao_xianneng_wife.give_birth(zhao_x2, zhao_x1);
 
-zhao_xianbing2.marry(female_unknown);
-zhao_xianbing2.sps.give_birth(zhao_x3);
+zhao_xianbing2.marry(zhao_xianbing2_wife);
+zhao_xianbing2_wife.give_birth(zhao_x3);
 
 zhao_fucai.marry(wang_fuying);
 wang_fuying.give_birth(xiong_yuwen);
@@ -480,6 +537,7 @@ person chen_yan       = person.person(false, "陈", "艳",         "1961",   "")
 person zhang_qiang    = person.person(true,  "张", "强",         question, "");
 person liu_geyao      = person.person(false, "刘", "戈瑶",       question, "");
 person chen_kai       = person.person(true,  "陈", "凯",         "1976",   "");
+person chen_kai_wife  = person.person(false,  unknown, unknown,      question, "");
 person chen_yong      = person.person(true,  "陈", "勇",         question, "");
 person chen_lei       = person.person(true,  "陈", "雷",         "1986",   "2005");
 person chen_jialiang  = person.person(true,  "陈", "佳亮",       "1988",   "");
@@ -518,42 +576,13 @@ chen_lifeng2.marry(chen_lifeng2_);
 chen_qingfeng.marry(wang_xiuqin);
 wang_xiuqin.give_birth(chen_kai);
 
-chen_kai.marry(female_unknown);
-chen_kai.sps.give_birth(chen_xurui);
+chen_kai.marry(chen_kai_wife);
+chen_kai_wife.give_birth(chen_xurui);
 
 chen_lin.marry(lv_x);
 lv_x.give_birth(chen_yong);
 
-/* ################ Bernoulli ################ */
-/*
-person nicolaus_senior = person.person(true, "Bernoulli", "Nicolaus Senior", "1623", "1708");
-person jacob_i         = person.person(true, "Bernoulli", "Jacob I",         "1654", "1705");
-person nicolaus_i      = person.person(true, "Bernoulli", "Nicolaus I",      "1662", "1716");
-person johannes_i      = person.person(true, "Bernoulli", "Johannes I",      "1667", "1748");
-person nicolaus_ii     = person.person(true, "Bernoulli", "Nicolaus II",     "1687", "1759");
-person nicolaus_iii    = person.person(true, "Bernoulli", "Nicolaus III",    "1695", "1726");
-person daniel          = person.person(true, "Bernoulli", "Daniel",          "1700", "1782");
-person johannes_ii     = person.person(true, "Bernoulli", "Johannes II",     "1710", "1790");
-person johannes_iii    = person.person(true, "Bernoulli", "Johannes III",    "1746", "1807");
-person jacob_ii        = person.person(true, "Bernoulli", "Jacob II",        "1759", "1789");
 
-nicolaus_senior.marry(female_unknown);
-nicolaus_senior.sps.give_birth(jacob_i);
-nicolaus_senior.sps.give_birth(nicolaus_i, jacob_i);
-nicolaus_senior.sps.give_birth(johannes_i, nicolaus_i);
-
-nicolaus_i.marry(female_unknown);
-nicolaus_i.sps.give_birth(nicolaus_ii);
-
-johannes_i.marry(female_unknown);
-johannes_i.sps.give_birth(nicolaus_iii);
-johannes_i.sps.give_birth(daniel, nicolaus_iii);
-johannes_i.sps.give_birth(johannes_ii, daniel);
-
-johannes_ii.marry(female_unknown);
-johannes_ii.sps.give_birth(johannes_iii);
-johannes_ii.sps.give_birth(jacob_ii, johannes_iii);
-*/
 
 
 
@@ -570,14 +599,17 @@ shipout("xiong");
 erase(currentpicture);
 
 
-
-xiong_zuxin.marry(wang_fuying);      // 使 王福英 的丈夫 显示为 熊祖鑫 
+xiong_zuxin.marry(wang_fuying);      // 使 王福英 的丈夫 显示为 熊祖鑫
 picture wang = draw_tree(wang_rixi);
 //add_time_stamp(wang);
 attach(wang.fit(), (0,0), se);
 shipout("wang");
 erase(currentpicture);
 
+picture han = draw_tree(han_xinxiu);
+attach(han.fit(), (0,0), se);
+shipout("han");
+erase(currentpicture);
 
 picture chen = draw_tree(chen_baixin);
 //add_time_stamp(chen);
@@ -591,11 +623,3 @@ picture zhao = draw_tree(zhao_tonghan);
 attach(zhao.fit(), (0, 0), se);
 shipout("zhao");
 erase(currentpicture);
-
-/*
-
-picture bernoulli = draw_tree(nicolaus_senior);
-attach(bernoulli.fit(), (0, 0), se);
-shipout("bernoulli.eps");
-erase(currentpicture);
-*/
