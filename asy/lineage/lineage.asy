@@ -2,9 +2,10 @@
    - build the family tree in memory firstly
    - draw the diagram for the tree
 
-   last updated(bruin, 2015-06-22): xelatex and utf-8
+   - updated(bruin, 2015-06-22): xelatex and utf-8
+   - updated(bruin, 2016-02-11): multiple spouses support; also add nick_name field
 
-   usage: "asy -f pdf family-utf8.asy" under windows
+   usage: "asy -f pdf family-utf8.asy" under windows/linux
  */
 
 settings.tex = "xelatex";
