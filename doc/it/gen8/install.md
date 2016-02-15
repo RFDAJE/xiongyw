@@ -1,5 +1,5 @@
 HP Gen8 Microserver config and setup memo
-====================================
+=========================================
 
 Firmware configuration
 ----------------------
@@ -33,6 +33,8 @@ Firmware configuration
    ```
 * Disable VID (Virtual Install Disk):
 
+
+Power consumption: ~37.5W (w/ 4 HDDs)
 
 Debian jessie 8.2 Installation
 ------------------------------
