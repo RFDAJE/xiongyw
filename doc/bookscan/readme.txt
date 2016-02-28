@@ -15,7 +15,7 @@ note that as the page 2 mobile distance changes during the process, need to make
 
 - change pictures into bw: tiff2bw input.tif output.tif
 
-- tif2pdf: use the script "tiff2pdf.sh": 
+- tif2pdf (sudo apt-get install libtiff-tools): use the script "tiff2pdf.sh": 
 
 for f in *.tif; do
   tiff2pdf -o ${f%tif}pdf $f
