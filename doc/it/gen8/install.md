@@ -168,6 +168,11 @@ net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216 
 
 
+generating torrent seed for hdchina:
+
+transmission-create the-folder/ -t  https://tracker.hdchina.club/announce.php
+
+
 Aria2
 -----
 
