@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 all:
-	asy -f pdf lineage.asy
+	asy -f pdf gens.asy
 	mkdir -p pdf
 	cp *.pdf pdf
 
