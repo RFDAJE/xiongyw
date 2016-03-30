@@ -426,40 +426,6 @@ lv_x.give_birth(chen_yong);
 //
 /* ######################################################################## */
 
-/*
-picture xiong=draw_tree(xiong_jiasong);
-//add_time_stamp(xiong);
-attach(xiong.fit(), (0,0), se);
-shipout("xiong");
-erase(currentpicture);
-
-
-//xiong_zuxin.marry(wang_fuying);      // 使 王福英 的丈夫 显示为 熊祖鑫
-picture wang = draw_tree(wang_rixi);
-//add_time_stamp(wang);
-attach(wang.fit(), (0,0), se);
-shipout("wang");
-erase(currentpicture);
-
-picture chen = draw_tree(chen_baixin);
-//add_time_stamp(chen);
-attach(chen.fit(), (0, 0), se);
-shipout("chen");
-erase(currentpicture);
-
-//zhao_fucai.marry(wang_fuying);
-picture zhao = draw_tree(zhao_tonghan);
-//add_time_stamp(zhao);
-attach(zhao.fit(), (0, 0), se);
-shipout("zhao");
-erase(currentpicture);
-
-
-picture huang = draw_tree(huang_dacai);
-attach(huang.fit(), (0,0), se);
-shipout("huang");
-erase(currentpicture);
-*/
 
 shipout_lineage(xiong_jiasong, "xiong");
 shipout_lineage(wang_rixi,     "wang");
