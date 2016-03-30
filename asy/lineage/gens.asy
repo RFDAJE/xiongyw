@@ -43,12 +43,12 @@ person wen_x3         = person.person(true,  unknown, unknown2,       question, 
 person yan_xiangxiao  = person.person(false, "严", "相孝",       "1911.07.20",   "1995");
 person xiong_zuxin    = person.person(true,  "熊", "祖鑫",       "1944.01.25",   blank);
 person wang_fuying    = person.person(false, "王", "福英",       "1946.03.19",   blank);
-person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   blank, nick_name="大红");
-person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   blank, nick_name="小红");
+person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   blank, notes="小名大红");
+person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   blank, notes="小名小红");
 person tian_aigu      = person.person(false, "田", "爱姑",       "1971.12.14",   blank);
-person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   blank, nick_name="秋秋");
+person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   blank, notes="小名秋秋");
 person chen_juan      = person.person(false, "陈", "娟",         "1972.11.11",   blank);
-person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   blank, nick_name="元元");
+person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   blank, notes="小名元元");
 
 /* 关系 */
 
@@ -108,29 +108,29 @@ person wang_lachun    = person.person(true,  "王", "齐三",       question, "2
 person wang_lachun_wife= person.person(false,"刘", "宝姑",       question, blank);
 person wang_silin     = person.person(true,  "王", "四林",       question, blank);
 person wang_silin_wife = person.person(false,  "乔", unknown2,       question, blank);
-person wang_chunqing  = person.person(true,  "王", "先林",       "1958",   blank, nick_name="春清");
+person wang_chunqing  = person.person(true,  "王", "先林",       "1958",   blank, notes="小名春清");
 person wang_yunxiang  = person.person(false, "王", "运香",       "1961",   blank);
-person wang_yuzhen    = person.person(false, "王", "先秀",       "1963",   blank, nick_name="玉珍");
+person wang_yuzhen    = person.person(false, "王", "先秀",       "1963",   blank, notes="小名玉珍");
 person zhou_chijun    = person.person(true,  "周", "赤军",       "1963",   blank);
-person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   blank, nick_name="云珍");
-person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   blank, nick_name="想清");
+person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   blank, notes="小名云珍");
+person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   blank, notes="小名想清");
 person hu_aiqiong     = person.person(false, "胡", "爱琼",       question, blank);
-person wang_yuran     = person.person(true,  "王", "禹然",       "2010",   blank, nick_name="贝贝");
-person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   blank, nick_name="大兵");
+person wang_yuran     = person.person(true,  "王", "禹然",       "2010",   blank, notes="小名贝贝");
+person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   blank, notes="小名大兵");
 person deng_quanbin   = person.person(false, "邓", "全斌",       question, blank);
-person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   blank, nick_name="小兵");
+person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   blank, notes="小名小兵");
 person tao_weijun     = person.person(false, "陶", "卫军",       question, blank);
-person wang_qiyu      = person.person(true,  "王", "齐禹",       "1972.1.14",   blank, nick_name="三兵");
+person wang_qiyu      = person.person(true,  "王", "齐禹",       "1972.1.14",   blank, notes="小名三兵");
 person wang_haiyan    = person.person(true,  "王", "海燕",       question, blank);
-person wang_dahong    = person.person(false, "王", unknown2,       question, blank, nick_name="大红");
-person wang_xiaohong  = person.person(false, "王", unknown2,       question, blank, nick_name="小红");
+person wang_dahong    = person.person(false, "王", unknown2,       question, blank, notes="小名大红");
+person wang_xiaohong  = person.person(false, "王", unknown2,       question, blank, notes="小名小红");
 person wang_cuie      = person.person(false, "王", "翠娥",       "1985",   blank);
 person wang_cong      = person.person(false, "王", "聪",         "1987",   blank);
 person wang_li        = person.person(false, "王", "丽",         "1990",   blank);
 person wang_gongbao   = person.person(true,  "王", "功宝",       "1995",   blank);
-person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   blank, nick_name="qiangqiang");
-person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   blank, nick_name="mingming");
-person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   blank, nick_name="linlin");
+person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   blank, notes="小名祥祥");
+person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   blank, notes="小名明明");
+person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   blank, notes="小名淋淋");
 
 /* 关系 */
 
@@ -426,7 +426,7 @@ lv_x.give_birth(chen_yong);
 //
 /* ######################################################################## */
 
-
+/*
 picture xiong=draw_tree(xiong_jiasong);
 //add_time_stamp(xiong);
 attach(xiong.fit(), (0,0), se);
@@ -459,4 +459,11 @@ picture huang = draw_tree(huang_dacai);
 attach(huang.fit(), (0,0), se);
 shipout("huang");
 erase(currentpicture);
- 
+*/
+
+shipout_lineage(xiong_jiasong, "xiong");
+shipout_lineage(wang_rixi,     "wang");
+shipout_lineage(chen_baixin,   "chen");
+shipout_lineage(zhao_tonghan,  "zhao");
+shipout_lineage(huang_dacai,   "huang");
+

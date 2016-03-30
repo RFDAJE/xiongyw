@@ -3,7 +3,7 @@
    - draw the diagram for the tree
 
    - updated(bruin, 2015-06-22): xelatex and utf-8
-   - updated(bruin, 2016-02-11): multiple spouses support; also add nick_name field
+   - updated(bruin, 2016-02-11): multiple spouses support; also add "notes" field
    - updated(bruin, 2016-03-28): fix horizontal alignment bug
 
    Todo: 
@@ -18,10 +18,18 @@
    import "lineage.asy" as lineage;
  */
 
+/* Unicode Enclosed Alphanumerics: https://en.wikipedia.org/wiki/Enclosed_Alphanumerics
+ *  ①②③④⑤⑥⑦⑧⑨⑩...
+ */
+   
 settings.tex = "xelatex";
 
 
 texpreamble("\usepackage{xeCJK}");
+
+// Unicode Enclosed Alphanumerics: https://en.wikipedia.org/wiki/Enclosed_Alphanumerics
+// texpreamble("\usepackage{pifont}"); 
+
 
 /*
 texpreamble("\setCJKmainfont{arialuni.ttf}");
@@ -88,9 +96,9 @@ struct person{
     bool     sex;   /* true for male */
     string   surname;
     string   given_name;
-    string   nick_name;
     string   born_at;
     string   dead_at;
+    string   notes;
 
     person   dad;    /* null if unknown */
     person   mom;    /* null if unknown */
@@ -128,14 +136,14 @@ struct person{
                          string given_name,
                          string born_at,
                          string dead_at,
-                         string nick_name = ""){
+                         string notes = blank){
         person p = new person;
         p.sex = sex;
         p.surname = surname;
         p.given_name = given_name;
-        p.nick_name = nick_name;
         p.born_at = born_at;
         p.dead_at = dead_at;
+        p.notes = notes;
 
         p.dad = null;
         p.mom = null;
@@ -229,20 +237,39 @@ pair frame_size(frame f){
 }
 
 
-
-picture draw_person(person p){
+/* fixme: 在画之前如何确定文字的长度?貌似中文的姓名，即使宽度超过minipage的宽度，也不会
+ *        换行，而且生成的 pic 的 size 也不能反映世界的宽度。。。
+ * \widthof: http://tex.stackexchange.com/questions/18576/get-width-of-a-given-text-as-length
+ */
+picture draw_person(person p, int num = 0){ // num: 脚注上标顺序；缺省 0 或小于 0 表示不需要画上标
     picture pic;
-    string s;
-
-    //minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox["+format("%d", (int)width)+"bp][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width),
-    // minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox[\textwidth][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, width),
-    if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) { // 生卒日期都不清楚的就不写
-        s = minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox[\textwidth][s]{"+p.surname + p.given_name + "}", g_name_width);
-    } else {
-        s = minipage(((p.sex!=true)?"\kai":"\hei")+"\makebox[\textwidth][s]{"+p.surname + p.given_name + "}\\[2pt]\tiny" + p.born_at + "-" + p.dead_at, g_name_width);
+    real txt_width = g_name_width;
+    string  s1;  // minipage(s1, txt_width)
+    string  s2;  // s2 = minipage() output
+    
+    if (num > 0) {
+        txt_width += g_glyph_width / 2;
     }
 
-    label(pic, s, (0, 0), name_pen, NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+    // 第一行，姓名 + 脚注上标(可选)
+    s1 = (p.sex != true)? "\kai":"\hei";  // 男子用黑体，女子用楷体
+    s1 += "\makebox[\textwidth][s]{"+p.surname + p.given_name; // [s] means evenly distribute the text
+    // 脚注上标
+    if (num > 0) {
+        s1 += "\textsuperscript{[" + format(num) + "]}}"; 
+    }
+    else {
+        s1 += "}"; 
+    }
+    // 第二行，生卒日期。如果都不清楚的就不画
+    if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) {
+    }
+    else {
+        s1 += "\\[2pt]\tiny" + p.born_at + "-" + p.dead_at;
+    }
+
+    s2 = minipage(s1, txt_width);
+    label(pic, s2, (0, 0), name_pen, NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
 
     return pic;
 }
@@ -258,6 +285,8 @@ picture draw_tree(person root){
 
     /* 先画自己, attach 到 pic 上 */
     self = draw_person(root);
+    //write(root.surname + root.given_name);
+    //write(pic_size(self).x);
     attach(pic, self.fit(), (0, 0), se);
 
     /* 再依次所有的配偶，一一 attach 到 pic 上 self 的下方 */
@@ -275,7 +304,7 @@ picture draw_tree(person root){
     /* 最后递归画 kids */
 
     /* (xoff, yoff) 是在 pic 中 attach 下一棵子树的坐标 */
-    real xoff = g_name_width + g_kid_h_gap;
+    real xoff = pic_size(self).x + g_kid_h_gap;
     real yoff = 0;
     
     real xskip = 2; /* 水平连接线和 self/kid 的间距 */
@@ -304,7 +333,36 @@ picture draw_tree(person root){
     return pic;
 }
 
+/*
+ * add x/y margins to a picture
+ */
+picture add_margin(picture pic=currentpicture,
+                   real xmargin=0.05, // in percentage
+                   real ymargin=xmargin,
+                   pen dp=invisible) {
+    pair size = size(pic, user=true);
+    pair min = min(pic, user=true);
+    pair max = max(pic, user=true);
+    real delta_x = size.x * xmargin;
+    real delta_y = size.y * ymargin;
+    draw(pic, (min.x-delta_x, min.y-delta_y)--(max.x+delta_x, max.y+delta_y), dp);
+    return pic;
+}
+
+
 /* add time stamp in the lower left corner of the picture */
-void add_time_stamp(picture pic){
-    label(pic, minipage("\fs\footnotesize " + time("%Y-%m-%d")+"\:修订", 100), (0,-pic_size(pic).y), 0.001SE);
+void add_time_stamp(picture pic=currentpicture){
+    label(pic, minipage("\fs\footnotesize 本表修订于 " + time("%Y-%m-%d"), 100), (0,-pic_size(pic).y-30), se);
+}
+
+void shipout_lineage(person root, string file_name) {
+    picture pic=draw_tree(root);
+
+    erase(currentpicture);
+    attach(pic.fit(), (0,0), se);
+    add_time_stamp();
+    add_margin();
+    add_time_stamp(pic);
+    shipout(file_name);
+    erase(currentpicture);
 }

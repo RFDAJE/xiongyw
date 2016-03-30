@@ -14,20 +14,20 @@ person female_unknown = person.person(false, unknown, unknown2, question, blank)
 
 
 
-person zhao_jiasong  = person.person(true,  "赵", "松家",       question, question);
-person zhao_jiasong_wife  = person.person(false, unknown, unknown2, question, question );
-person zhao_cheng_x  = person.person(false, "赵", "承",       question, question);
+person zhao_jiasong  = person.person(true,  "赵", "松家",       "1900", "2000", notes="xx");
+person zhao_jiasong_wife  = person.person(false, unknown, unknown2, question, question, notes="xx" );
+person zhao_cheng_x  = person.person(false, "赵", "承",       question, question, notes="xx");
 person zhao_chengbin = person.person(true,  "赵", "承筹",     question, question);
-person wen_bishou     = person.person(true,  "文", "寿必",       question, question);
+person wen_bishou     = person.person(true,  "文", "寿必",       question, question, notes="xx");
 person wen_changxiang = person.person(true,  "文", "祥昌",       question, question);
-person wen_changxiang_wife  = person.person(false, unknown, unknown2, question, question );
+person wen_changxiang_wife  = person.person(false, unknown, unknown2, question, question, notes="xx" );
 person wen_x          = person.person(false, "文", unknown2,       question, blank);
 person wen_weixing    = person.person(true,  "文", "星卫",       question, blank);
 person wen_x1         = person.person(true,  unknown, unknown2,       question, blank); 
 person wen_x2         = person.person(true,  unknown, unknown2,       question, blank); 
 person wen_x3         = person.person(true,  unknown, unknown2,       question, blank); 
 person yan_xiangxiao  = person.person(false, "严", "孝",       question, blank);
-person zhao_zuxin    = person.person(true,  "赵", "鑫",       question, blank);
+person zhao_zuxin    = person.person(true,  "赵", "鑫",       question, blank, notes="yy");
 person wang_fuying    = person.person(false, "王", "英",       question, blank);
 person zhao_yuwen    = person.person(true,  "赵", "贤文",      question, blank);
 person zhao_yuwu     = person.person(true,  "赵", "贤武",      question, blank);
@@ -66,12 +66,14 @@ tian_aigu.give_birth(zhao_qiushi);
 zhao_yuwu.marry(chen_juan);
 chen_juan.give_birth(zhao_kaiyuan);
 
-
-
+shipout_lineage(zhao_jiasong, "test");
+/*
 
 picture test=draw_tree(zhao_jiasong);
 attach(test.fit(), (0,0), se);
+add_time_stamp();
+add_margin();
 shipout("test");
 erase(currentpicture);
-
+*/
  
