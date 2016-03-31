@@ -5,10 +5,11 @@
    - updated(bruin, 2015-06-22): xelatex and utf-8
    - updated(bruin, 2016-02-11): multiple spouses support; also add "notes" field
    - updated(bruin, 2016-03-28): fix horizontal alignment bug
+   - updated(bruin, 2016-03-31): add notes support
 
    Todo: 
      + in certain cases, the dash lines are not aligned (2016-03-28)
-     - add notes into the diagram
+     + add notes into the diagram (2016-03-31)
      - restrict (specify) the width of the diagram
      - use elipse to indicate multiple kids as "etc"
      - indicate mother when there are step mothers
@@ -88,8 +89,8 @@ string unknown  = "□";
 string unknown2 = "□□";
 
 /* for born/dead date */
-string question = "?";     // reached but not known yet
-string blank = "";         // not reached
+string question = "?";     // happened but not known
+string blank = "";         // not happen yet
 
 /* person: a node in family tree */
 struct person{
@@ -98,7 +99,10 @@ struct person{
     string   given_name;
     string   born_at;
     string   dead_at;
-    string   notes;
+
+    /* 个人备注信息 */    
+    string   notes;  /* "" 表示没有备注 */
+    int      notes_order; /* 本备注在树上所有备注中的排序，>=0 */
 
     person   dad;    /* null if unknown */
     person   mom;    /* null if unknown */
@@ -143,7 +147,14 @@ struct person{
         p.given_name = given_name;
         p.born_at = born_at;
         p.dead_at = dead_at;
-        p.notes = notes;
+
+        /* not draw person without surname, so its notes */
+        if (surname == unknown) {
+            p.notes = blank;
+        } else {
+            p.notes = notes;
+        }
+        p.notes_order = - 1;
 
         p.dad = null;
         p.mom = null;
@@ -238,25 +249,27 @@ pair frame_size(frame f){
 
 
 /* fixme: 在画之前如何确定文字的长度?貌似中文的姓名，即使宽度超过minipage的宽度，也不会
- *        换行，而且生成的 pic 的 size 也不能反映世界的宽度。。。
+ *        换行，而且生成的 pic 的 size 也不能反映实际的宽度。。。
  * \widthof: http://tex.stackexchange.com/questions/18576/get-width-of-a-given-text-as-length
  */
-picture draw_person(person p, int num = 0){ // num: 脚注上标顺序；缺省 0 或小于 0 表示不需要画上标
+picture draw_person(person p){
     picture pic;
     real txt_width = g_name_width;
     string  s1;  // minipage(s1, txt_width)
     string  s2;  // s2 = minipage() output
     
-    if (num > 0) {
-        txt_width += g_glyph_width / 2;
+    if (p.notes_order >= 0) {
+        txt_width += g_glyph_width / 2.;
     }
 
     // 第一行，姓名 + 脚注上标(可选)
-    s1 = (p.sex != true)? "\kai":"\hei";  // 男子用黑体，女子用楷体
+    s1 = (p.sex != true)? "\kai ":"\hei ";  // 男子用黑体，女子用楷体
     s1 += "\makebox[\textwidth][s]{"+p.surname + p.given_name; // [s] means evenly distribute the text
+//    s1 += p.surname + p.given_name; // [s] means evenly distribute the text
     // 脚注上标
-    if (num > 0) {
-        s1 += "\textsuperscript{[" + format(num) + "]}}"; 
+    if (p.notes_order >= 0) {
+        s1 += "\textsuperscript{[" + format(p.notes_order + 1) + "]}}"; 
+//        s1 += "\textsuperscript{[" + format(p.notes_order + 1) + "]}"; 
     }
     else {
         s1 += "}"; 
@@ -265,12 +278,110 @@ picture draw_person(person p, int num = 0){ // num: 脚注上标顺序；缺省 
     if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) {
     }
     else {
-        s1 += "\\[2pt]\tiny" + p.born_at + "-" + p.dead_at;
+        s1 += "\\[2pt]\tiny " + p.born_at + "-" + p.dead_at;
     }
 
     s2 = minipage(s1, txt_width);
     label(pic, s2, (0, 0), name_pen, NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
 
+    return pic;
+}
+
+
+/*
+ * 按广度优先设置树中所有备注的顺序，并按顺序画出所有备注
+ */
+picture set_n_draw_notes(person root, string title_notes = blank) {
+    picture pic;
+    person[] q; // the queue for breath-first traverse
+    string s1;  // minipage() input
+    string s2;  // minipage() output
+    int i, j;
+
+    /* push only not yet in the queue */
+    void push_unique(person[] q, person p) {
+        for (int i = 0; i < q.length; ++ i) {
+            if (q[i] == p)
+                return;
+        }
+        q.push(p);
+    }
+    
+    if (root == null)
+        return null;
+
+    /*
+     * 遍历，建立队列
+     */
+    push_unique(q, root);
+    i = 0;
+
+    while (i < q.length) {
+        /* self's espouses */
+        for (j = 0; j < q[i].sps.length; ++ j) {
+            push_unique(q, q[i].sps[j]);            
+        }
+        
+        /* kid & their espouses */
+        if (q[i].kid != null) {
+            person kid = q[i].kid;
+            
+            push_unique(q, kid);
+            for (j = 0; j < kid.sps.length; ++ j) {
+                push_unique(q, kid.sps[j]);            
+            }
+            
+            while (kid.rsib != null) {
+                push_unique(q, kid.rsib);
+                for (j = 0; j < kid.rsib.sps.length; ++ j) {
+                    push_unique(q, kid.rsib.sps[j]);            
+                }
+                kid = kid.rsib;
+            }
+        }
+
+        ++ i;
+    }
+
+    /*
+    for (i = 0; i < q.length; ++ i) {
+        q[i].info();
+    }
+    */
+
+    /*
+     * 设置备注顺序(供draw_tree()时使用), 并画备注
+     */
+    if (title_notes != blank) {
+        j = 1;  // 标题最多只有一个备注
+    } else {
+        j = 0;
+    }
+    s1 = "\fs\footnotesize 备注: \\[3pt]";
+
+    if (title_notes != blank) {
+        s1 += "\textsuperscript{[$1$]}" + title_notes + "\\[2pt]";
+    }
+    
+    for (i = 0; i < q.length; ++ i) {
+        if (q[i].notes != blank) {
+            q[i].notes_order = j;
+            ++ j;
+
+            //s1 += "\makebox[1cm][l]{\textsuperscript{[" + format(j) + "]}" + q[i].notes + "}\\[2pt]";
+            s1 += "\textsuperscript{[" + format(j) + "]}" + q[i].notes + "\\[2pt]";
+
+        }
+    }
+
+    //write(s1);
+
+    if (j == 0)  // 没有备注
+        return null; 
+        
+    s2 = minipage(s1, 18cm);
+    label(pic, s2, (0, 0), name_pen, NoFill); 
+    
     return pic;
 }
 
@@ -355,14 +466,34 @@ void add_time_stamp(picture pic=currentpicture){
     label(pic, minipage("\fs\footnotesize 本表修订于 " + time("%Y-%m-%d"), 100), (0,-pic_size(pic).y-30), se);
 }
 
-void shipout_lineage(person root, string file_name) {
-    picture pic=draw_tree(root);
+void shipout_lineage(person root, string file_name, string title, string title_notes = blank) {
+
+    string s;  // minipage() input for title line
+    
+    picture ttl; // title
+    picture tree;
+    picture notes; 
+
+    real v_off = 0;
+
+    s = "\hei\LARGE\underline{" + title + "}";
+    if (title_notes != blank) {
+        s += "\textsuperscript{[$1$]}";
+    }
+    
+    label(ttl, minipage(s, 10cm), (0, 0), name_pen, NoFill); 
+    notes = set_n_draw_notes(root, title_notes);
+    tree = draw_tree(root);
 
     erase(currentpicture);
-    attach(pic.fit(), (0,0), se);
-    add_time_stamp();
+    attach(ttl.fit(), (0, 0), se);
+    v_off -= pic_size(ttl).y + 30;
+    attach(tree.fit(), (0, v_off), se);
+    v_off -= pic_size(tree).y + 30;
+    if (notes != null) {
+        attach(notes.fit(),(0, v_off), se);
+    }
     add_margin();
-    add_time_stamp(pic);
     shipout(file_name);
     erase(currentpicture);
 }

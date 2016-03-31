@@ -41,14 +41,14 @@ person wen_x1         = person.person(true,  unknown, unknown2,       question, 
 person wen_x2         = person.person(true,  unknown, unknown2,       question, blank);  /* 性别亦不清楚 */
 person wen_x3         = person.person(true,  unknown, unknown2,       question, blank);  /* 性别亦不清楚 */
 person yan_xiangxiao  = person.person(false, "严", "相孝",       "1911.07.20",   "1995");
-person xiong_zuxin    = person.person(true,  "熊", "祖鑫",       "1944.01.25",   blank);
+person xiong_zuxin    = person.person(true,  "熊", "祖鑫",       "1944.01.25",   blank, notes="本名赵复才，两岁时由于生母病逝且家境窘迫，被熊家领养，遂改用此名。");
 person wang_fuying    = person.person(false, "王", "福英",       "1946.03.19",   blank);
-person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   blank, notes="小名大红");
-person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   blank, notes="小名小红");
+person xiong_yuwen    = person.person(true,  "熊", "育文",       "1970.07.16",   blank); // notes="小名大红");
+person xiong_yuwu     = person.person(true,  "熊", "育武",       "1971.09.23",   blank); // notes="小名小红");
 person tian_aigu      = person.person(false, "田", "爱姑",       "1971.12.14",   blank);
-person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   blank, notes="小名秋秋");
+person xiong_qiushi   = person.person(false, "熊", "秋实",       "1996.08.07",   blank); // notes="小名秋秋");
 person chen_juan      = person.person(false, "陈", "娟",         "1972.11.11",   blank);
-person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   blank, notes="小名元元");
+person xiong_kaiyuan  = person.person(false, "熊", "开元",       "2000.12.19",   blank); // notes="小名元元");
 
 /* 关系 */
 
@@ -84,16 +84,16 @@ chen_juan.give_birth(xiong_kaiyuan);
 
 /* 人员 */
 
-person wang_rixi      = person.person(true,  "王", "日熙",       question, question);  // 排行第六; 兄弟姊妹共七位
+person wang_rixi      = person.person(true,  "王", "日熙",       question, question, notes = "共有兄弟姊妹七人，在其中排行第六 。");
 person wang_rixi_wife = person.person(false,  unknown, unknown,       question, question);
 person wang_yuenan    = person.person(true,  "王", "月南",       question, question);
 person wang_yuenan_wife = person.person(false,  "肖", unknown2,       question, question);
-person wang_yueying   = person.person(false, "王", "月英",       question, question);
+person wang_yueying   = person.person(false, "王", "月英",       question, question, notes="国民党营级军官，带兵路过五峰时和韩新秀结合，后病逝于驻地恩施 。");
 person wang_yuehai    = person.person(true,  "王", "月海",       question, question);
 person wang_yueping   = person.person(true,  "王", "月平",       question, "1948");
 person wang_reyang    = person.person(true,  "王", unknown2,       question, question); // 王月英的丈夫，也姓王，二羊村
-person han_xinxiu     = person.person(false, "韩", "新秀",       "1915.09.27", "1991.08.18");  // 亦名 黄桂香,韩香大
-person shi_shixiang   = person.person(true,  "石", "世祥",       question, "1974");   // 韩新秀的第二个丈夫，和韩无后
+person han_xinxiu     = person.person(false, "韩", "新秀",       "1915.09.27", "1991.08.18", notes="又名黄桂香、韩香大。四岁丧母，十岁丧父。"); 
+person shi_shixiang   = person.person(true,  "石", "世祥",       question, "1974", notes="和韩新秀无后。");   // 韩新秀的第二个丈夫，和韩无后
 person wang_liansheng = person.person(true,  "王", "连生",       question, question);
 person wang_liansheng_wife = person.person(false,  "彭", unknown2,       question, question);
 person wang_chuanxi   = person.person(true,  "王", "传熙",       "1936",   question);
@@ -108,29 +108,29 @@ person wang_lachun    = person.person(true,  "王", "齐三",       question, "2
 person wang_lachun_wife= person.person(false,"刘", "宝姑",       question, blank);
 person wang_silin     = person.person(true,  "王", "四林",       question, blank);
 person wang_silin_wife = person.person(false,  "乔", unknown2,       question, blank);
-person wang_chunqing  = person.person(true,  "王", "先林",       "1958",   blank, notes="小名春清");
+person wang_chunqing  = person.person(true,  "王", "先林",       "1958",   blank); // notes="小名春清"
 person wang_yunxiang  = person.person(false, "王", "运香",       "1961",   blank);
-person wang_yuzhen    = person.person(false, "王", "先秀",       "1963",   blank, notes="小名玉珍");
+person wang_yuzhen    = person.person(false, "王", "先秀",       "1963",   blank); // notes="小名玉珍");
 person zhou_chijun    = person.person(true,  "周", "赤军",       "1963",   blank);
-person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   blank, notes="小名云珍");
-person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   blank, notes="小名想清");
+person wang_yunzhen   = person.person(false, "王", "云珍",       "1968",   blank); // notes="小名云珍");
+person wang_xiankui   = person.person(true,  "王", "先奎",       "1978",   blank); // notes="小名想清");
 person hu_aiqiong     = person.person(false, "胡", "爱琼",       question, blank);
-person wang_yuran     = person.person(true,  "王", "禹然",       "2010",   blank, notes="小名贝贝");
-person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   blank, notes="小名大兵");
+person wang_yuran     = person.person(true,  "王", "禹然",       "2010",   blank); // notes="小名贝贝");
+person shi_hebin      = person.person(true,  "石", "和彬",       "1965",   blank); // notes="小名大兵");
 person deng_quanbin   = person.person(false, "邓", "全斌",       question, blank);
-person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   blank, notes="小名小兵");
+person wang_qisong    = person.person(true,  "王", "齐松",       "1968",   blank); // notes="小名小兵");
 person tao_weijun     = person.person(false, "陶", "卫军",       question, blank);
-person wang_qiyu      = person.person(true,  "王", "齐禹",       "1972.1.14",   blank, notes="小名三兵");
+person wang_qiyu      = person.person(true,  "王", "齐禹",       "1972.1.14",   blank); // notes="小名三兵");
 person wang_haiyan    = person.person(true,  "王", "海燕",       question, blank);
-person wang_dahong    = person.person(false, "王", unknown2,       question, blank, notes="小名大红");
-person wang_xiaohong  = person.person(false, "王", unknown2,       question, blank, notes="小名小红");
+person wang_dahong    = person.person(false, "王", unknown2,       question, blank); // notes="小名大红");
+person wang_xiaohong  = person.person(false, "王", unknown2,       question, blank); // notes="小名小红");
 person wang_cuie      = person.person(false, "王", "翠娥",       "1985",   blank);
 person wang_cong      = person.person(false, "王", "聪",         "1987",   blank);
 person wang_li        = person.person(false, "王", "丽",         "1990",   blank);
 person wang_gongbao   = person.person(true,  "王", "功宝",       "1995",   blank);
-person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   blank, notes="小名祥祥");
-person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   blank, notes="小名明明");
-person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   blank, notes="小名淋淋");
+person zhou_xiang     = person.person(true,  "周", "祥",         "1991",   blank); // notes="小名祥祥");
+person shi_kanming    = person.person(true,  "石", "衎明",       "1996",   blank); // notes="小名明明");
+person wang_yingjun   = person.person(false, "王", "滢珺",       "1996.11.01",   blank); // notes="小名淋淋");
 
 /* 关系 */
 
@@ -215,16 +215,16 @@ person huang_zhiyu = person.person(true, "黄", "志禹", question, question);
 person huang_zhiyu_wife = person.person(false, unknown, unknown2, question, question);
 person huang_shiguang = person.person(true, "黄", "士光", question, question);
 person huang_shiguang_wife = person.person(false, "胡", "氏", question, question);
-person huang_shideng = person.person(true, "黄", "士登", "1887.04.25", "1942.08.01");
+person huang_shideng = person.person(true, "黄", "士登", "1887.04.25", "1942.08.01", notes="为五峰当地一代名医。又名韩宝山，其外曾祖父名为韩天德，韩姓盖由此而来。");
 person huang_shideng_wife = person.person(false, "田", "氏", question, question);
 person huang_zizhang = person.person(true, "黄", "子章", question, question);
 person huang_zizhang_wife = person.person(false, "周", "氏",  question, question);
-person huang_haida = person.person(true, "黄", "海大", "1917.12.27", "1982.08.29");  // 亦名 黄河清
-person huang_haida_wife0 = person.person(false, "唐", "氏", question, question); 
-person huang_haida_wife1 = person.person(false, "张", "卜秀", "1919.12.05", "1989.05.22");
-person huang_haida_wife2 = person.person(false, "吴", "厚英", "1924.11.02", "2014.08.04");
+person huang_haida = person.person(true, "黄", "海大", "1917.12.27", "1982.08.29", notes="又名黄河清。两岁丧母，八岁丧父，后由黄士登(韩宝山)抚养并从其学习医术。");  
+person huang_haida_wife0 = person.person(false, "唐", "氏", question, question, notes="和黄海大无后。"); 
+person huang_haida_wife1 = person.person(false, "张", "卜秀", "1919.12.05", "1989.05.22", notes="和黄海大离异后再婚，也嫁给一黄姓(但无后)。"); 
+person huang_haida_wife2 = person.person(false, "吴", "厚英", "1924.11.02", "2014.08.04", notes="和黄海大无后。");
 person huang_daoming = person.person(true, "黄", "道明", "1944.08.25", blank);
-person zou_xiangchun = person.person(false, "邹", "祥春", "1947.04.04", blank); // 亦名 杨仲芳
+person zou_xiangchun = person.person(false, "邹", "祥春", "1947.04.04", blank, notes="又名杨仲芳。"); 
 person huang_shenghong = person.person(true, "黄", "声鸿", "1968.12.09", blank);
 person huang_shenghong_wife = person.person(false, "郑", "龙萍", "1970.02.15", blank);
 person zhang_fangnian = person.person(true, "张", "方年", "1970.02.25", blank);
@@ -353,8 +353,8 @@ xiong_zuxin.marry(wang_fuying);
 
 person chen_baixin    = person.person(true,  "陈", "百新",       "1911",   question);
 person zhang_juying   = person.person(false, "张", "菊英",       "1911",   "1987");
-person chen_lifeng    = person.person(true,  "陈", "立丰",       "1931",   "2004");
-person wang_yumei     = person.person(false, "王", "玉梅",       "1937",   blank);
+person chen_lifeng    = person.person(true,  "陈", "立丰",       "1931",   "2004", notes="籍贯浙江鄞县。");
+person wang_yumei     = person.person(false, "王", "玉梅",       "1937",   blank,  notes="籍贯山东招远。");
 person chen_yufeng    = person.person(false, "陈", "玉丰",       question, blank);
 person liu_jichang    = person.person(true,  "刘", "继昌",       question, blank);
 person chen_lifeng2   = person.person(true,  "陈", "利丰",       question, question);
@@ -422,14 +422,14 @@ lv_x.give_birth(chen_yong);
 
 /* ######################################################################## */
 //
-//  画图
+//  画图 
 //
 /* ######################################################################## */
 
 
-shipout_lineage(xiong_jiasong, "xiong");
-shipout_lineage(wang_rixi,     "wang");
-shipout_lineage(chen_baixin,   "chen");
-shipout_lineage(zhao_tonghan,  "zhao");
-shipout_lineage(huang_dacai,   "huang");
+shipout_lineage(xiong_jiasong, "xiong", "熊姓世系表", "族谱: 【震起鄱阳泰云开，万家承祖育英才。】\\本表修订于 2016.03.31。");
+shipout_lineage(wang_rixi,     "wang",  "王姓世系表", "族谱: 【寿同日月，福齐海天。】\\本表修订于 2016.03.31。");
+shipout_lineage(chen_baixin,   "chen",  "陈姓世系表", "本表修订于 2016.03.31。"); 
+shipout_lineage(zhao_tonghan,  "zhao",  "赵姓世系表", "本表修订于 2016.03.31。");
+shipout_lineage(huang_dacai,   "huang", "黄姓世系表", "族谱: 【必甲凤文国，大佩祖宗志；士子\underline{广登朝，荣华传万世}；大道生民广，渊源少浩长。】由于当时家族人丁不兴旺，其中打下划线的辈分被跳过，后两句为再续谱。宗祠对联: 【家藏东观文章古，世守西江孝友风。】\\本表修订于 2016.03.31。");
 
