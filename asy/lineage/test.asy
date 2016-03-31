@@ -69,6 +69,6 @@ chen_juan.give_birth(zhao_kaiyuan);
 
 
 //set_n_draw_notes(zhao_jiasong);
-shipout_lineage(zhao_jiasong, "test", "赵姓世系表", "标题注");
+shipout_lineage(zhao_jiasong, "test", "赵姓世系表", "标题注", 12cm);
 
 

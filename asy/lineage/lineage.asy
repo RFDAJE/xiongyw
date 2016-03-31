@@ -291,7 +291,7 @@ picture draw_person(person p){
 /*
  * 按广度优先设置树中所有备注的顺序，并按顺序画出所有备注
  */
-picture set_n_draw_notes(person root, string title_notes = blank) {
+picture set_n_draw_notes(person root, string title_notes = blank, real notes_width=15cm) {
     picture pic;
     person[] q; // the queue for breath-first traverse
     string s1;  // minipage() input
@@ -379,7 +379,7 @@ picture set_n_draw_notes(person root, string title_notes = blank) {
     if (j == 0)  // 没有备注
         return null; 
         
-    s2 = minipage(s1, 18cm);
+    s2 = minipage(s1, notes_width);
     label(pic, s2, (0, 0), name_pen, NoFill); 
     
     return pic;
@@ -466,7 +466,7 @@ void add_time_stamp(picture pic=currentpicture){
     label(pic, minipage("\fs\footnotesize 本表修订于 " + time("%Y-%m-%d"), 100), (0,-pic_size(pic).y-30), se);
 }
 
-void shipout_lineage(person root, string file_name, string title, string title_notes = blank) {
+void shipout_lineage(person root, string file_name, string title, string title_notes = blank, real notes_width=15cm) {
 
     string s;  // minipage() input for title line
     
@@ -481,8 +481,8 @@ void shipout_lineage(person root, string file_name, string title, string title_n
         s += "\textsuperscript{[$1$]}";
     }
     
-    label(ttl, minipage(s, 10cm), (0, 0), name_pen, NoFill); 
-    notes = set_n_draw_notes(root, title_notes);
+    label(ttl, minipage(s, notes_width), (0, 0), name_pen, NoFill); 
+    notes = set_n_draw_notes(root, title_notes, notes_width);
     tree = draw_tree(root);
 
     erase(currentpicture);
