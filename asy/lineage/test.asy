@@ -20,6 +20,7 @@ person zhao_cheng_x  = person(false, "赵", "承",       question, question, not
 person zhao_chengbin = person(true,  "赵", "承筹",     question, question);
 person wen_bishou     = person(true,  "文", "寿必",       question, question, notes="文寿必");
 person wen_changxiang = person(true,  "文", "祥昌",       question, question);
+person wen_changxiang2 = person(true,  "文", "祥盛",       question, question);
 person wen_changxiang_wife  = person(false, unknown, unknown2, question, question, notes="yyy");
 person wen_x          = person(false, "文", unknown2,       question, blank);
 person wen_weixing    = person(true,  "文", "星卫",       question, blank);
@@ -34,7 +35,12 @@ person zhao_yuwu     = person(true,  "赵", "贤武",      question, blank);
 person tian_aigu      = person(false, "周", "爱凤",     question, blank);
 person zhao_qiushi   = person(false, "赵", "秋若",      question, blank);
 person chen_juan      = person(false, "张", "娟丽",     question, blank);
-person zhao_kaiyuan  = person(false, "赵", "元元",      question, blank);
+person zhao_kaiyuan  = person(false, "赵", "丽丽",      question, blank);
+person zhao_fang  = person(false, "赵", "芳",      question, blank);
+person zhao_yan  = person(false, "赵", "艳",      question, blank);
+person zhao_lan  = person(false, "赵", "兰",      question, blank);
+person zhao_chu  = person(false, "赵", "楚",      question, blank);
+person zhao_qian  = person(false, "赵", "茜",      question, blank);
 
 
 /* 关系 */
@@ -46,6 +52,7 @@ zhao_jiasong_wife.give_birth(zhao_chengbin, zhao_cheng_x);
 wen_bishou.marry(zhao_cheng_x);
 zhao_cheng_x.give_birth(wen_changxiang);
 zhao_cheng_x.give_birth(wen_x, wen_changxiang);
+zhao_cheng_x.give_birth(wen_changxiang2, wen_x);
 
 wen_changxiang.marry(wen_changxiang_wife);
 wen_changxiang_wife.give_birth(wen_weixing);
@@ -66,9 +73,20 @@ tian_aigu.give_birth(zhao_qiushi);
 zhao_yuwu.marry(chen_juan);
 chen_juan.give_birth(zhao_kaiyuan);
 
+zhao_kaiyuan.marry(male_unknown);
+zhao_fang.marry(male_unknown);
+zhao_yan.marry(male_unknown);
+zhao_lan.marry(male_unknown);
+zhao_chu.marry(male_unknown);
 
-//shipout_lineage(zhao_jiasong, split_after=zhao_chengbin, "test", "赵姓世系表", "标题注", 12cm);
-shipout_lineage(zhao_jiasong, zhao_yuwen, "test", "赵姓世系表", "标题注", 12cm);
-//shipout_lineage(zhao_jiasong, wen_changxiang, "test", "赵姓世系表", "标题注", 12cm);
+zhao_kaiyuan.give_birth(zhao_fang);
+zhao_fang.give_birth(zhao_yan);
+zhao_yan.give_birth(zhao_lan);
+zhao_lan.give_birth(zhao_chu);
+zhao_chu.give_birth(zhao_qian);
+
+shipout_lineage(zhao_jiasong, splits = new person[] {zhao_zuxin, zhao_yan}, "test", "赵姓世系表", "标题注", 12cm);
+//shipout_lineage(zhao_jiasong, split_after = wen_changxiang, "test", "赵姓世系表", "标题注", 12cm);
+//shipout_lineage(zhao_jiasong,  "test", "赵姓世系表", "标题注", 12cm);
 
 
