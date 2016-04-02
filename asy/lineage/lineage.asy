@@ -6,6 +6,7 @@
    - updated(bruin, 2016-02-11): multiple spouses support; also add "notes" field
    - updated(bruin, 2016-03-28): fix horizontal alignment bug
    - updated(bruin, 2016-03-31): add notes support
+   - updated(bruin, 2016-04-02): add split (into 2 parts) support
 
    Todo: 
      + in certain cases, the dash lines are not aligned (2016-03-28)
