@@ -67,8 +67,8 @@ zhao_yuwu.marry(chen_juan);
 chen_juan.give_birth(zhao_kaiyuan);
 
 
-
-//set_n_draw_notes(zhao_jiasong);
-shipout_lineage(zhao_jiasong, "test", "赵姓世系表", "标题注", 12cm);
+//shipout_lineage(zhao_jiasong, split_after=zhao_chengbin, "test", "赵姓世系表", "标题注", 12cm);
+shipout_lineage(zhao_jiasong, zhao_yuwen, "test", "赵姓世系表", "标题注", 12cm);
+//shipout_lineage(zhao_jiasong, wen_changxiang, "test", "赵姓世系表", "标题注", 12cm);
 
 

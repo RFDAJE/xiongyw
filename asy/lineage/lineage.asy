@@ -66,9 +66,13 @@ unitsize(0, 0);
 
 real g_glyph_width = 12;                      /* 一个汉字的宽度, in bp */
 real g_name_height = g_glyph_width;           /* 人名高度 */
+real g_conn_v_off = g_name_height / 2;        /* 人名后引出横线在 y 方向的偏移 */
 real g_name_width = g_glyph_width * 3;        /* 人名最多三个字 */
+real g_x_skip = 2;                            /* 水平连接线和 self/kid 的间距 */
+real g_y_skip = 6;                            /* kids 子树之间的垂直间距 */
 real g_spouse_v_gap = 3;                      /* 配偶上下间距 */
 real g_kid_h_gap = g_name_width;              /* 上下两辈之间的水平距离 */  
+
 defaultpen(fontsize(g_glyph_width));
 
 pair   se=0.0001SE;         /* used for alignment for picture attach() */
@@ -94,26 +98,35 @@ string blank = "";         // not happen yet
 
 /* person: a node in family tree */
 struct person{
+
+    /* 
+     * 个人基本信息
+     */
     bool     sex;   /* true for male */
     string   surname;
     string   given_name;
     string   born_at;
     string   dead_at;
+    string   notes;  /* 备注, "" 表示没有备注 */
 
-    /* 个人备注信息 */    
-    string   notes;  /* "" 表示没有备注 */
-    int      notes_order; /* 本备注在树上所有备注中的排序，>=0 */
-
+    /*
+     * 直系亲属: 父母、兄弟姐妹、配偶、儿女
+     */
     person   dad;    /* null if unknown */
     person   mom;    /* null if unknown */
-
-    /* one may have multiple spouses */
-    person[] sps;
-
-    person   kid;    /* first child; null if leaf */
     person   lsib;   /* left sibling; null if first kid */
     person   rsib;   /* right sibling; null if last kid */
+    person[] sps;    /* one may have multiple spouses */
+    person   kid;    /* first child; null if no kid */
 
+    /* 
+     * 画图时使用的辅助信息。为方便记，也放在这里 
+     */
+    int      level;       /* 树的层，root 为 0 层 */
+    int      notes_order; /* 本备注在树上所有备注中的排序，>=0 */
+    pair     rect_size;   /* rectangle size，包括自己和配偶 */
+    real     xoff, yoff;  /* 相对于其父(母)的 offset, 向左、向下为正值. (0,0) means root */
+    
     void info() {
         write("------------------");
         write("姓名: " + this.surname + " " + this.given_name);
@@ -154,7 +167,6 @@ struct person{
         } else {
             p.notes = notes;
         }
-        p.notes_order = - 1;
 
         p.dad = null;
         p.mom = null;
@@ -163,6 +175,11 @@ struct person{
         p.lsib = null;
         p.rsib = null;
 
+        p.notes_order = - 1;
+        p.rect_size = (-1, -1);
+        p.xoff = - 1;
+        p.yoff = - 1;
+        
         return p;
     }
 
@@ -194,14 +211,15 @@ struct person{
             return false;
 
         kid.mom = this;
-    //this.info();
-    //kid.info();
-    if (dad == null) {
-           kid.dad = this.sps[0];
-    }
-    else {
-       kid.dad = dad;
-    }
+        //this.info();
+        //kid.info();
+        if (dad == null) {
+               kid.dad = this.sps[0];
+        }
+        else {
+           kid.dad = dad;
+        }
+        
         kid.lsib = lsib;
 
         if(kid.lsib != null){
@@ -216,6 +234,7 @@ struct person{
 
         return true;
     }
+
 } from person unravel person;
 
 
@@ -282,7 +301,8 @@ picture draw_person(person p){
     }
 
     s2 = minipage(s1, txt_width);
-    label(pic, s2, (0, 0), name_pen, NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+    label(pic, s2, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+    //label(pic, s2, (0, 0), name_pen, filltype = Draw(p=dotted));  // with bounding box
 
     return pic;
 }
@@ -396,8 +416,10 @@ picture draw_tree_recursive(person root){
 
     /* 先画自己, attach 到 pic 上 */
     self = draw_person(root);
-    //write(root.surname + root.given_name);
-    //write(pic_size(self).x);
+    if (root.dad == null || root.mom == null) {
+        root.xoff = 0;
+        root.yoff = 0;
+    }
     attach(pic, self.fit(), (0, 0), se);
 
     /* 再依次所有的配偶，一一 attach 到 pic 上 self 的下方 */
@@ -412,14 +434,15 @@ picture draw_tree_recursive(person root){
         v_offset += pic_size(spouse).y + g_spouse_v_gap;
     }
 
+    // rect_size = self + spouses
+    root.rect_size = pic_size(pic);
+
     /* 最后递归画 kids */
 
     /* (xoff, yoff) 是在 pic 中 attach 下一棵子树的坐标 */
     real xoff = pic_size(self).x + g_kid_h_gap;
     real yoff = 0;
     
-    real xskip = 2; /* 水平连接线和 self/kid 的间距 */
-    real yskip = 6; /* kids 子树之间的垂直间距 */
     
     for(kid = root.kid; kid != null; kid = kid.rsib){
 
@@ -429,17 +452,125 @@ picture draw_tree_recursive(person root){
          *           |
          *           +----[kid]
          */
-        pair self_right = (pic_size(self).x + xskip, - g_name_height / 2);
+        pair self_right = (pic_size(self).x + g_x_skip, - g_conn_v_off);
         pair middle = self_right + (g_kid_h_gap / 2, 0);
-        draw(pic, self_right--middle--(middle + (0, yoff))--(self_right + (g_kid_h_gap - xskip * 2, yoff)), line_pen);
+        draw(pic, self_right--middle--(middle + (0, yoff))--(self_right + (g_kid_h_gap - g_x_skip * 2, yoff)), line_pen);
 
         /* 画子树并 attach 到 pic 上 */
+        kid.xoff = xoff;
+        kid.yoff = yoff;
         picture k = draw_tree_recursive(kid);
         attach(pic, k.fit(), (xoff, yoff), se);
 
-
-        yoff -= pic_size(k).y + yskip;
+        yoff -= pic_size(k).y + g_y_skip;
     }
+
+    return pic;
+}
+
+
+/* note: split_after should only have only 1 kid */
+picture draw_tree(person root, person split_after = null) {
+
+    if (split_after == null) {
+        return draw_tree_recursive(root);
+    }
+
+    /* 
+     * two trees are to be connected as below:
+     *
+     
+     +===================+
+     |                   |
+     |    pic1           |
+     |              A +--|--+ B
+     +===================+  |
+   D +----------------------+ C
+     |
+     |   +===================+
+   E +---+ F                 |
+         |   pic 2           |
+         |                   |
+         +===================+
+     
+    */
+    picture pic, pic1, pic2;
+    person kid, parent;
+    pair A, B, C, D, E, F;
+    real xoff, yoff; 
+    
+    kid = split_after.kid;
+    split_after.kid = null;  // split after it
+
+    pic1 = draw_tree_recursive(root);
+    pic2 = draw_tree_recursive(kid);
+
+    /* 
+     * 1st part 
+     */
+    attach(pic, pic1.fit(), (0, 0), se);
+    
+
+    /*
+     * connection lines 
+     */
+    /* get A's offset (from root to split_after) */
+    parent = split_after;
+    xoff = 0;
+    yoff = 0;
+    do {
+        xoff += parent.xoff;
+        yoff += parent.yoff;
+        
+        // get next parent 
+        if (parent.dad == null && parent.mom == null) {
+            break;
+        }
+        
+        if (parent.dad != null && parent.dad.xoff != - 1) {
+            parent = parent.dad;
+        } else if (parent.mom != null && parent.mom.xoff != - 1) {
+            parent = parent.mom;
+        } else {
+            write("fixme: something wrong!");
+        }
+    } while (parent != null);
+
+    xoff += split_after.rect_size.x + g_x_skip;
+    yoff -= g_conn_v_off;
+
+    A = (xoff, yoff);
+    B = (pic_size(pic1).x + g_kid_h_gap / 2, A.y);
+    C = (B.x, - pic_size(pic1).y - g_name_height * 2);
+    D = (0, C.y);
+    E = (0, D.y - g_name_height * 2);
+    F = E + (g_kid_h_gap / 2, 0);
+
+    /*
+    dot(pic, A, red); 
+    dot(pic, B, red); 
+    dot(pic, C, red); 
+    dot(pic, D, red); 
+    dot(pic, E, red); 
+    dot(pic, F, red); 
+    */
+    
+    real r = g_name_height / 4; // radius of the rounded cornor for connection lines
+    path p = A--(B-(r,0)){right}..{down}(B-(0,r))--
+                (C+(0, r)){down}..{left}(C-(r,0))--
+                (D+(r,0)){left}..{down}(D-(0,r))--
+                (E+(0,r)){down}..{right}(E+(r,0))--F;
+
+    draw(pic, p, line_pen);
+    
+    
+
+    /* 
+     * 2nd part 
+     */    
+    attach(pic, pic2.fit(), (F+(0, g_conn_v_off)), se);
+
+    split_after.kid = kid;  // resotre relationship
 
     return pic;
 }
@@ -466,7 +597,7 @@ void add_time_stamp(picture pic=currentpicture){
     label(pic, minipage("\fs\footnotesize 本表修订于 " + time("%Y-%m-%d"), 100), (0,-pic_size(pic).y-30), se);
 }
 
-void shipout_lineage(person root, string file_name, string title, string title_notes = blank, real notes_width=15cm) {
+void shipout_lineage(person root, person split_after=null, string file_name, string title, string title_notes = blank, real notes_width=15cm) {
 
     string s;  // minipage() input for title line
     
@@ -483,7 +614,8 @@ void shipout_lineage(person root, string file_name, string title, string title_n
     
     label(ttl, minipage(s, notes_width), (0, 0), name_pen, NoFill); 
     notes = set_n_draw_notes(root, title_notes, notes_width);
-    tree = draw_tree_recursive(root);
+    //tree = draw_tree_recursive(root);
+    tree = draw_tree(root, split_after);
 
     erase(currentpicture);
     attach(ttl.fit(), (0, 0), se);
