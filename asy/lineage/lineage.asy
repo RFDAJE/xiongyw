@@ -216,7 +216,7 @@ struct person{
 
         return true;
     }
-};
+} from person unravel person;
 
 
 
@@ -386,7 +386,7 @@ picture set_n_draw_notes(person root, string title_notes = blank, real notes_wid
 }
 
 
-picture draw_tree(person root){
+picture draw_tree_recursive(person root){
 
     picture pic, self, spouse;
     person kid;
@@ -434,7 +434,7 @@ picture draw_tree(person root){
         draw(pic, self_right--middle--(middle + (0, yoff))--(self_right + (g_kid_h_gap - xskip * 2, yoff)), line_pen);
 
         /* 画子树并 attach 到 pic 上 */
-        picture k = draw_tree(kid);
+        picture k = draw_tree_recursive(kid);
         attach(pic, k.fit(), (xoff, yoff), se);
 
 
@@ -483,7 +483,7 @@ void shipout_lineage(person root, string file_name, string title, string title_n
     
     label(ttl, minipage(s, notes_width), (0, 0), name_pen, NoFill); 
     notes = set_n_draw_notes(root, title_notes, notes_width);
-    tree = draw_tree(root);
+    tree = draw_tree_recursive(root);
 
     erase(currentpicture);
     attach(ttl.fit(), (0, 0), se);
