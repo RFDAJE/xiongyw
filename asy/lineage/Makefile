@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean test gens zjz zhao 
 
 test:
 	asy -f pdf test.asy
@@ -8,8 +8,11 @@ gens:
 	mkdir -p pdf
 	cp *.pdf pdf
 
-misc:
-	asy -f pdf zhangjuzheng.asy
+zjz:
+	asy -f pdf misc/zhangjuzheng.asy -o misc/
+
+zhao:
+	asy -f pdf misc/zhao.asy -o misc/
 
 clean:
 	-rm *.log 

@@ -12,12 +12,12 @@ import "lineage.asy" as lineage;
 person male_unknown   = person(true,  unknown, unknown2, question, blank);
 person female_unknown = person(false, unknown, unknown2, question, blank);
 
-person ellipse        = person(true, "...", "......", question, question);
+person ellipse        = person(true, "", "$\cdots$", question, question);
 
 
-person zhao_jiasong  = person(true,  "赵", "松家",       "前200", "前100", notes="这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注");
+person zhao_jiasong  = person(true,  "赵", "松家",       "前200", "前190", notes="这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注");
 person zhao_jiasong_wife  = person(false, unknown, unknown2, question, question, notes="xxx");
-person zhao_cheng_x  = person(false, "赵", "承",       question, question, notes="这是赵成的备注");
+person zhao_cheng_x  = person(false, "赵", "承",       "2000.10.10", "2100.12.12", notes="这是赵成的备注");
 person zhao_chengbin = person(true,  "赵", "承筹",     question, question);
 person wen_bishou     = person(true,  "文", "寿必",       question, question, notes="文寿必");
 person wen_changxiang = person(true,  "文", "祥昌",       question, question);

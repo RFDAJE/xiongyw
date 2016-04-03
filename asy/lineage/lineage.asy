@@ -184,6 +184,7 @@ struct person{
         return p;
     }
 
+
     /* A.marry(B)  is not necessarily meaning B.marry(A) because the order may differ... but if "uni" == true, then
      * it means A and B are both married once (with each other), i.e., A.marry(B) implies B.marry(A). so a single call
      * is enough; otherwise, multiple calls may needed.
@@ -236,8 +237,11 @@ struct person{
         return true;
     }
 
-} from person unravel person;
+} from person unravel person; 
 
+person clone(person p) {
+    return person(p.sex, p.surname, p.given_name, p.born_at, p.dead_at, p.notes);
+}        
 
 
 /*
@@ -294,6 +298,41 @@ picture add_margin(picture pic=currentpicture,
  * \widthof: http://tex.stackexchange.com/questions/18576/get-width-of-a-given-text-as-length
  */
 picture draw_person(person p){
+    picture pic, name, date;
+    string  s1;  // 姓名
+    string  s2;  // 生卒年
+    
+    // 第一行，姓名 + 脚注上标(可选)
+    s1 = (p.sex != true)? "\kai ":"\hei ";  // 男子用黑体，女子用楷体
+    s1 += p.surname + p.given_name; 
+    // 脚注上标
+    if (p.notes_order >= 0) {
+        s1 += "\textsuperscript{[" + format(p.notes_order + 1) + "]}"; 
+    }
+    
+    label(name, s1, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+
+    // 第二行，生卒日期。如果都不清楚的就不画
+    if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) {
+        return name;
+    }
+    
+    s2 = "\tiny " + p.born_at + "-" + p.dead_at;
+    label(date, s2, (0, 0), name_pen, filltype = NoFill); 
+    // 生卒日期可能很长，当它比名字长并且长度大于常数 g_name_width 时，需要自动换行，所以采用minipage(s2, g_name_width). 
+    if ((pic_size(date).x > pic_size(name).x) && (pic_size(date).x > g_name_width)) {
+        erase(date);
+        label(date, minipage(s2, g_name_width), (0, 0), name_pen, filltype = NoFill); 
+    }
+
+    /* attach name & date to pic */
+    attach(pic, name.fit(), (0, 0), se);
+    attach(pic, date.fit(), (0, - pic_size(name).y - 2), se);
+
+    return pic;
+}
+
+picture draw_person_save(person p){
     picture pic;
     real txt_width = g_name_width;
     string  s1;  // minipage(s1, txt_width)
