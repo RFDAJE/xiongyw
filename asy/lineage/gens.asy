@@ -93,7 +93,7 @@ person wang_yuehai    = person(true,  "王", "月海",       question, question)
 person wang_yueping   = person(true,  "王", "月平",       question, "1948");
 person wang_reyang    = person(true,  "王", unknown2,       question, question); // 王月英的丈夫，也姓王，二羊村
 person han_xinxiu     = person(false, "韩", "新秀",       "1915.09.27", "1991.08.18", notes="又名黄桂香、韩香大。四岁丧母，十岁丧父。"); 
-person shi_shixiang   = person(true,  "石", "世祥",       question, "1974", notes="和韩新秀无后。");   // 韩新秀的第二个丈夫，和韩无后
+person shi_shixiang   = person(true,  "石", "世祥",       question, "1974", notes="陶家台人，以裁缝为业，和韩新秀无后。");   // 韩新秀的第二个丈夫，和韩无后
 person wang_liansheng = person(true,  "王", "连生",       question, question);
 person wang_liansheng_wife = person(false,  "彭", unknown2,       question, question);
 person wang_chuanxi   = person(true,  "王", "传熙",       "1936",   question);
@@ -179,9 +179,9 @@ wang_yuzhen.give_birth(zhou_xiang);
 wang_xiankui.marry(hu_aiqiong);
 hu_aiqiong.give_birth(wang_yuran);
 
-//wang_yueping.marry(uni=false, han_xinxiu);
-//han_xinxiu.marry(uni=false, wang_yueping, shi_shixiang);
-wang_yueping.marry(han_xinxiu);
+wang_yueping.marry(uni=false, han_xinxiu);
+han_xinxiu.marry(uni=false, wang_yueping, shi_shixiang);
+//wang_yueping.marry(han_xinxiu);
 han_xinxiu.give_birth(wang_fuen);
 han_xinxiu.give_birth(wang_fuying, wang_fuen);
 
@@ -219,10 +219,10 @@ person huang_shideng = person(true, "黄", "士登", "1887.04.25", "1942.08.01",
 person huang_shideng_wife = person(false, "田", "氏", question, question);
 person huang_zizhang = person(true, "黄", "子章", question, question);
 person huang_zizhang_wife = person(false, "周", "氏",  question, question);
-person huang_haida = person(true, "黄", "海大", "1917.12.27", "1982.08.29", notes="又名黄河清。两岁丧母，八岁丧父，后由黄士登(韩宝山)抚养并从其学习医术。");  
-person huang_haida_wife0 = person(false, "唐", "氏", question, question, notes="和黄海大无后。"); 
+person huang_haida = person(true, "黄", "海大", "1917.12.27", "1982.08.29", notes="又名黄河清。自八岁丧父后由黄士登(韩宝山)抚养并从其学习医术。与张卜秀育有一子。");  
+person huang_haida_wife0 = person(false, "唐", "氏", question, question); 
 person huang_haida_wife1 = person(false, "张", "卜秀", "1919.12.05", "1989.05.22", notes="和黄海大离异后再婚，也嫁给一黄姓(但无后)。"); 
-person huang_haida_wife2 = person(false, "吴", "厚英", "1924.11.02", "2014.08.04", notes="和黄海大无后。");
+person huang_haida_wife2 = person(false, "吴", "厚英", "1924.11.02", "2014.08.04");
 person huang_daoming = person(true, "黄", "道明", "1944.08.25", blank);
 person zou_xiangchun = person(false, "邹", "祥春", "1947.04.04", blank, notes="又名杨仲芳。"); 
 person huang_shenghong = person(true, "黄", "声鸿", "1968.12.09", blank);

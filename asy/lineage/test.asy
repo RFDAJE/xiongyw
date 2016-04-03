@@ -12,6 +12,7 @@ import "lineage.asy" as lineage;
 person male_unknown   = person(true,  unknown, unknown2, question, blank);
 person female_unknown = person(false, unknown, unknown2, question, blank);
 
+person ellipse        = person(true, "...", "......", question, question);
 
 
 person zhao_jiasong  = person(true,  "赵", "松家",       "前200", "前100", notes="这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注这是赵家松的备注");
@@ -46,8 +47,11 @@ person zhao_qian  = person(false, "赵", "茜",      question, blank);
 /* 关系 */
 
 zhao_jiasong.marry(zhao_jiasong_wife);
-zhao_jiasong_wife.give_birth(zhao_cheng_x);
-zhao_jiasong_wife.give_birth(zhao_chengbin, zhao_cheng_x);
+zhao_jiasong_wife.give_birth(ellipse);
+
+ellipse.marry(female_unknown);
+female_unknown.give_birth(zhao_cheng_x);
+female_unknown.give_birth(zhao_chengbin, zhao_cheng_x);
 
 wen_bishou.marry(zhao_cheng_x);
 zhao_cheng_x.give_birth(wen_changxiang);
@@ -85,7 +89,7 @@ zhao_yan.give_birth(zhao_lan);
 zhao_lan.give_birth(zhao_chu);
 zhao_chu.give_birth(zhao_qian);
 
-shipout_lineage(zhao_jiasong, splits = new person[] {zhao_zuxin, zhao_yan}, "test", "赵姓世系表", "标题注", 12cm);
+shipout_lineage(zhao_jiasong, splits = new person[] {zhao_zuxin, zhao_fang, zhao_lan}, "test", "赵姓世系表", "标题注", 12cm);
 //shipout_lineage(zhao_jiasong, split_after = wen_changxiang, "test", "赵姓世系表", "标题注", 12cm);
 //shipout_lineage(zhao_jiasong,  "test", "赵姓世系表", "标题注", 12cm);
 
