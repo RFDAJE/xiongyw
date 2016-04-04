@@ -180,6 +180,10 @@ struct person{
             p.notes = notes;
         }
 
+        p.order = order;
+        p.throne = throne;
+        p.hao = hao;
+        
         p.dad = null;
         p.mom = null;
         p.sps = new person[]{};
@@ -384,21 +388,88 @@ picture add_margin(picture pic=currentpicture,
 }
 
 
-/* fixme: 在画之前如何确定文字的长度?貌似中文的姓名，即使宽度超过minipage的宽度，也不会
- *        换行，而且生成的 pic 的 size 也不能反映实际的宽度。。。
- * \widthof: http://tex.stackexchange.com/questions/18576/get-width-of-a-given-text-as-length
+/*
+ * 下面的序号(1)，脚注号[1]，谥号，生卒日期都是可选的:
+ * +------------+
+ * |(1) 姓名 [1]|
+ * |谥号        |
+ * |生卒日期    |
+ * +------------+
  */
 picture draw_person(person p){
+    picture pic, ord, name, hao, date;
+    string  s1;  // 姓名
+    string  s2;  // 生卒年
+
+    // 第一行之序号
+    /*
+    int order;
+    order = scan_int(p.order);
+    if (order > 0) {
+        //s1 = "\ding{" + format("%d", order + 171) + "}";
+        return circle_text("囧");
+    }
+    */
+    if (p.order != blank) {
+        ord = circle_text(p.order, g_name_height - 2);
+    }
+    
+    // 第一行，姓名 + 脚注上标(可选)
+    s1 = (p.sex != true)? "\kai ":"\song ";  // 男用宋体，女用楷体
+    s1 += p.surname + p.given_name; 
+    // 脚注上标
+    if (p.notes_order >= 0) {
+        s1 += "\textsuperscript{[" + format("%d", p.notes_order + 1) + "]}"; 
+    }
+    
+    label(name, s1, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+
+    p.name_width = pic_size(ord).x + pic_size(name).x;  // 保存第一行的长度
+
+    // 第二行，号
+    if (p.hao != blank) {
+        s1 = (p.sex != true)? "\kai ":"\song " + "\footnotesize " + p.hao; 
+        label(hao, s1, (0, 0), name_pen, filltype = NoFill); 
+    }
+
+    // 第三行，生卒日期。如果都不清楚的就不画
+    if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) {
+    } else {
+        s2 = "\tiny " + p.born_at + "-" + p.dead_at;
+        label(date, s2, (0, 0), name_pen, filltype = NoFill); 
+        // 生卒日期可能很长，当它比名字长并且长度大于常数 g_name_width 时，需要自动换行，所以采用minipage(s2, g_name_width). 
+        if ((pic_size(date).x > p.name_width) && (pic_size(date).x > g_name_width)) {
+            erase(date);
+            label(date, minipage(s2, g_name_width), (0, 0), name_pen, filltype = NoFill); 
+        }
+    }
+
+    /* attach ord, name, hao & date to pic */
+    if (p.order == blank) {
+        attach(pic, name.fit(), (0, 0), se);
+    } else {
+        attach(pic, ord.fit(), (0, 0), se);
+        attach(pic, name.fit(), (pic_size(ord).x, 0), se);
+    }
+    if (p.hao != blank) {
+        attach(pic, hao.fit(), (0, - pic_size(pic).y), se);
+    }
+    attach(pic, date.fit(), (0, - pic_size(pic).y - 2), se);
+
+    return pic;
+}
+
+picture draw_person_save2(person p){
     picture pic, name, date;
     string  s1;  // 姓名
     string  s2;  // 生卒年
     
     // 第一行，姓名 + 脚注上标(可选)
-    s1 = (p.sex != true)? "\kai ":"\song ";  // 男子用黑体，女子用楷体
+    s1 = (p.sex != true)? "\kai ":"\song ";  // 男用宋体，女用楷体
     s1 += p.surname + p.given_name; 
     // 脚注上标
     if (p.notes_order >= 0) {
-        s1 += "\textsuperscript{[" + format(p.notes_order + 1) + "]}"; 
+        s1 += "\textsuperscript{[" + format("%d", p.notes_order + 1) + "]}"; 
     }
     
     label(name, s1, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
@@ -426,7 +497,7 @@ picture draw_person(person p){
     return pic;
 }
 
-picture draw_person_save(person p){
+picture draw_person_save_1(person p){
     picture pic;
     real txt_width = g_name_width;
     string  s1;  // minipage(s1, txt_width)

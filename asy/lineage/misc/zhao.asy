@@ -75,7 +75,7 @@ person zhao_wuxu_wife   = clone(female_unknown);
 person zhao_jia         = person(true,  "", "嘉",       question, "前424", hao="桓子"); 
 person zhao_zhou        = person(true,  "", "周",       question, question, hao="代成君");  // 
 person zhao_zhou_wife   = clone(female_unknown);
-person zhao_huan        = person(true,  "", "浣",       question, "前409", hao="献候", order="9"); 
+person zhao_huan        = person(true,  "", "浣",       question, "前409", order="1", hao="献候"); 
 
 
 /* 关系 */
