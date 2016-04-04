@@ -1,5 +1,7 @@
 .PHONY: all clean test gens zjz zhao 
 
+all: gens test zjz zhao
+
 test:
 	asy -f pdf test.asy
 
