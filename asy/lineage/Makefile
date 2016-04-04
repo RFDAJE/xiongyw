@@ -5,8 +5,8 @@ test:
 
 gens:
 	asy -f pdf gens.asy
-	mkdir -p pdf
-	cp *.pdf pdf
+	-mkdir -p pdf
+	-cp *.pdf pdf
 
 zjz:
 	asy -f pdf misc/zhangjuzheng.asy -o misc/

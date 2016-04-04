@@ -41,8 +41,10 @@ texpreamble("\setCJKfamilyfont{hei}{simhei.ttf}");
 texpreamble("\setCJKfamilyfont{kai}{simkai.ttf}");
 */
 
-texpreamble("\setCJKmainfont[Path=./fonts/]{arialuni.ttf}");
-texpreamble("\setCJKfamilyfont{song}[Path=./fonts/]{arialuni.ttf}");
+//texpreamble("\setCJKmainfont[Path=./fonts/]{arialuni.ttf}");
+//texpreamble("\setCJKfamilyfont{song}[Path=./fonts/]{arialuni.ttf}");
+texpreamble("\setCJKmainfont[Path=../../doc/surangama/fonts/]{stsong-lyj.ttf}");
+texpreamble("\setCJKfamilyfont{song}[Path=../../doc/surangama/fonts/]{stsong-lyj.ttf}");
 texpreamble("\setCJKfamilyfont{fs}[Path=./fonts/]{simfang.ttf}");
 texpreamble("\setCJKfamilyfont{hei}[Path=./fonts/]{simhei.ttf}");
 texpreamble("\setCJKfamilyfont{kai}[Path=./fonts/]{simkai.ttf}");
@@ -111,6 +113,10 @@ struct person{
     string   dead_at;
     string   notes;  /* 备注, "" 表示没有备注 */
 
+    string   order;       /* 在位的顺序。帝王才有! */
+    string   throne;      /* 在位的年头 */
+    string   hao;         /* 庙号，或谥号、年号、官位等 */
+
     /*
      * 直系亲属: 父母、兄弟姐妹、配偶、儿女
      */
@@ -126,6 +132,7 @@ struct person{
      */
     int      level;       /* 树的层，root 为 0 层 */
     int      notes_order; /* 本备注在树上所有备注中的排序，>=0 */
+    real     name_width;  /* 名字的实际长度 */
     pair     rect_size;   /* rectangle size，包括自己和配偶 */
     pair     offset;      /* 相对于其父(母)的 offset, 向左、向上为正值. (0,0) means root */
     
@@ -155,7 +162,10 @@ struct person{
                          string given_name,
                          string born_at,
                          string dead_at,
-                         string notes = blank){
+                         string notes = blank,
+                         string order = blank,
+                         string throne = blank,
+                         string hao = blank){
         person p = new person;
         p.sex = sex;
         p.surname = surname;
@@ -178,6 +188,7 @@ struct person{
         p.rsib = null;
 
         p.notes_order = - 1;
+        p.name_width = 0;
         p.rect_size = (-1, -1);
         p.offset = g_default_offset;
         
@@ -245,8 +256,88 @@ person clone(person p) {
 
 
 /*
+ * seems there is no scan() routine in asymptote...
+ */
+int scan_int(string s) {
+    int ret = 0;
+    int asc; 
+    int zero = 48; // ascii value of "0" is 48
+
+    // todo: check validity of input string
+    string s2 = reverse(s);
+    for (int i = 0; i < length(s2); ++ i) {
+        asc = ascii(substr(s2, i, 1)) - zero;
+        ret += asc * (10 ^ i);
+    }
+
+    return ret;
+}
+
+
+/*
  * 第二部分:绘图
  */
+
+/*
+ * return the bounding box of a path[]:
+ * - [0]: low-left point
+ * - [1]: up-right point
+ */
+pair[] bound_box(path[] pp){
+     pair[] bb;
+     real xmin = infinity, ymin = infinity;
+     real xmax = -infinity, ymax = -infinity;
+
+     for (path p: pp) {
+         pair sw = min(p), ne = max(p);
+         if(sw.x < xmin) xmin = sw.x;
+         if(sw.y < ymin) ymin = sw.y;
+         if(ne.x > xmax) xmax = ne.x;
+         if(ne.y > ymax) ymax = ne.y;
+     }
+
+     bb.push((xmin, ymin));
+     bb.push((xmax, ymax));
+
+     return bb;
+}
+
+/* 
+ * put a circle around a text and scale the whole that
+ * the diameter equals to the height specified
+ */
+picture circle_text(string s, real height, bool black=true) {
+    pair bbox[], center;
+    path c;
+    real width, ht, r, sk;
+    picture p1;
+
+    path[] txt = texpath(s);
+    bbox = bound_box(txt);
+    width = bbox[1].x - bbox[0].x;
+    ht = bbox[1].y - bbox[0].y;
+    center = (bbox[0].x + width / 2, bbox[0].y + ht / 2);
+    if (width > ht) {
+        r = width / 2;
+    } else {
+        r = ht / 2;
+    }
+    r *= 1.3;
+
+    sk = height / (r * 2); // scale
+    
+    c = circle(center, r);
+
+    if (black) {
+        draw(p1, scale(sk) * c, line_pen);
+        fill(p1, scale(sk) * txt, line_pen);
+    } else {
+        fill(p1, scale(sk) * c, line_pen);
+        fill(p1, scale(sk) * txt, white);
+    }
+    
+    return p1;
+}
 
 
 
@@ -303,7 +394,7 @@ picture draw_person(person p){
     string  s2;  // 生卒年
     
     // 第一行，姓名 + 脚注上标(可选)
-    s1 = (p.sex != true)? "\kai ":"\hei ";  // 男子用黑体，女子用楷体
+    s1 = (p.sex != true)? "\kai ":"\song ";  // 男子用黑体，女子用楷体
     s1 += p.surname + p.given_name; 
     // 脚注上标
     if (p.notes_order >= 0) {
@@ -311,6 +402,9 @@ picture draw_person(person p){
     }
     
     label(name, s1, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+
+    p.name_width = pic_size(name).x;  // 保存第一行的长度
+
 
     // 第二行，生卒日期。如果都不清楚的就不画
     if ((p.born_at == question || p.born_at == blank) && (p.dead_at == question || p.dead_at == blank)) {
@@ -569,7 +663,8 @@ picture draw_single_tree_recursive(person root){
     if (root.kid == null)
         return pic;
 
-    xoff = pic_size(self).x + g_kid_h_gap;
+    //xoff = pic_size(self).x + g_kid_h_gap;
+    xoff = root.name_width + g_kid_h_gap;
     yoff = 0;
     
     /* 画连接线。每个子树到父树的连接线都分为三段，AB(统一画), C1C2, CD:
@@ -584,7 +679,8 @@ picture draw_single_tree_recursive(person root){
      *                
      */
     /* 先画公共部分 AB */
-    A = (pic_size(self).x + g_x_skip, - g_conn_v_off);
+    //A = (pic_size(self).x + g_x_skip, - g_conn_v_off);
+    A = (root.name_width + g_x_skip, - g_conn_v_off);
     B = A + (g_kid_h_gap / 2 - g_x_skip, 0);
     draw(pic, A--B, line_pen); 
 
@@ -711,7 +807,8 @@ picture draw_split_tree_recursive(person root, person[] splits = new person[]{})
 
     A0 = (xoff, yoff); // 记录该值，后面用来更新子树根节点的 offset
 
-    xoff += splits2[0].rect_size.x + g_x_skip;
+    //xoff += splits2[0].rect_size.x + g_x_skip;
+    xoff += splits2[0].name_width + g_x_skip;
     yoff -= g_conn_v_off;
 
     A = (xoff, yoff);
@@ -864,7 +961,8 @@ picture connect_trees(picture pic1,
     xoff += split.rect_size.x + g_x_skip;
     yoff -= g_conn_v_off;
 
-    A = A0 + (split.rect_size.x + g_x_skip, - g_conn_v_off);
+    //A = A0 + (split.rect_size.x + g_x_skip, - g_conn_v_off);
+    A = A0 + (split.name_width + g_x_skip, - g_conn_v_off);
     B = (pic_size(pic1).x + g_kid_h_gap / 2, A.y);
     C = (B.x, - pic_size(pic1).y - g_name_height * 2);
     D = (0, C.y);

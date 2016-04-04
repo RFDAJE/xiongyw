@@ -52,22 +52,30 @@ person zhao_chao        = person(true,  "", "朝",       question, question);
 
 
 /* 赵衰以下 */
-person zhao_shuai       = person(true,  "", "衰",       question, "前622"); // he has more than one wife, actually
+person zhao_shuai       = person(true,  "", "衰",       question, "前622", hao="成子"); // he has more than one wife, actually
 person zhao_shuai_wife  = clone(female_unknown);
-person zhao_dun         = person(true,  "", "盾",       question, "前601");
+person zhao_dun         = person(true,  "", "盾",       question, "前601", hao="宣子");
 person zhao_tong        = person(true,  "", "同",       question, "前583");
 person zhao_kuo         = person(true,  "", "括",       question, "前583");
 person zhao_yingqi      = person(true,  "", "婴齐",       question, question);
 person zhao_dun_wife    = clone(female_unknown);
-person zhao_shuo        = person(true,  "", "朔",       question, "前597");
+person zhao_shuo        = person(true,  "", "朔",       question, "前597", hao="庄子");
 person zhao_shuo_wife   = clone(female_unknown);
-person zhao_WU          = person(true,  "", "武",       question, "前541"); // 赵氏孤儿
+person zhao_WU          = person(true,  "", "武",       question, "前541", hao="文子", notes="此即赵氏孤儿。"); // 
 person zhao_WU_wife     = clone(female_unknown);
 person zhao_huo         = person(true,  "", "或",       question, question); 
-person zhao_cheng       = person(true,  "", "成",       question, "前518"); 
+person zhao_cheng       = person(true,  "", "成",       question, "前518", hao="景子"); 
 person zhao_cheng_wife  = clone(female_unknown);
-person zhao_yang        = person(true,  "", "鞅",       question, "前476"); 
+person zhao_yang        = person(true,  "", "鞅",       question, "前476", hao="简子"); 
 person zhao_yang_wife   = clone(female_unknown);
+person zhao_bolu        = person(true,  "", "伯鲁",       question, question); 
+person zhao_bolu_wife   = clone(female_unknown);
+person zhao_wuxu        = person(true,  "", "毋恤",       question, "前425", hao="襄子"); 
+person zhao_wuxu_wife   = clone(female_unknown);
+person zhao_jia         = person(true,  "", "嘉",       question, "前424", hao="桓子"); 
+person zhao_zhou        = person(true,  "", "周",       question, question, hao="代成君");  // 
+person zhao_zhou_wife   = clone(female_unknown);
+person zhao_huan        = person(true,  "", "浣",       question, "前409", hao="献候", order="9"); 
 
 
 /* 关系 */
@@ -118,9 +126,19 @@ zhao_WU.marry(zhao_WU_wife);
 zhao_WU_wife.give_birth(zhao_cheng);
 zhao_cheng.marry(zhao_cheng_wife);
 zhao_cheng_wife.give_birth(zhao_yang);
+zhao_yang.marry(zhao_yang_wife);
+zhao_yang_wife.give_birth(zhao_bolu);
+zhao_yang_wife.give_birth(zhao_wuxu, zhao_bolu);
+zhao_wuxu.marry(zhao_wuxu_wife);
+zhao_wuxu_wife.give_birth(zhao_jia);
+zhao_bolu.marry(zhao_bolu_wife);
+zhao_bolu_wife.give_birth(zhao_zhou);
+zhao_zhou.marry(zhao_zhou_wife);
+zhao_zhou_wife.give_birth(zhao_huan);
 
 
-g_kid_h_gap *= .6;  // 缩小两辈之间间距
+
+g_kid_h_gap *= .8;  // 缩小两辈之间间距
 shipout_lineage(zao_fu, /* new person[]{gong_ming}, */ "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 10cm);
 
 

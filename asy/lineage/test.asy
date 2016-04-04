@@ -38,8 +38,8 @@ person zhao_qiushi   = person(false, "赵", "秋若",      question, blank);
 person chen_juan      = person(false, "张", "娟丽",     question, blank);
 person zhao_kaiyuan  = person(false, "赵", "丽丽",      question, blank);
 person zhao_fang  = person(false, "赵", "芳",      question, blank);
-person zhao_yan  = person(false, "赵", "艳",      question, blank);
-person zhao_lan  = person(false, "赵", "兰",      question, blank);
+person zhao_yan  = person(false, "赵", "艳",      "1981.10.10", "2029.12.12");
+person zhao_lan  = person(false, "赵", "兰",      "1981.10.10", "2029.12.12");
 person zhao_chu  = person(false, "赵", "楚",      question, blank);
 person zhao_qian  = person(false, "赵", "茜",      question, blank);
 
