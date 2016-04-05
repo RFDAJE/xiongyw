@@ -89,8 +89,10 @@ zhao_yan.give_birth(zhao_lan);
 zhao_lan.give_birth(zhao_chu);
 zhao_chu.give_birth(zhao_qian);
 
-shipout_lineage(zhao_jiasong, splits = new person[] {zhao_zuxin, zhao_fang, zhao_lan}, "test", "赵姓世系表", "标题注", 12cm);
-//shipout_lineage(zhao_jiasong, split_after = wen_changxiang, "test", "赵姓世系表", "标题注", 12cm);
-//shipout_lineage(zhao_jiasong,  "test", "赵姓世系表", "标题注", 12cm);
+
+g_debug = true;
+//shipout_lineage(zhao_jiasong, splits = new person[] {zhao_zuxin, zhao_fang, zhao_lan}, "test", "赵姓世系表", "标题注", 12cm);
+//zhao_zuxin.kid = null;
+shipout_lineage(zhao_jiasong,  "test", "赵姓世系表", "标题注", 12cm);
 
 
