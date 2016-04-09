@@ -288,7 +288,7 @@ int handle_get_request(int sd, const char *url,     /* input  */
    batch convert: $cat test.html | sed -e 's@\\@\\\\@g' | sed -e 's@\"@\\\"@g' | sed -e 's@^@\"@g' | sed -e 's@$@\\n\"@g'
 */
 static char s_part1[] =
-"<html><head><title>%s</title>\n"
+"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>%s</title>\n"
 "<style>\n"
 "\n"
 "table {border-collapse:collapse;}\n"
