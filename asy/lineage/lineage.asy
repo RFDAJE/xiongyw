@@ -7,6 +7,7 @@
    - updated(bruin, 2016-03-28): fix horizontal alignment bug
    - updated(bruin, 2016-03-31): add notes support
    - updated(bruin, 2016-04-02): add split (into more than 2 parts) support
+   - updated(bruin, 2016-04-19): add has() method as a combination of marry() & give_birth(), for simplification.
 
    Todo: 
      + in certain cases, the dash lines are not aligned (2016-03-28)
@@ -162,8 +163,8 @@ struct person{
      *  +--------+----+----------+
      *
      */
-    pair     tree_size;   /* size of the tree where the root is self */
     pair     root_size;   /* size of the root node of the tree，包括自己和配偶 */
+    pair     tree_size;   /* size of the tree where the root is self */
     pair[]   space_size;  /* 从上到下，每一个长方形 space 的大小 */
     
     pair     offset;      /* 相对于其父(母)的 offset, 向左、向上为正值. (0,0) means root */
@@ -286,6 +287,37 @@ struct person{
         return true;
     }
 
+    /*
+     * added(bruin, 2016.04.19): marry() 和 give_birth() 的简化版:
+     * - 不需要提供配偶信息
+     * - 孩子们由不定长参数传入，第一个为长子(女)，依次列出
+     *
+     * 限制: 不考虑多配偶的情况
+     */
+    bool has(...person[] kids) {
+        person male_unknown   = person(true,  unknown, unknown2, question, blank);
+        person female_unknown = person(false, unknown, unknown2, question, blank);
+        person mom;
+
+        if (this.sex == true) {
+            this.marry(female_unknown);
+            mom = female_unknown;
+        } else {
+            this.marry(male_unknown);
+            mom = this;
+        }
+        
+        for (int i = 0; i < kids.length; ++ i) {
+            if (i == 0) {
+                mom.give_birth(kids[i]);
+            } else {
+                mom.give_birth(kids[i], kids[i - 1]);
+            }
+        }
+
+        return true;
+    }
+
 } from person unravel person; 
 
 person clone(person p) {
@@ -360,7 +392,7 @@ picture circle_text(string s, real height, bool black=true) {
     } else {
         r = ht / 2;
     }
-    r *= 1.3;
+    r *= 1.4;  // 避免文字和圆周太近
 
     sk = height / (r * 2); // scale
     
@@ -445,7 +477,7 @@ picture draw_person(person p){
     }
     */
     if (p.order != blank) {
-        ord = circle_text(p.order, g_name_height - 2);
+        ord = circle_text(p.order, g_name_height - 3);  // 使高度略小些
     }
     
     // 第一行，姓名 + 脚注上标(可选)
@@ -823,6 +855,60 @@ picture draw_single_tree_recursive(person root){
 }
 
 
+void draw_connection_line_r(picture pic, // the picture
+                            person root, // the root
+                            pair A) {    // the position of root (top-left) in pic
+
+    /*
+     * A +-------+   C0  +---------+
+     *   |     B +---+---+ E0      |
+     *   +-------+   |   +---------+
+     *               :
+     *               :
+     *               |   +--------+
+     *               +---+ En     |
+     *               Cn  +--------+
+     *               
+     *  1. 先画 B--C0
+     *  2. 再依次画 Cn--En
+     *  3. 最后画 C0--Cn
+     */
+       
+    if (root.kid == null) {  // 叶子节点
+        return;
+    }
+
+    person kid;    
+    pair B, C0, Cn, E0, En;
+    int i;
+    real h = g_kid_h_gap / 2 - g_x_skip; // 短横 BC 的长度, BC=CE 
+     
+    B = A + (root.name_width + g_x_skip, - g_name_height / 2);
+    C0 = B + (h, 0);
+
+    // B--C0
+    draw(pic, B--C0, line_pen);
+
+    // Cn-En
+    for (kid = root.kid; kid != null; kid = kid.rsib) {
+        //En = A + kid.offset - (g_x_skip, g_name_height / 2);
+        En = A + kid.offset - (0, g_name_height / 2);
+        Cn = En - (h, 0);
+        draw(pic, Cn--En, line_pen);
+    }
+
+    // C0--Cn
+    draw(pic, C0--Cn, line_pen);
+
+
+    /*
+     * 递归
+     */
+    for (kid = root.kid; kid != null; kid = kid.rsib) {
+        draw_connection_line_r(pic, kid, A + kid.offset);
+    }
+}
+
 /*
  *               A
  *  +----+   H   +------------------------+
@@ -872,6 +958,7 @@ attach_kid_pack(picture pd, picture pk,
     
     if (zz) {
         attach(pd, pk.fit(), A, se);
+        kid.offset = A;
         /* draw connection line & update H */
         B -= (0, ks.y);
         return new pair[]{A,B,H};
@@ -889,6 +976,7 @@ attach_kid_pack(picture pd, picture pk,
     //if (!hit) {
     if (true) {
         attach(pd, pk.fit(), C, se);
+        kid.offset = C;
         /* draw connection line & update H */
 
         /* update spaces[] */
@@ -964,23 +1052,9 @@ picture draw_single_tree_recursive_pack(person root){
     xoff = root.name_width + g_kid_h_gap;
     yoff = 0;
     
-    /* 画连接线。每个子树到父树的连接线都分为三段，AB(统一画), C1C2, CD:
-     *
-     *        A   B   D
-     * [self] +---+---+ [kid0]
-     *            |
-     *         C1 +---+ [kid1]
-     *            |
-     *            |
-     *         C2 +---+ [kid2]
-     *                
-     */
-    /* 先画公共部分 AB */
-    //A = (pic_size(self).x + g_x_skip, - g_conn_v_off);
     A = (root.name_width + g_x_skip, - g_conn_v_off);
     B = A + (g_kid_h_gap / 2 - g_x_skip, 0);
-    draw(pic, A--B, line_pen); 
-    C1 = C2 = B;
+    //C1 = C2 = B;
     D = B + (g_kid_h_gap / 2 - g_x_skip, 0);
 
     /* 开始循环 */
@@ -1027,10 +1101,14 @@ picture draw_single_tree_recursive_pack(person root){
 }
 
 picture draw_single_tree(person root) {
-    if (g_debug)
-        return draw_single_tree_recursive_pack(root);
-    else
+    if (g_debug) {
+        picture pic = draw_single_tree_recursive_pack(root);
+        draw_connection_line_r(pic, root, (0, 0));
+        return pic;
+    }
+    else {
         return draw_single_tree_recursive(root);
+    }
 }
 
 

@@ -103,7 +103,7 @@ zhang_jianxiu_wife.give_birth(zhang_chongyun, zhang_chongrun);
 
 
 
-
+g_debug = true;
 
 
 shipout_lineage(zhang_zhen, "zhangjuzheng", "张居正世系表", "根据《张居正大传》编制于 2016.03.31。", 10cm);

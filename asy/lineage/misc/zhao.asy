@@ -111,98 +111,233 @@ person zhao_fu          = person(true,  "", "辅",       question, question);
 
 
 /* 关系 */
+/*
 zao_fu.marry(zao_fu_wife);
 zao_fu_wife.give_birth(ellipse1);
+*/
+zao_fu.has(ellipse1);
+
+/*
 ellipse1.marry(male_unknown);
 ellipse1.give_birth(yan_fu);
+*/
+ellipse1.has(yan_fu);
+
+/*
 yan_fu.marry(yan_fu_wife);
 yan_fu_wife.give_birth(shu_dai);
+*/
+yan_fu.has(shu_dai);
+
+/*
 shu_dai.marry(shu_dai_wife);
 shu_dai_wife.give_birth(ellipse2);
+*/
+shu_dai.has(ellipse2);
+
+/*
 ellipse2.marry(male_unknown);
 ellipse2.give_birth(gong_ming);
+*/
+ellipse2.has(gong_ming);
+
+/*
 gong_ming.marry(gong_ming_wife);
 gong_ming_wife.give_birth(zhao_su);
 gong_ming_wife.give_birth(zhao_shuai, zhao_su);
+*/
+gong_ming.has(zhao_su, zhao_shuai);
+
+/*
 zhao_su.marry(zhao_su_wife);
 zhao_su_wife.give_birth(zhao_gongmeng);
+*/
+zhao_su.has(zhao_gongmeng);
+
+/*
 zhao_gongmeng.marry(zhao_gongmeng_wife);
 zhao_gongmeng_wife.give_birth(zhao_chuan);
 zhao_gongmeng_wife.give_birth(zhao_chuan2, zhao_chuan);
+*/
+zhao_gongmeng.has(zhao_chuan, zhao_chuan2);
+
+/*
 zhao_chuan.marry(zhao_chuan_wife);
 zhao_chuan_wife.give_birth(zhao_zhan0);
 zhao_chuan_wife.give_birth(zhao_zhan, zhao_zhan0);
+*/
+zhao_chuan.has(zhao_zhan0, zhao_zhan);
+
+/*
 zhao_zhan.marry(zhao_zhan_wife);
 zhao_zhan_wife.give_birth(zhao_sheng);
+*/
+zhao_zhan.has(zhao_sheng);
+
+/*
 zhao_sheng.marry(zhao_sheng_wife);
 zhao_sheng_wife.give_birth(zhao_wu);
 zhao_sheng_wife.give_birth(zhao_wu2, zhao_wu);
+*/
+zhao_sheng.has(zhao_wu, zhao_wu2);
+
+/*
 zhao_wu.marry(zhao_wu_wife);
-zhao_wu2.marry(zhao_wu2_wife);
 zhao_wu_wife.give_birth(zhao_ji);
+*/
+zhao_wu.has(zhao_ji);
+
+/*
+zhao_wu2.marry(zhao_wu2_wife);
 zhao_wu2_wife.give_birth(zhao_wu2_kid);
+*/
+zhao_wu2.has(zhao_wu2_kid);
+
+/*
 zhao_wu2_kid.marry(zhao_wu2_kid_wife);
 zhao_wu2_kid_wife.give_birth(zhao_chao);
+*/
+zhao_wu2_kid.has(zhao_chao);
+
+
 
 // 赵衰以下
+/*
 zhao_shuai.marry(zhao_shuai_wife);
 zhao_shuai_wife.give_birth(zhao_dun);
 zhao_shuai_wife.give_birth(zhao_tong, zhao_dun);
 zhao_shuai_wife.give_birth(zhao_kuo, zhao_tong);
 zhao_shuai_wife.give_birth(zhao_yingqi, zhao_kuo);
+*/
+zhao_shuai.has(zhao_dun, zhao_tong, zhao_kuo, zhao_yingqi);
+
+/*
 zhao_dun.marry(zhao_dun_wife);
 zhao_dun_wife.give_birth(zhao_shuo);
+*/
+zhao_dun.has(zhao_shuo);
+
+
 zhao_shuo.marry(zhao_shuo_wife);
 zhao_shuo_wife.give_birth(zhao_WU);
+/*
+zhao_shuo.has(zhao_WU);
+*/
+
+/*
 zhao_WU.marry(zhao_WU_wife);
 zhao_WU_wife.give_birth(zhao_cheng);
+*/
+zhao_WU.has(zhao_cheng);
+
+/*
 zhao_cheng.marry(zhao_cheng_wife);
 zhao_cheng_wife.give_birth(zhao_yang);
+*/
+zhao_cheng.has(zhao_yang);
+
+/*
 zhao_yang.marry(zhao_yang_wife);
 zhao_yang_wife.give_birth(zhao_bolu);
 zhao_yang_wife.give_birth(zhao_wuxu, zhao_bolu);
+*/
+zhao_yang.has(zhao_bolu, zhao_wuxu);
+
+/*
 zhao_wuxu.marry(zhao_wuxu_wife);
 zhao_wuxu_wife.give_birth(zhao_jia);
+*/
+zhao_wuxu.has(zhao_jia);
+
+/*
 zhao_bolu.marry(zhao_bolu_wife);
 zhao_bolu_wife.give_birth(zhao_zhou);
+*/
+zhao_bolu.has(zhao_zhou);
+
+/*
 zhao_zhou.marry(zhao_zhou_wife);
 zhao_zhou_wife.give_birth(zhao_huan);
+*/
+zhao_zhou.has(zhao_huan);
+
+
+/*
 zhao_huan.marry(zhao_huan_wife);
 zhao_huan_wife.give_birth(zhao_ji2);
 zhao_huan_wife.give_birth(zhao_x, zhao_ji2);
+*/
+zhao_huan.has(zhao_ji2, zhao_x);
+
+/*
 zhao_ji2.marry(zhao_ji2_wife);
+zhao_ji2_wife.give_birth(zhao_zhang);
+*/
+zhao_ji2.has(zhao_zhang);
+
+/*
 zhao_x.marry(zhao_x_wife);
 zhao_x_wife.give_birth(zhao_chao2);
-zhao_ji2_wife.give_birth(zhao_zhang);
+*/
+zhao_x.has(zhao_chao2);
+
+/*
 zhao_zhang.marry(zhao_zhang_wife);
 zhao_zhang_wife.give_birth(zhao_zhong);
+*/
+zhao_zhang.has(zhao_zhong);
+
+/*
 zhao_zhong.marry(zhao_zhong_wife);
 zhao_zhong_wife.give_birth(zhao_yu);
 zhao_zhong_wife.give_birth(zhao_cheng2, zhao_yu);
+*/
+zhao_zhong.has(zhao_yu, zhao_cheng2);
+
+/*
 zhao_yu.marry(zhao_yu_wife);
 zhao_yu_wife.give_birth(zhao_yong);
+*/
+zhao_yu.has(zhao_yong);
+
+/*
 zhao_yong.marry(zhao_yong_wife);
 zhao_yong_wife.give_birth(zhao_zhang2);
 zhao_yong_wife.give_birth(zhao_he, zhao_zhang2);
 zhao_yong_wife.give_birth(zhao_pyj, zhao_he);
 zhao_yong_wife.give_birth(zhao_sheng2, zhao_pyj); 
+*/
+zhao_yong.has(zhao_zhang2, zhao_he, zhao_pyj, zhao_sheng2);
 
+/*
 zhao_he.marry(zhao_he_wife);
 zhao_he_wife.give_birth(zhao_dan);
 zhao_he_wife.give_birth(zhao_caj, zhao_dan);
 zhao_he_wife.give_birth(zhao_llj, zhao_caj);
+*/
+zhao_he.has(zhao_dan, zhao_caj, zhao_llj);
 
+/*
 zhao_dan.marry(zhao_dan_wife);
 zhao_dan_wife.give_birth(zhao_yan);
+*/
+zhao_dan.has(zhao_yan);
+
+/*
 zhao_yan.marry(zhao_yan_wife);
 zhao_yan_wife.give_birth(zhao_jia2);
 zhao_yan_wife.give_birth(zhao_qian, zhao_jia2);
+*/
+zhao_yan.has(zhao_jia2, zhao_qian);
+
+/*
 zhao_jia2.marry(zhao_jia2_wife);
 zhao_jia2_wife.give_birth(zhao_fu);
+*/
+zhao_jia2.has(zhao_fu);
 
-
-
+//g_debug = true;
 g_kid_h_gap *= .8;  // 缩小两辈之间间距
 shipout_lineage(zao_fu, new person[]{zhao_yang},  "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 20cm);
-
+//shipout_lineage(zao_fu,  "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 20cm);
 
