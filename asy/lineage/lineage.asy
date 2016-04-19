@@ -86,6 +86,7 @@ pair   se=0.0001SE;         /* used for alignment for picture attach() */
 
 pen line_pen = linewidth(0.4) + black + linecap(0); /* square cap */
 pen name_pen = linewidth(0.1) + black + fontsize(g_glyph_width);
+pen name_pen_female = linewidth(0.1) + deepblue + fontsize(g_glyph_width);
 
 pen fill_male = paleblue;
 pen fill_female = pink;
@@ -502,7 +503,7 @@ picture draw_person(person p){
         s1 += "\textsuperscript{[" + format("%d", p.notes_order + 1) + "]}"; 
     }
     
-    label(name, s1, (0, 0), name_pen, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
+    label(name, s1, (0, 0), p.sex? name_pen: name_pen_female, filltype = NoFill);  //Fill(ymargin=1, ((p.sex==true)?fill_male:fill_female)));
 
     p.name_width = pic_size(ord).x + pic_size(name).x;  // 保存第一行的长度
 
@@ -760,13 +761,77 @@ picture set_n_draw_notes(person root, string title_notes = blank, real notes_wid
 }
 
 
+
+/*
+ * draw connection lines recursively
+ *
+ * 使用了下面几个全局变量:
+ * - g_kid_h_gap: 两代之间的水平间隔
+ * - g_x_skip: 连线和人名之间的水平空隙
+ * - g_name_height: 人名高度
+ */
+void _draw_conn_lines_r(picture pic, // the picture
+                        person root, // the root
+                        pair A) {    // the position of root (top-left) in pic
+
+    /*
+     * A +-------+   C0  +---------+
+     *   |     B +---+---+ E0      |
+     *   +-------+   |   +---------+
+     *               :
+     *               :
+     *               |   +--------+
+     *               +---+ En     |
+     *               Cn  +--------+
+     *               
+     *  1. 先画 B--C0
+     *  2. 再依次画 Cn--En
+     *  3. 最后画 C0--Cn
+     */
+       
+    if (root.kid == null) {  // 叶子节点
+        return;
+    }
+
+    person kid;    
+    pair B, C0, Cn, E0, En;
+    int i;
+    real h = g_kid_h_gap / 2 - g_x_skip; // 短横 BC 的长度, BC=CE 
+     
+    B = A + (root.name_width + g_x_skip, - g_name_height / 2);
+    C0 = B + (h, 0);
+
+    // B--C0
+    draw(pic, B--C0, g_debug? green: line_pen);
+
+    // Cn-En
+    for (kid = root.kid; kid != null; kid = kid.rsib) {
+        En = A + kid.offset - (g_x_skip, g_name_height / 2);
+        Cn = En - (h, 0);
+        draw(pic, Cn--En, g_debug? blue: line_pen);
+    }
+
+    // C0--Cn
+    draw(pic, C0--Cn, g_debug? red: line_pen);
+
+
+    /*
+     * 递归
+     */
+    for (kid = root.kid; kid != null; kid = kid.rsib) {
+        _draw_conn_lines_r(pic, kid, A + kid.offset);
+    }
+}
+
+
 /* 
  * recursively draw a tree, which is not split it into multi-parts.
  * the following size info are also updated:
  *   - person.root_size
  *   - person.offset
  */
-picture _draw_simple_tree_r(person root){
+picture _draw_simple_tree_r(person root, 
+                            int level = 0){ // 嵌套层次
 
     picture pic, self, spouse;
     person kid;
@@ -831,7 +896,7 @@ picture _draw_simple_tree_r(person root){
     //A = (pic_size(self).x + g_x_skip, - g_conn_v_off);
     A = (root.name_width + g_x_skip, - g_conn_v_off);
     B = A + (g_kid_h_gap / 2 - g_x_skip, 0);
-    draw(pic, A--B, line_pen); 
+    //draw(pic, A--B, line_pen); 
 
     /* 开始循环 */
     C1 = C2 = B;
@@ -841,12 +906,12 @@ picture _draw_simple_tree_r(person root){
         kid.offset = (xoff, yoff);
         
         /* 画子树并 attach 到 pic 上 */
-        picture k = _draw_simple_tree_r(kid);
+        picture k = _draw_simple_tree_r(kid, level + 1);
         attach(pic, k.fit(), (xoff, yoff), se);
 
         /* 画连接线 C1--C2, C--D */
         D = C2 + (g_kid_h_gap / 2 -g_x_skip, 0);
-        draw(pic, C1--C2--D, line_pen);
+        //draw(pic, C1--C2--D, line_pen);
 
         /* 更新 yoff 以及 C1, C2 */
         yoff -= pic_size(k).y + g_y_skip;
@@ -857,70 +922,12 @@ picture _draw_simple_tree_r(person root){
     /* 更新 root.tree_size, root.space_size */
     root.tree_size = pic_size(pic);
 
+    /* 最后画连接线 */
+    if (level == 0) {
+        _draw_conn_lines_r(pic, root, (0, 0));
+    }
+
     return pic;
-}
-
-
-/*
- * draw connection lines recursively
- *
- * 使用了下面几个全局变量:
- * - g_kid_h_gap: 两代之间的水平间隔
- * - g_x_skip: 连线和人名之间的水平空隙
- * - g_name_height: 人名高度
- */
-void _connect_simple_tree_nodes_r(picture pic, // the picture
-                            person root, // the root
-                            pair A) {    // the position of root (top-left) in pic
-
-    /*
-     * A +-------+   C0  +---------+
-     *   |     B +---+---+ E0      |
-     *   +-------+   |   +---------+
-     *               :
-     *               :
-     *               |   +--------+
-     *               +---+ En     |
-     *               Cn  +--------+
-     *               
-     *  1. 先画 B--C0
-     *  2. 再依次画 Cn--En
-     *  3. 最后画 C0--Cn
-     */
-       
-    if (root.kid == null) {  // 叶子节点
-        return;
-    }
-
-    person kid;    
-    pair B, C0, Cn, E0, En;
-    int i;
-    real h = g_kid_h_gap / 2 - g_x_skip; // 短横 BC 的长度, BC=CE 
-     
-    B = A + (root.name_width + g_x_skip, - g_name_height / 2);
-    C0 = B + (h, 0);
-
-    // B--C0
-    draw(pic, B--C0, line_pen);
-
-    // Cn-En
-    for (kid = root.kid; kid != null; kid = kid.rsib) {
-        //En = A + kid.offset - (g_x_skip, g_name_height / 2);
-        En = A + kid.offset - (0, g_name_height / 2);
-        Cn = En - (h, 0);
-        draw(pic, Cn--En, blue);
-    }
-
-    // C0--Cn
-    draw(pic, C0--Cn, red);
-
-
-    /*
-     * 递归
-     */
-    for (kid = root.kid; kid != null; kid = kid.rsib) {
-        _connect_simple_tree_nodes_r(pic, kid, A + kid.offset);
-    }
 }
 
 /*
@@ -944,59 +951,41 @@ void _connect_simple_tree_nodes_r(picture pic, // the picture
  *  |    |   |   |        |               |
  *  +----+   |   +----+   |               |
  *         H +---|    |   |               |
- *           |  B+----+---+----+          |
+ *           |  B+----+   +----+          |
  *           :   |/////////////|          |
  *               |/////////////|          |
  *             C +--------+----+----------+ 
  *
  */
-pair[]
-_attach_kid_pack(picture pd, picture pk, // picture dad & kid
-                person dad, person kid, // person dad & kid
-                pair[] ABH) {      // 点 ABH 的坐标
+/* return the next attach point for no packing case */
+pair _attach_kid_pack(picture pd, picture pk, // picture dad & kid
+                person dad, person kid,       // person dad & kid
+                pair A,                       // attach point as if there is no packing requirement
+                bool pack=false) {
 
 
     int i;
-    pair A, B, C, H;
-    real tmp;
     pair ks = pic_size(pk);  // kid size
-    bool hit, zz = (dad.kid == kid);  // 第一个孩子
+    bool hit, zz = (dad.kid == kid);  // 第一个孩子(长子)
     
-    A = ABH[0];
-    B = ABH[1];
-    H = ABH[2];
-    C = B + (0, - tmp);
-    
-    if (zz) {
-        attach(pd, pk.fit(), A, se);
-        kid.offset = A;
-        /* draw connection line & update H */
-        B -= (0, ks.y);
-        return new pair[]{A,B,H};
-    }
+    attach(pd, pk.fit(), A, se);
+    kid.offset = A;
 
-    /* 从上到下检查是否有合适的空间 */
-    hit = false;
+    /* 
+     * 更新 root.space_size: 需要把root 下面的空间和 root 孩子可能带来的空间合并 
+     */
+    //root.space_size.push((root.root_size.x, root.tree_size.y - root.root_size.y));
 
-    //if (!hit) {
-    if (true) {
-        attach(pd, pk.fit(), C, se);
-        kid.offset = C;
-        /* draw connection line & update H */
 
-        /* update B */
-        B -= (0, ks.y) ; //- tmp;
-
-        return new pair[]{A,B,H};
-    }
-    
-    return new pair[]{A,B,H};
+    return A + (0, - pic_size(pk).y - g_y_skip);
 }
 
 /* 
  * recursively draw a simple tree, connection lines are left undrawn.
  */
-picture _draw_simple_tree_pack_1_r(person root, bool pack=false){
+picture _draw_simple_tree_pack_r(person root, 
+                                 bool pack=false, 
+                                 int level=0){  // 嵌套层次
 
     picture pic, self, spouse;
     int i;
@@ -1048,29 +1037,14 @@ picture _draw_simple_tree_pack_1_r(person root, bool pack=false){
     xoff = root.name_width + g_kid_h_gap;
     yoff = 0;
     
-    A = (root.name_width + g_x_skip, - g_conn_v_off);
-    B = A + (g_kid_h_gap / 2 - g_x_skip, 0);
-    //C1 = C2 = B;
-    D = B + (g_kid_h_gap / 2 - g_x_skip, 0);
-
-    /* 开始循环 */
-    pair[] ABH;
-    ABH.push(D + (0, g_conn_v_off));
-    ABH.push(D + (0, g_conn_v_off));
-    ABH.push(D + (0, g_conn_v_off));
+    A = (root.name_width + g_kid_h_gap, 0);
     for(kid = root.kid; kid != null; kid = kid.rsib){
-        picture pk = _draw_simple_tree_pack_1_r(kid);
-        write("before", ABH[1]);
-        ABH = _attach_kid_pack(pic, pk, root, kid, ABH);
-        write(ABH[1]);
+        picture pk = _draw_simple_tree_pack_r(kid, pack, level + 1);
+        A = _attach_kid_pack(pic, pk, root, kid, A, pack);
     }
 
     /* 更新 root.tree_size */
     root.tree_size = pic_size(pic);
-    /* 
-     * 更新 root.space_size: 需要把root 下面的空间和 root 孩子可能带来的空间合并 
-     */
-    root.space_size.push((root.root_size.x, root.tree_size.y - root.root_size.y));
 
     if (g_debug) {
         /* 画 root 整个树下空白的框框 
@@ -1095,14 +1069,14 @@ picture _draw_simple_tree_pack_1_r(person root, bool pack=false){
         
     }
 
+    /* 最后画连接线 */
+    if (level == 0) {
+        _draw_conn_lines_r(pic, root, (0, 0));
+    }
+
     return pic;
 }
 
-picture _draw_simple_tree_pack_r(person root, bool pack=false) {
-    picture pic = _draw_simple_tree_pack_1_r(root, pack);
-    _connect_simple_tree_nodes_r(pic, root, (0, 0));
-    return pic;
-}
 
 /*
  * "simple" just means "not split"

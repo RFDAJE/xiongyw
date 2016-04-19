@@ -336,8 +336,8 @@ zhao_jia2_wife.give_birth(zhao_fu);
 */
 zhao_jia2.has(zhao_fu);
 
-//g_debug = true;
+g_debug = true;
 g_kid_h_gap *= .8;  // 缩小两辈之间间距
-shipout_lineage(zao_fu, new person[]{zhao_yang},  "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 20cm);
+shipout_lineage(zao_fu, new person[]{zhao_yang},  "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 20cm, pack=true);
 //shipout_lineage(zao_fu,  "zhao", "赵国世系表", "参考\underline{https://zh.wikipedia.org/wiki/趙國君主世系圖}编制。", 20cm);
 
