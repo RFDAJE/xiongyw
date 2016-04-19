@@ -52,7 +52,7 @@ person zheng             = person(true,  "", "政",       question, question);
 person min               = person(false, "", "敏",       question, question); 
 
 person jia_she_wife0     = person(false,  "", unknown,       question, question);  // 原配
-person jia_she_wife1     = person(false,  "刑", "夫人",       question, question);   // , notes="和贾赦无后。"
+person jia_she_wife1     = person(false,  "邢", "夫人",       question, question);   // , notes="和贾赦无后。"
 person jia_she_wife2     = person(false,  "", unknown,       question, question);  
 person jia_she_wife3     = person(false,  "", unknown,       question, question);  
 person jia_she_wife4     = person(false,  "", "嫣红",       question, question);  
