@@ -1,4 +1,4 @@
-.PHONY: all clean test gens zjz zhao 
+.PHONY: all clean test gens zjz zhao hlm tym
 
 all: gens test zjz zhao
 
@@ -15,6 +15,13 @@ zjz:
 
 zhao:
 	asy -f pdf misc/zhao.asy -o misc/
+
+hlm:
+	asy -f pdf misc/hlm_jia.asy -o misc/
+
+tym:
+	asy -f pdf misc/taoyuanming.asy -o misc/
+
 
 clean:
 	-rm *.log 
