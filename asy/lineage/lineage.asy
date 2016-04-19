@@ -971,6 +971,10 @@ pair _attach_kid_pack(picture pd, picture pk, // picture dad & kid
     attach(pd, pk.fit(), A, se);
     kid.offset = A;
 
+
+    // TODO:  marge rects, and then pack!!!!
+
+    
     /* 
      * 更新 root.space_size: 需要把root 下面的空间和 root 孩子可能带来的空间合并 
      */
