@@ -381,7 +381,7 @@ pair[] bound_box(path[] pp){
  * put a circle around a text and scale the whole that
  * the diameter equals to the height specified
  */
-picture circle_text(string s, real height, bool black=true) {
+picture circle_text(string s, real height, bool black=true, pen p=line_pen) {
     pair bbox[], center;
     path c;
     real width, ht, r, sk;
@@ -404,10 +404,10 @@ picture circle_text(string s, real height, bool black=true) {
     c = circle(center, r);
 
     if (black) {
-        draw(p1, scale(sk) * c, line_pen);
-        fill(p1, scale(sk) * txt, line_pen);
+        draw(p1, scale(sk) * c, p);
+        fill(p1, scale(sk) * txt, p);
     } else {
-        fill(p1, scale(sk) * c, line_pen);
+        fill(p1, scale(sk) * c, p);
         fill(p1, scale(sk) * txt, white);
     }
     
@@ -492,7 +492,9 @@ picture draw_person(person p){
     }
     */
     if (p.order != blank) {
-        ord = circle_text(p.order, g_name_height - 3);  // 使高度略小些
+        ord = circle_text(p.order, 
+                          g_name_height - 3,   // 使高度略小些
+                          p=p.sex? name_pen: name_pen_female);
     }
     
     // 第一行，姓名 + 脚注上标(可选)
