@@ -121,6 +121,8 @@ struct person{
     string   throne;      /* 在位的年头 */
     string   hao;         /* 庙号，或谥号、年号、官位等 */
 
+    bool     di;          /* 和其父母的关系是嫡是庶出(或同宗)? */
+    
     /*
      * 直系亲属: 父母、兄弟姐妹、配偶、儿女
      */
@@ -203,7 +205,8 @@ struct person{
                          string notes = blank,
                          string order = blank,
                          string throne = blank,
-                         string hao = blank){
+                         string hao = blank,
+                         bool   di = true){
         person p = new person;
         p.sex = sex;
         p.surname = surname;
@@ -221,6 +224,7 @@ struct person{
         p.order = order;
         p.throne = throne;
         p.hao = hao;
+        p.di = di;
         
         p.dad = null;
         p.mom = null;
@@ -810,7 +814,11 @@ void _draw_conn_lines_r(picture pic, // the picture
     for (kid = root.kid; kid != null; kid = kid.rsib) {
         En = A + kid.offset - (g_x_skip, g_name_height / 2);
         Cn = En - (h, 0);
-        draw(pic, Cn--En, g_debug? blue: line_pen);
+        if (kid.di) {
+            draw(pic, Cn--En, g_debug? blue: line_pen);
+        } else {
+            draw(pic, Cn--En, g_debug? blue + dashed: line_pen + dashed);
+        }
     }
 
     // C0--Cn

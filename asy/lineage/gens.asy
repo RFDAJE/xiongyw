@@ -426,6 +426,8 @@ lv_x.give_birth(chen_yong);
 //
 /* ######################################################################## */
 
+name_pen_female = linewidth(0.1) + deepred + fontsize(g_glyph_width);
+
 shipout_lineage(xiong_jiasong, "xiong", "熊姓世系表", "族谱: 【震起鄱阳泰云开，万家承祖育英才。】本表修订于 2016.03.31。", 12cm);
 shipout_lineage(wang_rixi,     "wang",  "王姓世系表", "族谱: 【寿同日月，福齐海天。】本表修订于 2016.03.31。", 12cm);
 shipout_lineage(chen_baixin,   "chen",  "陈姓世系表", "本表修订于 2016.03.31。", 9cm); 
