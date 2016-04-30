@@ -192,6 +192,17 @@ sudo apt-get install scantailor pdftk texlive asymptote libtiff-tools
 
   tesseract -l chi_sim input.tif out hocr
 
+- convert pdf pages into tiff:
+
+  convert -density 300 -trim test.pdf -quality 100 pages-%03d.tiff
+
+  ref: http://stackoverflow.com/questions/6605006/convert-pdf-to-image-with-high-resolution
+
+- extract images from pdf:
+
+   sudo apt-get install poppler-utils
+   pdfimages -tiff dcd.pdf tiff
+
 - pdfsandwich: http://www.tobias-elze.de/pdfsandwich/
   sudo dpkg -i pdfsandwich_0.1.0_amd64.deb  # There will be an error message. Ignore it and proceed!
   sudo apt-get -fy install
