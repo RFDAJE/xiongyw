@@ -1,6 +1,6 @@
 /*
  * created(bruin, 2014-08-25)
- * last updated(bruin, 2014-11-14)
+ * last updated(bruin, 2016-05-11)
  *
  */
 
@@ -23,6 +23,9 @@ import math;
 //import labelpath3;
 //import labelpath;
 import fontsize;
+
+
+bool debug = false; // 为节省时间(texpath()非常耗时, 采用自带label())
 
 /*
  * about sizes
@@ -84,7 +87,7 @@ int i;
 real gui_arithmetic(real radian)
 {
     if(radian < 0 || radian > pi){
-	return 0;
+    return 0;
     }
     
     return (1. - radian / pi);
@@ -94,7 +97,7 @@ real gui_arithmetic(real radian)
 real gui_sine(real radian)
 {
     if(radian < 0 || radian > pi){
-	return 0;
+    return 0;
     }
     
     return cos(radian / 2.);
@@ -116,18 +119,18 @@ guide fish(int n, real gui_interp(real))
     // 1. determine the array of shadow length, starting from winter solstice, in CW order
     real[] gui;  
     for(i = 0; i < n * 4; ++ i){
-	real rad = radians(90. / n * i);
-	if(rad > pi){
-	    rad = rad - pi;
-	}
-    	gui[i] = gui_interp(rad);
-	//write(gui[i]);
+    real rad = radians(90. / n * i);
+    if(rad > pi){
+        rad = rad - pi;
+    }
+        gui[i] = gui_interp(rad);
+    //write(gui[i]);
     }
 
     // 2. obtain the direction for each point, respective to the shadow array.
     pair[] roots;
     for(i = 0; i < n * 4; ++ i){
-	roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
+    roots[i] = unityroot(n * 4, i);  // starting from (1,0), in CCW order
     }
 
     // make it starts from winter soltice and in CW order, by indexing an array by an array
@@ -140,42 +143,42 @@ guide fish(int n, real gui_interp(real))
     guide fish;
     // right-hand half: in CW order
     for(i = 0; i < n * 2; ++ i){
-	pair p = O + gui[i] * dir(roots[i]);
-	fish = fish..p;
-	//dot(" ", p);
+    pair p = O + gui[i] * dir(roots[i]);
+    fish = fish..p;
+    //dot(" ", p);
     }
     // the center of the circle
     fish = fish..(0, 0);
     // left-hand half: in CCW order, not including the summer soltice
     for(i = n * 4 - 1; i > n * 2; -- i){
-	pair p = O + gui[i] * dir(roots[i]);
-	fish = fish..p;
-	//dot(" ", p);
+    pair p = O + gui[i] * dir(roots[i]);
+    fish = fish..p;
+    //dot(" ", p);
     }
     // the summer soltice: need special treatment as its shadow length is zero.
     fish = fish..{E}(0, -1){W};
 
     // 4. add the exterior part, to make it cyclic.
     for(i = n * 2 + 1; i < n * 4; ++ i){
-	fish = fish..roots[i];
+    fish = fish..roots[i];
     }
     fish = fish..{E}cycle;
     
     return fish;
 }
 
-void draw_yinyang(){
+void draw_yinyang(picture pic=currentpicture){
 
     // circle
-    draw(unitcircle);
+    draw(pic, unitcircle);
 
     // fish
-    filldraw(fish(6, gui_sine));
+    filldraw(pic, fish(6, gui_sine));
     //draw(fish(6, gui_arithmetic), grey);
     
     // eyes
-    fill(circle((-0.35, 0), 1/12.));
-    unfill(circle((0.35, 0), 1/12.));
+    fill(pic, circle((-0.35, 0), 1/12.));
+    unfill(pic, circle((0.35, 0), 1/12.));
 }
 
 /*
@@ -201,6 +204,23 @@ pair[] bound_box(path[] pp){
 
     return bb;
 }
+
+/*
+ * add x/y margins to a picture
+ */
+picture add_margin(picture pic=currentpicture,
+                   real xmargin=0.05, // in percentage
+                   real ymargin=xmargin,
+                   pen dp=invisible) {
+    pair size = size(pic, user=true);
+    pair min = min(pic, user=true);
+    pair max = max(pic, user=true);
+    real delta_x = size.x * xmargin;
+    real delta_y = size.y * ymargin;
+    draw(pic, (min.x-delta_x, min.y-delta_y)--(max.x+delta_x, max.y+delta_y), dp);
+    return pic;
+}
+
 
 /*
  * circularly bend a path[]: typically a return from texpath()
@@ -306,7 +326,8 @@ path[] bend_path(path[] pp, // array of paths
 /*
  * evenly distributed annotation around the circumference of a circle
  */
-void circular_annotate(real r1, // radius for inner circle
+void circular_annotate(picture pic=currentpicture, 
+                       real r1, // radius for inner circle
                        real r2, // radius for outter circle
                        string[] texts, // array of the annoation text. the length of the array determines how to divide circumference into ranges;
                        bool text_inside = true, // way of annotation: inside ranges, or across ranges?
@@ -331,7 +352,7 @@ void circular_annotate(real r1, // radius for inner circle
      */
     pair[] roots, delimits;
     for(i = 0; i < n; ++ i){
-	roots[i] = unityroot(n, i);
+    roots[i] = unityroot(n, i);
     }
     roots = reflect(S, N) * (rotate(90) * roots);
     //roots = rotate(90) * reflect(S, N) * roots;
@@ -344,7 +365,7 @@ void circular_annotate(real r1, // radius for inner circle
      */
     path[] label_path;
     for(i = 0; i < n; ++ i){
-	label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits[i], delimits[i + 1], CW);
+    label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits[i], delimits[i + 1], CW);
     }
 
     /*
@@ -353,7 +374,7 @@ void circular_annotate(real r1, // radius for inner circle
     
     for(i = 0; i < n; ++ i){
 
-	path p = label_path[i];
+        path p = label_path[i];
 
         // the start/middle/stop point of the arc:
         // - [0]: the point
@@ -367,82 +388,83 @@ void circular_annotate(real r1, // radius for inner circle
         end[0] = relpoint(p, 1.0);
 
         // the tang/norm direction of the arc at each point
-	real len = arclength(p);
+        real len = arclength(p);
         start[1] = dir(p, arctime(p, 0));
         start[2] = rotate(90) * start[1];
-	middle[1] = dir(p, arctime(p, len / 2));
-	middle[2] = rotate(90) * middle[1];
-	end[1] = dir(p, arctime(p, len));
-	end[2] = rotate(90) * end[1];
+        middle[1] = dir(p, arctime(p, len / 2));
+        middle[2] = rotate(90) * middle[1];
+        end[1] = dir(p, arctime(p, len));
+        end[2] = rotate(90) * end[1];
 
-	//draw(p, Arrow);
-	//draw(md--(md + tang), Arrow);
-	//draw(md--(md - norm), Arrow);
+        //draw(p, Arrow);
+        //draw(md--(md + tang), Arrow);
+        //draw(md--(md - norm), Arrow);
 
         /* labelpath, but not support xelatex for chinese */
-	//labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
+        //labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
 
         /* labelpath3, not clear how to use it yet */
         //path3 p3 = path3(p);
-	//draw(labelpath(texts[i], p3));
+        //draw(labelpath(texts[i], p3));
 
-        /* simple label */
-        /*
-        if(text_inside) {
-            label(scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
-        }
-        else {
-            label(scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
-        }
-        */
-
-        // the path[] for the text
-        path[] text = texpath(Label(texts[i]));
-        pair[] bb = bound_box(text);
-        real text_width = bb[1].x - bb[0].x;
-        real text_height = bb[1].y - bb[0].y;
-        // calculate the target height/width, by scaling the text height to the 3/5 * (r2-r1)
-        real r_gap = (r2 - r1) * 2 / 5;  /* 1/5 on top, 1/5 at bottom */
-        real text_height2 = (r2 - r1) * 3 / 5;
-        real text_width2 = text_width / text_height * text_height2;
-        real rad = text_width2 / ((r1 + r2) / 2); // text区域对应的夹角(弧度)
-        real deg = Degrees(rad);
-        //write(deg);
-        if (bend_text) {
-            text = bend_path(text, r1 + r_gap / 2, r2 - r_gap / 2, degrees(middle[0]) - deg / 2, deg);
+        // simple label
+        if (debug) {
+            if(text_inside) {
+                label(scale((r1-r2)/1.5) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
+            }
+            else {
+                label(scale((r1-r2)/1.5) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
+            }
+        
         } else {
-            text = scale(text_width2 / text_width, text_height2 / text_height) * text;
-            text = rotate(degrees(middle[1])) * text;
-            text = shift(middle[0]) * text;
+            // the path[] for the text
+            path[] text = texpath(Label(texts[i]));
+            pair[] bb = bound_box(text);
+            real text_width = bb[1].x - bb[0].x;
+            real text_height = bb[1].y - bb[0].y;
+            // calculate the target height/width, by scaling the text height to the 3/5 * (r2-r1)
+            real r_gap = (r2 - r1) * 2 / 5;  /* 1/5 on top, 1/5 at bottom */
+            real text_height2 = (r2 - r1) * 3 / 5;
+            real text_width2 = text_width / text_height * text_height2;
+            real rad = text_width2 / ((r1 + r2) / 2); // text区域对应的夹角(弧度)
+            real deg = Degrees(rad);
+            //write(deg);
+            if (bend_text) {
+                text = bend_path(text, r1 + r_gap / 2, r2 - r_gap / 2, degrees(middle[0]) - deg / 2, deg);
+            } else {
+                text = scale(text_width2 / text_width, text_height2 / text_height) * text;
+                text = rotate(degrees(middle[1])) * text;
+                text = shift(middle[0]) * text;
+            }
+            //draw(text, dp);
+            fill(text, dp);
         }
-        //draw(text, dp);
-        fill(text, dp);
     }
 
     /*
      * 3. circles
      */
-    if(draw_r1) {	
-        draw(scale(r1)*unitcircle, dp);
+    if(draw_r1) {   
+        draw(pic, scale(r1)*unitcircle, dp);
     }
 
     if(draw_r2) {
-        draw(scale(r2)*unitcircle, dp);
+        draw(pic, scale(r2)*unitcircle, dp);
     }
 
     /*
      * 4. delimites
      */
     for(i = 0; i < n; ++ i){
-	
-	//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
+    
+    //draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
 
         if(draw_delim) {
             if(text_inside) {
-	        draw(scale(r1)*delimits[i]--scale(r2)*delimits[i], dp);
+                draw(pic, scale(r1)*delimits[i]--scale(r2)*delimits[i], dp);
             }
             else{
-	        draw(scale((r1+r2)/2)*roots[i]--scale(r2)*roots[i], dp);
+                draw(pic, scale((r1+r2)/2)*roots[i]--scale(r2)*roots[i], dp);
             }
         }
     }
@@ -451,7 +473,8 @@ void circular_annotate(real r1, // radius for inner circle
 /*
  * manually distributed annotation around the circumference of a circle
  */
-void circular_annotate2(real r1, // radius for inner circle
+void circular_annotate2(picture pic=currentpicture, 
+                        real r1, // radius for inner circle
                         real r2, // radius for outter circle
                         real[] angles,  // array of the (start_angle, stop_angle). angle 0 is due north, CW.
                         string[] texts, // array of the corresponding texts.
@@ -479,8 +502,8 @@ void circular_annotate2(real r1, // radius for inner circle
         real gauche = angles[i*2];
         real droit = angles[i*2+1];
         real moyen = (gauche + droit) / 2;
-	delimits_left[i] = rotate(-gauche) * dir(O--(0,1));
-	delimits_right[i] = rotate(-droit) * dir(O--(0,1));
+        delimits_left[i] = rotate(-gauche) * dir(O--(0,1));
+        delimits_right[i] = rotate(-droit) * dir(O--(0,1));
         middles[i] = rotate(-moyen) * dir(O--(0,1));
     }
 
@@ -489,7 +512,7 @@ void circular_annotate2(real r1, // radius for inner circle
      */
     path[] label_path;
     for(i = 0; i < n; ++ i){
-	label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits_left[i], delimits_right[i], CW);
+    label_path[i] = scale((r1 + r2) / 2.) * arc(O, delimits_left[i], delimits_right[i], CW);
     }
 
     /*
@@ -498,7 +521,7 @@ void circular_annotate2(real r1, // radius for inner circle
     
     for(i = 0; i < n; ++ i){
 
-	path p = label_path[i];
+    path p = label_path[i];
 
         // the start/middle/stop point of the arc:
         // - [0]: the point
@@ -511,74 +534,76 @@ void circular_annotate2(real r1, // radius for inner circle
         end[0] = relpoint(p, 1.0);
 
         // the tang/norm direction of the arc at mdpoint
-	real len = arclength(p);
+        real len = arclength(p);
         start[1] = dir(p, arctime(p, 0));
         start[2] = rotate(90) * start[1];
-	middle[1] = dir(p, arctime(p, len / 2));
-	middle[2] = rotate(90) * middle[1];
-	end[1] = dir(p, arctime(p, len));
-	end[2] = rotate(90) * end[1];
+        middle[1] = dir(p, arctime(p, len / 2));
+        middle[2] = rotate(90) * middle[1];
+        end[1] = dir(p, arctime(p, len));
+        end[2] = rotate(90) * end[1];
 
-	//draw(p, Arrow);
-	//draw(md--(md + tang), Arrow);
-	//draw(md--(md - norm), Arrow);
+        //draw(p, Arrow);
+        //draw(md--(md + tang), Arrow);
+        //draw(md--(md - norm), Arrow);
 
         /* labelpath, but not support xelatex for chinese */
-	//labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
+        //labelpath(texts[i], shift(scale((r1-r2)/2.5) * norm) * p);
 
         /* labelpath3, not clear how to use it yet */
         //path3 p3 = path3(p);
-	//draw(labelpath(texts[i], p3));
+        //draw(labelpath(texts[i], p3));
 
         /* simple label */
         if(text_inside) {
-            label(scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
+            label(pic, scale(text_scale) * rotate(degrees(middle[1])) * Label(texts[i], middle[0]), dp);
         }
         else {
-            label(scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
+            label(pic, scale(text_scale) * rotate(degrees(start[1])) * Label(texts[i], start[0]), dp);
         }
     }
 
     /*
      * 3. circles
      */
-    if(draw_r1) {	
-        draw(scale(r1)*unitcircle, dp);
+    if(draw_r1) {   
+        draw(pic, scale(r1)*unitcircle, dp);
     }
 
     if(draw_r2) {
-        draw(scale(r2)*unitcircle, dp);
+        draw(pic, scale(r2)*unitcircle, dp);
     }
 
     /*
      * 4. delimites
      */
     for(i = 0; i < n; ++ i){
-	
-	//draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
+    
+    //draw(scale(r1)*roots[i]--scale(r2)*roots[i], dotted+grey);
 
         if(draw_delim) {
             if(text_inside) {
-	        draw(scale(r1)*delimits_left[i]--scale(r2)*delimits_left[i], dp);
-	        draw(scale(r1)*delimits_right[i]--scale(r2)*delimits_right[i], dp);
+                draw(pic, scale(r1)*delimits_left[i]--scale(r2)*delimits_left[i], dp);
+                draw(pic, scale(r1)*delimits_right[i]--scale(r2)*delimits_right[i], dp);
             }
             else{
-	        draw(scale((r1+r2)/2)*middles[i]--scale(r2)*middles[i], dp);
+                draw(pic, scale((r1+r2)/2)*middles[i]--scale(r2)*middles[i], dp);
             }
         }
     }
 }
 
-void draw_color_background(real r1, real r2) {
+void draw_color_background(picture pic=currentpicture, real r1, real r2, bool draw_yellow=true) {
 
      path pie = rotate(-45) * buildcycle(arc((0, 0), r1, 0, 90), (0, r1)--(0, r2), arc((0, 0), r2, 90, 0), (r2, 0)--(r1, 0));
 
-     fill(pie, lightgreen);
-     fill(rotate(90) * pie, gray);
-     //fill(rotate(180) * pie, gray);   // blanc pour automne
-     fill(rotate(270) * pie, lightred);
+     fill(pic, pie, lightgreen);
+     fill(pic, rotate(90) * pie, gray);
+     fill(pic, rotate(180) * pie, white);   // blanc pour automne
+     fill(pic, rotate(270) * pie, lightred);
 
-     fill(scale(r1) * unitcircle, lightyellow);
+     if (draw_yellow) {
+         fill(pic, scale(r1) * unitcircle, lightyellow);
+     }
 }
 
 
@@ -618,12 +643,26 @@ void draw_4_delims(real[] radius, pen noir, pen blanc)
  * draw stuff now 
  *************************************************************************/
 
+picture core;
 
 /*
- * 青赤黄白黑 背景
+ * core: 
+ * 
+ *   0-1.0:  阴阳鱼
+ * 1.0-1.4:  八卦文字
+ * 1.4-2.0:  八卦图案
+ * 2.0-2.4:  十二生肖
+ * 2.4-3.0:  十二地支
  */
 
-draw_color_background(2.0, 6.9);
+ 
+
+//debug = true;
+
+ 
+// 青赤黄白黑 背景
+draw_color_background(2.0, 3.0);
+ 
 
 /*
  * 阴阳鱼和八卦
@@ -633,53 +672,79 @@ draw_yinyang();
 
 // 八卦：http://zh.wikipedia.org/wiki/%E5%85%AB%E5%8D%A6
 circular_annotate(1.0, 1.4, new string[]{"坎", "艮", "震", "巽", "离", "坤", "兌", "乾"}, draw_r1=false, draw_r2=false, draw_delim=false);
-
 circular_annotate(1.4, 2.0, new string[]{"☵", "☶", "☳", "☴", "☲", "☷", "☱", "☰"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
 /*
- * 十二生肖
+ * 十二生肖、十二地支
  */
 circular_annotate(2.0, 2.4, new string[]{"鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"}, draw_r2=false);
 circular_annotate(2.4, 3.0, new string[]{"子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"}, draw_r1=false);
 
-/*
- * 子午流注
- */
-//circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "1", "足厥陰肝經", "3", "手太陰肺經", "5", "手陽明大腸經", "7", "足陽明胃經", "9", "足太陰脾經", "11", "手少陰心經", "13", "手太陽小腸經", "15", "足太陽膀胱經", "17", "足少陰腎經", "19", "手厥陰心包經", "21", "手少陽三焦經", "23"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-//circular_annotate(3.0, 3.3, new string[]{"足少陽膽經", "①", "足厥陰肝經", "③", "手太陰肺經", "⑤", "手陽明大腸經", "⑦", "足陽明胃經", "⑨", "足太陰脾經", "⑪", "手少陰心經", "①", "手太陽小腸經", "③", "足太陽膀胱經", "⑤", "足少陰腎經", "⑦", "手厥陰心包經", "⑨", "手少陽三焦經", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+attach(core, currentpicture.fit(), (0,0), O);
 
-circular_annotate(3.0, 3.4, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
 
-//circular_annotate(3.25, 3.6, new string[]{"足少陽", "足厥陰", "手太陰", "手陽明", "足陽明", "足太陰", "手少陰", "手太陽", "足太陽", "足少陰", "手厥陰", "手少陽"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+////////////////////////////////////////////////////
+// mini
+//
+// 3.0-3.45: 十二时辰
+// 3.45-4.0: 十二月份
+// 4.0-4.4: 十二节气阳历日子
+// 4.4-5.0: 十二节气名称
+// 5.0-5.6: 四灵
+// 5.7: 外圈
+// 
 
+draw_color_background(3.0, 5.3, draw_yellow=false); // 添背景
+
+circular_annotate(3.0, 3.45, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=true, draw_r2=false, draw_delim=false);
+circular_annotate(3.45, 4.0, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true, draw_r1=false, draw_r2=true);
+circular_annotate(4.0, 4.3, new string[]{"\texttt{12.23}", "\texttt{1.6}", "\texttt{1.21}", "\texttt{2.6}", "\texttt{2.21}", "\texttt{3.6}", "\texttt{3.21}", "\texttt{4.6}", "\texttt{4.21}", "\texttt{5.6}", "\texttt{5.21}", "\texttt{6.6}", "\texttt{6.21}", "\texttt{7.8}", "\texttt{7.23}", "\texttt{8.8}", "\texttt{8.23}", "\texttt{9.8}", "\texttt{9.23}", "\texttt{10.8}", "\texttt{10.23}", "\texttt{11.8}", "\texttt{11.23}", "\texttt{12.8}"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
+circular_annotate(4.3, 4.8, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_r2=true, draw_delim=false);
+circular_annotate(4.8, 5.3, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
+draw(scale(5.4)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));  // 外圈
+circular_annotate(5.4, 5.8, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
+
+currentpicture = rotate(180) * currentpicture;  // 万物负阴而抱阳: 坐北朝南；背北朝南；面南背北；左青龙右白虎；左升右降
+add_margin();
+shipout("yinyang-mini");
+
+
+///////////////////////////////////////////////
+// full:
+//
+
+
+
+erase(currentpicture);
+attach(rotate(180)*core.fit(), (0, 0), O);  // fixme: 不知道这里为什么要把core先翻转180度...
+draw_color_background(3.0, 6.9, draw_yellow=false); // 添背景
+
+//
+// 子午流注
+//
+
+circular_annotate(3.0, 3.4, new string[]{"夜半", "①", "雞鳴", "③", "平旦", "⑤", "日出", "⑦", "食時", "⑨", "隅中", "⑪", "日中", "①", "日昳", "③", "晡時", "⑤", "日入", "⑦", "黃昏", "⑨", "人定", "⑪"}, bend_text=true, draw_r1=true, draw_r2=false, draw_delim=false);
 circular_annotate(3.4, 3.9, new string[]{"\texttt{\bfseries GB}", "\texttt{\bfseries LR}", "\texttt{\bfseries LU}",  "\texttt{\bfseries LI}", "\texttt{\bfseries ST}", "\texttt{\bfseries SP}", "\texttt{\bfseries HT}", "\texttt{\bfseries SI}", "\texttt{\bfseries BL}", "\texttt{\bfseries KI}", "\texttt{\bfseries PC}", "\texttt{\bfseries TE}"}, bend_text=true, draw_r1=false, draw_r2=false);
-
 circular_annotate(3.9, 4.3, new string[]{"足少陽膽經", "足厥陰肝經", "手太陰肺經", "手陽明大腸經", "足陽明胃經", "足太陰脾經", "手少陰心經", "手太陽小腸經", "足太陽膀胱經", "足少陰腎經", "手厥陰心包經", "手少陽三焦經"}, bend_text=true, draw_r1=false, draw_delim=true);
 
 
-/* 
- * 二十四节气
- */
+// 
+// 二十四节气
+//
 circular_annotate(4.3, 4.7, new string[]{"冬月", "臘月", "正月",  "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月"}, bend_text=true, draw_r2=false);
-
 circular_annotate(4.7, 4.9, new string[]{"\texttt{12.23}", "\texttt{1.6}", "\texttt{1.21}", "\texttt{2.6}", "\texttt{2.21}", "\texttt{3.6}", "\texttt{3.21}", "\texttt{4.6}", "\texttt{4.21}", "\texttt{5.6}", "\texttt{5.21}", "\texttt{6.6}", "\texttt{6.21}", "\texttt{7.8}", "\texttt{7.23}", "\texttt{8.8}", "\texttt{8.23}", "\texttt{9.8}", "\texttt{9.23}", "\texttt{10.8}", "\texttt{10.23}", "\texttt{11.8}", "\texttt{11.23}", "\texttt{12.8}"}, bend_text=true, draw_r1=false, draw_r2=false, draw_delim=false);
-
 circular_annotate(4.9, 5.4, new string[]{"冬至", "小寒", "大寒", "立春", "雨水", "驚蟄", "春分", "清明", "穀雨", "立夏", "小滿", "芒種", "夏至", "小暑", "大暑", "立秋", "處暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪"}, bend_text=true, draw_r1=false, draw_r2=true, draw_delim=false);
 
 
 // 六气
 circular_annotate(5.4, 5.9, new string[]{"太陽寒水", "厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金"},  bend_text=true, draw_r1=false);
 
-/*
-circular_annotate2(4.7, 5.3, new real[]{0,45, 45,135, 135,180, 180,225, 225,315, 315, 360}, 
-                   new string[]{"厥陰風木", "少陰君火", "少陽相火", "太陰濕土", "陽明燥金", "太陽寒水"}, text_scale=0.3);
-*/
 
 
-/*
- * 四灵二十八宿
- */
+//
+// 四灵二十八宿
+//
 
 circular_annotate(5.9, 6.3, new string[]{"虛","女","牛","斗","箕","尾","心",
                                          "房","氐","亢","角","軫","翼","張",
@@ -688,37 +753,20 @@ circular_annotate(5.9, 6.3, new string[]{"虛","女","牛","斗","箕","尾","�
 
 circular_annotate(6.3, 6.9, new string[]{"玄\ \ \ 武","青\ \ \ 龍","朱\ \ \ 雀","白\ \ \ 虎"}, bend_text=true);
 
-/*
- * 外圈
- */
+//
+// 外圈
+//
 draw(scale(7.0)*unitcircle,  defaultpen + linewidth(line_width_in_bp * 3));
 
 
-/*
- * 四方
- */
+//
+// 四方
+//
 circular_annotate(7.1, 7.5, new string[]{"北","東","南","西"}, draw_r1=false, draw_r2=false, draw_delim=false);
 
-
-
 // this is to make 4 seasons/directions more distinguishable
+//draw_4_delims(new real[]{2.0, 3.0, 3.4, 4.7, 5.4, 6.4}, defaultpen + linewidth(line_width_in_bp * 6) + linecap(0), defaultpen + linewidth(line_width_in_bp * 4) + linecap(2) + white);
 
-/*
-draw_4_delims(new real[]{2.0, 3.0,   
-                         3.4, 4.7,   
-                         5.4, 6.4}, 
-              defaultpen + linewidth(line_width_in_bp * 6) + linecap(0), 
-              defaultpen + linewidth(line_width_in_bp * 4) + linecap(2) + white);
-*/
-
-/*
- * draw the invisible line to extend the margin of the picture
- */
-draw(shift(-8,-8)*scale(8*2)*unitsquare, white);
-
-
-
-/*
- * 万物负阴而抱阳: 坐北朝南；背北朝南；面南背北；左青龙右白虎；左升右降
- */
-currentpicture = rotate(180) * currentpicture;
+currentpicture = rotate(180) * currentpicture; // 万物负阴而抱阳: 坐北朝南；背北朝南；面南背北；左青龙右白虎；左升右降
+add_margin();
+shipout("yinyang");
