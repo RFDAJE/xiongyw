@@ -25,9 +25,24 @@
     
     
 	function onLoad() {
-	    JG2C.set_canvas(document.getElementById("myCanvas"));
+		var canvas = document.getElementById("myCanvas")
+
+	    JG2C.set_canvas(canvas);
 	    JG2C.set_mstate(JSGO.mstate_create(19, 19));
 	    JG2C.draw_mstate();
+
+
+	    // event hooks
+	    canvas.onclick = JG2C.onClick;
+	    canvas.ondblclick = JG2C.onDoubleClick;
+	    canvas.oncontextmenu = JG2C.onRightClick;
+	    canvas.onmousemove = JG2C.onMouseMove;  // note that this is a closure
+	    canvas.onmousewheel = JG2C.onMouseWheel;
+	    canvas.onmouseleave = JG2C.onMouseLeave;
+	    canvas.onmouseenter = JG2C.onMouseEnter;
+	    canvas.addEventListener('mouseover', JG2C.handleFocus, false);
+	    canvas.addEventListener('mouseout', JG2C.handleFocus, false);
+	    canvas.addEventListener('keydown', JG2C.handleKeyDown, false);
 	}
 
     window.onload = onLoad;
@@ -35,7 +50,6 @@
     </script>
     </head>
     <body>
-    GO!<br>
     <div id="div1">
 	    <canvas id="myCanvas" width="100" height="512" tabindex="0" style="border:2px solid white;"></canvas>
     </div>
