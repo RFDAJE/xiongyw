@@ -338,7 +338,7 @@ var JSGO = (function(){
         var string = mstate_get_string(mstate, row, col).string;
 
         for(i = 0; i < string.len; i ++){
-            _set_vertex(mstate, string.row[i], string.col[i], COLOR.GREEN);
+            _set_vertex(mstate, string.rows[i], string.cols[i], COLOR.GREEN);
         }
     }
 
@@ -500,21 +500,21 @@ var JSGO = (function(){
             /* southern neighboring vertex */
             if(row < dup.nrow - 1 && 
                mstate_get_vertex_color(dup, (row + 1), col) === enemy &&
-               mstate_get_string_dof(dup, (row + 1), col).dof.len === 0){
+               mstate_get_string(dup, (row + 1), col).dof.len === 0){
                 return MOVE.GOOD;
             }
 
             /* western neighboring vertex */
             if(col > 0 && 
                mstate_get_vertex_color(dup, row, (col - 1)) === enemy && 
-               mstate_get_string_dof(dup, row, (col - 1)).dof.len === 0){
+               mstate_get_string(dup, row, (col - 1)).dof.len === 0){
                 return MOVE.GOOD;
             }
 
             /* eastern neighboring vertex */
             if(col < dup.ncol - 1 && 
                mstate_get_vertex_color(dup, row, (col + 1))  === enemy && 
-               mstate_get_string_dof(dup, row, (col + 1)).dof.len === 0){
+               mstate_get_string(dup, row, (col + 1)).dof.len === 0){
                 return MOVE.GOOD;
             }
 
@@ -603,9 +603,9 @@ var JSGO = (function(){
                 if (string.dof.len === 0) {
                     _remove_string(mstate, neig.rows[i], neig.cols[i]);
                     // add dead stones
-                    for (i = 0; i < string.string.len; i ++) {
-                        dead.rows.push(string.string.rows[i]);
-                        dead.cols.push(string.string.cols[i]);
+                    for (j = 0; j < string.string.len; j ++) {
+                        dead.rows.push(string.string.rows[j]);
+                        dead.cols.push(string.string.cols[j]);
                         dead.len ++;
                     }
                 }

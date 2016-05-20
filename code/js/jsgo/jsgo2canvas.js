@@ -33,13 +33,14 @@ var JG2C = (function(){
         return {"width": _canvas.width, "height": _canvas.height };
     }
     
-    function circle_at(row, col, radius, color) {
+    function circle_at(row, col, radius, color, indicate = false) {
         // find out the center
         var x = GRID_SIZE * (col + 2);
         var y = GRID_SIZE * (row + 2);
 
         
         _ctx.beginPath();
+        _ctx.strokeStyle = "black";
         _ctx.arc(x, y, radius, 0, Math.PI * 2, false);
         
         _ctx.fillStyle = color;
@@ -47,6 +48,16 @@ var JG2C = (function(){
         _ctx.fill();
         _ctx.closePath();
         _ctx.stroke();
+
+        // indicate the next move
+        if (indicate) {
+            _ctx.beginPath();
+            _ctx.strokeStyle = "red";
+            _ctx.rect(x - GRID_SIZE / 6, y - GRID_SIZE / 6, GRID_SIZE / 3, GRID_SIZE / 3);
+            _ctx.closePath();
+            _ctx.stroke();
+        }
+
     }
 
     function text_at(row, col, text, font, textAlign, textBaseline) {
@@ -60,7 +71,9 @@ var JG2C = (function(){
     }
 
     function draw_mstate(mstate = _mstate) {
-        var i, x1, y1, x2, y2;
+        var i, j, x1, y1, x2, y2;
+        
+        _ctx.clearRect(0, 0, _canvas.width, _canvas.height);
 
         // draw board outline
         _ctx.strokeStyle = "black";
@@ -115,20 +128,46 @@ var JG2C = (function(){
             text_at(- 1, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "bottom");
             text_at(mstate.nrow, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "top");
         }
-        
-        //circle_at(0, 0, STONE_RADIUS, "white");
-        //circle_at(0, 1, STONE_RADIUS, "black");
 
+        // draw stones 
+        for (i = 0; i < mstate.nrow; i ++ ) {
+            for (j = 0; j < mstate.ncol; j ++) {
+                var color = JSGO.mstate_get_vertex_color(_mstate, i, j);
+                if (color === JSGO.COLOR.WHITE) {
+                    circle_at(i, j, STONE_RADIUS, "white");
+                } else if (color === JSGO.COLOR.BLACK) {
+                    circle_at(i, j, STONE_RADIUS, "black");
+                }
+            }
+        }
     }
 
-
+    /* convert (x, y) in canvas coordinate into board's (row, col)
+     * return { "row": a, "col", b}
+     */
+    function _pixel_to_board(x, y) {
+        var row = Math.round(y / GRID_SIZE) - 2;
+        var col = Math.round(x / GRID_SIZE) - 2;
+        console.log(row + "," + col);
+        if (row > _mstate.nrow - 1 || row < 0 || col > _mstate.ncol - 1 || col < 0) {
+            return null;
+        } else {
+            return {"row": row, "col": col};
+        }
+    }
+    
     /*
      *----------------------------------
      * event handlers
      *----------------------------------
      */
     function onClick(e) {
-        console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+        //console.log("onClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+        var position = _pixel_to_board(e.clientX, e.clientY);
+        if (position !== null) {
+            JSGO.mstate_commit_a_move(_mstate, position.row, position.col);
+            draw_mstate();
+        }
     }
 
     function onDoubleClick(e) {
@@ -139,28 +178,19 @@ var JG2C = (function(){
         console.log("onRightClick: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
     }
     
-    //
-    // the fact: canvas fires onmousemove events even the mouse position is not moved.
-    // the impact: when click event happens, the current position is added into the path, but
-    //   a mouse move event with the same position will be emitted. if we want to draw the
-    //   current path, the last two points are identical...then the Bezier curve will not be draw,
-    //   probably because the linear equations are not properly formed...
-    // the remedy: omit mouse move event when the position is not changed. use closure the keep the 
-    //   previous positions;
-    var onMouseMove = (function() {
-        // previous e.clientX and e.clientY
-        var pre_x = -1;
-        var pre_y = -1;
-        return function(e){
-            if(pre_x === e.clientX && pre_y === e.clientY) {
-                // console.log("move without position change!");
+    function onMouseMove(e) {
+        //console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
+        var position = _pixel_to_board(e.clientX, e.clientY);
+        draw_mstate();
+        if (position !== null) {
+            var move = JSGO.mstate_get_move_validity(_mstate, position.row, position.col);
+            if (move !== JSGO.MOVE.GOOD) {
                 return;
             }
-            pre_x = e.clientX;
-            pre_y = e.clientY;
-            console.log("onMouseMove: x=" + e.clientX + ", y=" + e.clientY + ", detail=" + e.detail);
-            }
-    }());
+            var player = JSGO.mstate_get_next_player(_mstate);
+            circle_at(position.row, position.col, STONE_RADIUS, player === JSGO.PLAYER.WHITE? "white" : "black", true);
+        }
+    }
 
     function onMouseWheel(e) {
         console.log("onMouseWheel: dx=" + e.deltaX + ", dy=" + e.deltaY);
@@ -168,6 +198,7 @@ var JG2C = (function(){
 
     function onMouseLeave(e) {
         console.log("onMouseLeave: e=" + e);
+        draw_mstate();
     }
 
     function onMouseEnter(e) {
