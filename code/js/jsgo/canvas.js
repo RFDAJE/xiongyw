@@ -10,11 +10,14 @@ var KANVAS = (function(){
     const STONE_RADIUS = (GRID_SIZE - 3) / 2;
     const LINE_WIDTH_1 = 1;  // inner lines
     const LINE_WIDTH_2 = 2;  // outter lines
+    const LINE_WIDTH_3 = 3;  // outter lines
 
     var _canvas = null;
     var _ctx = [];
     var _mstate = null;
 
+    var _show_number = false;
+    
     const BOARD = 0;
     const STONE = 1;
     const MARK = 2;
@@ -50,7 +53,7 @@ var KANVAS = (function(){
     const NOTHING = 0;
     const SQUARE = 1;
     const TRIANGLE = 2;
-    const CROSS = 3;
+    const FORBIDDEN = 3;
 
     /* "idx" is the canvas index, starting from 0 (bottom one) */
     function circle_at(idx, row, col, radius, color, indicate = NOTHING) {
@@ -78,25 +81,27 @@ var KANVAS = (function(){
             _ctx[idx].closePath();
             _ctx[idx].stroke();
         } else if (indicate === TRIANGLE) {
-        } else if (indicate === CROSS) {
+        } else if (indicate === FORBIDDEN) {
             _ctx[idx].beginPath();
+            _ctx[idx].lineWidth = LINE_WIDTH_3;
             _ctx[idx].strokeStyle = "red";
-            _ctx[idx].moveTo(x - GRID_SIZE / 4, y - GRID_SIZE / 4);
-            _ctx[idx].lineTo(x + GRID_SIZE / 4, y + GRID_SIZE / 4);
-            _ctx[idx].moveTo(x - GRID_SIZE / 4, y + GRID_SIZE / 4);
-            _ctx[idx].lineTo(x + GRID_SIZE / 4, y - GRID_SIZE / 4);
+            _ctx[idx].arc(x, y, radius, 0, Math.PI * 2, false);
+            _ctx[idx].moveTo(x - radius * .7, y + radius * .7);
+            _ctx[idx].lineTo(x + radius * .7, y - radius * .7);
             _ctx[idx].closePath();
             _ctx[idx].stroke();
         }
     }
 
-    function text_at(idx, row, col, text, font, textAlign, textBaseline) {
+    function text_at(idx, row, col, text, font, textAlign, textBaseline, color="black") {
         // find out the center
         var x = GRID_SIZE * (col + 2);
         var y = GRID_SIZE * (row + 2);
+        
         _ctx[idx].font = font;
         _ctx[idx].textAlign = textAlign;
         _ctx[idx].textBaseline = textBaseline;
+        _ctx[idx].fillStyle = color;
         _ctx[idx].fillText(text, x, y);
     }
 
@@ -161,7 +166,7 @@ var KANVAS = (function(){
 
     }
 
-    /* stones are drawn on the 2nd layer */
+    /* stones are drawn on the STONE layer */
     function draw_stones(mstate = _mstate) {
         var i, j, color;
 
@@ -170,12 +175,51 @@ var KANVAS = (function(){
         // draw stones 
         for (i = 0; i < mstate.nrow; i ++ ) {
             for (j = 0; j < mstate.ncol; j ++) {
-                color = RULE.mstate_get_vertex_color(_mstate, i, j);
+                color = RULE.mstate_get_vertex_color(mstate, i, j);
                 if (color === RULE.COLOR.WHITE) {
                     circle_at(STONE, i, j, STONE_RADIUS, "white");
                 } else if (color === RULE.COLOR.BLACK) {
                     circle_at(STONE, i, j, STONE_RADIUS, "black");
                 }
+            }
+        }
+
+        if (_show_number === true) {
+            _draw_numbers();
+        }
+    }
+
+    /* can also hide numbers */
+    function draw_numbers(yes = true) {
+        _show_number = yes;
+        _draw_numbers();
+    }
+    
+    /* numbers are on the MARK layer */
+    function _draw_numbers(mstate = _mstate) {
+        var i, row, col, color;
+        var font1 = Math.round(GRID_SIZE / 2) + "pt sans-serif";   // for numbers < 100
+        var font2 = Math.round(GRID_SIZE / 2.5) + "pt sans-serif";  // for numbers >=100
+
+        _ctx[MARK].clearRect(0, 0, _canvas[MARK].width, _canvas[MARK].height);
+
+        if (_show_number === false) {
+            return;
+        }
+        
+        // draw numbers
+        for (i = 0; i <= mstate.count; i ++ ) {
+            row = mstate.rows[i];
+            col = mstate.cols[i];
+            if (row === RULE.PASS && col === RULE.PASS) {
+                continue;
+            }
+          
+            color = RULE.mstate_get_vertex_color(mstate, row, col);
+            if (color === RULE.COLOR.WHITE) {
+                text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "black");
+            } else if (color === RULE.COLOR.BLACK) {
+                text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "white");
             }
         }
     }
@@ -226,7 +270,7 @@ var KANVAS = (function(){
             if (move === RULE.MOVE.GOOD) {
                 circle_at(STONE, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", SQUARE);
             } else if (move === RULE.MOVE.INKO || move === RULE.MOVE.SUIC){
-                circle_at(STONE, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", CROSS);
+                circle_at(STONE, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", FORBIDDEN);
             }
         }
     }
@@ -256,7 +300,20 @@ var KANVAS = (function(){
     };
 
     function handleKeyDown(e) {
+        const N_KEY = 78;
         console.log("key down:" + e.keyCode);
+
+        var key_id = e.keyCode || e.which;
+
+        if (key_id === N_KEY) {  // toggle for show/hide numbers
+            if (_show_number === true)
+                _show_number = false;
+            else
+                _show_number = true;
+
+            _draw_numbers();
+        }
+        
         return false;
     };
 
@@ -269,6 +326,7 @@ var KANVAS = (function(){
         "get_canvas_size": get_canvas_size,
         "draw_board": draw_board,
         "draw_stones": draw_stones,
+        "draw_numbers": draw_numbers,
 
         // event handlers
         "onMouseMove": onMouseMove,

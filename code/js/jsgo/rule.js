@@ -202,7 +202,7 @@ var RULE = (function(){
     function mstate_get_vertex_color(mstate, row, col){
         // check range
         if (row >= mstate.nrow || col >= mstate.ncol || row < 0 || col < 0) {
-            console.log("ERROR: row/col out of range!");
+            console.log("ERROR: row/col (" + row + ", " + col + ") out of range!");
             return null;
         }
         return mstate.color[row][col];
