@@ -4,30 +4,31 @@
 
 "use strict";
 
-var JG2C = (function(){
+var KANVAS = (function(){
 
-    const GRID_SIZE = 45; // in pixel
+    const GRID_SIZE = 29; // in pixel
     const STONE_RADIUS = (GRID_SIZE - 3) / 2;
     const LINE_WIDTH_1 = 1;  // inner lines
     const LINE_WIDTH_2 = 2;  // outter lines
 
-    var _canvas = [null, null];
-    var _ctx = [null, null];
+    var _canvas = null;
+    var _ctx = [];
     var _mstate = null;
 
-    /* input: an array of 2 canvas: [board, stone] */
+    /* input: an array of canvas: [board, stone, mark] */
     function set_canvas(c) {
         _canvas = c;
-	    _ctx[0] = _canvas[0].getContext('2d');
-	    _ctx[1] = _canvas[1].getContext('2d');
+        for (var i = 0; i < c.length; i ++) {
+    	    _ctx.push(_canvas[i].getContext('2d'));
+        }
     }
 
     function set_mstate(m) {
         _mstate = m;
-	    _canvas[0].width = (_mstate.ncol + 3) * GRID_SIZE;
-    	_canvas[0].height = (_mstate.nrow + 3) * GRID_SIZE;;
-	    _canvas[1].width = (_mstate.ncol + 3) * GRID_SIZE;
-    	_canvas[1].height = (_mstate.nrow + 3) * GRID_SIZE;;
+        for (var i = 0; i < _canvas.length; i ++ ) {
+    	    _canvas[i].width = (_mstate.ncol + 3) * GRID_SIZE;
+        	_canvas[i].height = (_mstate.nrow + 3) * GRID_SIZE;;
+        }
     }
 
     function get_mstate() {
@@ -40,7 +41,8 @@ var JG2C = (function(){
         
         return {"width": _canvas[0].width, "height": _canvas[0].height };
     }
-    
+
+    /* "idx" is the canvas index, starting from 0 (bottom one) */
     function circle_at(idx, row, col, radius, color, indicate = false) {
         // find out the center
         var x = GRID_SIZE * (col + 2);
@@ -65,17 +67,16 @@ var JG2C = (function(){
             _ctx[idx].closePath();
             _ctx[idx].stroke();
         }
-
     }
 
-    function text_at(row, col, text, font, textAlign, textBaseline) {
+    function text_at(idx, row, col, text, font, textAlign, textBaseline) {
         // find out the center
         var x = GRID_SIZE * (col + 2);
         var y = GRID_SIZE * (row + 2);
-        _ctx[0].font = font;
-        _ctx[0].textAlign = textAlign;
-        _ctx[0].textBaseline = textBaseline;
-        _ctx[0].fillText(text, x, y);
+        _ctx[idx].font = font;
+        _ctx[idx].textAlign = textAlign;
+        _ctx[idx].textBaseline = textBaseline;
+        _ctx[idx].fillText(text, x, y);
     }
 
     function draw_board(mstate = _mstate) {
@@ -125,16 +126,16 @@ var JG2C = (function(){
         }
         
         // draw grid marks: AB... & 1234
-        var mark_font = "16pt sans-serif";
+        var mark_font = Math.round(GRID_SIZE / 3) + "pt sans-serif";
         _ctx[0].fillStyle = "black";
         for (i = mstate.nrow; i > 0; i --) { // 1 starts from the bottom of the board
-            text_at(mstate.nrow - i, - 1, i.toString()+ " ", mark_font, "end", "middle");
-            text_at(mstate.nrow - i, mstate.ncol, " " + i.toString()+ " ", mark_font, "start", "middle");
+            text_at(0, mstate.nrow - i, - 1, i.toString()+ " ", mark_font, "end", "middle");
+            text_at(0, mstate.nrow - i, mstate.ncol, " " + i.toString()+ " ", mark_font, "start", "middle");
         }
 
         for (i = 0; i < mstate.ncol; i ++) {  // not using 'I'
-            text_at(- 1, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "bottom");
-            text_at(mstate.nrow, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "top");
+            text_at(0, - 1, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "bottom");
+            text_at(0, mstate.nrow, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "top");
         }
 
     }

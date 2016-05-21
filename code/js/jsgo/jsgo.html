@@ -30,23 +30,25 @@
 	function onLoad() {
 		var board = document.getElementById("board")
 		var stone = document.getElementById("stone")
+		var mark = document.getElementById("mark")
+		var top = mark;
 
-	    JG2C.set_canvas([board, stone]);
-	    JG2C.set_mstate(RULE.mstate_create(19, 19));
-	    JG2C.draw_board();
+	    KANVAS.set_canvas([board, stone, mark]);
+	    KANVAS.set_mstate(RULE.mstate_create(19, 19));
+	    KANVAS.draw_board();
 
 
 	    // event hooks
-	    stone.onclick = JG2C.onClick;
-	    stone.ondblclick = JG2C.onDoubleClick;
-	    stone.oncontextmenu = JG2C.onRightClick;
-	    stone.onmousemove = JG2C.onMouseMove;  // note that this is a closure
-	    stone.onmousewheel = JG2C.onMouseWheel;
-	    stone.onmouseleave = JG2C.onMouseLeave;
-	    stone.onmouseenter = JG2C.onMouseEnter;
-	    stone.addEventListener('mouseover', JG2C.handleFocus, false);
-	    stone.addEventListener('mouseout', JG2C.handleFocus, false);
-	    stone.addEventListener('keydown', JG2C.handleKeyDown, false);
+	    top.onclick = KANVAS.onClick;
+	    top.ondblclick = KANVAS.onDoubleClick;
+	    top.oncontextmenu = KANVAS.onRightClick;
+	    top.onmousemove = KANVAS.onMouseMove;  // note that this is a closure
+	    top.onmousewheel = KANVAS.onMouseWheel;
+	    top.onmouseleave = KANVAS.onMouseLeave;
+	    top.onmouseenter = KANVAS.onMouseEnter;
+	    top.addEventListener('mouseover', KANVAS.handleFocus, false);
+	    top.addEventListener('mouseout', KANVAS.handleFocus, false);
+	    top.addEventListener('keydown', KANVAS.handleKeyDown, false);
 	}
 
     window.onload = onLoad;
@@ -55,8 +57,9 @@
     </head>
     <body>
     <div id="div1">
-	    <canvas id="stone" width="100" height="512" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
-	    <canvas id="board" width="100" height="512" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+	    <canvas id="mark" width="100" height="100" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+	    <canvas id="stone" width="100" height="100" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+	    <canvas id="board" width="100" height="100" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
     </div>
     </body>
 </html>

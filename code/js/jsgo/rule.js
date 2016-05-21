@@ -69,16 +69,16 @@ var RULE = (function(){
      * - D4
      */
     const SYMMETRY = { 
-        "I": 0, /* identity, i.e., no symmetry */
-        "H": 1,
-        "V": 2,
-        "D": 3,     /* only for square board */
-        "DD": 4,    /* only for square board */
-        "R": 5,     /* only for square board */
-        "R2": 6,
-        "R2H": 7,
-        "R2D": 8,   /* only for square board */
-        "D4": 9     /* only for square board */
+        "I": "I",   /* identity, i.e., no symmetry */
+        "H": "H",
+        "V": "V",
+        "D": "D",   /* only for square board */
+        "DD": "DD", /* only for square board */
+        "R": "R",   /* only for square board */
+        "R2": "R2",
+        "R2H": "R2H",
+        "R2D": "R2D",  /* only for square board */
+        "D4": "D4"     /* only for square board */
     };
 
     /*##############################################################
