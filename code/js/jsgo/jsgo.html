@@ -21,8 +21,9 @@
     }
     
 </style>
-    <script type="text/javascript" src="jsgo.js"></script>
-    <script type="text/javascript" src="jsgo2canvas.js"></script>
+    <script type="text/javascript" src="rule.js"></script>
+    <script type="text/javascript" src="honte.js"></script>
+    <script type="text/javascript" src="canvas.js"></script>
     <script type="text/javascript">
     
     
@@ -31,7 +32,7 @@
 		var stone = document.getElementById("stone")
 
 	    JG2C.set_canvas([board, stone]);
-	    JG2C.set_mstate(JSGO.mstate_create(19, 19));
+	    JG2C.set_mstate(RULE.mstate_create(19, 19));
 	    JG2C.draw_board();
 
 
