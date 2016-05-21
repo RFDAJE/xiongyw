@@ -21,14 +21,15 @@ var RULE = (function(){
     };
 
     /* 
-     * vertex color (state): restrict the values to be 0,1,2,3, 
-     * i.e, can be stored in two bits.
+     * vertex color (state):
+     * if it's occupied, then it's the number of the move. so if it's an even number, it's white, otherwise it's black.
+     * if it's not occupied, it can be green (-1) or forbidden (-2).
      */
     const COLOR = {
-        "WHITE": "W",  /* occupied by a white stone */
-        "BLACK": "B",  /* occupied by a white stone */
-        "GREEN": "G",  /* not occupied and valid for the next mover */
-        "RED": "R"     /* not occupied, but it's forbidden for the next mover, because of ko or suicide rules */
+        "WHITE": 0,  /* occupied by a white stone */
+        "BLACK": 1,  /* occupied by a white stone */
+        "GREEN": -1,  /* not occupied and valid for the next mover */
+        "RED":   -2   /* not occupied, but it's forbidden for the next mover, because of ko or suicide rules */
     };
 
     /* types of rules */
@@ -186,7 +187,7 @@ var RULE = (function(){
             "nrow": nrow,
             "ncol": ncol,
             "rule": rule,
-            "count": 0, // the 1st move is always start from 0 for white with a PASS move
+            "count": 1, // the 1st move is always start from 0 for white with a PASS move
             "rows": [PASS], 
             "cols": [PASS], 
             "ko": { "who": PLAYER.NONE, "row": -1, "col": -1 },
@@ -199,13 +200,21 @@ var RULE = (function(){
         return JSON.parse(JSON.stringify(mstate));
     }
 
-    function mstate_get_vertex_color(mstate, row, col){
+    /* 
+     * return { "color": x, "count": y }, where color is the one of COLOR, count is the number of the move.
+     */
+    function mstate_get_vertex(mstate, row, col){
         // check range
         if (row >= mstate.nrow || col >= mstate.ncol || row < 0 || col < 0) {
             console.log("ERROR: row/col (" + row + ", " + col + ") out of range!");
             return null;
         }
-        return mstate.color[row][col];
+
+        if (mstate.color[row][col] >= 0) { // occupied
+            return {"color": mstate.color[row][col] % 2, "count": mstate.color[row][col]};
+        } else {
+            return {"color": mstate.color[row][col], "count": mstate.color[row][col]};
+        }
     }
 
     /*
@@ -252,29 +261,29 @@ var RULE = (function(){
         vertices.cols.push(col);
         vertices.len ++;
 
-        who = mstate_get_vertex_color(state, row, col);
+        who = mstate_get_vertex(state, row, col).color;
 
         /*
          * recursively search in N/E/S/W directions
          */
          
         /* northern search */
-        if (dir !== SOUTH && row > 0 && mstate_get_vertex_color(state, row - 1, col) == who) {
+        if (dir !== SOUTH && row > 0 && mstate_get_vertex(state, row - 1, col).color === who) {
             _get_string(state, row - 1, col, vertices, NORTH);
         }
 
         /* eastern search */
-        if (dir !== WEST && col < state.ncol - 1 && mstate_get_vertex_color(state, row, col + 1) == who) {
+        if (dir !== WEST && col < state.ncol - 1 && mstate_get_vertex(state, row, col + 1).color === who) {
             _get_string(state, row, col + 1, vertices, EAST);
         }
 
         /* southern search */
-        if (dir !== NORTH && row < state.nrow - 1 && mstate_get_vertex_color(state, row + 1, col) == who) {
+        if (dir !== NORTH && row < state.nrow - 1 && mstate_get_vertex(state, row + 1, col).color === who) {
             _get_string(state, row + 1, col, vertices, SOUTH);
         }
 
         /* western search */
-        if (dir !== EAST && col > 0 && mstate_get_vertex_color(state, row, col - 1) == who) {
+        if (dir !== EAST && col > 0 && mstate_get_vertex(state, row, col - 1).color === who) {
             _get_string(state, row, col - 1, vertices, WEST);
         }
 
@@ -300,8 +309,8 @@ var RULE = (function(){
         var i, found;
 
         /* dof means it should be unoccupied */
-        if(mstate_get_vertex_color(state, row, col) == COLOR.BLACK ||
-           mstate_get_vertex_color(state, row, col) == COLOR.WHITE) {
+        if(mstate_get_vertex(state, row, col).color == COLOR.BLACK ||
+           mstate_get_vertex(state, row, col).color == COLOR.WHITE) {
             return   - 1;
         }
 
@@ -359,8 +368,8 @@ var RULE = (function(){
         }
 
         /* sanity check: it should not be empty */
-        if(mstate_get_vertex_color(state, row, col) != COLOR.BLACK &&
-           mstate_get_vertex_color(state, row, col) != COLOR.WHITE) {
+        if(mstate_get_vertex(state, row, col).color !== COLOR.BLACK &&
+           mstate_get_vertex(state, row, col).color !== COLOR.WHITE) {
             console.log("ERROR: the vertices is not occupied by any player yet!");
             return null;
         }
@@ -402,9 +411,9 @@ var RULE = (function(){
     /* black always moves on odd counts */
     function mstate_get_next_player(mstate) {
         if(0 === mstate.count % 2)
-            return PLAYER.BLACK;
-        else
             return PLAYER.WHITE;
+        else
+            return PLAYER.BLACK;
     }
 
 
@@ -436,7 +445,7 @@ var RULE = (function(){
             }
 
             /* reoccupy check */
-            saved = mstate_get_vertex_color(mstate, row, col);
+            saved = mstate_get_vertex(mstate, row, col).color;
             if(saved == COLOR.WHITE || saved == COLOR.BLACK){
                 return MOVE.PILE;
             }
@@ -492,28 +501,28 @@ var RULE = (function(){
 
             /* northern neighboring vertex */
             if(row > 0 && 
-               mstate_get_vertex_color(dup, (row - 1), col) === enemy && 
+               mstate_get_vertex(dup, (row - 1), col).color === enemy && 
                mstate_get_string(dup, (row - 1), col).dof.len === 0){
                 return MOVE.GOOD;
             }
 
             /* southern neighboring vertex */
             if(row < dup.nrow - 1 && 
-               mstate_get_vertex_color(dup, (row + 1), col) === enemy &&
+               mstate_get_vertex(dup, (row + 1), col).color === enemy &&
                mstate_get_string(dup, (row + 1), col).dof.len === 0){
                 return MOVE.GOOD;
             }
 
             /* western neighboring vertex */
             if(col > 0 && 
-               mstate_get_vertex_color(dup, row, (col - 1)) === enemy && 
+               mstate_get_vertex(dup, row, (col - 1)).color === enemy && 
                mstate_get_string(dup, row, (col - 1)).dof.len === 0){
                 return MOVE.GOOD;
             }
 
             /* eastern neighboring vertex */
             if(col < dup.ncol - 1 && 
-               mstate_get_vertex_color(dup, row, (col + 1))  === enemy && 
+               mstate_get_vertex(dup, row, (col + 1)).color  === enemy && 
                mstate_get_string(dup, row, (col + 1)).dof.len === 0){
                 return MOVE.GOOD;
             }
@@ -561,7 +570,7 @@ var RULE = (function(){
         }
 
         /* commit the move now */
-        _set_vertex(mstate, row, col, mover_color);
+        _set_vertex(mstate, row, col, mstate.count);
 
 
         /*
@@ -598,7 +607,7 @@ var RULE = (function(){
         }
 
         for (i = 0; i < neig.len; i ++) {
-            if (mstate_get_vertex_color(mstate, neig.rows[i], neig.cols[i]) === enemy_color) {
+            if (mstate_get_vertex(mstate, neig.rows[i], neig.cols[i]).color === enemy_color) {
                 string = mstate_get_string(mstate, neig.rows[i], neig.cols[i]);
                 if (string.dof.len === 0) {
                     _remove_string(mstate, neig.rows[i], neig.cols[i]);
@@ -613,9 +622,9 @@ var RULE = (function(){
         }
 
         /* update the board state */
-        mstate.count ++;
         mstate.rows.push(row);
         mstate.cols.push(col);
+        mstate.count ++;
 
         /*
          * update KO status 
@@ -644,7 +653,7 @@ var RULE = (function(){
 
         for (i = 0; i < mstate.nrow; i ++) {
             for (j = 0; j < mstate.ncol; j ++) {
-                var tmp = mstate_get_vertex_color(mstate, i, j);
+                var tmp = mstate_get_vertex(mstate, i, j).color;
                 if (tmp !== COLOR.BLACK && tmp !== COLOR.WHITE) {
                     if(mstate_get_move_validity(mstate, i, j) === MOVE.GOOD)
                         _set_vertex(mstate, i, j, COLOR.GREEN);
@@ -696,7 +705,7 @@ var RULE = (function(){
         middle = mstate.nrow / 2;
         IS_H: for (i = 0; i < mstate.ncol; i ++) { /* for each column */
             for (j = 0; j < middle; j ++) {
-                if(mstate_get_vertex_color(mstate, j, i) !== mstate_get_vertex_color(mstate, mstate.nrow - 1 - j, i)) {
+                if(mstate_get_vertex(mstate, j, i).color !== mstate_get_vertex(mstate, mstate.nrow - 1 - j, i).color) {
                     is_H = false;
                     break IS_H;
                 }
@@ -709,7 +718,7 @@ var RULE = (function(){
         middle = mstate.ncol / 2;
         IS_V: for (i = 0; i < mstate.nrow; i ++) { /* for each row */
             for (j = 0; j < middle; j ++) {
-                if(mstate_get_vertex_color(mstate, i, j) !== mstate_get_vertex_color(mstate, i, mstate.ncol - 1 - j)) {
+                if(mstate_get_vertex(mstate, i, j).color !== mstate_get_vertex(mstate, i, mstate.ncol - 1 - j).color) {
                     is_V = false;
                     break IS_V;
                 }
@@ -729,7 +738,7 @@ var RULE = (function(){
                     var ii, jj; /* (i, j) ---> (ii, jj) */
                     ii = mstate.ncol - 1 - j;
                     jj = mstate.ncol - 1 - i;
-                    if (mstate_get_vertex_color(mstate, i, j) !== mstate_get_vertex_color(mstate, ii, jj)) {
+                    if (mstate_get_vertex(mstate, i, j) !== mstate_get_vertex(mstate, ii, jj)) {
                         is_D = false;
                         break IS_D;
                     }
@@ -740,7 +749,7 @@ var RULE = (function(){
             is_DD = true;
             IS_DD: for (i = 0; i < mstate.nrow - 1; i ++) {   /* for each row (ommit the last row) */
                 for (j = i + 1; j < mstate.ncol; j ++) { /* (i, j) ---> (j, j) */
-                    if(mstate_get_vertex_color(mstate, i, j) !== mstate_get_vertex_color(mstate, j, i)){
+                    if(mstate_get_vertex(mstate, i, j).color !== mstate_get_vertex(mstate, j, i).color){
                         is_DD = false;
                         break IS_DD;
                     }
@@ -754,7 +763,7 @@ var RULE = (function(){
                     var ii, jj; /* (i, j) ---> (ii, jj) */
                     ii = mstate.ncol - 1 - j;
                     jj = i;
-                    if (mstate_get_vertex_color(mstate, i, j) !== mstate_get_vertex_color(mstate, ii, jj)) {
+                    if (mstate_get_vertex(mstate, i, j).color !== mstate_get_vertex(mstate, ii, jj).color) {
                         is_R = false;
                         break IS_R;
                     }
@@ -772,7 +781,7 @@ var RULE = (function(){
                     var ii, jj; /* (i, j) ---> (ii, jj) */
                     ii = mstate.nrow - 1 - i;
                     jj = mstate.ncol - 1 - j;
-                    if (mstate_get_vertex_color(mstate, i, j) != mstate_get_vertex_color(mstate, ii, jj)) {
+                    if (mstate_get_vertex(mstate, i, j).color !== mstate_get_vertex(mstate, ii, jj).color) {
                         is_R2 = false;
                         break IS_RR;
                     }
@@ -836,7 +845,7 @@ var RULE = (function(){
         // methods:
         "mstate_create": mstate_create,
         "mstate_clone": mstate_clone,
-        "mstate_get_vertex_color": mstate_get_vertex_color,
+        "mstate_get_vertex": mstate_get_vertex,
         "mstate_get_string": mstate_get_string,
         "mstate_get_next_player": mstate_get_next_player,
         "mstate_get_move_validity": mstate_get_move_validity,

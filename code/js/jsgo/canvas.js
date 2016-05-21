@@ -175,7 +175,7 @@ var KANVAS = (function(){
         // draw stones 
         for (i = 0; i < mstate.nrow; i ++ ) {
             for (j = 0; j < mstate.ncol; j ++) {
-                color = RULE.mstate_get_vertex_color(mstate, i, j);
+                color = RULE.mstate_get_vertex(mstate, i, j).color;
                 if (color === RULE.COLOR.WHITE) {
                     circle_at(STONE, i, j, STONE_RADIUS, "white");
                 } else if (color === RULE.COLOR.BLACK) {
@@ -197,7 +197,7 @@ var KANVAS = (function(){
     
     /* numbers are on the MARK layer */
     function _draw_numbers(mstate = _mstate) {
-        var i, row, col, color;
+        var i, j, vert;
         var font1 = Math.round(GRID_SIZE / 2) + "pt sans-serif";   // for numbers < 100
         var font2 = Math.round(GRID_SIZE / 2.5) + "pt sans-serif";  // for numbers >=100
 
@@ -208,18 +208,31 @@ var KANVAS = (function(){
         }
         
         // draw numbers
-        for (i = 0; i <= mstate.count; i ++ ) {
-            row = mstate.rows[i];
-            col = mstate.cols[i];
-            if (row === RULE.PASS && col === RULE.PASS) {
-                continue;
+        if (false) { // this way the reoccupied position will be drawn by mutliple numbers
+            for (i = 0; i < mstate.count; i ++ ) {
+                var row, col, color;
+                row = mstate.rows[i];
+                col = mstate.cols[i];
+                if (row === RULE.PASS && col === RULE.PASS) {
+                    continue;
+                }
+                color = RULE.mstate_get_vertex(mstate, row, col).color;
+                if (color === RULE.COLOR.WHITE) {
+                    text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "black");
+                } else if (color === RULE.COLOR.BLACK) {
+                    text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "white");
+                }
             }
-          
-            color = RULE.mstate_get_vertex_color(mstate, row, col);
-            if (color === RULE.COLOR.WHITE) {
-                text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "black");
-            } else if (color === RULE.COLOR.BLACK) {
-                text_at(MARK, row, col, i.toString(), i < 100? font1: font2, "center", "middle", "white");
+        } else {
+            for (i = 0; i < mstate.nrow; i ++) {
+                for (j = 0; j < mstate.ncol; j ++) {
+                    vert = RULE.mstate_get_vertex(mstate, i, j);
+                    if (vert.color === RULE.COLOR.WHITE) {
+                        text_at(MARK, i, j, vert.count.toString(), vert.count < 100? font1: font2, "center", "middle", "black");
+                    } else if (vert.color === RULE.COLOR.BLACK) {
+                        text_at(MARK, i, j, vert.count.toString(), vert.count < 100? font1: font2, "center", "middle", "white");
+                    }
+                }
             }
         }
     }
