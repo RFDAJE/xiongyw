@@ -6,7 +6,7 @@
 
 var KANVAS = (function(){
 
-    const GRID_SIZE = 29; // in pixel
+    const GRID_SIZE = 39; // in pixel
     const STONE_RADIUS = (GRID_SIZE - 3) / 2;
     const LINE_WIDTH_1 = 1;  // inner lines
     const LINE_WIDTH_2 = 2;  // outter lines
@@ -14,6 +14,10 @@ var KANVAS = (function(){
     var _canvas = null;
     var _ctx = [];
     var _mstate = null;
+
+    const BOARD = 0;
+    const STONE = 1;
+    const MARK = 2;
 
     /* input: an array of canvas: [board, stone, mark] */
     function set_canvas(c) {
@@ -39,11 +43,17 @@ var KANVAS = (function(){
         if (_mstate === null)
             return null;
         
-        return {"width": _canvas[0].width, "height": _canvas[0].height };
+        return {"width": _canvas[BOARD].width, "height": _canvas[BOARD].height };
     }
 
+    /* indication */
+    const NOTHING = 0;
+    const SQUARE = 1;
+    const TRIANGLE = 2;
+    const CROSS = 3;
+
     /* "idx" is the canvas index, starting from 0 (bottom one) */
-    function circle_at(idx, row, col, radius, color, indicate = false) {
+    function circle_at(idx, row, col, radius, color, indicate = NOTHING) {
         // find out the center
         var x = GRID_SIZE * (col + 2);
         var y = GRID_SIZE * (row + 2);
@@ -60,10 +70,21 @@ var KANVAS = (function(){
         _ctx[idx].stroke();
 
         // indicate the next move
-        if (indicate) {
+        if (indicate === SQUARE) {
+            _ctx[idx].beginPath();
+            _ctx[idx].lineWidth = LINE_WIDTH_2;
+            _ctx[idx].strokeStyle = "green";
+            _ctx[idx].rect(x - GRID_SIZE / 6, y - GRID_SIZE / 6, GRID_SIZE / 3, GRID_SIZE / 3);
+            _ctx[idx].closePath();
+            _ctx[idx].stroke();
+        } else if (indicate === TRIANGLE) {
+        } else if (indicate === CROSS) {
             _ctx[idx].beginPath();
             _ctx[idx].strokeStyle = "red";
-            _ctx[idx].rect(x - GRID_SIZE / 6, y - GRID_SIZE / 6, GRID_SIZE / 3, GRID_SIZE / 3);
+            _ctx[idx].moveTo(x - GRID_SIZE / 4, y - GRID_SIZE / 4);
+            _ctx[idx].lineTo(x + GRID_SIZE / 4, y + GRID_SIZE / 4);
+            _ctx[idx].moveTo(x - GRID_SIZE / 4, y + GRID_SIZE / 4);
+            _ctx[idx].lineTo(x + GRID_SIZE / 4, y - GRID_SIZE / 4);
             _ctx[idx].closePath();
             _ctx[idx].stroke();
         }
@@ -82,60 +103,60 @@ var KANVAS = (function(){
     function draw_board(mstate = _mstate) {
         var i, j, x1, y1, x2, y2;
         
-        _ctx[0].clearRect(0, 0, _canvas[0].width, _canvas[0].height);
+        _ctx[BOARD].clearRect(0, 0, _canvas[BOARD].width, _canvas[BOARD].height);
 
         // draw board outline
-        _ctx[0].strokeStyle = "black";
-        _ctx[0].fillStyle="#EEB422";
-        _ctx[0].beginPath();
-        _ctx[0].lineWidth = LINE_WIDTH_2;
-        _ctx[0].fillRect(GRID_SIZE, GRID_SIZE, GRID_SIZE * (mstate.ncol + 1), GRID_SIZE * (mstate.nrow + 1));
-        _ctx[0].stroke();
+        _ctx[BOARD].strokeStyle = "black";
+        _ctx[BOARD].fillStyle="#EEB422";
+        _ctx[BOARD].beginPath();
+        _ctx[BOARD].lineWidth = LINE_WIDTH_2;
+        _ctx[BOARD].fillRect(GRID_SIZE, GRID_SIZE, GRID_SIZE * (mstate.ncol + 1), GRID_SIZE * (mstate.nrow + 1));
+        _ctx[BOARD].stroke();
         
         // draw board grid
-        _ctx[0].beginPath();
-        _ctx[0].lineWidth = LINE_WIDTH_1;
+        _ctx[BOARD].beginPath();
+        _ctx[BOARD].lineWidth = LINE_WIDTH_1;
         for (i = 0; i < mstate.nrow; i ++) {
             x1 = GRID_SIZE * 2;
             x2 = (mstate.ncol + 1) * GRID_SIZE;
             y1 = (i + 2) * GRID_SIZE;
-            _ctx[0].moveTo(x1, y1);
-            _ctx[0].lineTo(x2, y1);
+            _ctx[BOARD].moveTo(x1, y1);
+            _ctx[BOARD].lineTo(x2, y1);
         }
         
         for (i = 0; i < mstate.ncol; i ++) {
             y1 = GRID_SIZE * 2;
             y2 = (mstate.nrow + 1) * GRID_SIZE;
             x1 = (i + 2) * GRID_SIZE;
-            _ctx[0].moveTo(x1, y1);
-            _ctx[0].lineTo(x1, y2);
+            _ctx[BOARD].moveTo(x1, y1);
+            _ctx[BOARD].lineTo(x1, y2);
         }
-        _ctx[0].stroke();
+        _ctx[BOARD].stroke();
 
         // draw stars
         if (mstate.nrow === 19 && mstate.ncol === 19) {
-            circle_at(0,  3,  3, 4, "black");
-            circle_at(0,  3,  9, 4, "black");
-            circle_at(0,  3, 15, 4, "black");
-            circle_at(0,  9,  3, 4, "black");
-            circle_at(0,  9,  9, 4, "black");
-            circle_at(0,  9, 15, 4, "black");
-            circle_at(0, 15,  3, 4, "black");
-            circle_at(0, 15,  9, 4, "black");
-            circle_at(0, 15, 15, 4, "black");
+            circle_at(BOARD,  3,  3, 4, "black");
+            circle_at(BOARD,  3,  9, 4, "black");
+            circle_at(BOARD,  3, 15, 4, "black");
+            circle_at(BOARD,  9,  3, 4, "black");
+            circle_at(BOARD,  9,  9, 4, "black");
+            circle_at(BOARD,  9, 15, 4, "black");
+            circle_at(BOARD, 15,  3, 4, "black");
+            circle_at(BOARD, 15,  9, 4, "black");
+            circle_at(BOARD, 15, 15, 4, "black");
         }
         
         // draw grid marks: AB... & 1234
         var mark_font = Math.round(GRID_SIZE / 3) + "pt sans-serif";
-        _ctx[0].fillStyle = "black";
+        _ctx[BOARD].fillStyle = "black";
         for (i = mstate.nrow; i > 0; i --) { // 1 starts from the bottom of the board
-            text_at(0, mstate.nrow - i, - 1, i.toString()+ " ", mark_font, "end", "middle");
-            text_at(0, mstate.nrow - i, mstate.ncol, " " + i.toString()+ " ", mark_font, "start", "middle");
+            text_at(BOARD, mstate.nrow - i, - 1, i.toString()+ " ", mark_font, "end", "middle");
+            text_at(BOARD, mstate.nrow - i, mstate.ncol, " " + i.toString()+ " ", mark_font, "start", "middle");
         }
 
         for (i = 0; i < mstate.ncol; i ++) {  // not using 'I'
-            text_at(0, - 1, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "bottom");
-            text_at(0, mstate.nrow, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "top");
+            text_at(BOARD, - 1, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "bottom");
+            text_at(BOARD, mstate.nrow, i, "ABCDEFGHJKLMNOPQRST"[i], mark_font, "center", "top");
         }
 
     }
@@ -144,16 +165,16 @@ var KANVAS = (function(){
     function draw_stones(mstate = _mstate) {
         var i, j, color;
 
-        _ctx[1].clearRect(0, 0, _canvas[1].width, _canvas[1].height);
+        _ctx[STONE].clearRect(0, 0, _canvas[STONE].width, _canvas[STONE].height);
         
         // draw stones 
         for (i = 0; i < mstate.nrow; i ++ ) {
             for (j = 0; j < mstate.ncol; j ++) {
                 color = RULE.mstate_get_vertex_color(_mstate, i, j);
                 if (color === RULE.COLOR.WHITE) {
-                    circle_at(1, i, j, STONE_RADIUS, "white");
+                    circle_at(STONE, i, j, STONE_RADIUS, "white");
                 } else if (color === RULE.COLOR.BLACK) {
-                    circle_at(1, i, j, STONE_RADIUS, "black");
+                    circle_at(STONE, i, j, STONE_RADIUS, "black");
                 }
             }
         }
@@ -201,11 +222,12 @@ var KANVAS = (function(){
         draw_stones();
         if (position !== null) {
             var move = RULE.mstate_get_move_validity(_mstate, position.row, position.col);
-            if (move !== RULE.MOVE.GOOD) {
-                return;
-            }
             var player = RULE.mstate_get_next_player(_mstate);
-            circle_at(1, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", true);
+            if (move === RULE.MOVE.GOOD) {
+                circle_at(STONE, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", SQUARE);
+            } else if (move === RULE.MOVE.INKO || move === RULE.MOVE.SUIC){
+                circle_at(STONE, position.row, position.col, STONE_RADIUS, player === RULE.PLAYER.WHITE? "white" : "black", CROSS);
+            }
         }
     }
 
