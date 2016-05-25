@@ -153,7 +153,7 @@ var RULE = (function(){
      *     //   |  :  +-+-+-+-+-+-+-+-+-
      *     //   V  :  +-+-+-+-+-+-+-+-+-    
      *     //   (nrow-1)                        
-     *
+     *     the "color" value of each vertex is either >=0 or < 0, see notes around COLOR.
      *     "color": [
      *                [COLOR.GREEN,...],  // the first row
      *                [...],
