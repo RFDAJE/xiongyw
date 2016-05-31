@@ -89,7 +89,13 @@ sudo apt-get install hp-ams
 
 gfw
 ---
+bruin@gen8:~$ cat gfw.sh
+#!/bin/bash
 
+ssh -L 192.168.100.19:8080:localhost:8123 -i ~/aws.pem ubuntu@ec2-52-24-55-12.us-west-2.compute.amazonaws.com
+bruin@gen8:~$
+
+run this script in a tmux session and than detach the session.
 
 Samba
 -----
@@ -112,6 +118,46 @@ Samba
 $sudo apt-get install cifs-utils
 $sudo mount -t cifs -o user=bruin -o pass=qwerty //192.168.100.5/tele /tele
 ```
+
+simple git server
+-----------------
+1. on gen8
+$mkdir ~/work/wu.git
+$cd ~/work/wu.git
+$git init --bare
+
+2. on client
+$ mkdir wu
+$ cd wu
+$ git init
+$ touch readme
+$ git add readme
+$ git config --global user.email "5070319@qq.com"
+$ git config --global user.name "bruin"
+$ git commit -m "add"
+$ git remote add origin bruin@192.168.100.19:work/wu.git
+$ git push origin master
+The authenticity of host '192.168.100.19 (192.168.100.19)' can't be established.
+
+ECDSA key fingerprint is 44:0a:38:7e:72:3c:75:72:91:4f:1f:d8:d9:07:cd:b5.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.100.19' (ECDSA) to the list of known hosts.
+bruin@192.168.100.19's password:
+Counting objects: 3, done.
+Writing objects: 100% (3/3), 196 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+To bruin@192.168.100.19:work/wu.git
+ * [new branch]      master -> master
+
+3. clone the repo in another place:
+$ git clone bruin@192.168.100.19:work/wu.git
+Cloning into 'wu'...
+bruin@192.168.100.19's password:
+remote: Counting objects: 3, done.
+remote: Total 3 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (3/3), done.
+Checking connectivity... done.
+
 
 uhttpd
 ------
