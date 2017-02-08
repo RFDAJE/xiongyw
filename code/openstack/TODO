@@ -1,0 +1,12 @@
+- haproxy: timeout setting in config
+- network teaming: mode, and disable NetworkManager
+- rabbitmq: bind address setting, and haproxy for mq and it webui
+- mongod: web ui; replica set details
+- haproxy on host
+- stonith
+
+issues:
+------
++ openstack service list:
+  The request you have made requires authentication. (HTTP 401) (Request-ID: req-cd63c85b-41f0-4345-ab84-bd9e9eea2c8b)
+  resolved: url should be idential to registered url (at bootstrap).
