@@ -4,6 +4,13 @@
 
 MONGOD_res_name="mongod-clone"
 MONGOD_res_name_short=${MONGOD_res_name%-clone}
+# replica set name
+MONGOD_rs_name="rs0"
+# connection string: <https://docs.mongodb.com/manual/reference/connection-string/>
+MONGOD_nodes="${NODES[@]/%/${MGMT_SUFFIX}:27017}"   # mgmt interface
+MONGOD_nodes=${MONGOD_nodes// /,} # replace all space with comma: "n1:port,n2:port,n3:port"
+MONGOD_conn_url="mongodb://${MONGOD_nodes}/?replicaSet=${MONGOD_rs_name}"
+
 
 # call w/o arguments. it uses global variables such as $NODES etc.
 mongod() {
@@ -16,6 +23,8 @@ mongod() {
     return 0;
   fi
 
+  dep_install_check ${MONGOD_res_name}
+
   # install packages on each node
   for node in "${NODES[@]}"; do
     echo "installing mongodb packages..."
@@ -24,7 +33,7 @@ mongod() {
     cat <<-EOF | ssh -T ${node} --
 	sed -i.bak '{
 	/bindIp/c\ \ bindIp: ${node}${MGMT_SUFFIX}
-	/^#replication/creplication:\n  replSetName: rs0\n  #oplogSizeMB:\n  #secondaryIndexPrefetch:\n  #enableMajorityReadConcern:
+	/^#replication/creplication:\n  replSetName: ${MONGOD_rs_name}\n  #oplogSizeMB:\n  #secondaryIndexPrefetch:\n  #enableMajorityReadConcern:
 	}' /etc/mongod.conf
 	EOF
 
@@ -47,7 +56,7 @@ mongod() {
   echo "initializing the replica set..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	: set -x
-	mongo --host ${NODES[0]}${MGMT_SUFFIX} --eval 'rs.initiate({_id:"rs0", members:[{_id:0, host:"${NODES[0]}${MGMT_SUFFIX}:27017"}]})'
+	mongo --host ${NODES[0]}${MGMT_SUFFIX} --eval 'rs.initiate({_id:"${MONGOD_rs_name}", members:[{_id:0, host:"${NODES[0]}${MGMT_SUFFIX}:27017"}]})'
 	: fixme: how to make sure the first node becomes PRIMARY?
 	sleep 10
 	mongo --host ${NODES[0]}${MGMT_SUFFIX} --eval 'rs.conf()'
@@ -73,6 +82,8 @@ mongod() {
 mongod-d() {
   echo "removing mongodb HA config..."
 
+  dep_delete_check ${MONGOD_res_name}
+  
   echo "deleting mongod-clone resource..."
   ssh ${NODES[0]} -- pcs resource delete ${MONGOD_res_name}
 
@@ -98,7 +109,7 @@ mongod-r() {
 
 # testing rabbitmq ha. TODO: add more meaningful tests...
 mongod-t() {
-  ssh ${NODES[0]} -- pcs resource ${MONGOD_res_name}
+  ssh ${NODES[0]} -- pcs resource show ${MONGOD_res_name}
   echo "press any key to continue..."
   read -n 1
   ssh ${NODES[0]} -- mongo --host ${NODES[0]}${MGMT_SUFFIX} --eval 'rs.conf\(\)'
@@ -108,4 +119,7 @@ mongod-t() {
   echo "press any key to continue..."
   read -n 1
   ssh ${NODES[0]} -- mongo --host ${NODES[0]}${MGMT_SUFFIX} --eval 'rs.isMaster\(\)'
+  echo "press any key to continue..."
+  read -n 1
+  ssh ${NODES[0]} -- mongo "${MONGOD_conn_url}" --eval 'rs.isMaster\(\)'
 }

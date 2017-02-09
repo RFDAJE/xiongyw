@@ -32,16 +32,16 @@ _keystone_deps=( ${KEYSTONE_res_name} \
                  ${RABBITMQ_res_name} \
                  ${HAPROXY_res_name} )
 # ceilometer requires mariadb/rabbitmq and keystone
-_ceilometer_deps=( ${CEILOMETER_res_name} \
-                   ${MARIADB_res_name} \
-                   ${HAPROXY_res_name} \
-                   ${RABBITMQ_res_name} \
-                   ${KEYSTONE_res_name} )
+_ceil_deps=( ${CEIL_res_name} \
+             ${MARIADB_res_name} \
+             ${HAPROXY_res_name} \
+             ${RABBITMQ_res_name} \
+             ${KEYSTONE_res_name} )
 _horizon_deps=( ${HORIZON_res_name} \
                 ${MARIADB_res_name} \
                 ${HAPROXY_res_name} \
                 ${KEYSTONE_res_name} \
-                ${CEILOMETER_res_name} )
+                ${CEIL_res_name} )
                 
 _all_deps=( "${_chronyd_deps[*]}" \
             "${_memcached_deps[*]}" \
@@ -51,7 +51,7 @@ _all_deps=( "${_chronyd_deps[*]}" \
             "${_haproxy_deps[*]}" \
             "${_mariadb_deps[*]}" \
             "${_keystone_deps[*]}" \
-            "${_ceilometer_deps[*]}" \
+            "${_ceil_deps[*]}" \
             "${_horizon_deps[*]}" )
 #########################################################
 

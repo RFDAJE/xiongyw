@@ -1,7 +1,7 @@
 - haproxy: timeout setting in config
 - network teaming: mode, and disable NetworkManager
 - rabbitmq: bind address setting, and haproxy for mq and it webui
-- mongod: web ui; replica set details
+- mongod: web ui; replica set details; mongo shell; access control
 - haproxy on host
 - stonith
 

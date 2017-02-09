@@ -6,6 +6,12 @@ KEYSTONE_haproxy_cfg="/etc/haproxy/keystone.cfg"
 KEYSTONE_res_name="httpd-clone"
 KEYSTONE_res_name_short="httpd"
 
+# bootstrap project/role/user
+KEYSTONE_bootstrap_project="admin"
+KEYSTONE_bootstrap_user="admin"
+KEYSTONE_bootstrap_pass="qwerty"
+KEYSTONE_bootstrap_role="admim"
+KEYSTONE_bootstrap_region="RegionOne"
 
 keystone() {
 
@@ -110,21 +116,36 @@ _keystone_install_n_config() {
   done
 }
 
+# <http://docs.openstack.org/developer/keystone/configuration.html#bootstrapping-keystone-with-keystone-manage-bootstrap>
 _keystone_bootstrap () {
   local script3="/tmp/keystone3.sh"
   # populate the keystone db and bootstrap the service
   ssh ${NODES[0]} -- cat<<-EOF \>${script3}
 	#!/bin/bash
+	
 	echo "populating keystone db..."
-	# populate the identity service database, once.
 	su -s /bin/sh -c "keystone-manage db_sync" keystone
+	
+	# bootstrap the identity service, once. the endpoints use VIPs
+	# This will create an admin user with the admin role on the admin project.
+	# The user will have the password specified in the command. Note that both
+	# the user and the project will be created in the default domain.
+	
+	# The command will also create an identity service with the specified
+	# endpoint information.
+
+	# By creating an admin user and an identity endpoint, deployers may authenticate
+	# to keystone and perform identity operations like creating additional services
+	# and endpoints using that admin user.
 	echo "bootstrapping keystone service..."
-	# bootstrap the identity service, once. use VIPs
-	keystone-manage bootstrap --bootstrap-password qwerty \
+	keystone-manage bootstrap --bootstrap-username ${KEYSTONE_bootstrap_user} \
+	                          --bootstrap-password ${KEYSTONE_bootstrap_pass} \
+	                          --bootstrap-project-name ${KEYSTONE_bootstrap_project} \
+	                          --bootstrap-role-name ${KEYSTONE_bootstrap_role} \
 	                          --bootstrap-admin-url    http://VIP_MGMT:35357/v3/ \
 	                          --bootstrap-internal-url http://VIP_MGMT:35357/v3/ \
 	                          --bootstrap-public-url   http://VIP_EXT:5000/v3/ \
-	                          --bootstrap-region-id RegionOne
+	                          --bootstrap-region-id ${KEYSTONE_bootstrap_region}
 	EOF
   cat <<-EOF | ssh -T ${NODES[0]} --
 	sed -i -e "s/VIP_MGMT/${NODES_VIP_ADDRS[1]}/g" -e "s/VIP_EXT/${NODES_VIP_ADDRS[0]}/g" ${script3}
@@ -193,16 +214,15 @@ _keystone_create_domain_n_project() {
 
 	. ~/admin_openrc
 
-	echo "creating domain, project, user, role..."
-	set -x
-	# service project is for all openstack components
-	openstack project create --domain default --description "Service Project" service
-	# project specific domain/project/user/role
-	openstack domain create --description "ehualu domain" ehualu
-	openstack project create --domain ehualu --description "OceanRay Project" oceanray
-	openstack user create --domain ehualu --project oceanray --password qwerty admin
-	openstack role create --domain ehualu admin
-	openstack role add --domain ehualu --user admin admin
+	echo "creating service project for other services..."
+	openstack project create service --domain default --description "Service Project"
+	
+	#echo "creating additional domain, project, user, role..."
+	#openstack domain create --description "ehualu domain" ehualu
+	#openstack project create --domain ehualu --description "OceanRay Project" oceanray
+	#openstack user create --domain ehualu --project oceanray --password qwerty admin
+	#openstack role create --domain ehualu admin
+	#openstack role add --domain ehualu --user admin admin
 	EOF
   ssh ${NODES[0]} -- chmod +x ${script4} \; . ~/admin_openrc \; ${script4}
 }

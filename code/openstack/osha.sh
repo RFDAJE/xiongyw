@@ -188,7 +188,7 @@ main () {
         $1 ;;
       keystone | keystone-[dt])
         $1 ;;
-      ceilometer | ceilometer-[dt])
+      ceil | ceil-[dt])
         $1 ;;
       aodh | aodh-[dt])
         $1 ;;
