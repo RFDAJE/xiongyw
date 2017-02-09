@@ -10,8 +10,11 @@ KEYSTONE_res_name_short="httpd"
 KEYSTONE_bootstrap_project="admin"
 KEYSTONE_bootstrap_user="admin"
 KEYSTONE_bootstrap_pass="qwerty"
-KEYSTONE_bootstrap_role="admim"
+KEYSTONE_bootstrap_role="admin"
 KEYSTONE_bootstrap_region="RegionOne"
+KEYSTONE_bootstrap_service="keystone"
+# the project name for other openstack services
+KEYSTONE_service_project="service"
 
 keystone() {
 
@@ -126,22 +129,28 @@ _keystone_bootstrap () {
 	echo "populating keystone db..."
 	su -s /bin/sh -c "keystone-manage db_sync" keystone
 	
-	# bootstrap the identity service, once. the endpoints use VIPs
-	# This will create an admin user with the admin role on the admin project.
-	# The user will have the password specified in the command. Note that both
-	# the user and the project will be created in the default domain.
-	
-	# The command will also create an identity service with the specified
-	# endpoint information.
-
+	# bootstrap the identity service. 
+	#
+	# This will create "default" domain, and an admin user with the admin role on the
+	# admin project. Both the user and the project will be created in the "default" domain.
 	# By creating an admin user and an identity endpoint, deployers may authenticate
 	# to keystone and perform identity operations like creating additional services
 	# and endpoints using that admin user.
+	
+	# The command will also create an identity service with the specified endpoint
+	# information. Note that the identity service endpoints use VIPs.
 	echo "bootstrapping keystone service..."
+	: keystone-manage bootstrap --bootstrap-password qwerty \
+	                          --bootstrap-admin-url    http://VIP_MGMT:35357/v3/ \
+	                          --bootstrap-internal-url http://VIP_MGMT:35357/v3/ \
+	                          --bootstrap-public-url   http://VIP_EXT:5000/v3/ \
+	                          --bootstrap-region-id RegionOne
+	
 	keystone-manage bootstrap --bootstrap-username ${KEYSTONE_bootstrap_user} \
 	                          --bootstrap-password ${KEYSTONE_bootstrap_pass} \
 	                          --bootstrap-project-name ${KEYSTONE_bootstrap_project} \
 	                          --bootstrap-role-name ${KEYSTONE_bootstrap_role} \
+	                          --bootstrap-service-name ${KEYSTONE_bootstrap_service} \
 	                          --bootstrap-admin-url    http://VIP_MGMT:35357/v3/ \
 	                          --bootstrap-internal-url http://VIP_MGMT:35357/v3/ \
 	                          --bootstrap-public-url   http://VIP_EXT:5000/v3/ \
@@ -196,35 +205,27 @@ _keystone_haproxy_config() {
   done
 
   # copy tmp cfg to each node
-  set -x
   for node in "${NODES[@]}"; do
     scp ${tmp_cfg} ${node}:${KEYSTONE_haproxy_cfg}
   done
-  set +x
 
   # re-define haproxy resource
   haproxy_recreate_res
 }
 
+# use openstack CLI to create additional project "service" for other openstack components.
+# see <http://docs.openstack.org/developer/keystone/configuration.html#id1>
+#
+# the CLI uses the endpoint specified in admin_openrc...so the endpoint should
+# be available, that's why this step must happen after haproxy is correctly
+# configured for keystone.
 _keystone_create_domain_n_project() {
-  local script4="/tmp/keystone4.sh"
-  # create domain/project/user/role...
-  ssh ${NODES[0]} -- cat<<-EOF \>${script4}
-	#!/bin/bash
 
+  echo "creating service project for openstack services..."
+  cat <<-EOF | ssh -T ${NODES[0]} -- 
 	. ~/admin_openrc
-
-	echo "creating service project for other services..."
-	openstack project create service --domain default --description "Service Project"
-	
-	#echo "creating additional domain, project, user, role..."
-	#openstack domain create --description "ehualu domain" ehualu
-	#openstack project create --domain ehualu --description "OceanRay Project" oceanray
-	#openstack user create --domain ehualu --project oceanray --password qwerty admin
-	#openstack role create --domain ehualu admin
-	#openstack role add --domain ehualu --user admin admin
+	openstack project create ${KEYSTONE_service_project} --domain default --description "Service Project"
 	EOF
-  ssh ${NODES[0]} -- chmod +x ${script4} \; . ~/admin_openrc \; ${script4}
 }
 
 
@@ -306,4 +307,10 @@ keystone-t() {
   ssh ${NODES[0]} -- . ~/admin_openrc \; openstack user list --domain ehualu --project oceanray
   echo "role list --domain ehualu:"
   ssh ${NODES[0]} -- . ~/admin_openrc \; openstack role list --domain ehualu
+}
+
+# re-install keystone
+keystone-r() {
+  keystone-d
+  keystone
 }

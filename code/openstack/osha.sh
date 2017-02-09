@@ -186,9 +186,9 @@ main () {
         $1 ;;
       haproxy | haproxy-[dtr])
         $1 ;;
-      keystone | keystone-[dt])
+      keystone | keystone-[dtr])
         $1 ;;
-      ceil | ceil-[dt])
+      ceil | ceil-[dtr])
         $1 ;;
       aodh | aodh-[dt])
         $1 ;;
