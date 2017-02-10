@@ -35,6 +35,7 @@ _keystone_deps=( ${KEYSTONE_res_name} \
 _ceil_deps=( ${CEIL_res_name} \
              ${MARIADB_res_name} \
              ${HAPROXY_res_name} \
+             ${MEMCACHED_res_name} \
              ${RABBITMQ_res_name} \
              ${KEYSTONE_res_name} )
 _horizon_deps=( ${HORIZON_res_name} \

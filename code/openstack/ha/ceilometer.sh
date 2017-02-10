@@ -14,6 +14,13 @@ CEIL_service_name="ceilometer"
 CEIL_service_type="metering"
 CEIL_service_region=${KEYSTONE_bootstrap_region}
 
+# mongo mongodb://ceilometer:qwerty@c1m:27017,c2m:27017,c3m:27017/ceilometer?replicaSet=rs0
+# note that if omit the db name, mongo shell will report errors.
+CEIL_mongod_user="ceilometer"
+CEIL_mongod_pass="qwerty"
+CEIL_mongod_db="ceilometer"
+CEIL_mongod_conn_url="mongodb://${CEIL_mongod_user}:${CEIL_mongod_pass}@${MONGOD_nodes}/${CEIL_mongod_db}?replicaSet=${MONGOD_rs_name}"
+
 # we don't need "openstack-ceilometer-compute" pkg, which should be installed
 # on computer node (as an agent for nova).
 CEIL_install_pkgs="openstack-ceilometer-common \
@@ -29,12 +36,12 @@ CEIL_install_pkgs="openstack-ceilometer-common \
 
 
 ceil() {
-  echo "start ${CEIL_res_name} config..."
+  info "start ${CEIL_res_name} config..."
 
   # check if the resource already exist
   ssh ${NODES[0]} -- pcs resource show ${CEIL_res_name}
   if [[ $? = 0 ]]; then
-    echo "info: ${CEIL_res_name} resource already exist!"
+    warning "${CEIL_res_name} resource already exist!"
     return 0;
   fi
 
@@ -56,15 +63,23 @@ ceil() {
 
 # create db and user
 _ceil_prepare_mongodb() {
-  echo "preparing mongodb database & user..."
-  # note that the user is added into "admin"->"Users"
+  info "preparing mongodb database & user..."
+  local script="/tmp/mongo1.sh"
+  ssh ${NODES[0]} -- cat <<-EOF \> ${script}
+	#!/bin/bash
+	set -x
+	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("_DBNAME_"); db.createUser({user:"_USERNAME_", pwd:"_USERPASS_", roles:[ "readWrite","dbAdmin" ]})'
+	EOF
   cat <<-EOF | ssh -T ${NODES[0]} --
-	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("ceilometer"); db.createUser({user:"ceilometer", pwd:"qwerty", roles:[ "readWrite","dbAdmin" ]})'
+	sed -i -e "s/_DBNAME_/${CEIL_mongod_db}/g" -e "s/_USERNAME_/${CEIL_mongod_user}/g" -e "s/_USERPASS_/${CEIL_mongod_pass}/g" ${script}
+	chmod +x ${script}
+	${script}
 	EOF
 }
 
 
 _ceil_prepare_keystone() {
+  info "preparing keystone..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	. ~/admin_openrc
 	echo "creating a user 'ceilometer'..."
@@ -79,38 +94,73 @@ _ceil_prepare_keystone() {
 	EOF
 }
 
-
+# <http://docs.openstack.org/project-install-guide/telemetry/newton/install-base-rdo.html>
 _ceil_install_n_config() {
-  echo "installing ceilometer pkgs..."
+
+
+  local conf="/etc/ceilometer/ceilometer.conf"
+  
+  info "installing ceilometer pkgs..."
+  # note that the installation will install several systemd unit files
+  # under /usr/lib/systemd/system/...which are not enabled by default
+  #
+  #ls /usr/lib/systemd/system/openstack-ceilometer-*
+  #/usr/lib/systemd/system/openstack-ceilometer-api.service
+  #/usr/lib/systemd/system/openstack-ceilometer-central.service
+  #/usr/lib/systemd/system/openstack-ceilometer-collector.service
+  #/usr/lib/systemd/system/openstack-ceilometer-ipmi.service
+  #/usr/lib/systemd/system/openstack-ceilometer-notification.service
+  #/usr/lib/systemd/system/openstack-ceilometer-polling.service
+
   for node in "${NODES[@]}"; do
     ssh ${node} -- yum -y install ${CEIL_install_pkgs}
   done
 
-  echo "configuring ceilometer components..."
-  # 
+
+  info "configuring ceilometer ${conf}..."
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- cp ${conf} ${conf}.orig
+    cat <<-EOF | ssh -T ${node} --
+	: [default] section
+	sed -i "/^\[DEFAULT/,/^#rpc_backend/s/^#rpc_backend/rpc_backend/" ${conf}
+	sed -i "/^\[DEFAULT/a auth_strategy = keystone" ${conf}
+	: [database] section
+	sed -i "/^\[database/,/^#connection/s|^#connection.*|connection = ${CEIL_mongod_conn_url}|" ${conf}
+	: [oslo_messaging_rabbit] section
+	: [keystone_authtoken] section
+	: [service_credentials] section
+	EOF
+    # display the neat content again
+    info "${conf} content on ${node}:"
+    cat <<-EOF | ssh -T ${node} --
+	sed -n "/^[^#\ ].*/p" ${conf}
+	EOF
+  done  
 }
 
 
 ceil-d() {
-  echo "removing ${CEIL_res_name} resource..."
+  info "removing ${CEIL_res_name} resource..."
 
   dep_delete_check ${CEIL_res_name}
   
-  echo "deleting ${CEIL_res_name} resource..."
+  info "deleting ${CEIL_res_name} resource..."
   ssh ${NODES[0]} -- pcs resource delete ${CEIL_res_name}
 
-  echo "removing mongodb database ceilometer..."
+  info "removing mongodb database ceilometer..."
   # https://docs.mongodb.com/manual/reference/command/dropDatabase/
   cat <<-EOF | ssh -T ${NODES[0]} --
-	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("ceilometer"); db.runCommand({dropDatabase:1})'
+	set -x
+	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("${CEIL_mongod_db}"); db.runCommand({dropDatabase:1})'
 	EOF
 
-  echo "removing mongodb user ceilometer..."
+  info "removing mongodb user ceilometer..."
   cat <<-EOF | ssh -T ${NODES[0]} --
-	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("ceilometer"); db.dropUser("ceilometer")'
+	set -x
+	mongo "${MONGOD_conn_url}" --eval 'db=db.getSiblingDB("${CEIL_mongod_db}"); db.dropUser("${CEIL_mongod_user}")'
 	EOF
 
-  echo "removing ceilometer's endpoints & service from keystone..."
+  info "removing ceilometer's endpoints & service from keystone..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	. ~/admin_openrc
 	# no need to explicitly delete endpoints, deleting the service automatically also delete related endpoints
@@ -119,24 +169,23 @@ ceil-d() {
 	openstack service delete ${CEIL_service_type}
 	EOF
 
-  echo "removing keystone user for ceilometer..."
+  info "removing keystone user for ceilometer..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	. ~/admin_openrc
 	openstack user delete ${CEIL_keystone_user}
 	EOF
 
-  echo "removing ceilometer pkgs..."
+  info "removing ceilometer pkgs..."
   for node in "${NODES[@]}"; do
     ssh ${node} -- yum -y remove ${CEIL_install_pkgs}
   done
-
 
   # todo
 
 }
 
 ceil-t() {
-  echo "testing ${CEIL_res_name}..."
+  info "testing ${CEIL_res_name}..."
 
   # todo
 }
