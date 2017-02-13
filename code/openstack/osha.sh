@@ -30,8 +30,8 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/ehualu.sh
 
 #settings_home
-#settings_wukuang
-settings_ehualu
+settings_wukuang
+#settings_ehualu
 #                                                      #
 #                                                      #
 ########################################################

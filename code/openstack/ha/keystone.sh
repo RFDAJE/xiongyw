@@ -13,8 +13,16 @@ KEYSTONE_bootstrap_pass="qwerty"
 KEYSTONE_bootstrap_role="admin"
 KEYSTONE_bootstrap_region="RegionOne"
 KEYSTONE_bootstrap_service="keystone"
+KEYSTONE_admin_uri="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
+KEYSTONE_internal_uri="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
+KEYSTONE_public_uri="http://${NODES_VIP_ADDRS[0]}:5000/v3/"
+
+
 # the project name for other openstack services
 KEYSTONE_service_project="service"
+# the default domain name/id
+KEYSTONE_domain_name="Default"
+KEYSTONE_domain_id="default"
 
 keystone() {
 
@@ -151,10 +159,10 @@ _keystone_bootstrap () {
 	                          --bootstrap-project-name ${KEYSTONE_bootstrap_project} \
 	                          --bootstrap-role-name ${KEYSTONE_bootstrap_role} \
 	                          --bootstrap-service-name ${KEYSTONE_bootstrap_service} \
-	                          --bootstrap-admin-url    http://VIP_MGMT:35357/v3/ \
-	                          --bootstrap-internal-url http://VIP_MGMT:35357/v3/ \
-	                          --bootstrap-public-url   http://VIP_EXT:5000/v3/ \
-	                          --bootstrap-region-id ${KEYSTONE_bootstrap_region}
+	                          --bootstrap-admin-url    ${KEYSTONE_admin_uri} \
+	                          --bootstrap-internal-url ${KEYSTONE_internal_uri} \
+	                          --bootstrap-public-url   ${KEYSTONE_public_uri} \
+	                          --bootstrap-region-id    ${KEYSTONE_bootstrap_region}
 	EOF
   cat <<-EOF | ssh -T ${NODES[0]} --
 	sed -i -e "s/VIP_MGMT/${NODES_VIP_ADDRS[1]}/g" -e "s/VIP_EXT/${NODES_VIP_ADDRS[0]}/g" ${script3}
@@ -224,7 +232,7 @@ _keystone_create_domain_n_project() {
   echo "creating service project for openstack services..."
   cat <<-EOF | ssh -T ${NODES[0]} -- 
 	. ~/admin_openrc
-	openstack project create ${KEYSTONE_service_project} --domain default --description "Service Project"
+	openstack project create ${KEYSTONE_service_project} --domain ${KEYSTONE_domain_name} --description "Service Project"
 	EOF
 }
 
@@ -259,8 +267,6 @@ keystone-d() {
 	rm -f ~/admin_openrc
 	echo "deleting environment variables in /etc/profile..."
 	sed -i.bak '/OS_USERNAME/,+6d' /etc/profile
-	echo "removing haproxy cfg file..."
-	rm -f ${KEYSTONE_haproxy_cfg}
 	EOF
     ssh ${node} -- chmod +x ${script} \; ${script}
   done
@@ -280,6 +286,12 @@ keystone-d() {
 	EOF
   ssh ${NODES[0]} -- chmod +x ${script2} \; ${script2}
 
+  # remove haproxy cfg for keystone
+  echo "removing ${KEYSTONE_haproxy_cfg}..."
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- rm -f ${KEYSTONE_haproxy_cfg}
+  done
+
   # re-define haproxy resource
   haproxy_recreate_res
 }
@@ -298,15 +310,9 @@ keystone-t() {
   echo "domain list:"
   ssh ${NODES[0]} -- . ~/admin_openrc \; openstack domain list
   echo "project list --domain default:"
-  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack project list --domain default
-  echo "project list --domain ehualu:"
-  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack project list --domain ehualu
+  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack project list --domain ${KEYSTONE_domain_name}
   echo "user list --domain default --project service:"
-  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack user list --domain default --project service
-  echo "user list --domain ehualu --project oceanray:"
-  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack user list --domain ehualu --project oceanray
-  echo "role list --domain ehualu:"
-  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack role list --domain ehualu
+  ssh ${NODES[0]} -- . ~/admin_openrc \; openstack user list --domain ${KEYSTONE_domain_name} --project ${KEYSTONE_service_project}
 }
 
 # re-install keystone

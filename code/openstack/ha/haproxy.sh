@@ -401,6 +401,7 @@ haproxy_recreate_res() {
   else
     echo -n "deleting haproxy resource..."
     ssh ${NODES[0]} -- pcs resource delete ${HAPROXY_res_name}
+    sleep 5
     echo "done!"
   fi
 

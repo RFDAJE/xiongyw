@@ -4,6 +4,9 @@
 
 MEMCACHED_res_name="memcached-clone"
 MEMCACHED_res_name_short=${MEMCACHED_res_name%-clone}
+MEMCACHED_port="11211"
+MEMCACHED_hosts="${NODES[@]/%/${MGMT_SUFFIX}:${MEMCACHED_port}}"
+MEMCACHED_hosts="${MEMCACHED_hosts// /,}"
 
 memcached() {
 

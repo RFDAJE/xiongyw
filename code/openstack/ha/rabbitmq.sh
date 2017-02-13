@@ -10,6 +10,10 @@ RABBITMQ_res_name_short=${RABBITMQ_res_name%-master}
 RABBITMQ_erlang_cookie="/var/lib/rabbitmq/.erlang.cookie"
 # haproxy config file for rabbitmq mirror
 RABBITMQ_haproxy_cfg="/etc/haproxy/rabbitmq.cfg"
+RABBITMQ_port="5672"
+# for oslo.messaging config, <http://docs.openstack.org/ha-guide/shared-messaging.html>
+RABBITMQ_host="${NODES[@]/%/${MGMT_SUFFIX}:${RABBITMQ_port}}"
+RABBITMQ_host="${RABBITMQ_host// /,}"
 
 # https://www.rabbitmq.com/man/rabbitmq-env.conf.5.man.html
 #RABBITMQ_env_conf="/etc/rabbitmq/rabbitmq-env.conf"
