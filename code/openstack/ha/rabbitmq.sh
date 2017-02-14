@@ -12,8 +12,11 @@ RABBITMQ_erlang_cookie="/var/lib/rabbitmq/.erlang.cookie"
 RABBITMQ_haproxy_cfg="/etc/haproxy/rabbitmq.cfg"
 RABBITMQ_port="5672"
 # for oslo.messaging config, <http://docs.openstack.org/ha-guide/shared-messaging.html>
-RABBITMQ_host="${NODES[@]/%/${MGMT_SUFFIX}:${RABBITMQ_port}}"
-RABBITMQ_host="${RABBITMQ_host// /,}"
+RABBITMQ_hosts="${NODES[@]/%/${MGMT_SUFFIX}:${RABBITMQ_port}}"
+RABBITMQ_hosts="${RABBITMQ_hosts// /,}"
+# user/pass
+RABBITMQ_user="openstack"
+RABBITMQ_pass="qwerty"
 
 # https://www.rabbitmq.com/man/rabbitmq-env.conf.5.man.html
 #RABBITMQ_env_conf="/etc/rabbitmq/rabbitmq-env.conf"
@@ -22,7 +25,7 @@ rabbitmq() {
   local tmp_file="/tmp/.erlang.cookie"
   local cookie=""
 
-  echo "start rabbitmq HA config..."
+  info "start rabbitmq HA install & config..."
 
   # check if the resource already exist
   ssh ${NODES[0]} -- pcs resource show ${RABBITMQ_res_name}
@@ -33,7 +36,7 @@ rabbitmq() {
 
   # install packages on each node
   for node in "${NODES[@]}"; do
-    echo "installing rabbitmq packages..."
+    info "installing rabbitmq packages on ${node}..."
     ssh ${node} -- yum -y install rabbitmq-server rabbitmq-java-client librabbitmq librabbitmq-tools
     #echo "configuring node name..."
     #ssh ${node} -- echo "NODENAME=rabbit@${node}${MGMT_SUFFIX}" \> ${RABBITMQ_env_conf}
@@ -45,7 +48,7 @@ rabbitmq() {
     ssh ${node} -- systemctl disable rabbitmq-server
   done
 
-  echo "preparing erlang cookie for all NODES..."
+  info "preparing erlang cookie for all NODES..."
   scp ${NODES[0]}:${RABBITMQ_erlang_cookie} ${tmp_file}
   for node in "${NODES[@]:1}"; do
     scp ${tmp_file} ${node}:${RABBITMQ_erlang_cookie}
@@ -57,7 +60,7 @@ rabbitmq() {
 
   # it seems that the RA uses the cookie to find all nodes in the cluster,
   # so just defining the resource from any node will do...
-  echo "creating rabbitmq resource..."
+  info "creating rabbitmq resource..."
   cookie=$(cat ${tmp_file})
   cat <<-EOF | ssh -T ${NODES[0]} --
 	echo "creating mq-master resource..."
@@ -79,13 +82,18 @@ rabbitmq() {
   sleep 30;
   
 
-  # set ha policy to ha-all, and create a openstack account
+  # set ha policy to ha-all
   cat <<-'EOF' | ssh -T ${NODES[0]} --
 	echo "setting ha-all policy..."
 	rabbitmqctl set_policy ha-all '^(?!amq\.).*' '{"ha-mode": "all"}'
-	echo "adding user openstack..."
-	rabbitmqctl add_user openstack qwerty
-	rabbitmqctl set_permissions openstack ".*" ".*" ".*"
+	EOF
+
+  # create a openstack account
+  cat <<-EOF | ssh -T ${NODES[0]} --
+	echo "adding user ${RABBITMQ_user}..."
+	set -x
+	rabbitmqctl add_user ${RABBITMQ_user} ${RABBITMQ_pass}
+	rabbitmqctl set_permissions ${RABBITMQ_user} ".*" ".*" ".*"
 	EOF
 
   # fixme: need to config rabbitmq to listen on specific i/f, instead of all.

@@ -392,7 +392,7 @@ haproxy_recreate_res() {
   local vip0=${NODES_VIP_NAMES[0]}
   local vip1=${NODES_VIP_NAMES[1]}
 
-  echo "recreating resource ${HAPROXY_res_name}..."
+  info "recreating resource ${HAPROXY_res_name}..."
   # if haproxy is not yet created, do nothing
   echo "checking if haproxy is defined..."
   ssh ${NODES[0]} -- pcs resource show ${HAPROXY_res_name}

@@ -24,6 +24,11 @@ KEYSTONE_service_project="service"
 KEYSTONE_domain_name="Default"
 KEYSTONE_domain_id="default"
 
+KEYSTONE_conf_dir="/etc/keystone"
+KEYSTONE_httpd_conf_dir="/etc/httpd"
+KEYSTONE_log_dir="/var/log/keystone"
+KEYSTONE_httpd_log_dir="/var/log/httpd"
+
 keystone() {
 
   echo "start keystone HA config..."
@@ -262,10 +267,12 @@ keystone-d() {
 	echo "removing openstack-keystone httpd mod_wsgi packages..."
 	unlink /etc/httpd/conf.d/wsgi-keystone.conf
 	yum -y remove openstack-keystone httpd mod_wsgi
-	rm -rf /etc/keystone
-	rm -rf /etc/httpd
-	rm -f ~/admin_openrc
+	rm -rf ${KEYSTONE_conf_dir}
+	rm -rf ${KEYSTONE_httpd_conf_dir}
+	rm -rf ${KEYSTONE_log_dir}
+	rm -rf ${KEYSTONE_httpd_log_dir}
 	echo "deleting environment variables in /etc/profile..."
+	rm -f ~/admin_openrc
 	sed -i.bak '/OS_USERNAME/,+6d' /etc/profile
 	EOF
     ssh ${node} -- chmod +x ${script} \; ${script}

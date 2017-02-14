@@ -40,15 +40,22 @@ CEIL_mongod_conn_url="mongodb://${CEIL_mongod_user}:${CEIL_mongod_pass}@${MONGOD
 
 CEIL_api_port="8777"
 CEIL_public_uri="http://${NODES_VIP_ADDRS[0]}:${CEIL_api_port}"
-CEIL_internal_uri="http://${NODES_VIP_ADDRS[1]}:${CEIL_api_port}"
-CEIL_admin_uri="http://${NODES_VIP_ADDRS[1]}:${CEIL_api_port}"
+#CEIL_public_uri="http://10.2.162.165:${CEIL_api_port}"
+CEIL_internal_uri=${CEIL_public_uri}
+CEIL_admin_uri=${CEIL_public_uri}
+
 
 #########################################################################
 # api configuration
 # unlike keystone, the wsgi config file does not exist for ceilometer, we need to create it.
-CEIL_api_wsgi_conf="/etc/httpd/conf.d/wsgi-ceilometer-api.conf"
+CEIL_api_wsgi_conf="/etc/httpd/conf.d/wsgi-ceilometer.conf"
 # https://bugs.launchpad.net/ceilometer/+bug/1632635
 CEIL_api_wsgi_app="/usr/lib/python2.7/site-packages/ceilometer/api/app.wsgi"
+
+CEIL_conf_dir="/etc/ceilometer"
+CEIL_log_dir="/var/log/ceilometer"
+CEIL_api_access_log="/var/log/httpd/ceilometer_access.log"
+CEIL_api_error_log="/var/log/httpd/ceilometer_error.log"
 
 CEIL_haproxy_cfg="/etc/haproxy/ceilometer.cfg"
 
@@ -67,7 +74,7 @@ CEIL_install_pkgs="openstack-ceilometer-common \
 
 
 ceil() {
-  info "start ${CEIL_res_name} config..."
+  info "start ceilometer config..."
 
   # check if the resource already exist
   ssh ${NODES[0]} -- pcs resource show ${CEIL_res_name}
@@ -151,17 +158,16 @@ _ceil_install_n_config() {
     ssh ${node} -- cat <<-EOF \>${script}
 	#!/bin/bash
 	# [default] section
-	#sed -i "/^\[DEFAULT/,/^#rpc_backend/s/^#rpc_backend/rpc_backend/" ${conf}
-	#sed -i "/^\[DEFAULT/a auth_strategy = keystone" ${conf}
 	sed -i "/^\[DEFAULT/a\
 rpc_backend = rabbit\n\
 auth_strategy = keystone\n" ${conf}
 	# [database] section
-	#sed -i "/^\[database/,/^#connection/s|^#connection.*|connection = ${CEIL_mongod_conn_url}|" ${conf}
 	sed -i "/^\[database/a connection = ${CEIL_mongod_conn_url}" ${conf}
 	# [oslo_messaging_rabbit] section <http://docs.openstack.org/ha-guide/shared-messaging.html>
 	sed -i "/^\[oslo_messaging_rabbit/a\
-rabbit_host = ${RABBITMQ_host}\n\
+rabbit_hosts = ${RABBITMQ_hosts}\n\
+rabbit_userid = ${RABBITMQ_user}\n\
+rabbit_password = ${RABBITMQ_pass}\n\
 rabbit_retry_interval = 1\n\
 rabbit_retry_backoff = 2\n\
 rabbit_max_retries = 0\n\
@@ -170,24 +176,27 @@ rabbit_ha_queues = true\n" ${conf}
 	# [keystone_authtoken] section
 	sed -i "/^\[keystone_authtoken/a\
 auth_uri = ${KEYSTONE_public_uri}\n\
-auth_uri = ${KEYSTONE_internal_uri}\n\
+auth_url = ${KEYSTONE_internal_uri}\n\
 memcached_servers = ${MEMCACHED_hosts}\n\
 auth_type = password\n\
 project_domain_name = ${KEYSTONE_domain_name}\n\
 user_domain_name =  ${KEYSTONE_domain_name}\n\
 project_name = ${KEYSTONE_service_project}\n\
-user_name = ${CEIL_keystone_user}\n\
+username = ${CEIL_keystone_user}\n\
 password = ${CEIL_keystone_pass}\n" ${conf}
 	# [service_credentials] section
 	sed -i "/^\[service_credentials/a\
-auth_uri = ${KEYSTONE_public_uri}\n\
+auth_url = ${KEYSTONE_public_uri}\n\
 project_domain_id = ${KEYSTONE_domain_id}\n\
 user_domain_id = ${KEYSTONE_domain_id}\n\
 project_name = ${KEYSTONE_service_project}\n\
-user_name = ${CEIL_keystone_user}\n\
+username = ${CEIL_keystone_user}\n\
 password = ${CEIL_keystone_pass}\n\
 interface = internalURL\n\
 region_name = ${KEYSTONE_bootstrap_region}\n" ${conf}
+	# [collector]: disable udp socket
+	sed -i "/^\[collector/a\
+udp_address = \n" ${conf}
 	EOF
     ssh ${node} -- chmod +x ${script} \; ${script}
     # display the neat content again
@@ -262,6 +271,8 @@ _ceil_haproxy_config() {
   local ips=""
 
   # update haproxy config on each node, and restart haproxy resource
+  # note that according to <http://docs.openstack.org/ha-guide/controller-ha-haproxy.html#configuring-haproxy>
+  # "The Telemetry API service configuration does not have the option httpchk directive as it cannot process this check properly."
   echo "creating ${CEIL_haproxy_cfg} on each node..."
   >${tmp_cfg}
   cat <<-EOF >> ${tmp_cfg}
@@ -269,7 +280,7 @@ _ceil_haproxy_config() {
 	  bind ${NODES_VIP_ADDRS[0]}:${CEIL_api_port}
 	  balance  source
 	  option  tcpka
-	  option  httpchk
+	#  option  httpchk
 	  option  tcplog
 	EOF
   for idx in "${!NODES[@]}"; do
@@ -334,10 +345,13 @@ ceil-d() {
     ssh ${node} -- yum -y remove ${CEIL_install_pkgs}
   done
 
-  info "removing ceilometer config files..."
+  info "removing ceilometer config & log files..."
   for node in "${NODES[@]}"; do
     ssh ${node} -- rm -f ${CEIL_api_wsgi_conf}
-    ssh ${node} -- rm -rf $(dirname ${CEIL_api_wsgi_app})
+    ssh ${node} -- rm -rf ${CEIL_conf_dir}
+    ssh ${node} -- rm -rf ${CEIL_log_dir}
+    ssh ${node} -- rm -f ${CEIL_api_access_log}*
+    ssh ${node} -- rm -f ${CEIL_api_error_log}*
   done
 
   # reload httpd
@@ -357,7 +371,12 @@ ceil-d() {
 }
 
 ceil-t() {
-  info "testing ${CEIL_res_name}..."
+  info "testing ceilometer..."
+  ssh ${NODES[0]} -- . ~/admin_openrc \; ceilometer meter-list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; ceilometer sample-list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; ceilometer resource-list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; ceilometer event-list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; ceilometer capabilities
 
   # todo
 }

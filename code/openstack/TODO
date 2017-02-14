@@ -8,5 +8,42 @@
 issues:
 ------
 + openstack service list:
-  The request you have made requires authentication. (HTTP 401) (Request-ID: req-cd63c85b-41f0-4345-ab84-bd9e9eea2c8b)
-  resolved: url should be idential to registered url (at bootstrap).
+  - symptom: The request you have made requires authentication. (HTTP 401) (Request-ID: req-cd63c85b-41f0-4345-ab84-bd9e9eea2c8b)
+  - resolved: url should be idential to registered url (at bootstrap).
++ ceilometer-api
+  - symptom: haproxy webui shows backends failure
+  - resolved: don't add "option httpchk". <http://docs.openstack.org/ha-guide/controller-ha-haproxy.html#configuring-haproxy>
++ ceilometer-api: 1
+  - symptom: "ceilometer meter-list" return 500 internal server error.
+    trace in "/var/httpd/ceilometer_error.log": cannot register CLI option
+  - change uri to url in ceilometer.conf [service_credentials], error changes to:
+    Service Unavailable (HTTP 503) (Request-ID: req-0a15ba7b-9203-4923-872a-41c89ef7cb48)
+  - if remove authtoken middleware from pipeline (defined in api_paste.ini), the issue is gone.
+      so the problem is at keystone configuration.
+  - resolved: a typo in [keystone_authtoken] section: username, not user_name!
++ ceilometer-api: 2
+  - symptom: /var/log/ceilometer/api-wsgi.log: INFO ceilometer.api.controllers.v2.utils [-] No limit value provided, result set will be limited to 100.
+  - explanation: in [api] section of ceilometer.conf: #default_api_return_limit = 100
++ ceilometer-api: 3
+  - symptom: "ceilometer event-list/event-type-list" returns "Internal Server error (http 500)"
++ ceilometer-api: 4
+  - symptom: "ceilometer alarm-list" returns "Internal Server error (http 500)"
+  
++ ceilometer-central
+  - symptom: /var/log/ceilometer/central.log:
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager [-] Unable to discover resources: 'NoneType' object has no attribute 'get_access'
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager Traceback (most recent call last):
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/agent/manager.py", line 491, in discover
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager     self.keystone).get_endpoints(
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/keystone_client.py", line 41, in get_service_catalog
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager     return client.session.auth.get_access(client.session).service_catalog
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager AttributeError: 'NoneType' object has no attribute 'get_access'
+2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager
+2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
+2017-02-14 15:29:11.600 20122 ERROR ceilometer.agent.manager [-] Skipping images, keystone issue: An auth plugin is required to determine endpoint URL
++ ceilometer-collector
+  - symptom: /var/log/ceilometer/collector.log:
+    WARNING ceilometer.dispatcher [-] Failed to load any dispatchers for ceilometer.dispatcher.event
+  - related bug report: https://bugs.launchpad.net/oslo.config/+bug/1587315
+  - [DEFAULT] section in ceilometer.conf: #meter_dispatchers = database, #event_dispatchers =
+
