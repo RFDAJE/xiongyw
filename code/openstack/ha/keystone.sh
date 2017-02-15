@@ -13,9 +13,11 @@ KEYSTONE_bootstrap_pass="qwerty"
 KEYSTONE_bootstrap_role="admin"
 KEYSTONE_bootstrap_region="RegionOne"
 KEYSTONE_bootstrap_service="keystone"
-KEYSTONE_admin_uri="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
-KEYSTONE_internal_uri="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
-KEYSTONE_public_uri="http://${NODES_VIP_ADDRS[0]}:5000/v3/"
+KEYSTONE_admin_url="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
+KEYSTONE_internal_url="http://${NODES_VIP_ADDRS[1]}:35357/v3/"
+KEYSTONE_public_url="http://${NODES_VIP_ADDRS[0]}:5000/v3/"
+# http://adam.younglogic.com/2016/06/auth_uri-vs-auth_url/
+KEYSTONE_public_uri="http://${NODES_VIP_ADDRS[0]}:5000/"
 
 
 # the project name for other openstack services
@@ -164,9 +166,9 @@ _keystone_bootstrap () {
 	                          --bootstrap-project-name ${KEYSTONE_bootstrap_project} \
 	                          --bootstrap-role-name ${KEYSTONE_bootstrap_role} \
 	                          --bootstrap-service-name ${KEYSTONE_bootstrap_service} \
-	                          --bootstrap-admin-url    ${KEYSTONE_admin_uri} \
-	                          --bootstrap-internal-url ${KEYSTONE_internal_uri} \
-	                          --bootstrap-public-url   ${KEYSTONE_public_uri} \
+	                          --bootstrap-admin-url    ${KEYSTONE_admin_url} \
+	                          --bootstrap-internal-url ${KEYSTONE_internal_url} \
+	                          --bootstrap-public-url   ${KEYSTONE_public_url} \
 	                          --bootstrap-region-id    ${KEYSTONE_bootstrap_region}
 	EOF
   cat <<-EOF | ssh -T ${NODES[0]} --

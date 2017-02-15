@@ -119,7 +119,7 @@ _ceil_prepare_keystone() {
   info "preparing keystone..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	. ~/admin_openrc
-	echo "creating a user 'ceilometer'..."
+	echo "creating a user 'ceilometer' aka 'service credentials'..."
 	openstack user create ${CEIL_keystone_user} --domain ${KEYSTONE_domain_name} --password ${CEIL_keystone_pass}
 	openstack role add ${CEIL_keystone_role} --project ${CEIL_keystone_project} --user ${CEIL_keystone_user}
 
@@ -176,7 +176,7 @@ rabbit_ha_queues = true\n" ${conf}
 	# [keystone_authtoken] section
 	sed -i "/^\[keystone_authtoken/a\
 auth_uri = ${KEYSTONE_public_uri}\n\
-auth_url = ${KEYSTONE_internal_uri}\n\
+auth_url = ${KEYSTONE_internal_url}\n\
 memcached_servers = ${MEMCACHED_hosts}\n\
 auth_type = password\n\
 project_domain_name = ${KEYSTONE_domain_name}\n\
@@ -184,9 +184,9 @@ user_domain_name =  ${KEYSTONE_domain_name}\n\
 project_name = ${KEYSTONE_service_project}\n\
 username = ${CEIL_keystone_user}\n\
 password = ${CEIL_keystone_pass}\n" ${conf}
-	# [service_credentials] section
+	# [service_credentials]: credentials for accessing ceilometer service
 	sed -i "/^\[service_credentials/a\
-auth_url = ${KEYSTONE_public_uri}\n\
+auth_url = ${KEYSTONE_public_url}\n\
 project_domain_id = ${KEYSTONE_domain_id}\n\
 user_domain_id = ${KEYSTONE_domain_id}\n\
 project_name = ${KEYSTONE_service_project}\n\
