@@ -31,6 +31,9 @@ KEYSTONE_httpd_conf_dir="/etc/httpd"
 KEYSTONE_log_dir="/var/log/keystone"
 KEYSTONE_httpd_log_dir="/var/log/httpd"
 
+KEYSTONE_fernet_keys_dir="/etc/keystone/fernet-keys"
+KEYSTONE_credential_keys_dir="/etc/keystone/credential-keys"
+
 keystone() {
 
   echo "start keystone HA config..."
@@ -80,6 +83,7 @@ _keystone_install_n_config() {
   local script2="/tmp/keystone2.sh"
   local node=""
   local ips=""
+
   # on each node: install keystone/apache and config them
   for idx in "${!NODES[@]}"; do
     node=${NODES[$idx]}
@@ -95,9 +99,10 @@ _keystone_install_n_config() {
 			/^\[token/,/^#provider/s/^#provider.*$/provider = fernet/
 		}' /etc/keystone/keystone.conf
 
-		echo "initializing fernet key repository..."
-		keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
-		keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+		# note that fernet keys must be idential on all nodes of the cluster
+		#echo "initializing fernet key repository..."
+		#keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+		#keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 
 		echo "configuring apache..."
 		sed -i.bak "/^#ServerName.*/cServerName\ ${node}:80" /etc/httpd/conf/httpd.conf
@@ -131,6 +136,18 @@ _keystone_install_n_config() {
     # disable apache by default
     ssh ${node} -- systemctl stop httpd
     ssh ${node} -- systemctl disable httpd
+  done
+
+  info "preparing fernet-keys and credential-keys repository..."
+  ssh ${NODES[0]} -- keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+  ssh ${NODES[0]} -- keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+  scp -r ${NODES[0]}:${KEYSTONE_fernet_keys_dir} /tmp
+  scp -r ${NODES[0]}:${KEYSTONE_credential_keys_dir} /tmp
+  for node in "${NODES[@]:1}"; do
+    scp -r /tmp/${KEYSTONE_fernet_keys_dir##/*/} ${node}:/etc/keystone
+    scp -r /tmp/${KEYSTONE_credential_keys_dir##/*/} ${node}:/etc/keystone
+    ssh ${node} -- chown -R keystone:keystone ${KEYSTONE_fernet_keys_dir}
+    ssh ${node} -- chown -R keystone:keystone ${KEYSTONE_credential_keys_dir}
   done
 }
 
