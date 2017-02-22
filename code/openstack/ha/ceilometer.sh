@@ -134,9 +134,11 @@ _ceil_prepare_keystone() {
 # <http://docs.openstack.org/project-install-guide/telemetry/newton/install-base-rdo.html>
 _ceil_install_n_config() {
   local script="/tmp/ceil.sh"
+  local script2="/tmp/pipeline.sh"
   local conf="/etc/ceilometer/ceilometer.conf"
   local pipeline="/etc/ceilometer/pipeline.yaml"
 
+  
   info "installing ceilometer pkgs..."
   # note that the installation will install several systemd unit files
   # under /usr/lib/systemd/system/...which are disabled by default (suitable for pcmk)
@@ -153,6 +155,9 @@ _ceil_install_n_config() {
     ssh ${node} -- yum -y install ${CEIL_install_pkgs}
   done
 
+  ##################################################
+  # /etc/ceilometer/ceilometer.conf
+  ##################################################
   info "configuring ceilometer ${conf}..."
   for node in "${NODES[@]}"; do
     ssh ${node} -- cp ${conf} ${conf}.orig
@@ -207,11 +212,50 @@ udp_address = \n" ${conf}
 	EOF
   done
 
-  info "adding snmp source into ${pipeline}..."
-  for node in "${NODES[@]}"; do
-    # FIXME
-    #ssh ${node} -- sed -i -e "/^sources:/a\     - name: snmp_source\n      interval: 60\n      meters:\n          - "*"\n      resources:\n        - snmp://blahblah" ${pipeline}
+  ##################################################
+  # adding snmp resources into pipeline.yaml
+  ##################################################
+  # array of mgmt ip@, used in snmp resources
+  local ipms="" 
+  for idx in "${!NODES[@]}"; do
+    local ip=( ${NODES_IP_ADDRS[$idx]} )  # ip@ for each node
+    ipms[$idx]=${ip[1]}                   # the 2nd one is mgmt ip@
   done
+  #echo "${ipms[@]}"
+
+  # leading space in sed script: http://www.grymoire.com/Unix/Sed.html#uh-43
+  info "adding snmp sources into ${pipeline}..."
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- cat <<-'EOF' \>${script2}
+	#!/bin/bash
+	sed -i "/^sources:/a\
+	\    - name: snmp_source\n\
+	      interval: 120\n\
+	      meters:\n\
+	          - \"*\"\n\
+	      resources:\n\
+	EOF
+
+    # add snmp sources
+    for ip in "${ipms[@]}"; do
+      ssh ${node} -- cat <<-EOF \>\>${script2}
+	          - snmp://${ip}\n\\
+	EOF
+    done
+
+    # add sinks
+    ssh ${node} -- cat <<-EOF \>\>${script2}
+	      sinks:\n\\
+	          - meter-sink" ${pipeline}
+	EOF
+
+    ssh ${node} -- chmod +x ${script2} \; ${script2}
+
+  done
+
+  ##################################################
+  # ceilometer-api wsgi service
+  ##################################################
   
   info "configuring ceilometer-api service..."
   for idx in "${!NODES[@]}"; do

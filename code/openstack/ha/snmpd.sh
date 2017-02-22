@@ -30,7 +30,7 @@ snmpd() {
 
     info "configuring snmpd on ${node}..."
     ssh ${node} -- sed -i -e "/^access/s/systemview/all/" ${SNMPD_conf}
-    ssh ${node} -- set -x \; sed -i -e \"56 a view    all           included   .1\" ${SNMPD_conf}
+    ssh ${node} -- sed -i -e \"56 a view    all           included   .1\" ${SNMPD_conf}
 
     # snmpd service is disabled by default, so no need to turn it off
   done
