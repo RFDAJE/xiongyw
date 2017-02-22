@@ -11,7 +11,8 @@ issues:
 + openstack service list:
   - symptom: The request you have made requires authentication. (HTTP 401) (Request-ID: req-cd63c85b-41f0-4345-ab84-bd9e9eea2c8b)
   - resolved: url should be idential to registered url (at bootstrap).
-+ ceilometer-api
+
++ ceilometer-api: 0
   - symptom: haproxy webui shows backends failure
   - resolved: don't add "option httpchk". <http://docs.openstack.org/ha-guide/controller-ha-haproxy.html#configuring-haproxy>
 + ceilometer-api: 1
@@ -30,22 +31,29 @@ issues:
 + ceilometer-api: 4
   - symptom: "ceilometer alarm-list" returns "Internal Server error (http 500)"
 
-+ ceo;p,eter-central 1
++ ceilometer-central: 1
   - symptom: /var/log/ceilometer/central.log:
-    Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL  
-+ ceilometer-central
+    2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
+    2017-02-14 15:29:11.600 20122 ERROR ceilometer.agent.manager [-] Skipping images, keystone issue: An auth plugin is required to determine endpoint URL
+  - hint: ceilometer/agent/manager.py:507, ka_exceptions.ClientException
+  - resolved:
++ ceilometer-central: 2
   - symptom: /var/log/ceilometer/central.log:
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager [-] Unable to discover resources: 'NoneType' object has no attribute 'get_access'
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager Traceback (most recent call last):
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/agent/manager.py", line 491, in discover
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager     self.keystone).get_endpoints(
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/keystone_client.py", line 41, in get_service_catalog
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager     return client.session.auth.get_access(client.session).service_catalog
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager AttributeError: 'NoneType' object has no attribute 'get_access'
-2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager
-2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
-2017-02-14 15:29:11.600 20122 ERROR ceilometer.agent.manager [-] Skipping images, keystone issue: An auth plugin is required to determine endpoint URL
-
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager [-] Unable to discover resources: 'NoneType' object has no attribute 'get_access'
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager Traceback (most recent call last):
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/agent/manager.py", line 491, in discover
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager     self.keystone).get_endpoints(
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager   File "/usr/lib/python2.7/site-packages/ceilometer/keystone_client.py", line 41, in get_service_catalog
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager     return client.session.auth.get_access(client.session).service_catalog
+    2017-02-22 18:57:26.738 20565 ERROR ceilometer.agent.manager AttributeError: 'NoneType' object has no attribute 'get_access'
+  - resolution:
++ ceilometer-central: 3
+  - symptotm: /var/log/ceilometer/central.log:
+    2017-02-22 18:57:26.814 20565 WARNING stevedore.named [-] Could not load snmp
+    2017-02-22 18:57:26.815 20565 WARNING ceilometer.agent.manager [-] Continue after error from switch.port.receive.packets: No 'network.statistics.drivers' driver found, looking for 'snmp'
+  - resolution:
+  - reference: http://www.cnblogs.com/linyihan/p/5804745.html
+  
 + ceilometer-collector
   - symptom: /var/log/ceilometer/collector.log:
     WARNING ceilometer.dispatcher [-] Failed to load any dispatchers for ceilometer.dispatcher.event

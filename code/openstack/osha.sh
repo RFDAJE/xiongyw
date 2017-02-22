@@ -31,9 +31,9 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/xiamen.sh
 
 #settings_home
-#settings_wukuang
+settings_wukuang
 #settings_xiamen
-settings_ehualu
+#settings_ehualu
 #                                                      #
 #                                                      #
 ########################################################

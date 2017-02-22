@@ -246,7 +246,7 @@ udp_address = \n" ${conf}
     # add sinks
     ssh ${node} -- cat <<-EOF \>\>${script2}
 	      sinks:\n\\
-	          - meter-sink" ${pipeline}
+	          - meter_sink" ${pipeline}
 	EOF
 
     ssh ${node} -- chmod +x ${script2} \; ${script2}

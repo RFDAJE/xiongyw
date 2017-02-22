@@ -79,7 +79,7 @@ rabbitmq() {
 	EOF
 
   echo -n "Waiting rabbitmq-master resource up-running..."
-  sleep 30;
+  sleep 60;
   
 
   # set ha policy to ha-all
@@ -152,6 +152,8 @@ SKIP
 # delete rabbitmq resource completely
 rabbitmq-d() {
   echo "removing rabbitmq HA config..."
+
+  dep_delete_check ${RABBITMQ_res_name}
 
   echo "deleting resource ${RABBITMQ_res_name}..."
   ssh ${NODES[0]} -- pcs resource delete ${RABBITMQ_res_name}
