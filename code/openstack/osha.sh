@@ -28,9 +28,11 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/home.sh
 . $SCRIPTPATH/settings/wukuang.sh
 . $SCRIPTPATH/settings/ehualu.sh
+. $SCRIPTPATH/settings/xiamen.sh
 
 #settings_home
 #settings_wukuang
+#settings_xiamen
 settings_ehualu
 #                                                      #
 #                                                      #
@@ -60,6 +62,7 @@ settings_ehualu
 . $SCRIPTPATH/ha/vip.sh
 . $SCRIPTPATH/ha/haproxy.sh
 . $SCRIPTPATH/ha/keystone.sh
+. $SCRIPTPATH/ha/snmpd.sh
 . $SCRIPTPATH/ha/ceilometer.sh
 . $SCRIPTPATH/ha/horizon.sh
 # dependency & constraint
@@ -71,7 +74,7 @@ usage() {
   cat <<-EOF
 	usage: # $(basename $0) (tools|host|guests[-d]|pxeks|boot|reboot|reboot-vm|poweroff
 	                  |post[-t]|pacemaker[-d]|cluster-status|cluster-stop|cluster-start
-	                  |vip|haproxy|chronyd|memcached|rabbitmq|mongod|mariadb|keystone|ceilometer|aodh)
+	                  |vip|haproxy|chronyd|memcached|rabbitmq|mongod|mariadb|keystone|snmpd|ceilometer|aodh)
 
 	  - tools: prepare yum local mirrors and install/config httpd/dnsmasq services on the TOOLS box
 	  - host: kvm only. prepare a HOST box as a kvm host (install pkgs and config bridges/iptables)
@@ -97,6 +100,7 @@ usage() {
 	  - mongod:
 	  - mariadb:
 	  - keystone:
+	  - snmpd:
 	  - ceilometer:
 	  - aodh:
 	EOF
@@ -187,6 +191,8 @@ main () {
       haproxy | haproxy-[dtr])
         $1 ;;
       keystone | keystone-[dtr])
+        $1 ;;
+      snmpd | snmpd-[dtr])
         $1 ;;
       ceil | ceil-[dtr])
         $1 ;;

@@ -135,7 +135,8 @@ _ceil_prepare_keystone() {
 _ceil_install_n_config() {
   local script="/tmp/ceil.sh"
   local conf="/etc/ceilometer/ceilometer.conf"
-  
+  local pipeline="/etc/ceilometer/pipeline.yaml"
+
   info "installing ceilometer pkgs..."
   # note that the installation will install several systemd unit files
   # under /usr/lib/systemd/system/...which are disabled by default (suitable for pcmk)
@@ -206,6 +207,12 @@ udp_address = \n" ${conf}
 	EOF
   done
 
+  info "adding snmp source into ${pipeline}..."
+  for node in "${NODES[@]}"; do
+    # FIXME
+    #ssh ${node} -- sed -i -e "/^sources:/a\     - name: snmp_source\n      interval: 60\n      meters:\n          - "*"\n      resources:\n        - snmp://blahblah" ${pipeline}
+  done
+  
   info "configuring ceilometer-api service..."
   for idx in "${!NODES[@]}"; do
     local node=${NODES[$idx]}
@@ -254,7 +261,7 @@ _ceil_create_pcmk_resources() {
   ssh ${NODES[0]} -- pcs resource create ${CEIL_collector_res_name} systemd:openstack-ceilometer-collector
 
   # polling agent service
-  ssh ${NODES[0]} -- pcs resource create ${CEIL_polling_res_name} systemd:openstack-ceilometer-polling
+  #ssh ${NODES[0]} -- pcs resource create ${CEIL_polling_res_name} systemd:openstack-ceilometer-polling
 
   # central agent service
   ssh ${NODES[0]} -- pcs resource create ${CEIL_central_res_name} systemd:openstack-ceilometer-central
@@ -262,7 +269,6 @@ _ceil_create_pcmk_resources() {
   # ipmi agent service: FIXME: should it be a clone?
   ssh ${NODES[0]} -- pcs resource create ${CEIL_ipmi_res_name} systemd:openstack-ceilometer-ipmi
 
-  # FIXME: some of the service should be seprated on different nodes in the cluster...
 }
 
 _ceil_haproxy_config() {

@@ -33,6 +33,7 @@ _keystone_deps=( ${KEYSTONE_res_name} \
                  ${HAPROXY_res_name} )
 # ceilometer requires mariadb/rabbitmq and keystone
 _ceil_deps=( ${CEIL_res_name} \
+             ${SNMPD_res_name} \
              ${MARIADB_res_name} \
              ${HAPROXY_res_name} \
              ${MEMCACHED_res_name} \

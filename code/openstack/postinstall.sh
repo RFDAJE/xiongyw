@@ -30,7 +30,7 @@ postinstall-t() {
     if [[ $? = 0 ]]; then
       echo "ping success!"
     else
-      echo "ERROR: ping fail!"
+      error "ERROR: ping fail!"
       exit 1
     fi
 
@@ -38,7 +38,7 @@ postinstall-t() {
     echo "checking firewalld..."
     ssh ${node} -- systemctl status firewalld \| grep inactive
     if [[ $? != 0 ]]; then
-      echo "ERROR: firealld is not disabled on ${node}!"
+      error "firealld is not disabled on ${node}!"
       exit 1
     fi
 
@@ -46,7 +46,7 @@ postinstall-t() {
     echo "checking selinux..."
     ssh ${node} -- getenforce \| grep Disabled
     if [[ $? != 0 ]]; then
-      echo "ERROR: selinux is not disabled on ${node}!"
+      error "selinux is not disabled on ${node}!"
       exit 1
     fi
         
@@ -57,7 +57,7 @@ postinstall-t() {
       # iptables is installed, check further
       ssh ${node} -- systemctl status iptables \| grep inactive
       if [[ $? != 0 ]]; then
-        echo "ERROR: iptables is not disabled on ${node}!"
+        error "iptables is not disabled on ${node}!"
         exit 1
       fi
     fi
@@ -67,7 +67,7 @@ postinstall-t() {
 	timedatectl | grep "NTP enabled: yes"
 	EOF
     if [[ $? != 0 ]]; then
-      echo "ERROR: NTP is not enabled on ${node}! correct this by: timedatectl set-ntp 1"
+      error "NTP is not enabled on ${node}! correct this by: timedatectl set-ntp 1"
       exit 1
     fi
     
@@ -75,7 +75,7 @@ postinstall-t() {
 	timedatectl | grep "RTC in local TZ: no"
 	EOF
     if [[ $? != 0 ]]; then
-      echo "ERROR: RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
+      error "RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
       exit 1
     fi
   done

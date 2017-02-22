@@ -4,6 +4,7 @@
 - mongod: web ui; replica set details; mongo shell; access control
 - haproxy on host
 - stonith
+- config keystone to use MQ for sending notification (to be captured by ceilometer).
 
 issues:
 ------
@@ -28,7 +29,10 @@ issues:
   - symptom: "ceilometer event-list/event-type-list" returns "Internal Server error (http 500)"
 + ceilometer-api: 4
   - symptom: "ceilometer alarm-list" returns "Internal Server error (http 500)"
-  
+
++ ceo;p,eter-central 1
+  - symptom: /var/log/ceilometer/central.log:
+    Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL  
 + ceilometer-central
   - symptom: /var/log/ceilometer/central.log:
 2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager [-] Unable to discover resources: 'NoneType' object has no attribute 'get_access'
@@ -41,6 +45,7 @@ issues:
 2017-02-14 15:29:11.597 20122 ERROR ceilometer.agent.manager
 2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
 2017-02-14 15:29:11.600 20122 ERROR ceilometer.agent.manager [-] Skipping images, keystone issue: An auth plugin is required to determine endpoint URL
+
 + ceilometer-collector
   - symptom: /var/log/ceilometer/collector.log:
     WARNING ceilometer.dispatcher [-] Failed to load any dispatchers for ceilometer.dispatcher.event
