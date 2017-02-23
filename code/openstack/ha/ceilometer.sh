@@ -17,7 +17,6 @@ CEIL_notification_res_name="ceilometer-notification"
 CEIL_collector_res_name="ceilometer-collector"
 CEIL_polling_res_name="ceilometer-polling"
 CEIL_central_res_name="ceilometer-central"
-# FIXME: should ipmi service a clone resource?
 CEIL_ipmi_res_name="ceilometer-ipmi"
 CEIL_res_name=${CEIL_collector_res_name}
 
@@ -216,11 +215,11 @@ udp_address = \n" ${conf}
   # adding snmp resources into pipeline.yaml
   ##################################################
   # array of mgmt ip@, used in snmp resources
-  local ipms="" 
-  for idx in "${!NODES[@]}"; do
-    local ip=( ${NODES_IP_ADDRS[$idx]} )  # ip@ for each node
-    ipms[$idx]=${ip[1]}                   # the 2nd one is mgmt ip@
-  done
+  #local ipms="" 
+  #for idx in "${!NODES[@]}"; do
+  #  local ip=( ${NODES_IP_ADDRS[$idx]} )  # ip@ for each node
+  #  ipms[$idx]=${ip[1]}                   # the 2nd one is mgmt ip@
+  #done
   #echo "${ipms[@]}"
 
   # leading space in sed script: http://www.grymoire.com/Unix/Sed.html#uh-43
@@ -237,7 +236,8 @@ udp_address = \n" ${conf}
 	EOF
 
     # add snmp sources
-    for ip in "${ipms[@]}"; do
+    #for ip in "${ipms[@]}"; do
+    for ip in "${SNMP_IP_LIST[@]}"; do
       ssh ${node} -- cat <<-EOF \>\>${script2}
 	          - snmp://${ip}\n\\
 	EOF
@@ -310,8 +310,8 @@ _ceil_create_pcmk_resources() {
   # central agent service
   ssh ${NODES[0]} -- pcs resource create ${CEIL_central_res_name} systemd:openstack-ceilometer-central
 
-  # ipmi agent service: FIXME: should it be a clone?
-  ssh ${NODES[0]} -- pcs resource create ${CEIL_ipmi_res_name} systemd:openstack-ceilometer-ipmi
+  # ipmi agent service (to be run on each ipmi-capable host): 
+  #ssh ${NODES[0]} -- pcs resource create ${CEIL_ipmi_res_name} systemd:openstack-ceilometer-ipmi
 
 }
 
@@ -358,9 +358,9 @@ ceil-d() {
   # remove pcmk resources
   ssh ${NODES[0]} -- pcs resource delete ${CEIL_notification_res_name}
   ssh ${NODES[0]} -- pcs resource delete ${CEIL_collector_res_name}
-  ssh ${NODES[0]} -- pcs resource delete ${CEIL_polling_res_name}
+  #ssh ${NODES[0]} -- pcs resource delete ${CEIL_polling_res_name}
   ssh ${NODES[0]} -- pcs resource delete ${CEIL_central_res_name}
-  ssh ${NODES[0]} -- pcs resource delete ${CEIL_ipmi_res_name}
+  #ssh ${NODES[0]} -- pcs resource delete ${CEIL_ipmi_res_name}
 
   info "removing mongodb database ceilometer..."
   # https://docs.mongodb.com/manual/reference/command/dropDatabase/

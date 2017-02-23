@@ -93,6 +93,13 @@ settings_wukuang() {
     NODES_VIP_ADDRS=( "192.168.120.95" "10.0.1.50" )
     NODES_VIP_MASKS=( "23" "24" )
 
+    # for ceilometer to poll snmp info from all hosts/switches applicable
+    SNMP_IP_LIST=( "10.0.1.51" \
+                   "10.0.1.52" \
+                   "10.0.1.53" )
+    # for ceilometer to poll ipmi info from all applicable hosts
+    IPMI_IP_LIST=( "TODO" )
+
     # the local directory for storing repos
     TOOLS_MIRRORS_ROOT="/mirrors"
     # the source site from where to rsync

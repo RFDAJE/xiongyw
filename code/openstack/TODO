@@ -28,9 +28,27 @@ issues:
   - explanation: in [api] section of ceilometer.conf: #default_api_return_limit = 100
 + ceilometer-api: 3
   - symptom: "ceilometer event-list/event-type-list" returns "Internal Server error (http 500)"
+  - log: /var/log/httpd/ceilometer_error.log
+    mod_wsgi (pid=14970): Exception occurred processing WSGI script '/usr/lib/python2.7/site-packages/ceilometer/api/app.wsgi'.
+    Traceback (most recent call last):
+    ...
+    File "/usr/lib/python2.7/site-packages/ceilometer/api/controllers/v2/root.py", line 178, in panko_url
+      keystone_client.get_client())
+    File "/usr/lib/python2.7/site-packages/ceilometer/keystone_client.py", line 41, in get_service_catalog
+      return client.session.auth.get_access(client.session).service_catalog
+    AttributeError: 'NoneType' object has no attribute 'get_access'
+  - guess: keystone_client.get_client() return None, in panko_url().
+  - 
 + ceilometer-api: 4
   - symptom: "ceilometer alarm-list" returns "Internal Server error (http 500)"
 
++ ceilometer-api: 5
+  - one 'sample-create' command ends up with 2 records in mongodb:
+    $ ceilometer sample-create -r 37128ad6-daaa-4d22-9509-b7e1c6b08697 -m my-meter-name --meter-type gauge --meter-unit MB --sample-volume 48
+    db.getCollection('meter').find({counter_name:"my-meter-name"})
+  - hint:
+  - reason:
+  
 + ceilometer-central: 1
   - symptom: /var/log/ceilometer/central.log:
     2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
@@ -53,7 +71,14 @@ issues:
     2017-02-22 18:57:26.815 20565 WARNING ceilometer.agent.manager [-] Continue after error from switch.port.receive.packets: No 'network.statistics.drivers' driver found, looking for 'snmp'
   - resolution:
   - reference: http://www.cnblogs.com/linyihan/p/5804745.html
-  
+
++ ceilometer-ipmi: 1
+  - symptom: a log of error msgs in /var/log/ceilometer/agent-ipmi.log:
+    ERROR cotyledon EmptyPollstersList: No valid pollsters can be loaded with the startup parameters polling-namespaces and pollster-list.
+    ERROR ceilometer.agent.manager ExtensionLoadError: [Errno 2] No such file or directory
+  - hints: http://superuser.openstack.org/articles/ceilometer-full-stack-monitoring-for-openstack/
+    it's moved into ironic code base? To collect IPMI data OpenStack deployments require the Ironic Conductor. It will push IPMI monitoring data to Ceilometer on the notification bus. This data is not in the format that Ceilometer requires. The Ceilometer notification handler intercepts this data and stores it in the Ceilometer Storage DB. The Ceilometer IPMI Inspector periodically checks the Ceilometer Storage DB and converts the format from the Ironic message format to the Ceilometer format.
+        
 + ceilometer-collector
   - symptom: /var/log/ceilometer/collector.log:
     WARNING ceilometer.dispatcher [-] Failed to load any dispatchers for ceilometer.dispatcher.event

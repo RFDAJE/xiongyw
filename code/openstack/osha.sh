@@ -31,9 +31,9 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/xiamen.sh
 
 #settings_home
-settings_wukuang
+#settings_wukuang
 #settings_xiamen
-#settings_ehualu
+settings_ehualu
 #                                                      #
 #                                                      #
 ########################################################
@@ -73,8 +73,8 @@ settings_wukuang
 usage() {
   cat <<-EOF
 	usage: # $(basename $0) (tools|host|guests[-d]|pxeks|boot|reboot|reboot-vm|poweroff
-	                  |post[-t]|pacemaker[-d]|cluster-status|cluster-stop|cluster-start
-	                  |vip|haproxy|chronyd|memcached|rabbitmq|mongod|mariadb|keystone|snmpd|ceilometer|aodh)
+	                  |post[-t]|pacemaker[-d]|pcs
+	                  |vip|haproxy|chronyd|memcached|rabbitmq|mongod|mariadb|keystone|snmpd|ceil|aodh)
 
 	  - tools: prepare yum local mirrors and install/config httpd/dnsmasq services on the TOOLS box
 	  - host: kvm only. prepare a HOST box as a kvm host (install pkgs and config bridges/iptables)
@@ -86,9 +86,7 @@ usage() {
 	  - reboot: just reboot all nodes, using "ssh <node> -- reboot"
 	  - reboot-vm: reboot all nodes, using "virsh reboot <domain>"
 	  - pacemaker: install pacemaker and setup/start cluster
-	  - cluster-status: pcs status
-	  - cluster-stop: stop cluster
-	  - cluster-start: start cluster (required manual start after reboot all nodes)
+	  - pcs: all pcs commands, including cluster-start, cluster-stop, status, etc
 
 	  the following are openstack related ha services, most of them support delete and test, by suffix
 	  with '-d' and '-t' respectively; some also support reinstall, by suffixing a '-r'.
@@ -101,7 +99,7 @@ usage() {
 	  - mariadb:
 	  - keystone:
 	  - snmpd:
-	  - ceilometer:
+	  - ceil:
 	  - aodh:
 	EOF
 }
@@ -118,7 +116,7 @@ main () {
       exit 1;
     fi
 
-    if [[ $# != 1 ]]; then
+    if [[ $# < 1 ]]; then
        usage
        exit 1;
     fi
@@ -169,12 +167,13 @@ main () {
         postinstall-t ;;
       pacemaker | pacemaker-[d])
         $1 ;;
-      cluster-status)
-        ssh ${NODES[0]} -- pcs status ;;
-      cluster-stop)
-        ssh ${NODES[0]} -- pcs cluster stop --all ;;
-      cluster-start)
-        ssh ${NODES[0]} -- pcs cluster start --all ;;
+      pcs)
+        ssh ${NODES[0]} -- $* ;;
+      ${NODES[0]} | ${NODES[1]} | ${NODES[2]})
+        node=$1
+        shift
+        ssh ${node} -- $*
+        ;;
     ###############################################
       chronyd | chronyd-[dt])
         $1 ;;
@@ -198,6 +197,12 @@ main () {
         $1 ;;
       aodh | aodh-[dt])
         $1 ;;
+    ###############################################
+      openstack)
+        ssh ${NODES[0]} -- . admin_openrc \; $*;;
+      ceilometer)
+        ssh ${NODES[0]} -- . admin_openrc \; $*;;
+    ###############################################
       *)
         echo "error: unsupported service '$1'"
         usage
@@ -205,4 +210,4 @@ main () {
     esac
 }
 
-main $1
+main $*

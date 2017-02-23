@@ -183,7 +183,15 @@ rabbitmq-r() {
 # testing rabbitmq ha
 rabbitmq-t() {
   ssh ${NODES[0]} -- rabbitmqctl cluster_status
-  ssh ${NODES[0]} -- rabbitmqctl list_users
+
+  cat <<-'EOF' | ssh -T ${NODES[0]} --
+	rabbitmqctl list_users | grep openstack
+	EOF
+  if [[ $? != 0 ]]; then
+    error "rabbitmq user 'openstack does not exist! Fix this before proceeding..."
+    exit 1
+  fi
+  
   ssh ${NODES[0]} -- rabbitmqctl list_policies
   ssh ${NODES[0]} -- pcs resource show ${RABBITMQ_res_name}
 }
