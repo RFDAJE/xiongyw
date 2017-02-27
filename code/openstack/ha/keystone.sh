@@ -19,6 +19,7 @@ KEYSTONE_public_url="http://${NODES_VIP_ADDRS[0]}:5000/v3/"
 # http://adam.younglogic.com/2016/06/auth_uri-vs-auth_url/
 KEYSTONE_public_uri="http://${NODES_VIP_ADDRS[0]}:5000/"
 
+KEYSTONE_sqlalchemy_connection="mysql+pymysql://keystone:qwerty@${NODES_VIP_ADDRS[1]}/keystone"
 
 # the project name for other openstack services
 KEYSTONE_service_project="service"
@@ -95,7 +96,7 @@ _keystone_install_n_config() {
 		echo "configuring keystone..."
 		# config keystone;  keystone does not rely on rabbitmq, so we omit that part.
 		sed -i.bak '{
-			/^\[database/,/^#connection/s|^#connection.*$|connection = mysql+pymysql://keystone:qwerty@${NODES_VIP_ADDRS[1]}/keystone|
+			/^\[database/,/^#connection/s|^#connection.*$|connection = ${KEYSTONE_sqlalchemy_connection}|
 			/^\[token/,/^#provider/s/^#provider.*$/provider = fernet/
 		}' /etc/keystone/keystone.conf
 

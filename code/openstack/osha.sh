@@ -64,7 +64,9 @@ settings_ehualu
 . $SCRIPTPATH/ha/keystone.sh
 . $SCRIPTPATH/ha/snmpd.sh
 . $SCRIPTPATH/ha/ceilometer.sh
+. $SCRIPTPATH/ha/aodh.sh
 . $SCRIPTPATH/ha/horizon.sh
+
 # dependency & constraint
 . $SCRIPTPATH/ha/dependency.sh
 . $SCRIPTPATH/ha/constraint.sh
@@ -87,6 +89,8 @@ usage() {
 	  - reboot-vm: reboot all nodes, using "virsh reboot <domain>"
 	  - pacemaker: install pacemaker and setup/start cluster
 	  - pcs: all pcs commands, including cluster-start, cluster-stop, status, etc
+	  - openstack: all openstack commands
+	  - ceilomter: all ceilometer commands
 
 	  the following are openstack related ha services, most of them support delete and test, by suffix
 	  with '-d' and '-t' respectively; some also support reinstall, by suffixing a '-r'.

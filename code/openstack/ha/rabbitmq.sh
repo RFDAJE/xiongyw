@@ -17,6 +17,11 @@ RABBITMQ_hosts="${RABBITMQ_hosts// /,}"
 # user/pass
 RABBITMQ_user="openstack"
 RABBITMQ_pass="qwerty"
+# https://docs.openstack.org/developer/oslo.messaging/transport.html
+# "rabbit://user:pass@c1,user:pass@c2,user:pass@c3"
+RABBITMQ_host_n_port=(${NODES[@]/%/${MGMT_SUFFIX}:${RABBITMQ_port}})
+RABBITMQ_host_n_port_user_pass=${RABBITMQ_host_n_port[@]/#/${RABBITMQ_user}:${RABBITMQ_pass}@}
+RABBITMQ_transport_url="rabbit://${RABBITMQ_host_n_port_user_pass// /,}"
 
 # https://www.rabbitmq.com/man/rabbitmq-env.conf.5.man.html
 #RABBITMQ_env_conf="/etc/rabbitmq/rabbitmq-env.conf"

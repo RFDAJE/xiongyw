@@ -7,9 +7,9 @@
 # - notification agent: only active on one node
 # - collector: only active on one node
 # - polling: only active on one node
-# - central agent: only active on one node (fixme: what's the relation betw polling and central/ipmi/compute)
-# - ipmi agent: note that impi is supposed to run on every node supporting ipmi
-# - compute agent: to run on compute node, for effectiveness.
+# - central agent: only active on one node
+# - ipmi agent: note that impi is supposed to run on every node supporting ipmi; requires ironic
+# - compute agent: to run on compute node.
 #
 # as api service uses the same apache httpd server (the same as keystone), we choose
 # collector resource as the representation for all ceilometer services.
@@ -29,6 +29,7 @@ CEIL_keystone_role=${KEYSTONE_bootstrap_role}
 CEIL_service_name="ceilometer"
 CEIL_service_type="metering"
 CEIL_service_region=${KEYSTONE_bootstrap_region}
+CEIL_service_description="Telemetry"
 
 # mongo mongodb://ceilometer:qwerty@c1m:27017,c2m:27017,c3m:27017/ceilometer?replicaSet=rs0
 # note that if omit the db name, mongo shell will report errors.
@@ -118,12 +119,16 @@ _ceil_prepare_keystone() {
   info "preparing keystone..."
   cat <<-EOF | ssh -T ${NODES[0]} --
 	. ~/admin_openrc
-	echo "creating a user 'ceilometer' aka 'service credentials'..."
+	echo "creating a user/role aka 'service credentials' for ceilometer..."
 	openstack user create ${CEIL_keystone_user} --domain ${KEYSTONE_domain_name} --password ${CEIL_keystone_pass}
 	openstack role add ${CEIL_keystone_role} --project ${CEIL_keystone_project} --user ${CEIL_keystone_user}
 
 	echo "registering endpoints provided by ceilometer..."
-	openstack service create --name ${CEIL_service_name} --description "Telemetry" ${CEIL_service_type}
+
+	# create service entry
+	openstack service create --name ${CEIL_service_name} --description ${CEIL_service_description} ${CEIL_service_type}
+
+	# register endpoints
 	openstack endpoint create --region ${CEIL_service_region} ${CEIL_service_type} public   ${CEIL_public_uri}
 	openstack endpoint create --region ${CEIL_service_region} ${CEIL_service_type} internal ${CEIL_internal_uri}
 	openstack endpoint create --region ${CEIL_service_region} ${CEIL_service_type} admin    ${CEIL_admin_uri}
@@ -408,7 +413,6 @@ ceil-d() {
   for node in "${NODES[@]}"; do
     ssh ${node} -- systemctl reload httpd
   done
-
 
   # remove haproxy cfg file
   echo "removing ${CEIL_haproxy_cfg}..."
