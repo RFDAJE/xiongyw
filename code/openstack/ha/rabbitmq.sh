@@ -8,9 +8,17 @@ RABBITMQ_res_name="rabbitmq-master"
 RABBITMQ_res_name_short=${RABBITMQ_res_name%-master}
 # cookie path
 RABBITMQ_erlang_cookie="/var/lib/rabbitmq/.erlang.cookie"
+# main config file
+RABBITMQ_config="/etc/rabbitmq/rabbitmq.config"
+RABBITMQ_env_conf="/etc/rabbitmq/rabbitmq-env.conf"
 # haproxy config file for rabbitmq mirror
 RABBITMQ_haproxy_cfg="/etc/haproxy/rabbitmq.cfg"
+# mq service port
 RABBITMQ_port="5672"
+# web-ui port
+RABBITMQ_mgmt_port="15672"
+# erlang inter-node and CLI tools communication
+RABBITMQ_dist_port="25672"
 # for oslo.messaging config, <http://docs.openstack.org/ha-guide/shared-messaging.html>
 RABBITMQ_hosts="${NODES[@]/%/${MGMT_SUFFIX}:${RABBITMQ_port}}"
 RABBITMQ_hosts="${RABBITMQ_hosts// /,}"
@@ -29,6 +37,7 @@ RABBITMQ_transport_url="rabbit://${RABBITMQ_host_n_port_user_pass// /,}"
 rabbitmq() {
   local tmp_file="/tmp/.erlang.cookie"
   local cookie=""
+  local script="/tmp/rabbit.sh"
 
   info "start rabbitmq HA install & config..."
 
@@ -40,7 +49,10 @@ rabbitmq() {
   fi
 
   # install packages on each node
-  for node in "${NODES[@]}"; do
+  for idx in "${!NODES[@]}"; do
+    local node=${NODES[$idx]}
+    local ips=( ${NODES_IP_ADDRS[$idx]} )
+    
     info "installing rabbitmq packages on ${node}..."
     ssh ${node} -- yum -y install rabbitmq-server rabbitmq-java-client librabbitmq librabbitmq-tools
     #echo "configuring node name..."
@@ -51,6 +63,23 @@ rabbitmq() {
     ssh ${node} -- rabbitmq-plugins enable rabbitmq_management
     ssh ${node} -- systemctl stop rabbitmq-server
     ssh ${node} -- systemctl disable rabbitmq-server
+
+    echo "configuring rabbitmq..."
+    # this is to let mgmt web-ui to bind to a single ip@, otherwise haproxy won't bind to the same port
+    # ref: http://serverfault.com/questions/235669/how-do-i-make-rabbitmq-listen-only-to-localhost
+    cat <<-EOF | ssh -T ${node} --
+	  sed -i -e "/rabbitmq_management/,/^$/{
+	    /^$/i    {listener, [{port, ${RABBITMQ_mgmt_port}}, {ip, \"${ips[1]}\"}]}
+	  }" ${RABBITMQ_config}
+	EOF
+    # let mq service only bind to mgmt ip@, otherwise haproxy won't be able to bind to the same port
+    # https://www.rabbitmq.com/configure.html
+    ssh ${node} -- cat <<-EOF \>\> ${RABBITMQ_env_conf}
+	NODE_IP_ADDRESS="${ips[1]}"
+	NODE_PORT=${RABBITMQ_port}
+	NODENAME=rabbit@${node}${MGMT_SUFFIX}
+	#ERL_EPMD_ADDRESS="${ips[1]}"
+	EOF
   done
 
   info "preparing erlang cookie for all NODES..."
@@ -158,7 +187,9 @@ SKIP
 rabbitmq-d() {
   echo "removing rabbitmq HA config..."
 
-  dep_delete_check ${RABBITMQ_res_name}
+  if [[ $1 != "nocheck" ]]; then
+    dep_delete_check ${RABBITMQ_res_name}
+  fi
 
   echo "deleting resource ${RABBITMQ_res_name}..."
   ssh ${NODES[0]} -- pcs resource delete ${RABBITMQ_res_name}
@@ -181,7 +212,7 @@ rabbitmq-d() {
 
 # reinstall
 rabbitmq-r() {
-  rabbitmq-d
+  rabbitmq-d "nocheck"
   rabbitmq
 }
 

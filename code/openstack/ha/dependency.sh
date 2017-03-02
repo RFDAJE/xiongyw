@@ -39,6 +39,14 @@ _ceil_deps=( ${CEIL_res_name} \
              ${MEMCACHED_res_name} \
              ${RABBITMQ_res_name} \
              ${KEYSTONE_res_name} )
+
+_aodh_deps=( ${AODH_res_name} \
+             ${MARIADB_res_name} \
+             ${HAPROXY_res_name} \
+             ${RABBITMQ_res_name} \
+             ${KEYSTONE_res_name} \
+             ${CEIL_res_name} )
+             
 _horizon_deps=( ${HORIZON_res_name} \
                 ${MARIADB_res_name} \
                 ${HAPROXY_res_name} \
@@ -54,7 +62,8 @@ _all_deps=( "${_chronyd_deps[*]}" \
             "${_mariadb_deps[*]}" \
             "${_keystone_deps[*]}" \
             "${_ceil_deps[*]}" \
-            "${_horizon_deps[*]}" )
+            "${_horizon_deps[*]}" \
+            "${_aodh_deps[*]}" )
 #########################################################
 
 

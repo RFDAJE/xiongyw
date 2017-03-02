@@ -8,17 +8,16 @@
 # note that aodh HA contains several Pacemaker resources:
 # - api: clone, wsgi under apache, then under haproxy
 # - evaluator: only active on one node
-# - listener: only active on one node
 # - notifier: only active on one node
+# - listener: only active on one node
 # - expirer: only active on one node
-
-
+AODH_api_res_name=${KEYSTONE_res_name}
+AODH_evaluator_res_name="aodh-evaluator"
+AODH_notifier_res_name="aodh-notifier"
+AODH_listener_res_name="aodh-listener"
+AODH_expirer_res_name="aodh-expirer"
 # as api service uses the same apache httpd server (the same as keystone), we choose
 # evaluator resource as the representation for all aodh services.
-AODH_evaluator_res_name="aodh-evaluator"
-AODH_listener_res_name="aodh-listener"
-AODH_notifier_res_name="aodh-notifier"
-AODH_expirer_res_name="aodh-expirer"
 AODH_res_name=${AODH_evaluator_res_name}
 
 AODH_mariadb_user="aodh"
@@ -245,6 +244,20 @@ _aodh_create_pcmk_resources() {
   for node in "${NODES[@]}"; do
     ssh ${node} -- systemctl reload httpd
   done
+
+  # evaluator service
+  ssh ${NODES[0]} -- pcs resource create ${AODH_evaluator_res_name} systemd:openstack-aodh-evaluator
+
+  # notifier service
+  ssh ${NODES[0]} -- pcs resource create ${AODH_notifier_res_name} systemd:openstack-aodh-notifier
+
+  # listener service
+  # event-alarm: https://docs.openstack.org/developer/aodh/event-alarm.html
+  #ssh ${NODES[0]} -- pcs resource create ${AODH_listener_res_name} systemd:openstack-aodh-listener
+
+  # expirer service: 
+  # alarm_history_time_to_live = -1 means keeping the alarm history for ever.
+  #ssh ${NODES[0]} -- pcs resource create ${AODH_expirer_res_name} systemd:openstack-aodh-expirer
 }
 
 _aodh_haproxy_config() {
@@ -283,12 +296,32 @@ _aodh_haproxy_config() {
 aodh-d() {
   local script="/tmp/aodh-d.sh"
   
-  echo "removing ${AODH_res_name} resource..."
-
   dep_delete_check ${AODH_res_name}
   
-  echo "deleting aodh related pcmk resource..."
-  #ssh ${NODES[0]} -- pcs resource delete ${AODH_res_name}
+  info "deleting aodh related pcmk resource..."
+  ssh ${NODES[0]} -- pcs resource delete ${AODH_evaluator_res_name}
+  ssh ${NODES[0]} -- pcs resource delete ${AODH_notifier_res_name}
+  ssh ${NODES[0]} -- pcs resource delete ${AODH_listener_res_name}
+  ssh ${NODES[0]} -- pcs resource delete ${AODH_expirer_res_name}
+
+  info "removing aodh-api service..."
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- rm -f ${AODH_api_wsgi_conf}
+  done
+
+  # reload httpd
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- systemctl reload httpd
+  done
+
+  echo "removing ${AODH_haproxy_cfg} for haproxy..."
+  for node in "${NODES[@]}"; do
+    ssh ${node} -- rm -f ${AODH_haproxy_cfg}
+  done
+
+  # re-define haproxy resource
+  haproxy_recreate_res
+  
 
   info "removing aodh's endpoints & service from keystone..."
   cat <<-EOF | ssh -T ${NODES[0]} --
@@ -325,26 +358,11 @@ aodh-d() {
 
   info "removing aodh config & log files..."
   for node in "${NODES[@]}"; do
-    ssh ${node} -- rm -f ${AODH_api_wsgi_conf}
     ssh ${node} -- rm -rf ${AODH_conf_dir}
     ssh ${node} -- rm -rf ${AODH_log_dir}
     ssh ${node} -- rm -f ${AODH_api_access_log}*
     ssh ${node} -- rm -f ${AODH_api_error_log}*
   done
-  
-  # reload httpd
-  for node in "${NODES[@]}"; do
-    ssh ${node} -- systemctl reload httpd
-  done
-
-  # remove haproxy cfg file
-  echo "removing ${AODH_haproxy_cfg}..."
-  for node in "${NODES[@]}"; do
-    ssh ${node} -- rm -f ${AODH_haproxy_cfg}
-  done
-
-  # re-define haproxy resource
-  haproxy_recreate_res
 }
 
 aodh-t() {

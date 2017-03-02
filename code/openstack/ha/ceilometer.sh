@@ -11,13 +11,14 @@
 # - ipmi agent: note that impi is supposed to run on every node supporting ipmi; requires ironic
 # - compute agent: to run on compute node.
 #
-# as api service uses the same apache httpd server (the same as keystone), we choose
-# collector resource as the representation for all ceilometer services.
+CEIL_api_res_name=${KEYSTONE_res_name}
 CEIL_notification_res_name="ceilometer-notification"
 CEIL_collector_res_name="ceilometer-collector"
 CEIL_polling_res_name="ceilometer-polling"
 CEIL_central_res_name="ceilometer-central"
 CEIL_ipmi_res_name="ceilometer-ipmi"
+# as api service uses the same apache httpd server (the same as keystone), we choose
+# collector resource as the representation for all ceilometer services.
 CEIL_res_name=${CEIL_collector_res_name}
 
 # let ceilometer component has a user "ceilometer" of "admin" role in the "service" project
