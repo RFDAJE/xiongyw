@@ -1,8 +1,9 @@
 - haproxy: timeout setting in config
 - network teaming: mode, and disable NetworkManager
 - rabbitmq:
-  . bind address setting (done, via /etc/rabbitmq/rabbitmq-env.conf)
-  . haproxy for mq and it webui
+  . bind address for 5672: done, via /etc/rabbitmq/rabbitmq-env.conf
+  . bind address for 15672: done, via /etc/rabbitmq/rabbitmq.conf
+  . haproxy for mq and it webui: 
   . test crash/reboot cases
   . persistency: cluster status; user/permission; policy persistency
 - mongod: web ui; replica set details; mongo shell; access control
@@ -97,6 +98,7 @@ issues:
     ERROR oslo.messaging._drivers.impl_rabbit [-] [ee4d8c81-08df-4e66-85f0-deb485c0e937] AMQP server on c2m:5672 is unreachable: [Errno 111] Connection refused. Trying again in 1 seconds. Client port: None
     ...
     ERROR cotyledon AccessRefused: (0, 0): (403) ACCESS_REFUSED - Login was refused using authentication mechanism AMQPLAIN.
+  - identified and resolved: this is the rabbitmq issue. after fixing rabbitmq, the issue is gone.
 
 + rabbitmq:
   - after reboot, only one of the node is up running, and the cluster only has 1 node, although 'pcs status' shows that it's ok.

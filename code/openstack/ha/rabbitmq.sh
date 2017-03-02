@@ -64,7 +64,7 @@ rabbitmq() {
     ssh ${node} -- systemctl stop rabbitmq-server
     ssh ${node} -- systemctl disable rabbitmq-server
 
-    echo "configuring rabbitmq..."
+    info "configuring rabbitmq..."
     # this is to let mgmt web-ui to bind to a single ip@, otherwise haproxy won't bind to the same port
     # ref: http://serverfault.com/questions/235669/how-do-i-make-rabbitmq-listen-only-to-localhost
     cat <<-EOF | ssh -T ${node} --
@@ -97,10 +97,10 @@ rabbitmq() {
   info "creating rabbitmq resource..."
   cookie=$(cat ${tmp_file})
   cat <<-EOF | ssh -T ${NODES[0]} --
-	echo "creating mq-master resource..."
+	echo "creating rabbitmq-master resource..."
 	set -x
 	pcs resource create ${RABBITMQ_res_name_short} ocf:rabbitmq:rabbitmq-server-ha \
-	  erlang_cookie=${cookie} node_port=5672 \
+	  erlang_cookie=${cookie} node_port=${RABBITMQ_port} \
 	  op monitor interval=30 timeout=60 \
 	  op monitor interval=27 role=Master timeout=60 \
 	  op start interval=0 timeout=360 \
@@ -130,9 +130,6 @@ rabbitmq() {
 	rabbitmqctl set_permissions ${RABBITMQ_user} ".*" ".*" ".*"
 	EOF
 
-  # fixme: need to config rabbitmq to listen on specific i/f, instead of all.
-  # otherwise, haproxy will not work, because of bind fail.
-: <<'SKIP'
   # create haproxy setting for rabbitmq mirror, on each node
   for node in "${NODES[@]}"; do
     # ip:5672 for mq services
@@ -141,29 +138,26 @@ rabbitmq() {
     ssh ${node} -- cat<<-EOF \>${RABBITMQ_haproxy_cfg}
 	# mq listens on mgmt ip@, since it is not supposed to be access externally
 	listen rabbitmq_mirror
-	  bind ${NODES_VIP_ADDRS[1]}:5672
+	  bind ${NODES_VIP_ADDRS[1]}:${RABBITMQ_port}
 	  mode tcp
 	  balance source
 	  option tcplog
 	  option tcp-check
-	#  server g1 10.0.1.31:3306 check
-	#  server g2 10.0.1.32:3306 check
-	#  server g3 10.0.1.33:3306 check
 	EOF
     # append the server lists into haproxy cfg file
     for idx in "${!NODES[@]}"; do
       local srv="${NODES[$idx]}${MGMT_SUFFIX}"
       local ips=( ${NODES_IP_ADDRS[$idx]} )
       local ip=${ips[1]}
-      ssh ${node} -- echo "\ \ server ${srv} ${ip}:5672 check" \>\>${RABBITMQ_haproxy_cfg}
+      ssh ${node} -- echo "\ \ server ${srv} ${ip}:${RABBITMQ_port} check" \>\>${RABBITMQ_haproxy_cfg}
     done
 
     # http://ip:15672/ for web ui
     echo "adding haproxy config for rabbitmq web ui..."
     ssh ${node} -- cat<<-EOF \>\>${RABBITMQ_haproxy_cfg}
 	listen rabbitmq_webui
-	  bind ${NODES_VIP_ADDRS[0]}:15672
-	  bind ${NODES_VIP_ADDRS[1]}:15672
+	  bind ${NODES_VIP_ADDRS[0]}:${RABBITMQ_mgmt_port}
+	  bind ${NODES_VIP_ADDRS[1]}:${RABBITMQ_mgmt_port}
 	  balance  source
 	  option  tcpka
 	  option  httpchk
@@ -174,13 +168,12 @@ rabbitmq() {
       local srv="${NODES[$idx]}${MGMT_SUFFIX}"
       local ips=( ${NODES_IP_ADDRS[$idx]} )
       local ip=${ips[1]}
-      ssh ${node} -- echo "\ \ server ${srv} ${ip}:15672 check inter 2000 rise 2 fall 5" \>\>${RABBITMQ_haproxy_cfg}
+      ssh ${node} -- echo "\ \ server ${srv} ${ip}:${RABBITMQ_mgmt_port} check inter 2000 rise 2 fall 5" \>\>${RABBITMQ_haproxy_cfg}
     done
   done
    
   # re-define haproxy resource
   haproxy_recreate_res
-SKIP
 }
 
 # delete rabbitmq resource completely
