@@ -3,7 +3,7 @@
 - rabbitmq:
   . bind address for 5672: done, via /etc/rabbitmq/rabbitmq-env.conf
   . bind address for 15672: done, via /etc/rabbitmq/rabbitmq.conf
-  . haproxy for mq and it webui: 
+  . haproxy for mq and its web ui: done
   . test crash/reboot cases
   . persistency: cluster status; user/permission; policy persistency
 - mongod: web ui; replica set details; mongo shell; access control

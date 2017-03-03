@@ -368,7 +368,7 @@ aodh-d() {
 aodh-t() {
   info "testing aodh-api..."
 
-  ssh ${NODES[0]} -- aodh alarm list
-  ssh ${NODES[0]} -- aodh capabilities list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; aodh alarm list
+  ssh ${NODES[0]} -- . ~/admin_openrc \; aodh capabilities list
 
 }
