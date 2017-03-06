@@ -1,42 +1,102 @@
 #!/bin/bash
 
-# created(bruin, 2017-01-27)
+# created(bruin, 2017-03-06)
 
 # this script contains utilities to generate PXE and Kickstart config files.
 
 KS_URL_PLACE_HOLDER="URL_PLACE_HOLDER"
 
 
-# the 1st argument is the TOOLS's ip addr
+# depends on globals:
+# - CLUSTERS
+# - TOOLS_IP_ADDR
+# - KS_CFG_DIR
+# - KS_URL_PREFIX
+# - GUESTS_NIC_NR
+# - NETWORK_INSTALL_URL
+# - KERNEL_TFTP_PATH
+# - INITRD_TFTP_PATH
 pxeks() {
 
-  local tools=${1}
+  local idx=""
+  local idx2=""
+  local tools=${TOOLS_IP_ADDR}
 
-  echo "${FUNCNAME[0]}() entering..."
-  for idx in "${!NODES[@]}"; do
-    local ks_cfg_file=${NODES_KS_CFG_DIR}/${NODES_KS_CFG_FILES[$idx]}
-    local install_url=${NETWORK_INSTALL_URL}
-    local pxe_cfg_dir=${NODES_PXE_CFG_DIR}
-    local ks_cfg_url=${NODES_KS_URL_PREFIX}${NODES_KS_CFG_FILES[$idx]}
-    # take the first mac@ which is 17 characters long
-    local pxe_mac=${NODES_MAC_ADDR[$idx]:0:17}
-    local kernel=${KERNEL_TFTP_PATH}
-    local initrd=${INITRD_TFTP_PATH}
-    local guest_name=${NODES[$idx]}
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    local cluster=${entry[0]}
+    local ip1=${entry[1]}
+    local ip2=${entry[2]}
+    local node_nr=${entry[3]}
+    local mac_prefix=${entry[4]}
+    local ip_start=${entry[5]}
+    local root_pass=${entry[6]}
+    local guests_root=${entry[7]}
 
-    pxe_ks_generate_cfg ${tools} \
-                        ${ks_cfg_file} \
-                        ${install_url} \
-                        ${pxe_cfg_dir} \
-                        ${ks_cfg_url} \
-                        ${pxe_mac} \
-                        ${kernel} \
-                        ${initrd} \
-                        ${guest_name}
+    for idx2 in `seq 1 $node_nr`; do
+      local guest_name=${cluster}${idx2}
+      local ks_cfg_file=ks-kvm-${guest_name}.cfg
+      local ks_cfg_path=${KS_CFG_DIR}/${ks_cfg_file}
+      local ks_cfg_url=${KS_URL_PREFIX}/${ks_cfg_file}
+      local install_url=${NETWORK_INSTALL_URL}
+      local pxe_cfg_dir=${PXE_CFG_DIR}
+      local kernel=${KERNEL_TFTP_PATH}
+      local initrd=${INITRD_TFTP_PATH}
+      # use the 1st mac@ for pxe boot
+      local macs=($(get_macs ${idx} ${idx2}))
+      local pxe_mac=${macs[0]}
 
+      pxe_ks_generate_cfg ${tools} \
+                          ${ks_cfg_path} \
+                          ${install_url} \
+                          ${pxe_cfg_dir} \
+                          ${ks_cfg_url} \
+                          ${pxe_mac} \
+                          ${kernel} \
+                          ${initrd} \
+                          ${guest_name}
+    done
   done
 }
 
+
+pxeks-d() {
+
+  local idx=""
+  local idx2=""
+  local tools=${TOOLS_IP_ADDR}
+
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    local cluster=${entry[0]}
+    local ip1=${entry[1]}
+    local ip2=${entry[2]}
+    local node_nr=${entry[3]}
+    local mac_prefix=${entry[4]}
+    local ip_start=${entry[5]}
+    local root_pass=${entry[6]}
+    local guests_root=${entry[7]}
+
+    for idx2 in `seq 1 $node_nr`; do
+      local guest_name=${cluster}${idx2}
+      local ks_cfg_file=ks-kvm-${guest_name}.cfg
+      local ks_cfg_path=${KS_CFG_DIR}/${ks_cfg_file}
+      local ks_cfg_url=${KS_URL_PREFIX}/${ks_cfg_file}
+      local install_url=${NETWORK_INSTALL_URL}
+      local pxe_cfg_dir=${PXE_CFG_DIR}
+      local kernel=${KERNEL_TFTP_PATH}
+      local initrd=${INITRD_TFTP_PATH}
+      # use the 1st mac@ for pxe boot
+      local macs=($(get_macs ${idx} ${idx2}))
+      local pxe_mac=${macs[0]}
+
+      pxe_ks_remove_cfg ${tools} \
+                          ${ks_cfg_path} \
+                          ${pxe_cfg_dir} \
+                          ${pxe_mac}
+    done
+  done
+}
 
 # this function prepare ks and pxe config file for the guests, and boot them
 # the first time.
@@ -72,6 +132,15 @@ pxe_ks_generate_cfg() {
   _pxe_generate_cfg ${tools} ${pxe_cfg_dir} ${pxe_mac} ${kernel} ${initrd} ${ks_cfg_url} ${guest_name}
 }
 
+# it takes 4 args:
+# 1. tools ip
+# 2. ks_cfg_path on tools
+# 3. pxe_cfg_dir
+# 4. pxe_mac
+pxe_ks_remove_cfg() {
+  local pxe_cfg_path="${3}/01-${4//:/-}"
+  ssh ${1} -- set -x \; rm -f ${2} ${pxe_cfg_path}
+}
 
 ################################################################
 # takes parameters:

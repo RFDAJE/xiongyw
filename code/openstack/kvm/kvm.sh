@@ -50,7 +50,7 @@ usage() {
 
 	  - ssh-copy-id: allows root-ssh to each host without providing passwd
 	  - host: setup all hosts
-	  - guests: define all guests on all hosts
+	  - guests[-d]: define all guests on all hosts
 	  - pxeks: generate pxe/ks config file for all guests on all host
 	  - boot: boot all guests on all hosts
 	  - reboot: reboot all guests via ssh
@@ -101,13 +101,14 @@ main () {
         done
         ;;
       guests)
-        guests_create ${HOST_IP_ADDR}
-        ;;
+        guests_create ;;
       guests-d)
-        guests_delete ${HOST_IP_ADDR}
-        ;;
+        guests_delete ;;
       pxeks)
-        pxeks ${TOOLS_IP_ADDR}
+        pxeks
+        ;;
+      pxeks-d)
+        pxeks-d
         ;;
       boot)
         for node in "${NODES[@]}"; do

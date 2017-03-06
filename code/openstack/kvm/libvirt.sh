@@ -14,8 +14,8 @@
 
 # place holder in xml config file for VM
 VM_MAC_PLACE_HOLDER=( 'PLACE-HOLDER-0' 'PLACE-HOLDER-1' 'PLACE-HOLDER-2' 'PLACE-HOLDER-3' )
-
-
+VM_RAM_SIZE_PLACE_HOLDER=RAM_PLACE_HOLDER
+VM_CPU_NR_PLACE_HOLDER=CPU_NR_PLACE_HOLDER
 #########################################
 # define one libvirt VM
 # the parameters are:
@@ -37,7 +37,7 @@ vm_define() {
   ssh ${host} -- mkdir -p $(dirname $xml)
   ssh ${host} -- mkdir -p $(dirname $img)
 
-  echo -n "${FUNCNAME[0]}(): creating VM image ($img)..."
+  echo -n "on ${host}: ${FUNCNAME[0]}(): creating VM image ($img)..."
   if [[ -f ${img} ]]; then
     ssh ${host} -- rm -f ${img};
   fi
@@ -45,19 +45,23 @@ vm_define() {
   echo "done!"
 
 
-  echo -n "${FUNCNAME[0]}(): creating VM config file ($xml)..."
+  echo -n "on ${host}: ${FUNCNAME[0]}(): creating VM config file ($xml)..."
   _vm_generate_template_xml ${host} ${xml}
   # update the VM name
   ssh ${host} -- sed -i "s/template_name/${name}/" ${xml}
   # update the image file path
   ssh ${host} -- sed -i "s@template.qcow2@${img}@" ${xml}
+  # update ram size
+  ssh ${host} -- sed -i "s/${VM_RAM_SIZE_PLACE_HOLDER}/${GUESTS_RAM_SIZE}/" ${xml}
+  # update cpu nr
+  ssh ${host} -- sed -i "s/${VM_CPU_NR_PLACE_HOLDER}/${GUESTS_CPU_NR}/" ${xml}
   # update 4 mac@
   for idx in "${!mac[@]}"; do
     ssh ${host} -- sed -i "s/${VM_MAC_PLACE_HOLDER[$idx]}/${mac[idx]}/" ${xml}
   done
   echo "done!"
 
-  echo "${FUNCNAME[0]}(): defining VM ${name}..."
+  echo "on ${host}: ${FUNCNAME[0]}(): defining VM ${name}..."
   ssh ${host} -- virsh define ${xml}
   echo "done!"
 }
@@ -65,28 +69,28 @@ vm_define() {
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the vm name
 vm_start() {
-  echo "starting vm ${2} ..."
+  echo "on ${1}: starting vm ${2} ..."
   ssh ${1} -- virsh start ${2}
 }
 
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the vm name
 vm_reboot() {
-  echo "rebooting vm ${2} ..."
+  echo "on ${1}: rebooting vm ${2} ..."
   ssh ${1} -- virsh reboot ${2}
 }
 
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the vm name
 vm_stop() {
-  echo "stopping vm ${2} ..."
+  echo "on ${1}: stopping vm ${2} ..."
   ssh ${1} -- virsh stop ${2}
 }
 
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the vm name
 vm_destroy() {
-  echo "destroying vm ${2} ..."
+  echo "on ${1}: destroying vm ${2} ..."
   ssh ${1} -- virsh destroy ${2}
 }
 
@@ -95,12 +99,12 @@ vm_destroy() {
 # 2. full path to the image file
 # 3. full path to the xml file
 vm_delete() {
-  echo -n "${FUNCNAME[0]}(): "
+  echo -n "on ${1}: ${FUNCNAME[0]}(): "
   echo -n "removing VM image ${2}..."
   ssh ${1} -- rm -f ${2}
   echo "done!"
 
-  echo -n "${FUNCNAME[0]}(): "
+  echo -n "on ${1}: ${FUNCNAME[0]}(): "
   echo -n "removing VM config file ${3}..."
   ssh ${1} -- rm -f ${3}
   echo "done!"
@@ -109,20 +113,20 @@ vm_delete() {
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the vm name
 vm_undefine() {
-  echo "undefining vm ${1} ..."
+  echo "on ${1}: undefining vm ${1} ..."
   ssh ${1} -- virsh undefine ${2}
 }
 
 # the 1st argument is the HOST's hostname or ip@
 # the 2nd is the xml's full path
 _vm_generate_template_xml() {
-  echo "generating a template xml for VMs..."
+  echo "on ${1}: generating a template xml for VMs..."
   ssh ${1} -- cat <<'EOF' \>${2}
 <domain type='kvm'>
   <name>template_name</name>
-  <memory unit='KiB'>2097152</memory>
-  <currentMemory unit='KiB'>2097152</currentMemory>
-  <vcpu placement='static'>4</vcpu>
+  <memory unit='KiB'>RAM_PLACE_HOLDER</memory>
+  <currentMemory unit='KiB'>RAM_PLACE_HOLDER</currentMemory>
+  <vcpu placement='static'>CPU_NR_PLACE_HOLDER</vcpu>
   <os>
     <type arch='x86_64' machine='pc-i440fx-rhel7.0.0'>hvm</type>
     <bootmenu enable='yes'/>

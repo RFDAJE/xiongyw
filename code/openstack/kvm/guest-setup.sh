@@ -1,41 +1,87 @@
 #!/bin/bash
 
-# created(bruin, 2017-01-27)
+# created(bruin, 2017-03-06)
 
-# the first argument is the HOST's hostname or ip@
+# it uses the global CLUSTERS & GUESTS_NIC_NR
+# the 1st argument is the idx of CLUSTERS[]
+# the 2nd argument is the idx of the guest
+get_macs() {
+  local idx=${1}
+  local idx2=${2}
+
+  local entry=( ${CLUSTERS[${idx}]} )
+  local mac_prefix=${entry[4]}
+
+  # generate mac@ in an array
+  local mac=""
+  let mac_start=GUESTS_NIC_NR*idx2-GUESTS_NIC_NR
+  let mac_end=mac_start+GUESTS_NIC_NR-1
+  for i in `seq -f %02g ${mac_start} ${mac_end}`; do
+    mac+="${mac_prefix}${i} ";
+  done
+
+  echo ${mac}
+}
+
+# depends on global ${CLUSTERS[@]}
 guests_create() {
-  local host=${1}
+  local idx=""
+  local idx2=""
 
-  ssh ${host} -- mkdir -p ${GUESTS_ROOT}
-  # fixme: making sure that qemu:qemu can access the folder:
-  #   for any subdirectory to that, chmod go+xr <dir>
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    local cluster=${entry[0]}
+    local ip1=${entry[1]}
+    local ip2=${entry[2]}
+    local node_nr=${entry[3]}
+    local mac_prefix=${entry[4]}
+    local ip_start=${entry[5]}
+    local root_pass=${entry[6]}
+    local guests_root=${entry[7]}
 
-  for idx in "${!NODES[@]}"; do
-    local xml=${GUESTS_ROOT}/${GUESTS_CONFIG_FILES[$idx]}
-    local name=${NODES[$idx]}
-    local image=${GUESTS_ROOT}/${GUESTS_IMAGES[$idx]}
-    local size=${GUESTS_IMAGE_SIZE}
-    local mac=( ${NODES_MAC_ADDR[$idx]} )
+    for idx2 in `seq 1 $node_nr`; do
+      local name=${cluster}${idx2}
+      local xml=${guests_root}/${name}.xml
+      local image=${guests_root}/${name}.qcow2
+      local size=${GUESTS_IMAGE_SIZE}
 
-    vm_define ${host} ${xml} ${name} ${image} ${size} ${mac[*]}
+      local mac=$(get_macs ${idx} ${idx2})
+#      let mac_start=GUESTS_NIC_NR*idx2-GUESTS_NIC_NR
+#      let mac_end=mac_start+GUESTS_NIC_NR-1
+#      for i in `seq -f %02g ${mac_start} ${mac_end}`; do
+#        mac+="${mac_prefix}${i} ";
+#      done
+      local macs=(${mac})
+      #vm_define ${ip1} ${xml} ${name} ${image} ${size} ${macs[*]}
+      echo ${ip1} ${xml} ${name} ${image} ${size} ${macs[*]}
+    done
   done
 }
 
-
-# the first argument is the HOST's hostname or ip@
+# depends on global ${CLUSTERS[@]}
 guests_delete() {
-  local host=${1}
+  local idx=""
+  local idx2=""
 
-  echo "deleting guests..."
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    local cluster=${entry[0]}
+    local ip1=${entry[1]}
+    local ip2=${entry[2]}
+    local node_nr=${entry[3]}
+    local mac_prefix=${entry[4]}
+    local ip_start=${entry[5]}
+    local root_pass=${entry[6]}
+    local guests_root=${entry[7]}
 
-  for guest in "${NODES[@]}"; do
-    vm_destroy ${host} ${guest}
-    vm_undefine ${host} ${guest}
-  done
-
-  # remove VM images and xml
-  for idx in "${!GUESTS_IMAGES[@]}"; do
-    vm_delete ${host} "${GUESTS_ROOT}/${GUESTS_IMAGES[$idx]}" "${GUESTS_ROOT}/${GUESTS_CONFIG_FILES[$idx]}"
+    for idx2 in `seq 1 $node_nr`; do
+      local name=${cluster}${idx2}
+      local xml=${guests_root}/${name}.xml
+      local image=${guests_root}/${name}.qcow2
+      vm_destroy ${ip1} ${name}
+      vm_undefine ${ip1} ${name}
+      vm_delete ${ip1} ${image} ${xml}
+    done
   done
 }
 
