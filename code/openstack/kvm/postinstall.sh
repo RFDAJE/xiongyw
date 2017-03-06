@@ -1,24 +1,34 @@
 #!/bin/bash
 
-# created(bruin, 2017-03-03)
+# created(bruin, 2017-03-06)
 
+# args:
+# 1: hostname
+# 2: ext ip (team0), which should be currently accessible
+# 3: mgmt ip (team1)
+# 4: ext mask
+# 5: mgmt mask
+# 6: ext gw
+# 7: nic0 name
+# 8: nic1 name
+# 9: nic2 name
+# 10: nic3 name
+# 11: ext team name
+# 12: mgmt team name
+# 13: dns
 postinstall() {
 
-  _ssh_copy_id
-  _setup_teaming
-  #_update_sshd_listenaddress
-  _update_hostname_n_hosts
+  ssh ${2} -- hostnamectl set-hostname ${1}
 
-  for node in "${NODES[@]}"; do
-    _config_yum_repo ${TOOLS_IP_ADDR}:${TOOLS_HTTP_PORT} ${node}
-    _install_pkgs ${node}
-  done
+  _config_yum_repo ${TOOLS_IP_ADDR}:${TOOLS_HTTP_PORT} ${2}
+
+  _install_pkgs ${2}
 
   # timedatectl
-  for node in "${NODES[@]}"; do
-    ssh ${node} -- timedatectl set-ntp 1
-    ssh ${node} -- timedatectl set-local-rtc 0
-  done
+  ssh ${2} -- timedatectl set-ntp 1
+  ssh ${2} -- timedatectl set-local-rtc 0
+
+  _setup_teaming $*
 
   # ssh-key-gen?
 }
@@ -81,56 +91,33 @@ postinstall-t() {
   done
 }
 
-_ssh_copy_id() {
-  echo "adding all guests into host's /etc/hosts, and removing history in .ssh/* ..."
-  for idx in "${!NODES[@]}"; do
-    local name=${NODES[$idx]}
-    local ip=( ${NODES_IP_ADDRS[$idx]} )
 
-    sed -i "/\s${name}\s*$/d" /etc/hosts
-    sed -i "$ a ${ip[0]} ${name}" /etc/hosts
-
-    ssh-keygen -f "/root/.ssh/known_hosts" -R ${name}
-    ssh-keygen -f "/root/.ssh/known_hosts" -R ${ip[0]}
-  done
-
-  echo "ssh-copy-id for all guests..."
-  script="/tmp/ssh-copy-id.exp";
-  for node in "${NODES[@]}"; do
-    echo "ssh-copy-id..."
-    cat <<-EOF >${script}
-	#!/usr/bin/expect
-
-	set password "qwerty"
-	set timeout -1
-
-	spawn ssh-copy-id ${node}
-	expect {
-	    "(yes/no)?" {
-	        send "yes\r"
-	        exp_continue
-	    }
-	    "password:" {
-	        send \$password
-	        send "\r"
-	        exp_continue
-	    }
-	}
-	EOF
-	chmod +x ${script}
-	${script}
-  done
-}
-
+# args:
+# 1: hostname
+# 2: ext ip (team0), which should be currently accessible
+# 3: mgmt ip (team1)
+# 4: ext mask
+# 5: mgmt mask
+# 6: ext gw
+# 7: nic0 name
+# 8: nic1 name
+# 9: nic2 name
+# 10: nic3 name
+# 11: ext team name
+# 12: mgmt team name
+# 13: dns
 _setup_teaming() {
-  # setup network teaming for all nodes
+
   local script="/tmp/team.sh"
-  local name=""
-  local ip=""
-  for idx in "${!NODES[@]}"; do
-    name=${NODES[$idx]}
-    ip=( ${NODES_IP_ADDRS[$idx]} )
-    ssh ${name} -- cat <<-EOF \>${script}
+  local name=${1}
+  local ip=(${2} ${3})
+  local mask=(${4} ${5})
+  local gw=${6}
+  local nics=(${7} ${8} ${9} ${10})
+  local team=(${11} ${12})
+  local dns=${13}
+
+  ssh ${ip[0]} -- cat <<-EOF \>${script}
 	#!/bin/bash
 	echo "setting up network teaming for ${name}..."
 
@@ -143,15 +130,15 @@ _setup_teaming() {
 	systemctl enable NetworkManager
 	systemctl start NetworkManager; sleep 5
 
-	nmcli con add type team con-name ${NODES_TEAM_NAMES[0]} ifname ${NODES_TEAM_NAMES[0]} ip4 ${ip[0]}/${NODES_IP_MASKS[0]} gw4 ${NODES_GW_ADDRS[0]}
-	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[0]} ifname ${NODES_NIC_NAMES[0]} master ${NODES_TEAM_NAMES[0]}
-	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[1]} ifname ${NODES_NIC_NAMES[1]} master ${NODES_TEAM_NAMES[0]}
-	nmcli con modify ${NODES_TEAM_NAMES[0]} +ipv4.dns ${NODES_DNS_ADDR}
+	nmcli con add type team con-name ${team[0]} ifname ${team[0]} ip4 ${ip[0]}/${mask[0]} gw4 ${gw}
+	nmcli con add type team-slave con-name ${nics[0]} ifname ${nics[0]} master ${team[0]}
+	nmcli con add type team-slave con-name ${nics[1]} ifname ${nics[1]} master ${team[0]}
+	nmcli con modify ${team[0]} +ipv4.dns ${dns}
 
 	# don't set gw4 for the second team, if the gw does not allow outgoing traffic
-	nmcli con add type team con-name ${NODES_TEAM_NAMES[1]} ifname ${NODES_TEAM_NAMES[1]} ip4 ${ip[1]}/${NODES_IP_MASKS[1]}
-	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[2]} ifname ${NODES_NIC_NAMES[2]} master ${NODES_TEAM_NAMES[1]}
-	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[3]} ifname ${NODES_NIC_NAMES[3]} master ${NODES_TEAM_NAMES[1]}
+	nmcli con add type team con-name ${team[1]} ifname ${team[1]} ip4 ${ip[1]}/${mask[1]}
+	nmcli con add type team-slave con-name ${nics[2]} ifname ${nics[2]} master ${team[1]}
+	nmcli con add type team-slave con-name ${nics[3]} ifname ${nics[3]} master ${team[1]}
 
 	systemctl restart network
 
@@ -163,100 +150,116 @@ _setup_teaming() {
 	  echo "error!"
 	fi
 	EOF
-	ssh ${name} -- chmod +x ${script} \; ${script}
-  done
+  ssh ${ip[0]} -- chmod +x ${script} \; ${script}
 }
 
-# instead of listen on all i/f, specify the i/f to listen
-_update_sshd_listenaddress () {
-  local conf="/etc/ssh/sshd_config"
-  local ips=""
-  for idx in "${!NODES[@]}"; do
-    echo "updating sshd_config ${NODES[$idx]}..."
-    ips=( ${NODES_IP_ADDRS[${idx}]} )
-    cat <<-EOF | ssh -T ${NODES[$idx]} --
-		sed -i.bak -e "/#ListenAddress ::/a ListenAddress ${ips[0]}\nListenAddress ${ips[1]}" ${conf}
-	EOF
-    echo "restarting sshd..."
-    ssh ${NODES[$idx]} -- systemctl restart sshd
-  done
-}
-
-# update hostname and /etc/hosts for each node
-_update_hostname_n_hosts() {
+# update /etc/hosts on all nodes, as well as hosts and the box on which this script runs
+# note that VIPs should also be added into /etc/hosts
+# TODO: if $1=="cleanup", remove the entries
+update_etc_hosts() {
   local ip=""
   local name=""
   local ip_name=()   # ( "ip" "name" )
   local ip_names=()  # ( "ip name" "ip name" ... )
+  local nodes=()
+  local script="/tmp/hosts.sed"
+
+  info "updating /etc/hosts..."
 
   #
-  # 0. update hostname: hostname represent which i/f, mgmt or external?
-  #    it seems that rabbitmq cluster requires rabbit node names are the
-  #    same as the pacemaker node name. as all those infrastructure services
-  #    (pacemaker/rabbitmq/mariadb/...) should be only accessable from
-  #    internal mgmt network, it's better set the hostnames to mgmt ip@.
+  # 0. gather all nodes whose /etc/hosts is going to be updated
   #
-  echo "updating hostname..."
-  for node in "${NODES[@]}"; do
-    ssh ${node} -- hostnamectl set-hostname ${node}${MGMT_SUFFIX}
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    name=${entry[0]}
+    ip=${entry[1]}
+    local node_nr=${entry[3]}
+    local ip_start=${entry[5]}
+    nodes+=(${ip})  # host
+    for idx2 in $(seq 1 ${node_nr}); do
+      let ip_last=ip_start+idx2-1
+      local ext_ip=${SUBNET_PREFIX[0]}${ip_last}
+      nodes+=("${ext_ip}")
+    done
   done
 
-  echo "updating /etc/hosts..."
+  #echo "totally ${#nodes[@]} nodes to update: ${nodes[@]}"
 
   #
-  # 1. gather all ip/host paris in local array
+  # 1. gather all ip/host pairs in local array
   #
-  # external/mgmt/ipmi
-  for idx in "${!NODES[@]}"; do
-    name=${NODES[$idx]}
-    ip=( ${NODES_IP_ADDRS[$idx]} )
-    ip_names+=( "${ip[0]} ${name}" )
-    ip_names+=( "${ip[1]} ${name}m" )   # mgmt
-    ip_names+=( "${ip[2]} ${name}i" )   # ipmi
+  for idx in "${!CLUSTERS[@]}"; do
+    local entry=( ${CLUSTERS[${idx}]} )
+    name=${entry[0]}
+    local node_nr=${entry[3]}
+    local ip_start=${entry[5]}
+
+    for idx2 in $(seq 1 ${node_nr}); do
+      local ext_name=${name}${idx2}
+      local mgm_name=${name}${idx2}${MGMT_SUFFIX}
+      let ip_last=ip_start+idx2-1
+      local ext_ip=${SUBNET_PREFIX[0]}${ip_last}
+      local mgm_ip=${SUBNET_PREFIX[1]}${ip_last}
+      ip_names+=("${ext_ip} ${ext_name}")
+      ip_names+=("${mgm_ip} ${mgm_name}")
+    done
+
+    let vip=ip_start-1
+    local ext_vip=${SUBNET_PREFIX[0]}${vip}
+    local mgm_vip=${SUBNET_PREFIX[1]}${vip}
+    local ext_vipname=${name}vip
+    local mgm_vipname=${name}vipm
+    ip_names+=("${ext_vip} ${ext_vipname}")
+    ip_names+=("${mgm_vip} ${mgm_vipname}")
   done
 
-  # vips
-  for idx in "${!NODES_VIP_NAMES[@]}"; do
-    name=${NODES_VIP_NAMES[$idx]}
-    ip=${NODES_VIP_ADDRS[$idx]}
-    ip_names+=( "${ip} ${name}" )
-  done
+  #echo "totally ${#ip_names[@]} entries to add: ${ip_names[@]}"
+
   # test
   #for elm in "${ip_names[@]}"; do
   #  ip_name=( ${elm} )
   #  echo "${ip_name[@]}, ${#ip_name[@]}"
   #done
 
-  #
-  # 2. update /etc/hosts of each node
-  #
-  for node in "${NODES[@]}"; do
-    for elm in "${ip_names[@]}"; do
-      ip_name=( ${elm} )
-      ip=${ip_name[0]}
-      name=${ip_name[1]}
-      ssh ${node} -- sed -i \'"/\s${name}\s*$/d"\' /etc/hosts
-      ssh ${node} -- sed -i \'"$ a ${ip} ${name}"\' /etc/hosts
-    done
-    ssh ${node} -- cat /etc/hosts
-  done
+  :>${script}
 
-  #
-  # 3. update /etc/hosts of localhost
-  #
-  echo "updating /etc/host of localhost..."
   for elm in "${ip_names[@]}"; do
     ip_name=( ${elm} )
     ip=${ip_name[0]}
     name=${ip_name[1]}
-    sed -i "/\s${name}\s*$/d" /etc/hosts
-    sed -i "$ a ${ip} ${name}" /etc/hosts
+    cat<<-EOF >>${script}
+	/${name}\s*$/d
+	EOF
+    if [[ ${1} != "cleanup" ]]; then
+      cat<<-EOF >>${script}
+		$ a ${ip} ${name}
+		EOF
+	fi
   done
-  cat /etc/hosts
+
+  #cat ${script}
+
+  #
+  # 2. update /etc/hosts of localhost
+  #
+  sed -i -f ${script} /etc/hosts
+
+  #
+  # 3. update /etc/hosts of each node
+  #
+
+  for node in "${nodes[@]}"; do
+    info "updating ${node}:/etc/hosts..."
+    scp ${script} ${node}:${script}
+    ssh ${node} -- sed -i -f ${script} /etc/hosts
+    ssh ${node} -- cat /etc/hosts
+  done
+
 }
 
+
 # the 1st argument is the ip[:port] for the HTTP mirror server
-# the 2nd argument is the node name
+# the 2nd argument is the node name or ip
 # eg.: config_yum_repo 192.168.120.80:8080 g2
 _config_yum_repo() {
 
@@ -395,7 +398,7 @@ _config_yum_repo() {
 	EOF
 }
 
-# the 1st argument is the node name
+# the 1st argument is the node name or ip
 _install_pkgs() {
   local node=$1
   local script="/tmp/pkg.sh"

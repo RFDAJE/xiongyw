@@ -31,7 +31,7 @@ dnsmasq() {
       local pxe_mac=${macs[0]}
       # ip@
       let ip_last=ip_start+idx2-1
-      local ip=${SUBNET_PREFIX}${ip_last}
+      local ip=${SUBNET_PREFIX[0]}${ip_last}
 
       ssh ${tools} -- echo dhcp-range=${ip},static,${HOST_IP_MASK},infinite \>\> ${DNSMASQ_HOSTSFILE_PATH}
       ssh ${tools} -- echo dhcp-host=${pxe_mac},${ip},${guest_name},infinite \>\> ${DNSMASQ_HOSTSFILE_PATH}
@@ -55,7 +55,7 @@ dnsmasq-d() {
       local macs=($(get_macs ${idx} ${idx2}))
       local pxe_mac=${macs[0]}
       let ip_last=ip_start+idx2-1
-      local ip=${SUBNET_PREFIX}${ip_last}
+      local ip=${SUBNET_PREFIX[0]}${ip_last}
 
       ssh ${tools} -- sed -i -e "/${ip}/d" ${DNSMASQ_HOSTSFILE_PATH}
       ssh ${tools} -- sed -i -e "/${pxe_mac}/d" ${DNSMASQ_HOSTSFILE_PATH}

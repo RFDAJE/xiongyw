@@ -49,7 +49,10 @@ usage() {
   cat <<-EOF
 	usage: # $(basename $0) (ssh-copy-id|host|guests[-d]|pxeks|boot|reboot|reboot-vm|poweroff|pacemaker)
 
-	  - ssh-copy-id: allows root-ssh to each host without providing passwd
+	  - list-hosts: list ip@ and hostname of all hosts (cluster)
+	  - list-guests: list ip@ and hostname of all guests (node)
+	  - ssh-copy-id-hosts: allows root-ssh to each host without providing passwd
+
 	  - host: setup all hosts
 	  - guests[-d]: define all guests on all hosts
 	  - pxeks: generate pxe/ks config file for all guests on all host
@@ -57,7 +60,12 @@ usage() {
 	  - reboot: reboot all guests via ssh
 	  - reboot-vm: reboot all guests via virsh
 	  - poweroff: poweroff all guests via ssh
+	  - ssh-copy-id-guests: allows root-ssh to each guest without providing passwd
+	  - post: post install tasks
+	  - etc-hosts: update /etc/hosts on all nodes, as well as hosts and the box on which this script runs
+
 	  - pacemaker: install pacemaker on all guests and configure each cluster
+	  - chronyd:
 	EOF
 }
 
@@ -80,13 +88,53 @@ main () {
 
     case $1 in
     ###############################################
-      ssh-copy-id)
+      list-hosts)
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local ip=${entry[1]}
+          local ip2=${entry[2]}
+          echo ${ip}, ${ip2}: ${name}
+        done
+      ;;
+      list-guests)
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local node_nr=${entry[3]}
+          local ip_start=${entry[5]}
+          for idx2 in $(seq 1 ${node_nr}); do
+            local guest_name=${name}${idx2}
+            let ip_last=ip_start+idx2-1
+            local ip=${SUBNET_PREFIX[0]}${ip_last}
+            local ip2=${SUBNET_PREFIX[1]}${ip_last}
+            local pass="qwerty"
+            echo ${ip}, ${ip2}: ${guest_name}
+          done
+        done
+      ;;
+      ssh-copy-id-hosts)
         for idx in "${!CLUSTERS[@]}"; do
           local entry=( ${CLUSTERS[${idx}]} )
           local name=${entry[0]}
           local ip=${entry[1]}
           local pass=${entry[6]}
           ssh_copy_id ${name} ${ip} ${pass}
+        done
+        ;;
+      ssh-copy-id-guests)
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local node_nr=${entry[3]}
+          local ip_start=${entry[5]}
+          for idx2 in $(seq 1 ${node_nr}); do
+            local guest_name=${name}${idx2}
+            let ip_last=ip_start+idx2-1
+            local ip=${SUBNET_PREFIX[0]}${ip_last}
+            local pass="qwerty"
+            ssh_copy_id ${guest_name} ${ip} ${pass}
+          done
         done
         ;;
       host)
@@ -116,8 +164,15 @@ main () {
       dnsmasq-d)
         dnsmasq-d ;;
       boot)
-        for node in "${NODES[@]}"; do
-          vm_start ${HOST_IP_ADDR} ${node}
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local ip=${entry[1]}
+          local node_nr=${entry[3]}
+          for idx2 in `seq 1 $node_nr`; do
+            local guest_name=${name}${idx2}
+            vm_start ${ip} ${guest_name}
+          done
         done
         ;;
       reboot)
@@ -126,18 +181,61 @@ main () {
         done
         ;;
       reboot-vm)
-        for node in "${NODES[@]}"; do
-          vm_reboot ${HOST_IP_ADDR} ${node}
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local ip=${entry[1]}
+          local node_nr=${entry[3]}
+          for idx2 in `seq 1 $node_nr`; do
+            local guest_name=${name}${idx2}
+            vm_reboot ${ip} ${guest_name}
+          done
+        done
+        ;;
+      destroy-vm)
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local ip=${entry[1]}
+          local node_nr=${entry[3]}
+          for idx2 in `seq 1 $node_nr`; do
+            local guest_name=${name}${idx2}
+            vm_destroy ${ip} ${guest_name}
+          done
         done
         ;;
       poweroff)
-        ssh ${NODES[0]} -- pcs cluster stop --all
-        for node in "${NODES[@]}"; do
-          ssh ${node} -- poweroff
-        done
+        :
         ;;
       post)
-        postinstall ;;
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local name=${entry[0]}
+          local node_nr=${entry[3]}
+          local ip_start=${entry[5]}
+          for idx2 in $(seq 1 ${node_nr}); do
+			  #    update hostname: hostname represent which i/f, mgmt or external?
+			  #    it seems that rabbitmq cluster requires rabbit node names are the
+			  #    same as the pacemaker node name. as all those infrastructure services
+			  #    (pacemaker/rabbitmq/mariadb/...) should be only accessable from
+			  #    internal mgmt network, it's better set the hostnames to mgmt ip@.
+            local guest_name=${name}${idx2}${MGMT_SUFFIX}
+            let ip_last=ip_start+idx2-1
+            local ext_ip=${SUBNET_PREFIX[0]}${ip_last}
+            local mgmt_ip=${SUBNET_PREFIX[1]}${ip_last}
+            postinstall ${guest_name} ${ext_ip} ${mgmt_ip} ${NODES_IP_MASKS[*]} ${NODES_GW_ADDRS[0]} \
+                        ${NODES_NIC_NAMES[*]} \
+                        ${NODES_TEAM_NAMES[*]} \
+                        ${NODES_DNS_ADDR}
+          done
+        done
+        ;;
+      etc-hosts)
+        update_etc_hosts
+        ;;
+      etc-hosts-d)
+        update_etc_hosts cleanup
+        ;;
       post-t)
         postinstall-t ;;
       pacemaker | pacemaker-[d])

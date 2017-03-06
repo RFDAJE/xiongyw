@@ -14,6 +14,8 @@ settings_ehualu() {
                "hot  192.168.8.118  192.168.9.118  3  52:54:00:00:a4:  241 ssx    /home/data/kvm" \
                "warm 192.168.8.116  192.168.9.116  3  52:54:00:00:a5:  251 qwerty /home/data/kvm" )
 
+    # note that the VIPs of each cluster is the guest_ip_start - 1
+    # e.g., if ctl cluster nodes' ip start from .211, then the VIPs are .210
     SUBNET_PREFIX=( "192.168.8." "192.168.9." )
 
     # host nic info. the 1st nic put into br0, and 2nd put into br1 (thus all in promisc mode)
