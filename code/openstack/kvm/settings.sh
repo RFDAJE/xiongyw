@@ -58,4 +58,7 @@ settings_ehualu() {
     NETWORK_INSTALL_URL="http://${TOOLS_IP_ADDR}:${TOOLS_HTTP_PORT}/centos/7/os/x86_64/"
     KERNEL_TFTP_PATH="images/centos/7.3/x86_64/vmlinuz"
     INITRD_TFTP_PATH="images/centos/7.3/x86_64/initrd.img"
+
+    # also on TOOLS, for leasing static IP@ to vms
+    DNSMASQ_HOSTSFILE_PATH="/etc/dnsmasq.d/kvm-hostsfile.conf"
 }

@@ -40,6 +40,7 @@ settings_ehualu
 . $SCRIPTPATH/libvirt.sh
 . $SCRIPTPATH/guest-setup.sh
 . $SCRIPTPATH/pxe-ks.sh
+. $SCRIPTPATH/dnsmasq.sh
 . $SCRIPTPATH/postinstall.sh
 . $SCRIPTPATH/pacemaker.sh
 
@@ -110,6 +111,10 @@ main () {
       pxeks-d)
         pxeks-d
         ;;
+      dnsmasq)
+        dnsmasq ;;
+      dnsmasq-d)
+        dnsmasq-d ;;
       boot)
         for node in "${NODES[@]}"; do
           vm_start ${HOST_IP_ADDR} ${node}
