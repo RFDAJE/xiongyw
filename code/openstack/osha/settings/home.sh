@@ -37,6 +37,8 @@ settings_home() {
     # name, just suffixed with character 'm'.
     # if there is a 3rd ip@ for storage network, suffix with 's'.
     # the IPMI ip@ suffix is 'i'
+    SETTINGS_INFO="settings for home environment"
+
     NODES=( ctl1 ctl2 ctl3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"

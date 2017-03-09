@@ -19,7 +19,7 @@ postinstall() {
     ssh ${node} -- timedatectl set-ntp 1
     ssh ${node} -- timedatectl set-local-rtc 0
   done
-  
+
   # ssh-key-gen?
 }
 
@@ -49,7 +49,7 @@ postinstall-t() {
       error "selinux is not disabled on ${node}!"
       exit 1
     fi
-        
+
     # iptables
     echo "checking iptables..."
     ssh ${node} -- systemctl status iptables
@@ -63,6 +63,8 @@ postinstall-t() {
     fi
 
     # timedatectl
+    # "timedatectl set-ntp 1" depends on chronyd installed. we move this test to chronyd-t
+    :<<SKIP
     cat <<-'EOF' | ssh -T ${node} --
 	timedatectl | grep "NTP enabled: yes"
 	EOF
@@ -70,7 +72,7 @@ postinstall-t() {
       error "NTP is not enabled on ${node}! correct this by: timedatectl set-ntp 1"
       exit 1
     fi
-    
+
     cat <<-'EOF' | ssh -T ${node} --
 	timedatectl | grep "RTC in local TZ: no"
 	EOF
@@ -78,6 +80,7 @@ postinstall-t() {
       error "RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
       exit 1
     fi
+SKIP
   done
 }
 
@@ -142,7 +145,7 @@ _setup_teaming() {
 
 	systemctl enable NetworkManager
 	systemctl start NetworkManager; sleep 5
-	
+
 	nmcli con add type team con-name ${NODES_TEAM_NAMES[0]} ifname ${NODES_TEAM_NAMES[0]} ip4 ${ip[0]}/${NODES_IP_MASKS[0]} gw4 ${NODES_GW_ADDRS[0]}
 	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[0]} ifname ${NODES_NIC_NAMES[0]} master ${NODES_TEAM_NAMES[0]}
 	nmcli con add type team-slave con-name ${NODES_NIC_NAMES[1]} ifname ${NODES_NIC_NAMES[1]} master ${NODES_TEAM_NAMES[0]}

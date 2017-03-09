@@ -8,7 +8,7 @@ CHRONYD_res_name_short=${CHRONYD_res_name%-clone}
 chronyd() {
 
   local script="/tmp/chronyd.sh"
-  
+
   echo "setup chronyd service..."
 
   # check if the resource already exist
@@ -24,6 +24,7 @@ chronyd() {
 	#!/bin/bash
 	echo "installing chrony and configuring chronyd..."
 	yum -y install chrony
+	set -x
 	timedatectl set-ntp 1
 	timedatectl set-local-rtc 0
 	sed -i.bak -e "/^#allow/callow" -e "/^bindcmdaddress/cbindcmdaddress 0.0.0.0" /etc/chrony.conf
@@ -52,5 +53,21 @@ chronyd-t() {
   for node in "${NODES[@]}"; do
     echo "on $node:"
     ssh ${node} -- timedatectl \; chronyc sources -v
+
+    cat <<-'EOF' | ssh -T ${node} --
+	timedatectl | grep "NTP enabled: yes"
+	EOF
+    if [[ $? != 0 ]]; then
+      error "NTP is not enabled on ${node}! correct this by: timedatectl set-ntp 1"
+      exit 1
+    fi
+
+    cat <<-'EOF' | ssh -T ${node} --
+	timedatectl | grep "RTC in local TZ: no"
+	EOF
+    if [[ $? != 0 ]]; then
+      error "RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
+      exit 1
+    fi
   done
 }

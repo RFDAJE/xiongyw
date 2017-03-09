@@ -52,7 +52,7 @@ rabbitmq() {
   for idx in "${!NODES[@]}"; do
     local node=${NODES[$idx]}
     local ips=( ${NODES_IP_ADDRS[$idx]} )
-    
+
     info "installing rabbitmq packages on ${node}..."
     ssh ${node} -- yum -y install rabbitmq-server rabbitmq-java-client librabbitmq librabbitmq-tools
     #echo "configuring node name..."
@@ -113,8 +113,8 @@ rabbitmq() {
 	EOF
 
   echo -n "Waiting rabbitmq-master resource up-running..."
-  sleep 60;
-  
+  sleep 120;
+
 
   # set ha policy to ha-all
   cat <<-'EOF' | ssh -T ${NODES[0]} --
@@ -171,7 +171,7 @@ rabbitmq() {
       ssh ${node} -- echo "\ \ server ${srv} ${ip}:${RABBITMQ_mgmt_port} check inter 2000 rise 2 fall 5" \>\>${RABBITMQ_haproxy_cfg}
     done
   done
-   
+
   # re-define haproxy resource
   haproxy_recreate_res
 }
@@ -220,7 +220,7 @@ rabbitmq-t() {
     error "rabbitmq user 'openstack does not exist! Fix this before proceeding..."
     exit 1
   fi
-  
+
   ssh ${NODES[0]} -- rabbitmqctl list_policies
   ssh ${NODES[0]} -- pcs resource show ${RABBITMQ_res_name}
 }

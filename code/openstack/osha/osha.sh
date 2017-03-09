@@ -27,13 +27,15 @@ SCRIPTPATH=$(dirname $SCRIPT)
 #
 . $SCRIPTPATH/settings/home.sh
 . $SCRIPTPATH/settings/wukuang.sh
-. $SCRIPTPATH/settings/ehualu.sh
+. $SCRIPTPATH/settings/ehualu-dev.sh
+. $SCRIPTPATH/settings/ehualu-mini.sh
 . $SCRIPTPATH/settings/xiamen.sh
 
 #settings_home
 #settings_wukuang
 #settings_xiamen
-settings_ehualu
+#settings_ehualu_dev
+settings_ehualu_mini
 #                                                      #
 #                                                      #
 ########################################################
@@ -95,9 +97,9 @@ usage() {
 
 	  the following are openstack related ha services, most of them support delete and test, by suffix
 	  with '-d' and '-t' respectively; some also support reinstall, by suffixing a '-r'.
+	  - chronyd:
 	  - vip:
 	  - haproxy:
-	  - chronyd:
 	  - memcached:
 	  - rabbitmq:
 	  - mongod:
@@ -106,6 +108,8 @@ usage() {
 	  - snmpd:
 	  - ceil:
 	  - aodh:
+
+	  - ALL: install all components at once.
 	  - summary: output summary info for all services provided by the cluster.
 	EOF
 }
@@ -203,6 +207,51 @@ main () {
         $1 ;;
       aodh | aodh-[dt])
         $1 ;;
+      settings)
+        echo ${SETTINGS_INFO}
+		  local EXT_IPS=()
+		  local MGMT_IPS=()
+		  local IPMI_IPS=()
+		  for idx in "${!NODES[@]}"; do
+			local ips=( ${NODES_IP_ADDRS[$idx]} )
+			EXT_IPS+=(${ips[0]})
+			MGMT_IPS+=(${ips[1]})
+			IPMI_IPS+=(${ips[2]})
+		  done
+
+		  echo "+ nodes info (hostname, ext_ip, mgmt_ip, ipmi_ip):"
+		  for idx in "${!NODES[@]}"; do
+			echo "  - ${NODES[${idx}]}${MGMT_SUFFIXE} ${EXT_IPS[${idx}]} ${MGMT_IPS[${idx}]} ${IPMI_IPS[${idx}]}"
+		  done
+        ;;
+      ALL)
+        pacemaker; sleep ${BREATH_TIME_IN_SECONDS}
+        chronyd; sleep ${BREATH_TIME_IN_SECONDS}
+        vip; sleep ${BREATH_TIME_IN_SECONDS}
+        haproxy; sleep ${BREATH_TIME_IN_SECONDS}
+        memcached; sleep ${BREATH_TIME_IN_SECONDS}
+        rabbitmq; sleep ${BREATH_TIME_IN_SECONDS}
+        mariadb; sleep ${BREATH_TIME_IN_SECONDS}
+        mongod; sleep ${BREATH_TIME_IN_SECONDS}
+        keystone; sleep ${BREATH_TIME_IN_SECONDS}
+        snmpd; sleep ${BREATH_TIME_IN_SECONDS}
+        ceil; sleep ${BREATH_TIME_IN_SECONDS}
+        aodh; sleep ${BREATH_TIME_IN_SECONDS}
+        ;;
+      ALL-d)
+        aodh-d; sleep ${BREATH_TIME_IN_SECONDS}
+        ceil-d; sleep ${BREATH_TIME_IN_SECONDS}
+        snmpd-d; sleep ${BREATH_TIME_IN_SECONDS}
+        keystone-d; sleep ${BREATH_TIME_IN_SECONDS}
+        mongod-d; sleep ${BREATH_TIME_IN_SECONDS}
+        mariadb-d; sleep ${BREATH_TIME_IN_SECONDS}
+        rabbitmq-d; sleep ${BREATH_TIME_IN_SECONDS}
+        memcached-d; sleep ${BREATH_TIME_IN_SECONDS}
+        haproxy-d; sleep ${BREATH_TIME_IN_SECONDS}
+        vip-d; sleep ${BREATH_TIME_IN_SECONDS}
+        chronyd-d; sleep ${BREATH_TIME_IN_SECONDS}
+        pacemaker-d; sleep ${BREATH_TIME_IN_SECONDS}
+        ;;
       summary)
         $1 ;;
     ###############################################

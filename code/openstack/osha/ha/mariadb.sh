@@ -32,7 +32,7 @@ mariadb() {
   fi
 
   dep_install_check ${MARIADB_res_name}
-  
+
   #
   # on each node, do the following:
   #
@@ -154,8 +154,8 @@ mariadb() {
 	mysql -uroot -p${MARIADB_root_pass} -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'${NODES_SUBNET_FOR_MARIADB[1]}' IDENTIFIED BY '${MARIADB_root_pass}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 
 	echo "adding user haproxy_check..."
-	#mysql -uroot -p${MARIADB_root_pass} -e "CREATE USER haproxy_check@'${NODES_SUBNET_FOR_MARIADB[0]}';"
-	#mysql -uroot -p${MARIADB_root_pass} -e "GRANT USAGE ON *.* TO 'haproxy_check'@'${NODES_SUBNET_FOR_MARIADB[0]}' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+	mysql -uroot -p${MARIADB_root_pass} -e "CREATE USER haproxy_check@'${NODES_SUBNET_FOR_MARIADB[0]}';"
+	mysql -uroot -p${MARIADB_root_pass} -e "GRANT USAGE ON *.* TO 'haproxy_check'@'${NODES_SUBNET_FOR_MARIADB[0]}' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 	mysql -uroot -p${MARIADB_root_pass} -e "CREATE USER haproxy_check@'${NODES_SUBNET_FOR_MARIADB[1]}';"
 	mysql -uroot -p${MARIADB_root_pass} -e "GRANT USAGE ON *.* TO 'haproxy_check'@'${NODES_SUBNET_FOR_MARIADB[1]}' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 	EOF
@@ -163,7 +163,10 @@ mariadb() {
 	SKIP
 
   cat <<-EOF | ssh -T ${NODES[0]} --
+	mysql -uroot -p${MARIADB_root_pass} -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'${NODES_SUBNET_FOR_MARIADB[0]}' IDENTIFIED BY '${MARIADB_root_pass}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 	mysql -uroot -p${MARIADB_root_pass} -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'${NODES_SUBNET_FOR_MARIADB[1]}' IDENTIFIED BY '${MARIADB_root_pass}' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+	mysql -uroot -p${MARIADB_root_pass} -e "CREATE USER haproxy_check@'${NODES_SUBNET_FOR_MARIADB[0]}';"
+	mysql -uroot -p${MARIADB_root_pass} -e "GRANT USAGE ON *.* TO 'haproxy_check'@'${NODES_SUBNET_FOR_MARIADB[0]}' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 	mysql -uroot -p${MARIADB_root_pass} -e "CREATE USER haproxy_check@'${NODES_SUBNET_FOR_MARIADB[1]}';"
 	mysql -uroot -p${MARIADB_root_pass} -e "GRANT USAGE ON *.* TO 'haproxy_check'@'${NODES_SUBNET_FOR_MARIADB[1]}' IDENTIFIED BY '' WITH GRANT OPTION; FLUSH PRIVILEGES;"
 	EOF
@@ -221,7 +224,7 @@ mariadb-d() {
   echo "deleting mariadb resource..."
 
   dep_delete_check ${MARIADB_res_name}
-  
+
   ssh ${NODES[0]} -- pcs resource delete ${MARIADB_res_name}
 
   for node in "${NODES[@]}"; do

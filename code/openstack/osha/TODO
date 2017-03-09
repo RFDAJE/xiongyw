@@ -15,6 +15,7 @@
 - separate mq cluster for telemetry?
 - dns: for large deployment
 - gnocchi/panko/ironic?
+- "timedatectl set-ntp 1" status may change after install components.
 
 
 issues:

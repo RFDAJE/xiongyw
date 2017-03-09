@@ -5,6 +5,7 @@
 # this file contains settings for physical test environment at xiamen lab.
 
 settings_xiamen() {
+    SETTINGS_INFO="settings for xiamen environment"
 
     NODES=( operation1 operation2 operation3 )
     MGMT_SUFFIX="m"

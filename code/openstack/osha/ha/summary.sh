@@ -3,7 +3,25 @@
 # created(bruin, 2017-03-09)
 
 summary() {
-  info "service summary list"
+
+  info "system info"
+  echo "-----------------"
+
+  echo "Linux distro: CentOS 7.3 (x86_64)"
+  echo "Pacemaker: 1.1.15"
+  echo "HAProxy: 1.5.18"
+  echo "chrony: 2.1.1"
+  echo "memcached: 1.4.33"
+  echo "MariaDB-server: 10.1.20"
+  echo "RabbitMQ-server: 3.6.5"
+  echo "MongoDB: mongodb-org-3.4"
+  echo "OpenStack release: Newton (centos-openstack-newton)"
+  echo "openstack-keystone: 10.0.1"
+  echo "openstack-ceilometer: 7.0.1"
+  echo "openstack-aodh: 3.0.1"
+
+  info "controller cluster service summary"
+  echo "----------------------------------------"
 
   local EXT_IPS=()
   local MGMT_IPS=()
@@ -55,7 +73,7 @@ summary() {
   local rabbitmq_transport_url="rabbit://${rabbitmq_host_n_port_user_pass// /,}/"
 
   echo "  - transport url: ${rabbitmq_transport_url}"
-  echo "  - vip access (not recommended to use): ${NODES_VIP_ADDRS[1]}:${RABBITMQ_mgmt_port}"
+  echo "  - vip access (not recommended to use): ${NODES_VIP_ADDRS[1]}:${RABBITMQ_port}"
   echo "  - web ui for mgmt: http://guest:guest@${NODES_VIP_ADDRS[0]}:${RABBITMQ_mgmt_port}/"
   echo "                     http://guest:guest@${NODES_VIP_ADDRS[1]}:${RABBITMQ_mgmt_port}/"
 

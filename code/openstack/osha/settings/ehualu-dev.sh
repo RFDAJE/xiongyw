@@ -2,8 +2,8 @@
 
 # created(bruin, 2017-02-07)
 
-# this file contains settings for ehualu test environment deployment.
-settings_ehualu() {
+# this file contains settings for ehualu dev/test environment.
+settings_ehualu_dev() {
     # this is for test environment at wukuang office using kvm VMs for nodes.
     #
     # it's assumed that:
@@ -34,6 +34,8 @@ settings_ehualu() {
     # name, just suffixed with character 'm'. This is the host name.
     # if there is a 3rd ip@ for storage network, suffix with 's'.
     # the IPMI ip@ suffix is 'i'
+	SETTINGS_INFO="settings for ehualu dev environment"
+
     NODES=( c1 c2 c3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"
