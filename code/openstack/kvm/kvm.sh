@@ -130,10 +130,13 @@ main () {
           local ip_start=${entry[5]}
           for idx2 in $(seq 1 ${node_nr}); do
             local guest_name=${name}${idx2}
+            local guest_name2=${guest_name}${MGMT_SUFFIX}
             let ip_last=ip_start+idx2-1
             local ip=${SUBNET_PREFIX[0]}${ip_last}
+            local ip2=${SUBNET_PREFIX[1]}${ip_last}
             local pass="qwerty"
             ssh_copy_id ${guest_name} ${ip} ${pass}
+            ssh_copy_id ${guest_name2} ${ip2} ${pass}
           done
         done
         ;;
@@ -237,15 +240,36 @@ main () {
         update_etc_hosts cleanup
         ;;
       post-t)
-        postinstall-t ;;
-      pacemaker | pacemaker-[d])
-        $1 ;;
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local node_nr=${entry[3]}
+          local ip_start=${entry[5]}
+          for idx2 in $(seq 1 ${node_nr}); do
+            let ip_last=ip_start+idx2-1
+            local ext_ip=${SUBNET_PREFIX[0]}${ip_last}
+            postinstall-t ${ext_ip}
+          done
+        done
+        ;;
+      pacemaker|pacemaker-d)
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local cluster_name=${entry[0]}
+          local node_nr=${entry[3]}
+          local nodes=()
+          for idx2 in $(seq 1 ${node_nr}); do
+            local mgm_name=${cluster_name}${idx2}${MGMT_SUFFIX}
+            nodes+=(${mgm_name})
+          done
+          $1 ${cluster_name} ${nodes[*]}
+        done
+        ;;
       pcs)
-        ssh ${NODES[0]} -- $* ;;
-      ${NODES[0]} | ${NODES[1]} | ${NODES[2]})
-        node=$1
-        shift
-        ssh ${node} -- $*
+        for idx in "${!CLUSTERS[@]}"; do
+          local entry=( ${CLUSTERS[${idx}]} )
+          local cluster_name=${entry[0]}
+          ssh ${cluster_name}1m -- $*
+        done
         ;;
     ###############################################
       *)

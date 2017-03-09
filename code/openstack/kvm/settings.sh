@@ -3,11 +3,11 @@
 # created(bruin, 2017-03-03)
 
 # this file contains settings for ehualu mini-deployment, i.e., each
-# cluster is formed on several guests running a host.
+# cluster is formed by several guests running on a host.
 
 settings_ehualu() {
 
-    # an array of pairs of "cluster_name host_ext_ip host_mgmt_ip node_nr mac_prefix_for_guests guest_ip_start root_pass guests_root"
+    # an array of "cluster_name host_ext_ip host_mgmt_ip node_nr mac_prefix_for_guests guest_ip_start root_pass guests_root"
     CLUSTERS=( "ctl  192.168.8.120  192.168.9.120  3  52:54:00:00:a1:  211 qwerty /data/kvm" \
                "ptl  192.168.8.115  192.168.9.115  3  52:54:00:00:a2:  221 qwerty /data/kvm" \
                "gw   192.168.8.123  192.168.9.123  7  52:54:00:00:a3:  231 qwerty /data/kvm" \

@@ -33,8 +33,11 @@ postinstall() {
   # ssh-key-gen?
 }
 
+# args:
+# 1: ip
 postinstall-t() {
-  for node in "${NODES[@]}"; do
+    local node=${1}
+
     # connectivity check
     ssh ${node} -- ping -c 3 www.sohu.com
     if [[ $? = 0 ]]; then
@@ -88,7 +91,6 @@ postinstall-t() {
       error "RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
       exit 1
     fi
-  done
 }
 
 
