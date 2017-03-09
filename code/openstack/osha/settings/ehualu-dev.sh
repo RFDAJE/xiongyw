@@ -35,6 +35,9 @@ settings_ehualu_dev() {
     # if there is a 3rd ip@ for storage network, suffix with 's'.
     # the IPMI ip@ suffix is 'i'
 	SETTINGS_INFO="settings for ehualu dev environment"
+    # sleep for a while after install one component, otherwise
+    # the system may be choked by the pacemaker resources' activities
+	BREATH_TIME_IN_SECONDS=15
 
     NODES=( c1 c2 c3 )
     MGMT_SUFFIX="m"

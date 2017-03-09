@@ -6,6 +6,9 @@
 
 settings_xiamen() {
     SETTINGS_INFO="settings for xiamen environment"
+    # sleep for a while after install one component, otherwise
+    # the system may be choked by the pacemaker resources' activities
+	BREATH_TIME_IN_SECONDS=15
 
     NODES=( operation1 operation2 operation3 )
     MGMT_SUFFIX="m"

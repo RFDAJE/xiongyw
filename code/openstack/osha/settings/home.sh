@@ -39,6 +39,11 @@ settings_home() {
     # the IPMI ip@ suffix is 'i'
     SETTINGS_INFO="settings for home environment"
 
+    # sleep for a while after install one component, otherwise
+    # the system may be choked by the pacemaker resources' activities
+	BREATH_TIME_IN_SECONDS=30
+
+
     NODES=( ctl1 ctl2 ctl3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"

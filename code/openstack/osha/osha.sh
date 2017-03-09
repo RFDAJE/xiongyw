@@ -31,11 +31,11 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/ehualu-mini.sh
 . $SCRIPTPATH/settings/xiamen.sh
 
-#settings_home
+settings_home
 #settings_wukuang
 #settings_xiamen
 #settings_ehualu_dev
-settings_ehualu_mini
+#settings_ehualu_mini
 #                                                      #
 #                                                      #
 ########################################################
@@ -109,7 +109,10 @@ usage() {
 	  - ceil:
 	  - aodh:
 
-	  - ALL: install all components at once.
+	  - ALL: install all components in batch
+	  - ALL-d: remove all components in batch
+
+	  - settings: show settings
 	  - summary: output summary info for all services provided by the cluster.
 	EOF
 }
@@ -230,8 +233,8 @@ main () {
         vip; sleep ${BREATH_TIME_IN_SECONDS}
         haproxy; sleep ${BREATH_TIME_IN_SECONDS}
         memcached; sleep ${BREATH_TIME_IN_SECONDS}
-        rabbitmq; sleep ${BREATH_TIME_IN_SECONDS}
-        mariadb; sleep ${BREATH_TIME_IN_SECONDS}
+        rabbitmq; sleep ${BREATH_TIME_IN_SECONDS}; sleep ${BREATH_TIME_IN_SECONDS}
+        mariadb; sleep ${BREATH_TIME_IN_SECONDS}; sleep ${BREATH_TIME_IN_SECONDS}
         mongod; sleep ${BREATH_TIME_IN_SECONDS}
         keystone; sleep ${BREATH_TIME_IN_SECONDS}
         snmpd; sleep ${BREATH_TIME_IN_SECONDS}
