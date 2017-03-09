@@ -10,6 +10,12 @@
 - haproxy on host
 - stonith
 - config keystone to use MQ for sending notification (to be captured by ceilometer).
+- rsyslog
+- bastion: tools?
+- separate mq cluster for telemetry?
+- dns: for large deployment
+- gnocchi/panko/ironic?
+
 
 issues:
 ------
@@ -43,7 +49,7 @@ issues:
       return client.session.auth.get_access(client.session).service_catalog
     AttributeError: 'NoneType' object has no attribute 'get_access'
   - guess: keystone_client.get_client() return None, in panko_url().
-  - 
+  -
 + ceilometer-api: 4
   - symptom: "ceilometer alarm-list" returns "Internal Server error (http 500)"
 
@@ -53,7 +59,7 @@ issues:
     db.getCollection('meter').find({counter_name:"my-meter-name"})
   - hint:
   - reason:
-  
+
 + ceilometer-central: 1
   - symptom: /var/log/ceilometer/central.log:
     2017-02-14 15:29:11.598 20122 ERROR ceilometer.agent.manager [-] Skipping tenant, keystone issue: An auth plugin is required to determine endpoint URL
@@ -83,7 +89,7 @@ issues:
     ERROR ceilometer.agent.manager ExtensionLoadError: [Errno 2] No such file or directory
   - hints: http://superuser.openstack.org/articles/ceilometer-full-stack-monitoring-for-openstack/
     it's moved into ironic code base? To collect IPMI data OpenStack deployments require the Ironic Conductor. It will push IPMI monitoring data to Ceilometer on the notification bus. This data is not in the format that Ceilometer requires. The Ceilometer notification handler intercepts this data and stores it in the Ceilometer Storage DB. The Ceilometer IPMI Inspector periodically checks the Ceilometer Storage DB and converts the format from the Ironic message format to the Ceilometer format.
-        
+
 + ceilometer-collector
   - symptom: /var/log/ceilometer/collector.log:
     WARNING ceilometer.dispatcher [-] Failed to load any dispatchers for ceilometer.dispatcher.event

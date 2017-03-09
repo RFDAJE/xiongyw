@@ -9,7 +9,7 @@ settings_xiamen() {
     NODES=( operation1 operation2 operation3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"
-    IMPI_SUFFIX="i"
+    IPMI_SUFFIX="i"
 
     # the i/f name recognized by kernel
     NODES_NIC_NAMES=( enp3s0f1 eno1 )
@@ -45,7 +45,7 @@ settings_xiamen() {
     # ip:port of the web server
     TOOLS_IP_ADDR="192.168.101.11"
     TOOLS_HTTP_PORT="80"
-    
+
     # dhcp server bind address
     TOOLS_DHCP_BIND_IP="10.0.0.1"
     # dhcp option 3, providing default gateway to clients

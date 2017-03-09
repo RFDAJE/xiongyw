@@ -37,7 +37,7 @@ settings_wukuang() {
     NODES=( ctl1 ctl2 ctl3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"
-    IMPI_SUFFIX="i"
+    IPMI_SUFFIX="i"
 
     # the abstract path for the folder contains VM xml & images
     GUESTS_ROOT="/home/bruin/work/kvm/ha"

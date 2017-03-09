@@ -21,7 +21,7 @@
 SCRIPT=$(readlink -f $0)
 SCRIPTPATH=$(dirname $SCRIPT)
 
-######################################################## 
+########################################################
 # settings goes first                                  #
 # settings to be customized for each depolyment        #
 #
@@ -65,6 +65,7 @@ settings_ehualu
 . $SCRIPTPATH/ha/snmpd.sh
 . $SCRIPTPATH/ha/ceilometer.sh
 . $SCRIPTPATH/ha/aodh.sh
+. $SCRIPTPATH/ha/summary.sh
 . $SCRIPTPATH/ha/horizon.sh
 
 # dependency & constraint
@@ -105,6 +106,7 @@ usage() {
 	  - snmpd:
 	  - ceil:
 	  - aodh:
+	  - summary: output summary info for all services provided by the cluster.
 	EOF
 }
 
@@ -200,6 +202,8 @@ main () {
       ceil | ceil-[dtr])
         $1 ;;
       aodh | aodh-[dt])
+        $1 ;;
+      summary)
         $1 ;;
     ###############################################
       openstack)

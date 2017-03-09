@@ -2,7 +2,7 @@
 
 # created(bruin, 2017-02-07)
 
-# this file contains settings for ehualu test environment deployment. 
+# this file contains settings for ehualu test environment deployment.
 settings_ehualu() {
     # this is for test environment at wukuang office using kvm VMs for nodes.
     #
@@ -37,7 +37,7 @@ settings_ehualu() {
     NODES=( c1 c2 c3 )
     MGMT_SUFFIX="m"
     STOR_SUFFIX="s"
-    IMPI_SUFFIX="i"
+    IPMI_SUFFIX="i"
 
     # the abstract path for the folder contains VM xml & images
     GUESTS_ROOT="/home/bruin/work/kvm/ha"
@@ -94,7 +94,7 @@ settings_ehualu() {
                    "10.0.1.53" )
     # for ceilometer to poll ipmi info from all applicable hosts
     IPMI_IP_LIST=( "TODO" )
-    
+
     # the local directory for storing repos
     TOOLS_MIRRORS_ROOT="/mirrors"
     # the source site from where to rsync
