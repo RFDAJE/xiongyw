@@ -60,6 +60,8 @@ keystone() {
 
   _keystone_haproxy_config
 
+  sleep 10
+
   _keystone_create_domain_n_project
 }
 
