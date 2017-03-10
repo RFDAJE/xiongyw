@@ -42,7 +42,9 @@ chronyd() {
 chronyd-d() {
   echo "removing chrony package..."
   for node in "${NODES[@]}"; do
-    ssh ${node} -- yum -y remove chrony
+    # timedatectl depends on chronyd
+    #ssh ${node} -- yum -y remove chrony
+    :
   done
   echo "deleting chronyd-clone resource..."
   ssh ${NODES[0]} -- pcs resource delete ${CHRONYD_res_name}

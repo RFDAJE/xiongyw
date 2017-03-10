@@ -53,7 +53,11 @@ pacemaker-d() {
   ssh ${NODES[0]} -- pcs cluster destroy --all
   for node in "${NODES[@]}"; do
     echo "removing pacemaker package and its dependencies..."
-    ssh $node -- yum -y remove pacemaker pcs policycoreutils-python
+    ssh $node -- yum -y remove pacemaker pcs policycoreutils-python corosync
+    echo "removing files..."
+    ssh $node -- rm -rf /etc/corosync
+    ssh $node -- rm -rf /var/log/cluster
+    ssh $node -- rm -rf /var/lib/{corosync,pacemaker}
   done
 }
 

@@ -36,10 +36,14 @@ postinstall-t() {
 
     # firewalld
     echo "checking firewalld..."
-    ssh ${node} -- systemctl status firewalld \| grep inactive
-    if [[ $? != 0 ]]; then
-      error "firealld is not disabled on ${node}!"
-      exit 1
+    ssh ${node} -- systemctl status firewalld
+    if [[ $? == 0 ]]; then
+      # iptables is installed, check further
+      ssh ${node} -- systemctl status firewalld \| grep inactive
+      if [[ $? != 0 ]]; then
+        error "firealld is not disabled on ${node}!"
+        exit 1
+      fi
     fi
 
     # selinux
@@ -63,8 +67,7 @@ postinstall-t() {
     fi
 
     # timedatectl
-    # "timedatectl set-ntp 1" depends on chronyd installed. we move this test to chronyd-t
-    :<<SKIP
+    # "timedatectl set-ntp 1" depends on chronyd installed.
     cat <<-'EOF' | ssh -T ${node} --
 	timedatectl | grep "NTP enabled: yes"
 	EOF
@@ -80,7 +83,7 @@ postinstall-t() {
       error "RTC setting is not good on ${node}! correct this by: timedatectl set-local-rtc 0"
       exit 1
     fi
-SKIP
+
   done
 }
 
