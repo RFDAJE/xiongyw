@@ -69,7 +69,7 @@ summary() {
   done
 
   local rabbitmq_host_n_port=(${MGMT_IPS[@]/%/:${RABBITMQ_port}})
-  local rabbitmq_host_n_port_user_pass="${rabbitmq_host_n_port[@]/#/${RABBITMQ_user}:${RABBITMQ_pass}}"
+  local rabbitmq_host_n_port_user_pass="${rabbitmq_host_n_port[@]/#/${RABBITMQ_user}:${RABBITMQ_pass}@}"
   local rabbitmq_transport_url="rabbit://${rabbitmq_host_n_port_user_pass// /,}/"
 
   echo "  - transport url: ${rabbitmq_transport_url}"
@@ -87,7 +87,7 @@ summary() {
   echo "+ mongodb replica set:"
   local mongod_nodes="${MGMT_IPS[@]/%/:27017}"
   local mongod_nodes=${mongod_nodes// /,}
-  local mongod_conn_url="mongodb://${mongod_nodes}/?replicaSet=${mongod_rs_name}"
+  local mongod_conn_url="mongodb://${mongod_nodes}/?replicaSet=${MONGOD_rs_name}"
   echo "  - connection url: ${mongod_conn_url}"
 
   # keystone endpoints:
