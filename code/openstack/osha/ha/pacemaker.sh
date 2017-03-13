@@ -47,6 +47,11 @@ pacemaker() {
 }
 
 pacemaker-d() {
+  info "removing pacemaker..."a
+
+  # it seems that without cleanup resource, the stop command will hangup
+  echo "cleaning up resources..."
+  ssh ${NODES[0]} -- pcs resource cleanup
   echo "stopping the cluster..."
   ssh ${NODES[0]} -- pcs cluster stop --all
   echo "destroying the cluster..."

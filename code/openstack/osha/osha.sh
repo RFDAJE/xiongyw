@@ -32,9 +32,9 @@ SCRIPTPATH=$(dirname $SCRIPT)
 . $SCRIPTPATH/settings/ehualu-mini.sh
 . $SCRIPTPATH/settings/xiamen.sh
 
-#settings_home
+settings_home
 #settings_wukuang
-settings_wukuang_qa
+#settings_wukuang_qa
 #settings_xiamen
 #settings_ehualu_dev
 #settings_ehualu_mini
@@ -244,17 +244,18 @@ main () {
         aodh; sleep ${BREATH_TIME_IN_SECONDS}
         ;;
       ALL-d)
-        aodh-d; sleep ${BREATH_TIME_IN_SECONDS}
-        ceil-d; sleep ${BREATH_TIME_IN_SECONDS}
-        snmpd-d; sleep ${BREATH_TIME_IN_SECONDS}
-        keystone-d; sleep ${BREATH_TIME_IN_SECONDS}
-        mongod-d; sleep ${BREATH_TIME_IN_SECONDS}
-        mariadb-d; sleep ${BREATH_TIME_IN_SECONDS}
-        rabbitmq-d; sleep ${BREATH_TIME_IN_SECONDS}
-        memcached-d; sleep ${BREATH_TIME_IN_SECONDS}
-        haproxy-d; sleep ${BREATH_TIME_IN_SECONDS}
-        vip-d; sleep ${BREATH_TIME_IN_SECONDS}
-        chronyd-d; sleep ${BREATH_TIME_IN_SECONDS}
+        ssh ${NODES[0]} -- pcs resource cleanup
+        aodh-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        ceil-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        snmpd-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        keystone-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        mongod-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        mariadb-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        rabbitmq-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        memcached-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        haproxy-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        vip-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
+        chronyd-d; sleep ${BREATH_TIME_IN_SECONDS}; ssh ${NODES[0]} -- pcs resource cleanup
         pacemaker-d; sleep ${BREATH_TIME_IN_SECONDS}
         ;;
       summary)
