@@ -1,4 +1,6 @@
 ---
 - hosts: ctl
   roles:
+    - common
     - pacemaker
+

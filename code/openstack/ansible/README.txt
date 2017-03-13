@@ -3,6 +3,6 @@ prerequisites:
 - ssh-copy-id is done from ansible box to all hosts are done
 
 
-run:
+for ctl cluster, run:
 
-sudo ansible-playbook -i site_xxx.ini cluster_yyy.yml
+sudo ansible-playbook -v -i home.ini ctl.yml

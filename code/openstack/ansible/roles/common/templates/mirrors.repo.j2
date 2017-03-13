@@ -1,0 +1,117 @@
+###############################################
+# centos
+###############################################
+[base]
+name=CentOS-{{ releasever }} - Base
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/centos/{{ releasever }}/os/{{ basearch }}/
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#released updates
+[updates]
+name=CentOS-{{ releasever }} - Updates
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/centos/{{ releasever }}/updates/{{ basearch }}/
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#additional packages that may be useful
+[extras]
+name=CentOS-{{ releasever }} - Extras
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/centos/{{ releasever }}/extras/{{ basearch }}/
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#additional packages that extend functionality of existing packages
+[centosplus]
+name=CentOS-{{ releasever }} - Plus
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/centos/{{ releasever }}/centosplus/{{ basearch }}/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+###############################################
+# CentOS-OpenStack-newton.repo
+###############################################
+# Please see http://wiki.centos.org/SpecialInterestGroup/Cloud for more information
+[centos-openstack-newton]
+name=CentOS-7 - OpenStack newton
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/centos/7/cloud/{{ basearch }}/openstack-newton/
+gpgcheck=0
+enabled=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Cloud
+
+###########################################
+# epel
+###########################################
+# note: first do: yum install yum install epel-release
+[epel]
+name=Extra Packages for Enterprise Linux 7 - {{ basearch }}
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/epel/7/{{ basearch }}
+failovermethod=priority
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+
+###########################################
+# elrepo
+###########################################
+# note: first do: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+[elrepo]
+name=ELRepo.org Community Enterprise Linux Repository - el7
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/elrepo/el7/{{ basearch }}/
+enabled=0
+
+###########################################
+# mariadb 10.1.19
+###########################################
+
+[mariadb]
+name = MariaDB 10.1.19
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/mariadb/mariadb-10.1.19/yum/centos7-amd64/
+gpgkey=http://{{ mirror_ip }}:{{ mirror_port }}/mariadb/RPM-GPG-KEY-MariaDB
+gpgcheck=0
+
+###########################################
+# mongodb 3.4
+###########################################
+[mongodb-org-3.4]
+name=MongoDB Repository
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/mongodb/el7-3.4/
+gpgcheck=0
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
+
+###########################################
+# puppet pc1
+###########################################
+
+[puppetlabs-pc1]
+name=Puppet Labs PC1 Repository el 7 - {{ basearch }}
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/yum.puppetlabs.com/packages/yum/el/7/PC1/{{ basearch }}
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs-PC1
+       file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puppet-PC1
+enabled=1
+gpgcheck=0
+
+###########################################
+# ha-clustering
+###########################################
+
+[ha-clustering]
+name=Stable High Availability/Clustering packages (CentOS_CentOS-7)
+type=rpm-md
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/opensuse-repositories/network:/ha-clustering:/Stable/CentOS_CentOS-7/
+gpgcheck=0
+gpgkey=file:///{{ mirror_ip }}:{{ mirror_port }}/opensuse-repositories/network:/ha-clustering:/Stable/CentOS_CentOS-7/repodata/repomd.xml.key
+enabled=0
+
+###########################################
+# docker
+###########################################
+[docker]
+name=Docker Repository
+baseurl=http://{{ mirror_ip }}:{{ mirror_port }}/docker/yum/repo/centos7/
+enabled=1
+gpgcheck=0
+gpgkey=file:///{{ mirror_ip }}:{{ mirror_port }}/docker/gpg

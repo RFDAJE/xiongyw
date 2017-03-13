@@ -1,0 +1,76 @@
+- name: backup-existing-repo-files
+  shell: mkdir -p /etc/yum.repos.d/backup; mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
+
+- name: generate-an-all-in-one-yum-repo-file
+  template: src=mirrors.repo.j2 dest=/etc/yum.repos.d/mirrors.repo
+
+- name: disable-fastest-mirror-plugin
+#  shell: sed -i.bak -e '/enabled/cenabled=0' /etc/yum/pluginconf.d/fastestmirror.conf
+  template: src=fastestmirror.conf dest=/etc/yum/pluginconf.d/fastestmirror.conf
+
+- name: import-elrepo-rpm-gpg-key
+#  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+  rpm_key:
+    state: present
+    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
+- name: yum-update
+  yum:
+    name: '*'
+    state: latest
+
+- name: install-misc-pkgs
+  yum: name={{ item }} state=installed
+  with_items:
+    - NetworkManager-tui
+    - NetworkManager-team
+    - chrony
+    - ipmitool
+    - kexec-tools
+    - lsof
+    - lynx
+    - curl
+    - nmap-ncat
+    - psmisc
+    - rsync
+    - smartmontools
+    - socat
+    - sudo
+    - tcpdump
+    - tmux
+    - wget
+    - htop
+    - inxi
+    - gsmartcontrol
+    - vim-enhanced
+    - firewalld
+    - iptables
+
+#- name: yum-remove-some-pkgs
+#  yum: name={{ item }} state=removed
+#  with_items:
+#    - iptables
+
+- name: create-vim-symlink
+  shell: unlink /usr/bin/vi; ln -s /usr/bin/vim /usr/bin/vi
+
+- name: create-user-bruin
+  user: name=bruin shell=/bin/bash home=/home/bruin groups=wheel generate_ssh_key=yes ssh_key_bits=2048
+
+- name: set-bruin-password
+  shell: echo bruin:qwerty | chpasswd
+
+- name: disable-firewalld
+  service: name={{ item }} enabled=no
+  with_items:
+    - firewalld
+#    - iptables
+
+- name: disable-selinux
+  template: src=selinux.config dest=/etc/selinux/config
+
+- name: enable-nopasswd-sudo
+  template: src=sudoers dest=/etc/suduers
+
+- name: update-sshd-config
+  template: src=sshd_config dest=/etc/ssh/sshd_config
