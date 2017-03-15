@@ -23,7 +23,7 @@
   tags: [pacemaker]
   
 - name: setup-cluster
-  shell: pcs cluster setup --name {{ PCMK_cluster_name }}  {{ NODES_MGMT_NAME | join(" ") }}
+  shell: pcs cluster setup --name {{ CLUSTER_NAME }}  {{ NODES_MGMT_NAME | join(" ") }}
   run_once: true
   tags: [pacemaker]
   

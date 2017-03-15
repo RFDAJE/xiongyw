@@ -6,7 +6,6 @@ PCMK_pkgs:
   - psmisc 
   - policycoreutils-python
 
-PCMK_cluster_name: ctl
 PCMK_user: hacluster
 PCMK_pass: qwerty
   

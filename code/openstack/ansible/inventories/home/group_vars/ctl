@@ -1,4 +1,5 @@
 # number of nodes in the cluster
+CLUSTER_NAME: ctl
 NODES_NR: 3
 
 # external network teaming
