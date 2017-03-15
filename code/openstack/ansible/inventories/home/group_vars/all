@@ -3,3 +3,6 @@ mirror_port: 80
 releasever: 7
 basearch: x86_64
 
+MGMT_SUFFIX: m
+IPMI_SUFFIX: i
+STOR_SUFFIX: s

@@ -23,3 +23,4 @@ to run a specific task, tag the task and then:
 
 sudo ansible-playbook -v -i inventories/home ctl.yml --tags test
 
+or "sudo ./run.sh home ctl"

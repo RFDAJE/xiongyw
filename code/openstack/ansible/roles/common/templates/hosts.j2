@@ -1,0 +1,12 @@
+# THIS FILE IS CONTROLLED BY ANSIBLE
+# any local modifications will be overwritten!
+#
+
+# This file is managed by Ansible.
+127.0.0.1 localhost.localdomain localhost
+
+{% for item in ALL_IN_ONE %}
+{{ item.ext_ip }} {{ item.ext_name }}
+{{ item.mgmt_ip }} {{ item.mgmt_name }}
+{{ item.ipmi_ip }} {{ item.ipmi_name }}
+{% endfor %}

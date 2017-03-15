@@ -1,0 +1,12 @@
+---
+PCMK_pkgs: 
+  - pacemaker 
+  - corosync
+  - pcs 
+  - psmisc 
+  - policycoreutils-python
+
+PCMK_cluster_name: ctl
+PCMK_user: hacluster
+PCMK_pass: qwerty
+  

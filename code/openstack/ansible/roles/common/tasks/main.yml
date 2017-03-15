@@ -106,8 +106,8 @@
   template: src=sshd_config dest=/etc/ssh/sshd_config
 
 - name: update-hostname
-  hostname: name={{ item.name }}{{ MGMT_SUFFIX }}
-  with_items: "{{ NODES_IP_ADDRS }}"
+  hostname: name={{ item.mgmt_name }}
+  with_items: "{{ ALL_IN_ONE }}"
   when: item.ext_ip == inventory_hostname
 
 - name: update-etc-hosts
@@ -116,23 +116,29 @@
 # using nmcli module seems clumsy, for variable preparation, so let's just do it with shell:
 - name: setup-network-teaming
   shell: |
-    yum -y install NetworkManager-team
+    mkdir -p /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.name }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.slaves[0] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.slaves[1] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.name }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.slaves[0] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.slaves[1] }}* /etc/sysconfig/network-scripts/backup
 
     systemctl enable NetworkManager
     systemctl start NetworkManager 
     sleep 5
 
-    nmcli con add type team con-name {{ item.team[0].conn_name }} ifname {{ item.team[0].conn_name }} ip4 {{ item.ip.ext_ip }}/{{ item.mask }} gw4 {{ item.gw }} 
-    nmcli conn add type team-slave con-name {{ item.team[0].slave[0] }} ifname {{ item.team[0].slave[0] }} master {{ item.team[0].conn_name }}
-    nmcli conn add type team-slave con-name {{ item.team[0].slave[1] }} ifname {{ item.team[0].slave[1] }} master {{ item.team[0].conn_name }}
-    nmcli con modify {{ item.team[0].conn_name }} +ipv4.dns {{ item.dns[0] }}
+    nmcli con add type team con-name {{ item.ext_team.name }} ifname {{ item.ext_team.name }} ip4 {{ item.ext_ip }}/{{ item.ext_mask }} gw4 {{ item.ext_gw }} 
+    nmcli conn add type team-slave con-name {{ item.ext_team.slaves[0] }} ifname {{ item.ext_team.slaves[0] }} master {{ item.ext_team.name }}
+    nmcli conn add type team-slave con-name {{ item.ext_team.slaves[1] }} ifname {{ item.ext_team.slaves[1] }} master {{ item.ext_team.name }}
+    nmcli con modify {{ item.ext_team.name }} +ipv4.dns {{ item.dns[0] }}
 
-    nmcli con add type team con-name {{ item.team[1].conn_name }} ifname {{ item.team[1].conn_name }} ip4 {{ item.ip.mgmt_ip }}/{{ item.mask }} 
-    nmcli conn add type team-slave con-name {{ item.team[1].slave[0] }} ifname {{ item.team[1].slave[0] }} master {{ item.team[1].conn_name }}
-    nmcli conn add type team-slave con-name {{ item.team[1].slave[1] }} ifname {{ item.team[1].slave[1] }} master {{ item.team[1].conn_name }}
+    nmcli con add type team con-name {{ item.mgmt_team.name }} ifname {{ item.mgmt_team.name }} ip4 {{ item.mgmt_ip }}/{{ item.mgmt_mask }} 
+    nmcli conn add type team-slave con-name {{ item.mgmt_team.slaves[0] }} ifname {{ item.mgmt_team.slaves[0] }} master {{ item.mgmt_team.name }}
+    nmcli conn add type team-slave con-name {{ item.mgmt_team.slaves[1] }} ifname {{ item.mgmt_team.slaves[1] }} master {{ item.mgmt_team.name }}
     
     systemctl restart network
   with_items: "{{ ALL_IN_ONE }}"
-  when: item.ip.ext_ip == inventory_hostname
-  tags: [test] 
+  when: item.ext_ip == inventory_hostname
+  tags: [team]
 

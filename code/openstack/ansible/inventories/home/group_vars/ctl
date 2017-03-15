@@ -1,39 +1,111 @@
-HOSTNAME_PREFIX: ctl
-MGMT_SUFFIX: m
-IPMI_SUFFIX: i
-NODES_IP_ADDRS: [ {name: "ctl1", ext_ip: "192.168.100.51", mgmt_ip: "10.0.1.51", ipmi_ip: "10.0.2.51"},
-                  {name: "ctl2", ext_ip: "192.168.100.52", mgmt_ip: "10.0.1.52", ipmi_ip: "10.0.2.52"},
-                  {name: "ctl3", ext_ip: "192.168.100.53", mgmt_ip: "10.0.1.53", ipmi_ip: "10.0.2.53"} ]
+# number of nodes in the cluster
+NODES_NR: 3
+
+# external network teaming
+EXT_TEAMING:
+  name: team0
+  slaves: 
+    - eth0
+    - eth1
+
+# mgmt network teaming
+MGMT_TEAMING: 
+  name: team1
+  slaves: 
+    - eth2
+    - eth3
+
+# node name format: <prefix><n>[suffix], where:
+# - prefix: e.g., "ctl" for controller cluster
+# - n: index, start from 1
+# - suffix: for external ip, no suffix; for mgmt/ipmi/storage ip, use [m|i|s] respectively
+NODENAME_PREFIX: ctl
+
+NODES_EXT_NAME: 
+  - "{{ NODENAME_PREFIX }}1"
+  - "{{ NODENAME_PREFIX }}2"
+  - "{{ NODENAME_PREFIX }}3"
+NODES_EXT_IP:
+  - 192.168.100.51
+  - 192.168.100.52
+  - 192.168.100.53
+NODES_EXT_MASK: 24
+NODES_EXT_GW: 192.168.100.1
+
+NODES_MGMT_NAME: 
+  - "{{ NODES_EXT_NAME[0] }}{{ MGMT_SUFFIX }}"
+  - "{{ NODES_EXT_NAME[1] }}{{ MGMT_SUFFIX }}"
+  - "{{ NODES_EXT_NAME[2] }}{{ MGMT_SUFFIX }}"
+NODES_MGMT_IP:
+  - 10.0.1.51  
+  - 10.0.1.52  
+  - 10.0.1.53  
+NODES_MGMT_MASK: 24
+NODES_MGMT_GW: "{{ NODES_EXT_GW }}"
+
+NODES_IPMI_NAME: 
+  - "{{ NODES_EXT_NAME[0] }}{{ IPMI_SUFFIX }}"
+  - "{{ NODES_EXT_NAME[1] }}{{ IPMI_SUFFIX }}"
+  - "{{ NODES_EXT_NAME[2] }}{{ IPMI_SUFFIX }}"
+NODES_IPMI_IP:
+  - 10.0.2.51
+  - 10.0.2.52
+  - 10.0.2.53
+  
+NODES_DNS:
+  - 192.168.100.1
+
+NODES_EXT_VIP: 192.168.100.50
+NODES_MGMT_VIP: 10.0.1.50
 
 NODES_SUBNET_FOR_MARIADB: ["192.168.100.%", "10.0.1.%"]
+
 # CIDR format mask
-NODES_IP_MASKS: ["24", "24", "24"]
+#NODES_IP_MASKS: ["24", "24", "24"]
 # gateway for each subnet
-NODES_GW_ADDRS: ["192.168.100.1", "10.0.1.1", "10.0.2.1"]
-NODES_DNS_ADDR: ["192.168.100.1"]
+#NODES_GW_ADDRS: ["192.168.100.1", "10.0.1.1", "10.0.2.1"]
+#NODES_DNS_ADDR: ["192.168.100.1"]
 # the cluster has two VIPs: external and management, which are also the pckm resource names
-NODES_VIP_NAMES: ["vip0", "vip1"]
-NODES_VIP_ADDRS: ["192.168.100.50", "10.0.1.50"]
-NODES_VIP_MASKS: ["24", "24"]
+#NODES_VIP_NAMES: ["vip0", "vip1"]
+#NODES_VIP_ADDRS: ["192.168.100.50", "10.0.1.50"]
+#NODES_VIP_MASKS: ["24", "24"]
 
 
-TEAMING: 
-  - { conn_name: "team0", slave: ["eth0", "eth1"] }
-  - { conn_name: "team1", slave: ["eth2", "eth3"] }
-
-ALL_IN_ONE: 
-  - ip: "{{ NODES_IP_ADDRS[0] }}" 
-    team: "{{ TEAMING }}"
-    mask: "{{ NODES_IP_MASKS[0] }}"
-    gw: "{{ NODES_GW_ADDRS[0] }}"
-    dns: "{{ NODES_DNS_ADDR }}"
-  - ip: "{{ NODES_IP_ADDRS[1] }}" 
-    team: "{{ TEAMING }}"
-    mask: "{{ NODES_IP_MASKS[1] }}"
-    gw: "{{ NODES_GW_ADDRS[0] }}"
-    dns: "{{ NODES_DNS_ADDR }}"
-  - ip: "{{ NODES_IP_ADDRS[2] }}" 
-    team: "{{ TEAMING }}"
-    mask: "{{ NODES_IP_MASKS[2] }}"
-    gw: "{{ NODES_GW_ADDRS[0] }}"
-    dns: "{{ NODES_DNS_ADDR }}"
+# this is stupid, fixme: http://stackoverflow.com/questions/42811213/ansible-generate-variables-in-loops
+ALL_IN_ONE:
+  - ext_ip:    "{{ NODES_EXT_IP[0] }}"
+    ext_name:  "{{ NODES_EXT_NAME[0] }}"
+    ext_mask:  "{{ NODES_EXT_MASK }}"
+    ext_gw:    "{{ NODES_EXT_GW }}"
+    ext_team:  "{{ EXT_TEAMING }}"
+    mgmt_ip:   "{{ NODES_MGMT_IP[0] }}"
+    mgmt_name: "{{ NODES_MGMT_NAME[0] }}"
+    mgmt_mask: "{{ NODES_MGMT_MASK }}"
+    mgmt_team: "{{ MGMT_TEAMING }}"
+    ipmi_ip:   "{{ NODES_IPMI_IP[0] }}"
+    ipmi_name: "{{ NODES_IPMI_NAME[0] }}"
+    dns:       "{{ NODES_DNS }}" 
+  - ext_ip:    "{{ NODES_EXT_IP[1] }}"
+    ext_name:  "{{ NODES_EXT_NAME[1] }}"
+    ext_mask:  "{{ NODES_EXT_MASK }}"
+    ext_gw:    "{{ NODES_EXT_GW }}"
+    ext_team:  "{{ EXT_TEAMING }}"
+    mgmt_ip:   "{{ NODES_MGMT_IP[1] }}"
+    mgmt_name: "{{ NODES_MGMT_NAME[1] }}"
+    mgmt_mask: "{{ NODES_MGMT_MASK }}"
+    mgmt_team: "{{ MGMT_TEAMING }}"
+    ipmi_ip:   "{{ NODES_IPMI_IP[1] }}"
+    ipmi_name: "{{ NODES_IPMI_NAME[1] }}"
+    dns:       "{{ NODES_DNS }}" 
+  - ext_ip:    "{{ NODES_EXT_IP[2] }}"
+    ext_name:  "{{ NODES_EXT_NAME[2] }}"
+    ext_mask:  "{{ NODES_EXT_MASK }}"
+    ext_gw:    "{{ NODES_EXT_GW }}"
+    ext_team:  "{{ EXT_TEAMING }}"
+    mgmt_ip:   "{{ NODES_MGMT_IP[2] }}"
+    mgmt_name: "{{ NODES_MGMT_NAME[2] }}"
+    mgmt_mask: "{{ NODES_MGMT_MASK }}"
+    mgmt_team: "{{ MGMT_TEAMING }}"
+    ipmi_ip:   "{{ NODES_IPMI_IP[2] }}"
+    ipmi_name: "{{ NODES_IPMI_NAME[2] }}"
+    dns:       "{{ NODES_DNS }}" 
