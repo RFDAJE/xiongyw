@@ -39,6 +39,7 @@
     - sudo
     - tcpdump
     - tmux
+    - tree
     - wget
     - htop
     - inxi
