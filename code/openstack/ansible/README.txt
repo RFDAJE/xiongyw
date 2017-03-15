@@ -6,3 +6,8 @@ prerequisites:
 for ctl cluster, run:
 
 sudo ansible-playbook -v -i home.ini ctl.yml
+
+to run a specific task, tag the task and then:
+
+sudo ansible-playbook -v -i home.ini ctl.yml --tags test
+

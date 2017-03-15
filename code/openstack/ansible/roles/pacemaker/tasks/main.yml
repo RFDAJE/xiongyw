@@ -1,6 +1,6 @@
 ---
 - name: install_pkgs
-  debug: msg="install pkgs on {{ ansible_hostname }}"
+  debug: msg="install pkgs on {{ inventory_hostname }}"
 - name: config_cluster
-  debug: msg="configuring cluster on {{ ansible_hostname }}"
+  debug: msg="configuring cluster on {{ inventory_hostname }}"
   run_once: true

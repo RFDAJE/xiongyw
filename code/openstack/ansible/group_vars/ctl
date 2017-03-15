@@ -1,0 +1,18 @@
+HOSTNAME_PREFIX: ctl
+MGMT_SUFFIX: m
+IPMI_SUFFIX: i
+NODES_IP_ADDRS: [ {name: "ctl1", ext_ip: "192.168.100.51", mgmt_ip: "10.0.1.51", ipmi_ip: "10.0.2.51"},
+                  {name: "ctl2", ext_ip: "192.168.100.52", mgmt_ip: "10.0.1.52", ipmi_ip: "10.0.2.52"},
+                  {name: "ctl3", ext_ip: "192.168.100.53", mgmt_ip: "10.0.1.53", ipmi_ip: "10.0.2.53"} ]
+
+NODES_SUBNET_FOR_MARIADB: ["192.168.100.%", "10.0.1.%"]
+# CIDR format mask
+NODES_IP_MASKS: ["24", "24", "24"]
+# gateway for each subnet
+NODES_GW_ADDRS: ["192.168.100.1", "10.0.1.1", "10.0.2.1"]
+NODES_DNS_ADDR: ["192.168.100.1"]
+# the cluster has two VIPs: external and management, which are also the pckm resource names
+NODES_VIP_NAMES: ["vip0", "vip1"]
+NODES_VIP_ADDRS: ["192.168.100.50", "10.0.1.50"]
+NODES_VIP_MASKS: ["24", "24"]
+

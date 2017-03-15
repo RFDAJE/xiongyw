@@ -52,7 +52,11 @@
 #    - iptables
 
 - name: create-vim-symlink
-  shell: unlink /usr/bin/vi; ln -s /usr/bin/vim /usr/bin/vi
+#  shell: unlink /usr/bin/vi; ln -s /usr/bin/vim /usr/bin/vi
+  file:
+    src: /usr/bin/vim
+    dest: /usr/bin/vi
+    state: link
 
 - name: create-user-bruin
   user: name=bruin shell=/bin/bash home=/home/bruin groups=wheel generate_ssh_key=yes ssh_key_bits=2048
@@ -69,8 +73,36 @@
 - name: disable-selinux
   template: src=selinux.config dest=/etc/selinux/config
 
+- name: disable-ipv6
+  blockinfile:
+    path: /etc/sysctl.conf
+    backup: yes
+    block: |
+      net.ipv6.conf.all.disable_ipv6 = 1
+      net.ipv6.conf.default.disable_ipv6 = 1
+#  shell: echo net.ipv6.conf.all.disable_ipv6 = 1  >> /etc/sysctl.conf; \
+#         echo net.ipv6.conf.default.disable_ipv6 = 1 >> /etc/sysctl.conf; \
+#         sysctl -p
+# https://github.com/ansible/ansible/issues/19388
+#  sysctl:
+#    name: net.ipv6.conf.all.disable_ipv6
+#    value: 1
+#    sysctl_set: yes
+#    state: present
+#    sysctl_file: /etc/sysctl.conf
+#    reload: yes
+  tags: [test]
+
 - name: enable-nopasswd-sudo
   template: src=sudoers dest=/etc/suduers
 
 - name: update-sshd-config
   template: src=sshd_config dest=/etc/ssh/sshd_config
+
+- name: update-hostname
+  hostname: name="{{ item.name }}{{ MGMT_SUFFIX }}"
+  with_items: NODES_IP_ADDRS
+  when: item.ext_ip == inventory_hostname
+
+- name: update-etc-hosts
+  template: src=hosts.j2 dest=/etc/hosts
