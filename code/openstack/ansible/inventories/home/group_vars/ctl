@@ -15,3 +15,25 @@ NODES_DNS_ADDR: ["192.168.100.1"]
 NODES_VIP_NAMES: ["vip0", "vip1"]
 NODES_VIP_ADDRS: ["192.168.100.50", "10.0.1.50"]
 NODES_VIP_MASKS: ["24", "24"]
+
+
+TEAMING: 
+  - { conn_name: "team0", slave: ["eth0", "eth1"] }
+  - { conn_name: "team1", slave: ["eth2", "eth3"] }
+
+ALL_IN_ONE: 
+  - ip: "{{ NODES_IP_ADDRS[0] }}" 
+    team: "{{ TEAMING }}"
+    mask: "{{ NODES_IP_MASKS[0] }}"
+    gw: "{{ NODES_GW_ADDRS[0] }}"
+    dns: "{{ NODES_DNS_ADDR }}"
+  - ip: "{{ NODES_IP_ADDRS[1] }}" 
+    team: "{{ TEAMING }}"
+    mask: "{{ NODES_IP_MASKS[1] }}"
+    gw: "{{ NODES_GW_ADDRS[0] }}"
+    dns: "{{ NODES_DNS_ADDR }}"
+  - ip: "{{ NODES_IP_ADDRS[2] }}" 
+    team: "{{ TEAMING }}"
+    mask: "{{ NODES_IP_MASKS[2] }}"
+    gw: "{{ NODES_GW_ADDRS[0] }}"
+    dns: "{{ NODES_DNS_ADDR }}"
