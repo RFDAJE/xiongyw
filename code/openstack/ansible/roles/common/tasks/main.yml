@@ -1,5 +1,6 @@
 - name: backup-existing-repo-files
   shell: mkdir -p /etc/yum.repos.d/backup; mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
+  ignore_errors: true
 
 - name: generate-an-all-in-one-yum-repo-file
   template: src=mirrors.repo.j2 dest=/etc/yum.repos.d/mirrors.repo

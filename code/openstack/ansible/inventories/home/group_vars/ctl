@@ -15,9 +15,3 @@ NODES_DNS_ADDR: ["192.168.100.1"]
 NODES_VIP_NAMES: ["vip0", "vip1"]
 NODES_VIP_ADDRS: ["192.168.100.50", "10.0.1.50"]
 NODES_VIP_MASKS: ["24", "24"]
-
-mirror_ip: 192.168.100.19
-mirror_port: 80
-releasever: 7
-basearch: x86_64
-

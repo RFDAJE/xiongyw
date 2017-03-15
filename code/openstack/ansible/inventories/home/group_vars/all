@@ -1,0 +1,5 @@
+mirror_ip: 192.168.100.19
+mirror_port: 80
+releasever: 7
+basearch: x86_64
+
