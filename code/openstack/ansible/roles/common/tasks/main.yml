@@ -39,6 +39,7 @@
     - sudo
     - tcpdump
     - tmux
+    - tree
     - wget
     - htop
     - inxi
@@ -130,7 +131,7 @@
     nmcli con add type team con-name {{ item.team[1].conn_name }} ifname {{ item.team[1].conn_name }} ip4 {{ item.ip.mgmt_ip }}/{{ item.mask }} 
     nmcli conn add type team-slave con-name {{ item.team[1].slave[0] }} ifname {{ item.team[1].slave[0] }} master {{ item.team[1].conn_name }}
     nmcli conn add type team-slave con-name {{ item.team[1].slave[1] }} ifname {{ item.team[1].slave[1] }} master {{ item.team[1].conn_name }}
-    
+
     systemctl restart network
   with_items: "{{ ALL_IN_ONE }}"
   when: item.ip.ext_ip == inventory_hostname
