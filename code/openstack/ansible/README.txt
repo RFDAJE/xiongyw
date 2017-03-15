@@ -17,9 +17,9 @@ prerequisites:
 
 for ctl cluster, run:
 
-sudo ansible-playbook -v -i home ctl.yml
+sudo ansible-playbook -v -i inventories/home ctl.yml
 
 to run a specific task, tag the task and then:
 
-sudo ansible-playbook -v -i home ctl.yml --tags test
+sudo ansible-playbook -v -i inventories/home ctl.yml --tags test
 
