@@ -60,9 +60,11 @@
 
 - name: create-user-bruin
   user: name=bruin shell=/bin/bash home=/home/bruin groups=wheel generate_ssh_key=yes ssh_key_bits=2048
+  changed_when: false
 
 - name: set-bruin-password
   shell: echo bruin:qwerty | chpasswd
+  changed_when: false
 
 - name: disable-firewalld
   service: name={{ item }} enabled=no
@@ -73,9 +75,9 @@
 - name: disable-selinux
   template: src=selinux.config dest=/etc/selinux/config
 
-- name: disable-ipv6
+- name: disable-ipv6-1
   blockinfile:
-    path: /etc/sysctl.conf
+    dest: /etc/sysctl.conf
     backup: yes
     block: |
       net.ipv6.conf.all.disable_ipv6 = 1
@@ -91,7 +93,10 @@
 #    state: present
 #    sysctl_file: /etc/sysctl.conf
 #    reload: yes
-  tags: [test]
+
+- name: disable-ipv6-2
+  shell: sysctl -p
+  changed_when: false
 
 - name: enable-nopasswd-sudo
   template: src=sudoers dest=/etc/suduers
@@ -100,9 +105,10 @@
   template: src=sshd_config dest=/etc/ssh/sshd_config
 
 - name: update-hostname
-  hostname: name="{{ item.name }}{{ MGMT_SUFFIX }}"
-  with_items: NODES_IP_ADDRS
+  hostname: name={{ item.name }}{{ MGMT_SUFFIX }}
+  with_items: "{{ NODES_IP_ADDRS }}"
   when: item.ext_ip == inventory_hostname
+  tags: [test]
 
 - name: update-etc-hosts
   template: src=hosts.j2 dest=/etc/hosts
