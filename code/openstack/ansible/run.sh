@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # created(bruin, 2017-03-15): scripts to run ansible
 
 usage() {
@@ -11,12 +12,6 @@ usage() {
 	EOF
 }
 
-
-
-
-#####################################################
-# do the work...
-#####################################################
 main () {
   if [[ $(id -u) != 0 ]]; then
       echo "This script must be run by root, please try it with sudo."
