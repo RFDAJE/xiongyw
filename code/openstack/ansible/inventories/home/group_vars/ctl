@@ -1,63 +1,123 @@
-# number of nodes in the cluster
+---
+# pacemaker cluster name
 CLUSTER_NAME: ctl
+
+# number of nodes in the cluster
 NODES_NR: 3
 
-# external network teaming
-EXT_TEAMING:
-  name: team0
-  slaves: 
-    - eth0
-    - eth1
+# each node has 3 IPs: external, mgmt, ipmi
+NODE_EXT_IP_PREFIX: "192.168.100."
+NODE_EXT_IP_START: 51
+NODE_EXT_IP_MASK: 24
+NODE_EXT_IP_GW: 192.168.100.1
 
-# mgmt network teaming
-MGMT_TEAMING: 
-  name: team1
-  slaves: 
-    - eth2
-    - eth3
+NODE_MGMT_IP_PREFIX: "10.0.1."
+NODE_MGMT_IP_START: 51
+NODE_MGMT_IP_MASK: 24
+NODE_MGMT_IP_GW: 10.0.1.1
+
+NODE_IPMI_IP_PREFIX: "10.0.2."
+NODE_IPMI_IP_START: 151
+NODE_IPMI_IP_MASK: 24
+NODE_IPMI_IP_GW: 10.0.2.1
+
+NODES_DNS:
+  - 192.168.100.1
+
+# VIPs share the same mask/gw info
+CLUSTER_EXT_VIP: 192.168.100.50
+CLUSTER_EXT_VIP_NAME: ctlvip
+CLUSTER_MGMT_VIP: 10.0.1.50
+CLUSTER_MGMT_VIP_NAME: ctlmvip
+
+# each node has two network teaming, for external and mgmt ip
+TEAMING:
+  - name: team0
+    slaves:
+      - eth0
+      - eth1
+  - name: team1
+    slaves:
+      - eth2
+      - eth3
 
 # node name format: <prefix><n>[suffix], where:
 # - prefix: e.g., "ctl" for controller cluster
 # - n: index, start from 1
 # - suffix: for external ip, no suffix; for mgmt/ipmi/storage ip, use [m|i|s] respectively
 NODENAME_PREFIX: ctl
+EXT_NAME_IDX_START: 1
+EXT_NAME_SUFFIX: ""
+MGMT_NAME_IDX_START: 1
+MGMT_NAME_SUFFIX: "m"
+IPMI_NAME_IDX_START: 1
+IPMI_NAME_SUFFIX: "i"
 
-NODES_EXT_NAME: 
-  - "{{ NODENAME_PREFIX }}1"
-  - "{{ NODENAME_PREFIX }}2"
-  - "{{ NODENAME_PREFIX }}3"
-NODES_EXT_IP:
-  - 192.168.100.51
-  - 192.168.100.52
-  - 192.168.100.53
-NODES_EXT_MASK: 24
-NODES_EXT_GW: 192.168.100.1
 
-NODES_MGMT_NAME: 
-  - "{{ NODES_EXT_NAME[0] }}{{ MGMT_SUFFIX }}"
-  - "{{ NODES_EXT_NAME[1] }}{{ MGMT_SUFFIX }}"
-  - "{{ NODES_EXT_NAME[2] }}{{ MGMT_SUFFIX }}"
-NODES_MGMT_IP:
-  - 10.0.1.51  
-  - 10.0.1.52  
-  - 10.0.1.53  
-NODES_MGMT_MASK: 24
-NODES_MGMT_GW: "{{ NODES_EXT_GW }}"
+#-----------------------------------------------------------------------
+# http://stackoverflow.com/questions/42811213/ansible-generate-variables-in-loops
+NODES_FACT_template:
+  ext_ip:  "{{ NODE_EXT_IP_PREFIX  }}{{ NODE_EXT_IP_START|int + item|int }}"
+  mgmt_ip: "{{ NODE_MGMT_IP_PREFIX  }}{{ NODE_MGMT_IP_START|int + item|int }}"
+  ipmi_ip: "{{ NODE_IPMI_IP_PREFIX  }}{{ NODE_IPMI_IP_START|int + item|int }}"
+  ext_mask:  "{{ NODE_EXT_IP_MASK }}"
+  mgmt_mask: "{{ NODE_MGMT_IP_MASK }}"
+  ipmi_mask: "{{ NODE_IPMI_IP_MASK }}"
+  ext_gw:  "{{ NODE_EXT_IP_GW }}"
+  mgmt_gw: "{{ NODE_MGMT_IP_GW }}"
+  ipmi_gw: "{{ NODE_IPMI_IP_GW }}"
+  ext_name:  "{{ NODENAME_PREFIX }}{{EXT_NAME_IDX_START|int + item|int }}{{ EXT_NAME_SUFFIX }}"
+  mgmt_name: "{{ NODENAME_PREFIX }}{{MGMT_NAME_IDX_START|int + item|int }}{{ MGMT_NAME_SUFFIX }}"
+  ipmi_name: "{{ NODENAME_PREFIX }}{{IPMI_NAME_IDX_START|int + item|int }}{{ IPMI_NAME_SUFFIX }}"
+  dns: "{{ NODES_DNS }}"
+  team: "{{ TEAMING }}"
 
-NODES_IPMI_NAME: 
-  - "{{ NODES_EXT_NAME[0] }}{{ IPMI_SUFFIX }}"
-  - "{{ NODES_EXT_NAME[1] }}{{ IPMI_SUFFIX }}"
-  - "{{ NODES_EXT_NAME[2] }}{{ IPMI_SUFFIX }}"
-NODES_IPMI_IP:
-  - 10.0.2.51
-  - 10.0.2.52
-  - 10.0.2.53
-  
-NODES_DNS:
-  - 192.168.100.1
+NODES_EXT_NAME_template:
+  "{{ NODENAME_PREFIX }}{{EXT_NAME_IDX_START|int + item|int }}{{ EXT_NAME_SUFFIX }}"
 
-NODES_EXT_VIP: 192.168.100.50
-NODES_MGMT_VIP: 10.0.1.50
+NODES_MGMT_NAME_template:
+  "{{ NODENAME_PREFIX }}{{MGMT_NAME_IDX_START|int + item|int }}{{ MGMT_NAME_SUFFIX }}"
+
+
+
+
+
+
+
+
+
+#NODES_EXT_NAME:
+#  - "{{ NODENAME_PREFIX }}1"
+#  - "{{ NODENAME_PREFIX }}2"
+#  - "{{ NODENAME_PREFIX }}3"
+#NODES_EXT_IP:
+#  - 192.168.100.51
+#  - 192.168.100.52
+#  - 192.168.100.53
+#NODES_EXT_MASK: 24
+#NODES_EXT_GW: 192.168.100.1
+
+#NODES_MGMT_NAME:
+#  - "{{ NODES_EXT_NAME[0] }}{{ MGMT_SUFFIX }}"
+#  - "{{ NODES_EXT_NAME[1] }}{{ MGMT_SUFFIX }}"
+#  - "{{ NODES_EXT_NAME[2] }}{{ MGMT_SUFFIX }}"
+#NODES_MGMT_IP:
+#  - 10.0.1.51
+#  - 10.0.1.52
+#  - 10.0.1.53
+#NODES_MGMT_MASK: 24
+#NODES_MGMT_GW: "{{ NODES_EXT_GW }}"
+
+#NODES_IPMI_NAME:
+#  - "{{ NODES_EXT_NAME[0] }}{{ IPMI_SUFFIX }}"
+#  - "{{ NODES_EXT_NAME[1] }}{{ IPMI_SUFFIX }}"
+#  - "{{ NODES_EXT_NAME[2] }}{{ IPMI_SUFFIX }}"
+#NODES_IPMI_IP:
+#  - 10.0.2.51
+#  - 10.0.2.52
+#  - 10.0.2.53
+
+
 
 NODES_SUBNET_FOR_MARIADB: ["192.168.100.%", "10.0.1.%"]
 
@@ -85,7 +145,7 @@ ALL_IN_ONE:
     mgmt_team: "{{ MGMT_TEAMING }}"
     ipmi_ip:   "{{ NODES_IPMI_IP[0] }}"
     ipmi_name: "{{ NODES_IPMI_NAME[0] }}"
-    dns:       "{{ NODES_DNS }}" 
+    dns:       "{{ NODES_DNS }}"
   - ext_ip:    "{{ NODES_EXT_IP[1] }}"
     ext_name:  "{{ NODES_EXT_NAME[1] }}"
     ext_mask:  "{{ NODES_EXT_MASK }}"
@@ -97,7 +157,7 @@ ALL_IN_ONE:
     mgmt_team: "{{ MGMT_TEAMING }}"
     ipmi_ip:   "{{ NODES_IPMI_IP[1] }}"
     ipmi_name: "{{ NODES_IPMI_NAME[1] }}"
-    dns:       "{{ NODES_DNS }}" 
+    dns:       "{{ NODES_DNS }}"
   - ext_ip:    "{{ NODES_EXT_IP[2] }}"
     ext_name:  "{{ NODES_EXT_NAME[2] }}"
     ext_mask:  "{{ NODES_EXT_MASK }}"
@@ -109,4 +169,12 @@ ALL_IN_ONE:
     mgmt_team: "{{ MGMT_TEAMING }}"
     ipmi_ip:   "{{ NODES_IPMI_IP[2] }}"
     ipmi_name: "{{ NODES_IPMI_NAME[2] }}"
-    dns:       "{{ NODES_DNS }}" 
+    dns:       "{{ NODES_DNS }}"
+
+IP_START: 10
+info_temp:
+  ip: 192.168.0.{{ item }}
+  gw: 192.168.0.254
+  team: "{{ MGMT_TEAMING }}"
+
+

@@ -33,9 +33,9 @@ main () {
     local tags=${3}
 
     if [ -z ${tags} ]; then
-      ansible-playbook -v -i inventories/${site} ${book}.yml
+      ansible-playbook -vvv -i inventories/${site} ${book}.yml
     else
-      ansible-playbook -v -i inventories/${site} ${book}.yml --tags ${3}
+      ansible-playbook -vvv -i inventories/${site} ${book}.yml --tags ${3}
     fi
 }
 

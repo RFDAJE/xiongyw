@@ -1,3 +1,24 @@
+- name: set-fact-nodes-fact
+  set_fact:
+    NODES_FACT: "{{ (NODES_FACT | default([])) + [NODES_FACT_template] }}"
+  with_sequence: "start=0 count={{ NODES_NR }}"
+  run_once: true
+  tags: [always]
+
+- name: set-fact-nodes-ext-name
+  set_fact:
+    NODES_EXT_NAME: "{{ (NODES_EXT_NAME | default([])) + [NODES_EXT_NAME_template] }}"
+  with_sequence: "start=0 count={{ NODES_NR }}"
+  run_once: true
+  tags: [always]
+
+- name: set-fact-nodes-mgmt-name
+  set_fact:
+    NODES_MGMT_NAME: "{{ (NODES_MGMT_NAME | default([])) + [NODES_MGMT_NAME_template] }}"
+  with_sequence: "start=0 count={{ NODES_NR }}"
+  run_once: true
+  tags: [always]
+
 - name: backup-existing-repo-files
   shell: mkdir -p /etc/yum.repos.d/backup; mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/backup
   ignore_errors: true
@@ -108,38 +129,38 @@
 
 - name: update-hostname
   hostname: name={{ item.mgmt_name }}
-  with_items: "{{ ALL_IN_ONE }}"
+  with_items: "{{ NODES_FACT }}"
   when: item.ext_ip == inventory_hostname
 
 - name: update-etc-hosts
   template: src=hosts.j2 dest=/etc/hosts
 
-# using nmcli module seems clumsy, for variable preparation, so let's just do it with shell:
+# using nmcli module seems clumsy, for variable preparation, so let's just do it with shell
+# FIXME: need a loop for dealing different number of teaming scenarios
 - name: setup-network-teaming
   shell: |
     mkdir -p /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.name }}* /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.slaves[0] }}* /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.ext_team.slaves[1] }}* /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.name }}* /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.slaves[0] }}* /etc/sysconfig/network-scripts/backup
-    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.mgmt_team.slaves[1] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[0].name }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[0].slaves[0] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[0].slaves[1] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[1].name }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[1].slaves[0] }}* /etc/sysconfig/network-scripts/backup
+    mv /etc/sysconfig/network-scripts/ifcfg-{{ item.team[1].slaves[1] }}* /etc/sysconfig/network-scripts/backup
 
     systemctl enable NetworkManager
-    systemctl start NetworkManager 
+    systemctl start NetworkManager
     sleep 5
 
-    nmcli con add type team con-name {{ item.ext_team.name }} ifname {{ item.ext_team.name }} ip4 {{ item.ext_ip }}/{{ item.ext_mask }} gw4 {{ item.ext_gw }} 
-    nmcli conn add type team-slave con-name {{ item.ext_team.slaves[0] }} ifname {{ item.ext_team.slaves[0] }} master {{ item.ext_team.name }}
-    nmcli conn add type team-slave con-name {{ item.ext_team.slaves[1] }} ifname {{ item.ext_team.slaves[1] }} master {{ item.ext_team.name }}
-    nmcli con modify {{ item.ext_team.name }} +ipv4.dns {{ item.dns[0] }}
+    nmcli con add type team con-name {{ item.team[0].name }} ifname {{ item.team[0].name }} ip4 {{ item.ext_ip }}/{{ item.ext_mask }} gw4 {{ item.ext_gw }}
+    nmcli conn add type team-slave con-name {{ item.team[0].slaves[0] }} ifname {{ item.team[0].slaves[0] }} master {{ item.team[0].name }}
+    nmcli conn add type team-slave con-name {{ item.team[0].slaves[1] }} ifname {{ item.team[0].slaves[1] }} master {{ item.team[0].name }}
+    nmcli con modify {{ item.team[0].name }} +ipv4.dns {{ item.dns[0] }}
 
-    nmcli con add type team con-name {{ item.mgmt_team.name }} ifname {{ item.mgmt_team.name }} ip4 {{ item.mgmt_ip }}/{{ item.mgmt_mask }} 
-    nmcli conn add type team-slave con-name {{ item.mgmt_team.slaves[0] }} ifname {{ item.mgmt_team.slaves[0] }} master {{ item.mgmt_team.name }}
-    nmcli conn add type team-slave con-name {{ item.mgmt_team.slaves[1] }} ifname {{ item.mgmt_team.slaves[1] }} master {{ item.mgmt_team.name }}
-    
+    nmcli con add type team con-name {{ item.team[1].name }} ifname {{ item.team[1].name }} ip4 {{ item.mgmt_ip }}/{{ item.mgmt_mask }}
+    nmcli conn add type team-slave con-name {{ item.team[1].slaves[0] }} ifname {{ item.team[1].slaves[0] }} master {{ item.team[1].name }}
+    nmcli conn add type team-slave con-name {{ item.team[1].slaves[1] }} ifname {{ item.team[1].slaves[1] }} master {{ item.team[1].name }}
+
     systemctl restart network
-  with_items: "{{ ALL_IN_ONE }}"
+  with_items: "{{ NODES_FACT }}"
   when: item.ext_ip == inventory_hostname
   tags: [team]
-

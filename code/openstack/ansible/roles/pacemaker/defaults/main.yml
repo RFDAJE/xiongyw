@@ -1,11 +1,14 @@
 ---
-PCMK_pkgs: 
-  - pacemaker 
+PCMK_pkgs:
+  - pacemaker
   - corosync
-  - pcs 
-  - psmisc 
+  - pcs
+  - psmisc
   - policycoreutils-python
 
 PCMK_user: hacluster
 PCMK_pass: qwerty
-  
+
+# this is a lookup variable from "pcs status" command. if we don't
+# define it before-hand, ansible will report syntax error.
+PCS_STATUS: ""

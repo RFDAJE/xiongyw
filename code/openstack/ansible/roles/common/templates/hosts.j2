@@ -5,8 +5,12 @@
 # This file is managed by Ansible.
 127.0.0.1 localhost.localdomain localhost
 
-{% for item in ALL_IN_ONE %}
+{% for item in NODES_FACT %}
 {{ item.ext_ip }} {{ item.ext_name }}
 {{ item.mgmt_ip }} {{ item.mgmt_name }}
 {{ item.ipmi_ip }} {{ item.ipmi_name }}
 {% endfor %}
+
+# ext/mgmt vip names
+{{ CLUSTER_EXT_VIP }} {{ CLUSTER_EXT_VIP_NAME }}
+{{ CLUSTER_MGMT_VIP }} {{ CLUSTER_MGMT_VIP_NAME }}
