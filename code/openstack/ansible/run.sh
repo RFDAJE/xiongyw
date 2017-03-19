@@ -5,7 +5,7 @@
 
 usage() {
   cat <<-EOF
-	usage: # $(basename $0) <site> <playbook> [tags]
+	usage: # $(basename $0) [-v] <site> <playbook> [tags]
           site: home|wukuang|wukuang-qa
           playbook: ctl|ptl|gw|hot|warm
           tags (optional): test|remove
@@ -13,25 +13,37 @@ usage() {
 }
 
 main () {
+  local verbose=0
+  local args=""
+
   if [[ $(id -u) != 0 ]]; then
       echo "This script must be run by root, please try it with sudo."
       exit 1;
-    fi
+  fi
 
-    if [[ $# < 2 ]]; then
-       usage
-       exit 1;
-    fi
+  if [[ $# < 2 ]]; then
+     usage
+     exit 1;
+  fi
+
+  if [[ $1 == '-v' ]]; then
+     verbose=1
+     args+=" -vvv"
+     shift
+  fi
  
-    local site=${1}
-    local book=${2}
-    local tags=${3}
+  local site=${1}
+  local book=${2}
+  local tags=${3}
 
-    if [ -z ${tags} ]; then
-      ansible-playbook -vvv -i inventories/${site} ${book}.yml
-    else
-      ansible-playbook -vvv -i inventories/${site} ${book}.yml --tags ${3}
-    fi
+  args+=" -i inventories/${site} ${book}.yml"
+
+  if [[ -n ${tags} ]]; then
+    args+=" --tags ${tags}"
+  fi
+ 
+  ansible-playbook ${args}
+    
 }
 
 main $*

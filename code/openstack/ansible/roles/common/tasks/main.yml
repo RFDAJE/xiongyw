@@ -30,11 +30,15 @@
 #  shell: sed -i.bak -e '/enabled/cenabled=0' /etc/yum/pluginconf.d/fastestmirror.conf
   template: src=fastestmirror.conf dest=/etc/yum/pluginconf.d/fastestmirror.conf
 
+- name: copy-elrepo-rpm-gpg-key
+  template: src=RPM-GPG-KEY-elrepo.org dest=/etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
+
 - name: import-elrepo-rpm-gpg-key
 #  shell: rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
   rpm_key:
     state: present
-    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-elrepo.org
+#    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
 
 - name: yum-update
   yum:
@@ -80,6 +84,9 @@
     src: /usr/bin/vim
     dest: /usr/bin/vi
     state: link
+
+- name: create-etc-tmux-conf
+  template: src=tmux.conf dest=/etc/tmux.conf
 
 - name: create-user-bruin
   user: name=bruin shell=/bin/bash home=/home/bruin groups=wheel generate_ssh_key=yes ssh_key_bits=2048

@@ -1,0 +1,64 @@
+---
+##############################################
+# installation & configuration
+- name: lookup-pcs-status
+  set_fact:
+    PCS_STATUS: "{{ lookup('pipe', 'pcs status') }}"
+  run_once: true
+  ignore_errors: true
+  tags:
+    - pacemaker
+    - pacemaker-d
+
+- name: install_pkgs
+  yum: name={{ item }} state=installed
+  with_items: "{{ PCMK_pkgs }}"
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags:
+    - pacemaker
+
+- name: enable-n-start-pcsd
+  shell: |
+    systemctl enable pcsd
+    systemctl start pcsd
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+- name: setting-hacluster-passwd
+  shell: echo "{{ PCMK_user }}:{{ PCMK_pass }}" | chpasswd
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+- name: authorizing-cluster-nodes
+  shell: pcs cluster auth {{ NODES_MGMT_NAME | join(" ") }} -u {{ PCMK_user }} -p {{ PCMK_pass }}
+  run_once: true
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+- name: setup-cluster
+  shell: pcs cluster setup --name {{ CLUSTER_NAME }}  {{ NODES_MGMT_NAME | join(" ") }}
+  run_once: true
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+- name: start-cluster
+  shell: |
+    pcs cluster start --all
+    sleep 15
+  run_once: true
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+# fixme: temp disable stonith
+- name: disable-stonith
+  shell: pcs property set stonith-enabled=false
+  run_once: true
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+
+- name: disable-failure-is-fatal
+  shell: pcs property set start-failure-is-fatal=false
+  run_once: true
+  when: not PCS_STATUS.startswith("Cluster name:")
+  tags: [pacemaker]
+

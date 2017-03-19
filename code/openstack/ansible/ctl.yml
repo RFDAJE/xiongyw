@@ -3,5 +3,5 @@
   gather_facts: no
   roles:
     - common
-    - pacemaker
+    - { role: pacemaker, action: install }
 
