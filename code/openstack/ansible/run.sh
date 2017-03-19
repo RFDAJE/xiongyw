@@ -7,8 +7,12 @@ usage() {
   cat <<-EOF
 	usage: # $(basename $0) [-v] <site> <playbook> [tags]
           site: home|wukuang|wukuang-qa
-          playbook: ctl|ptl|gw|hot|warm
-          tags (optional): test|remove
+          playbook: ctl[-d]|ptl|gw|hot|warm
+          tags (optional): pacemaker|...
+	e.g.:
+	 install ctl cluster: sudo ./run.sh home ctl
+         install pacemaker on ctl cluster: sudo ./run.sh home ctl pacemaker
+         delete pacemaker on ctl cluster: sudo ./run.sh home ctl-d pacemaker
 	EOF
 }
 
