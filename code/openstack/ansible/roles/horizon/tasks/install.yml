@@ -1,0 +1,28 @@
+- name: install-yum-pkgs
+  yum: name={{ item }} state=installed
+  with_items:
+    - python-pip
+    - httpd
+    - mod_wsgi
+    - gcc
+  tags:
+    - horizon
+
+- name: upgrade-pip
+  pip:
+    name: pip
+    state: latest
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+  tags:
+    - horizon
+
+- name: install-pip-pkgs
+  pip:
+    name: "{{ item }}"
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    state: present
+  with_items:
+    - virtualenvwrapper
+  tags:
+    - horizon
+

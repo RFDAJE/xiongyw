@@ -1,0 +1,63 @@
+- name: install-yum-pkgs
+  yum: name={{ item }} state=installed
+  with_items:
+    - python-six
+    - python2-xmltodict
+    - python-pip
+    - gcc
+    - python-devel
+    - libffi-devel
+  tags:
+    - gateway
+
+- name: upgrade-pip
+  pip:
+    name: pip
+    state: latest
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+  tags:
+    - gateway
+
+- name: install-pip-pkgs
+  pip:
+    name: "{{ item }}"
+    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    state: present
+  with_items:
+    - keystoneauth1
+    - botocore
+    - webob
+    - xattr
+    - boto3
+    - awscli
+    - pika
+    - uwsgi
+  tags:
+    - gateway
+
+# this is ugly, but let's do it for now...
+#- name: copy-sig-pkgs
+#  copy: src=pkgs/sig.tgz dest=/tmp/sig.tgz
+#  tags:
+#    - gateway
+
+- name: mkdir-oceanray-sig
+  file:
+    path: "{{ PKG_INSTALL_ROOT }}"
+    state: directory
+  tags:
+    - gateway
+
+- name: unarchive-sig-pkg
+  unarchive:
+    src: pkgs/sig.tgz
+    dest: "{{ PKG_INSTALL_ROOT }}"
+  tags:
+    - gateway
+
+- name: mkdir-work-dir
+  file:
+    path: /var/lib/cygw
+    state: directory
+  tags:
+    - gateway
