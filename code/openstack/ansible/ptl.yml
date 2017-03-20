@@ -1,0 +1,8 @@
+---
+- hosts: ptl
+  gather_facts: no
+  roles:
+    - common
+    - { role: pacemaker, action: install }
+    - { role: horizon, action: install }
+

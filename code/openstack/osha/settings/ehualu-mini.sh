@@ -22,14 +22,14 @@ settings_ehualu_mini() {
     # this is used for grant user access rights for mariadb
     NODES_SUBNET_FOR_MARIADB=( "192.168.8.%" "192.168.9.%" )
     # CIDR format mask
-    NODES_IP_MASKS=( "16" "16" )
+    NODES_IP_MASKS=( "24" "24" )
     # gateway for each subnet
     NODES_GW_ADDRS=( "192.168.8.1" "192.168.8.1" )
     NODES_DNS_ADDR="219.141.136.10"
     # the cluster has two VIPs: external (1st) and management (2nd)
     NODES_VIP_NAMES=( "ctlvip" "ctlvipm" )  # these are also the pckm resource names
     NODES_VIP_ADDRS=( "192.168.8.210" "192.168.9.210" )
-    NODES_VIP_MASKS=( "16" "16" )
+    NODES_VIP_MASKS=( "24" "24" )
 
     # for ceilometer to poll snmp info from all hosts/switches applicable
     SNMP_IP_LIST=( "192.168.9.211" \

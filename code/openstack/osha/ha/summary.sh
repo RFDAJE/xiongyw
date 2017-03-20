@@ -82,6 +82,7 @@ summary() {
   echo "  - vip access: ${NODES_VIP_ADDRS[1]}:3306"
   echo "  - connection url for keystone: ${KEYSTONE_sqlalchemy_connection}"
   echo "  - connection url for aodh:     ${AODH_sqlalchemy_connection}"
+  echo "+ mariadb root password: ${MARIADB_root_pass}"
 
   # mongodb replica set
   echo "+ mongodb replica set:"
@@ -95,6 +96,7 @@ summary() {
   echo "  - public url:   ${KEYSTONE_public_url}"
   echo "  - internal url: ${KEYSTONE_internal_url}"
   echo "  - admin url:    ${KEYSTONE_admin_url}"
+  echo "+ keystone admin role passwd: ${KEYSTONE_bootstrap_pass}"
 
   # ceilometer api endpoint:
   echo "+ ceilometer endpoints:"

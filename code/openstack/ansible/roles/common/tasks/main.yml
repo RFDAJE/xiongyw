@@ -73,9 +73,10 @@
     - firewalld
     - iptables
 
-#- name: yum-remove-some-pkgs
-#  yum: name={{ item }} state=removed
-#  with_items:
+- name: yum-remove-some-pkgs
+  yum: name={{ item }} state=removed
+  with_items:
+    - vim-minimal
 #    - iptables
 
 - name: create-vim-symlink

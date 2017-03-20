@@ -1,0 +1,8 @@
+mirror_ip: 10.2.162.153
+mirror_port: 80
+releasever: 7
+basearch: x86_64
+
+MGMT_SUFFIX: m
+IPMI_SUFFIX: i
+STOR_SUFFIX: s

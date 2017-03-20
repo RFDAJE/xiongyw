@@ -1,0 +1,8 @@
+---
+- hosts: gw
+  gather_facts: no
+  roles:
+    - common
+    - { role: pacemaker, action: install }
+    - { role: gateway, action: install }
+

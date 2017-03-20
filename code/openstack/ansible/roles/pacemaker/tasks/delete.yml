@@ -1,15 +1,6 @@
---- 
+---
 ##############################################
 # delete
-
-- name: lookup-pcs-status
-  set_fact:
-    PCS_STATUS: "{{ lookup('pipe', 'pcs status') }}"
-  run_once: true
-  ignore_errors: true
-  tags:
-    - pacemaker-d
-
 
 - name: resource-cleanup
   shell: pcs resource cleanup

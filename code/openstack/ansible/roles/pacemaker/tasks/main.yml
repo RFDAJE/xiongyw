@@ -1,1 +1,12 @@
+---
+- name: lookup-pcs-status
+  command: pcs status
+  register: PCS_STATUS
+  run_once: true
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - pacemaker
+    - pacemaker-d
+
 - include: "{{ action }}.yml"
