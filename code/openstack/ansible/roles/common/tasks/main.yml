@@ -77,7 +77,7 @@
     - gsmartcontrol
     - vim-enhanced
     - firewalld
-    - iptables
+    - iptables-services
     - net-snmp
     - net-snmp-utils
   tags: [common]
@@ -164,12 +164,12 @@
   template: src=hosts.j2 dest=/etc/hosts
   tags: [common]
 
+- include: "{{ team }}.yml"
+
 - name: update-snmpd-conf
   template: src=snmpd.conf dest=/etc/snmp/snmpd.conf
   tags: [common]
 
 - name: enable-snmpd-service
-  service: name=snmpd enabled=yes state=started
+  service: name=snmpd enabled=yes state=restarted
   tags: [common]
-
-- include: "{{ team }}.yml"
