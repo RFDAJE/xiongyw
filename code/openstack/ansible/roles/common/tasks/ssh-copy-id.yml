@@ -1,0 +1,2 @@
+---
+# this is to allow the ansible box to ssh to each node without passwd

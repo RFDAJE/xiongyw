@@ -173,3 +173,5 @@
 - name: enable-snmpd-service
   service: name=snmpd enabled=yes state=restarted
   tags: [common]
+
+- include: ssh-copy-id.yml
