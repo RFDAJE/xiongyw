@@ -12,17 +12,40 @@
   pip:
     name: pip
     state: latest
-    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    extra_args: -i "{{ PYPI_INDEX_URL }}"
   tags:
     - horizon
 
-- name: install-pip-pkgs
-  pip:
-    name: "{{ item }}"
-    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
-    state: present
-  with_items:
-    - virtualenvwrapper
+#- name: install-pip-pkgs
+#  pip:
+#    name: "{{ item }}"
+#    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+#    state: present
+#  with_items:
+#    - virtualenvwrapper
+#  tags:
+#    - horizon
+
+- name: mkdir-root-dir-for-dashboard
+  file:
+    path: "{{ DASHBOARD_INSTALL_ROOT }}"
+    state: directory
   tags:
     - horizon
+
+- name: unarchive-horizon-pkg
+  unarchive:
+    src: "pkgs/{{ DASHBOARD_PKG_TARBALL }}"
+    dest: "{{ DASHBOARD_INSTALL_ROOT }}"
+  tags:
+    - horizon
+
+- name: pip-install-pkgs
+  pip:
+    requirements: "{{ DASHBOARD_INSTALL_ROOT }}/{{ DASHBOARD_PKG_TOP_DIR }}/requirements.txt"
+    extra_args: -i "{{ PYPI_INDEX_URL }}"
+  tags:
+    - horizon
+
+
 

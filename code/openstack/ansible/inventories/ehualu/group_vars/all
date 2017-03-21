@@ -6,3 +6,11 @@ basearch: x86_64
 MGMT_SUFFIX: m
 IPMI_SUFFIX: i
 STOR_SUFFIX: s
+
+
+#PYPI_INDEX_URL: https://pypi.douban.com/simple
+PYPI_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
+
+# for in-house built pkgs.
+PKG_INSTALL_ROOT: "/oceanray"
+

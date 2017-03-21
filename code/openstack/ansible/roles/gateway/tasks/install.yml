@@ -14,32 +14,29 @@
   pip:
     name: pip
     state: latest
-    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    extra_args: -i "{{PYPI_INDEX_URL}}"
   tags:
     - gateway
 
 - name: install-pip-pkgs
   pip:
     name: "{{ item }}"
-    extra_args: -i https://pypi.tuna.tsinghua.edu.cn/simple
+    extra_args: -i "{{PYPI_INDEX_URL}}"
     state: present
   with_items:
     - keystoneauth1
     - botocore
     - webob
-    - xattr
     - boto3
     - awscli
     - pika
     - uwsgi
+# note that xattr depends on cffi. if not explictly install, cffi will not able
+# to be downloaded from official site because of network issues.
+    - cffi
+    - xattr
   tags:
     - gateway
-
-# this is ugly, but let's do it for now...
-#- name: copy-sig-pkgs
-#  copy: src=pkgs/sig.tgz dest=/tmp/sig.tgz
-#  tags:
-#    - gateway
 
 - name: mkdir-oceanray-sig
   file:

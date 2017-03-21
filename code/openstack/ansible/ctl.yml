@@ -2,6 +2,6 @@
 - hosts: ctl
   gather_facts: no
   roles:
-    - common
+    - { role: common, team: team2 }
     - { role: pacemaker, action: install }
 

@@ -1,8 +1,7 @@
 ---
-- hosts: ptl
+- hosts: warm
   gather_facts: no
   roles:
     - { role: common, team: team2 }
     - { role: pacemaker, action: install }
-    - { role: horizon, action: install }
 
