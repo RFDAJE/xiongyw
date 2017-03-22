@@ -14,3 +14,31 @@ PYPI_INDEX_URL: https://pypi.tuna.tsinghua.edu.cn/simple
 # for in-house built pkgs.
 PKG_INSTALL_ROOT: "/oceanray"
 
+
+ctl_m: "192.168.9."
+ctl_i: "192.168.10."
+ctl_v: "192.168.8.210 ctlvip"
+ctl_vm: "192.168.9.210 ctlvipm"
+
+ptl_m: "192.168.9."
+ptl_i: "192.168.10."
+ptl_v: "192.168.8.220 ptlvip"
+ptl_vm: "192.168.9.220 ptlvipm"
+
+gw_m: "192.168.9."
+gw_i: "192.168.10."
+gw_v: "192.168.8.230 gwvip"
+gw_vm: "192.168.9.230 gwvipm"
+
+hot_m: "192.168.9."
+hot_i: "192.168.10."
+hot_s: "192.168.11."
+hot_v: "192.168.8.240 hotvip"
+hot_vm: "192.168.9.240 hotvipm"
+
+warm_m: "192.168.9."
+warm_i: "192.168.10."
+warm_s: "192.168.11."
+warm_v: "192.168.8.250 warmvip"
+warm_vm: "192.168.9.250 warmvipm"
+

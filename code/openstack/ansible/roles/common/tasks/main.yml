@@ -143,16 +143,20 @@
   template: src=sshd_config dest=/etc/ssh/sshd_config
   tags: [common]
 
+- name: restart-sshd
+  service: name=sshd state=restarted
+  tags: [common]
+
 - name: update-hostname
   hostname: name={{ item.mgmt_name }}
   with_items: "{{ NODES_FACT }}"
   when: item.ext_ip == inventory_hostname
   tags: [common]
 
-- name: update-etc-hosts
-  template: src=hosts.j2 dest=/etc/hosts
-  tags: [common]
+#- name: update-etc-hosts
+#  template: src=hosts.j2 dest=/etc/hosts
+#  tags: [common]
 
 - include: "{{ team }}.yml"
 
-- include: ssh-copy-id.yml
+#- include: ssh-copy-id.yml

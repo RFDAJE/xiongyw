@@ -13,6 +13,7 @@ usage() {
 	 To install ctl cluster for home environment: sudo ./run.sh home ctl
      To install pacemaker on ctl cluster for home environment: sudo ./run.sh home ctl pacemaker
      To delete pacemaker on ctl cluster for home environment: sudo ./run.sh home ctl-d pacemaker-d
+     To generate /etc/hosts for all nodes: sudo ./run.sh ehualu all hosts
 	EOF
 }
 
