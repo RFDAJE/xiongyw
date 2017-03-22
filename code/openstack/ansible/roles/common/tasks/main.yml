@@ -122,29 +122,20 @@
   template: src=selinux.config dest=/etc/selinux/config
   tags: [common]
 
-- name: disable-ipv6-1
-  blockinfile:
-    dest: /etc/sysctl.conf
-    backup: yes
-    block: |
-      net.ipv6.conf.all.disable_ipv6 = 1
-      net.ipv6.conf.default.disable_ipv6 = 1
-#  shell: echo net.ipv6.conf.all.disable_ipv6 = 1  >> /etc/sysctl.conf; \
-#         echo net.ipv6.conf.default.disable_ipv6 = 1 >> /etc/sysctl.conf; \
-#         sysctl -p
-# https://github.com/ansible/ansible/issues/19388
-#  sysctl:
-#    name: net.ipv6.conf.all.disable_ipv6
-#    value: 1
-#    sysctl_set: yes
-#    state: present
-#    sysctl_file: /etc/sysctl.conf
-#    reload: yes
-
-- name: disable-ipv6-2
-  shell: sysctl -p
-  changed_when: false
-  tags: [common]
+# https://bugzilla.redhat.com/show_bug.cgi?id=1370241
+#
+#- name: disable-ipv6-1
+#  blockinfile:
+#    dest: /etc/sysctl.conf
+#    backup: yes
+#    block: |
+#      net.ipv6.conf.all.disable_ipv6 = 1
+#      net.ipv6.conf.default.disable_ipv6 = 1
+#
+#- name: disable-ipv6-2
+#  shell: sysctl -p
+#  changed_when: false
+#  tags: [common]
 
 - name: enable-nopasswd-sudo
   template: src=sudoers dest=/etc/suduers

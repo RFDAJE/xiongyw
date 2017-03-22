@@ -54,7 +54,7 @@ TEAMING:
 # - prefix: e.g., "ctl" for controller cluster
 # - n: index, start from 1
 # - suffix: for external ip, no suffix; for mgmt/ipmi/storage ip, use [m|i|s] respectively
-NODENAME_PREFIX: hot
+NODENAME_PREFIX: warm
 EXT_NAME_IDX_START: 1
 EXT_NAME_SUFFIX: ""
 MGMT_NAME_IDX_START: 1
