@@ -4,4 +4,5 @@
   roles:
     - { role: common, team: team2 }
     - { role: pacemaker, action: install }
+    - { role: ntp, action: install }
 

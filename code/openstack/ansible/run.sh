@@ -6,13 +6,13 @@
 usage() {
   cat <<-EOF
 	usage: # $(basename $0) [-v] <site> <playbook> [tags]
-          site: home|wukuang|wukuang-qa
-          playbook: ctl[-d]|ptl|gw|hot|warm
-          tags (optional): pacemaker|...
+          site: home|ehualu|ehualu-dev|wukuang|wukuang-qa
+          playbook: ctl[-d]|ptl[-d]|gw[-d]|hot[-d]|warm[-d]
+          tags (optional): common|pacemaker[-d]|ntp[-d]|...
 	e.g.:
-	 install ctl cluster: sudo ./run.sh home ctl
-         install pacemaker on ctl cluster: sudo ./run.sh home ctl pacemaker
-         delete pacemaker on ctl cluster: sudo ./run.sh home ctl-d pacemaker
+	 To install ctl cluster for home environment: sudo ./run.sh home ctl
+     To install pacemaker on ctl cluster for home environment: sudo ./run.sh home ctl pacemaker
+     To delete pacemaker on ctl cluster for home environment: sudo ./run.sh home ctl-d pacemaker-d
 	EOF
 }
 
