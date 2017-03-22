@@ -1,0 +1,16 @@
+---
+- name: pcs-resource-show-snmpd
+  command: pcs resource show snmpd-clone
+  register: pcs_resource_show_snmpd_clone
+  run_once: true
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - snmpd-d
+  
+- name: delete-pacemaker-resource
+  shell: pcs resource delete snmpd-clone
+  run_once: true
+  when: not pcs_resource_show_snmpd_clone.stderr
+  tags:
+    - snmpd-d

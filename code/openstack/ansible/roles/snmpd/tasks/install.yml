@@ -1,0 +1,34 @@
+- name: install-snmpd-pkgs
+  yum: name={{ item }} state=installed
+  with_items:
+    - net-snmp
+    - net-snmp-utils
+  tags:
+    - snmpd
+
+- name: update-snmpd-conf
+  template: src=snmpd.conf dest=/etc/snmp/snmpd.conf
+  tags: 
+    - snmpd
+
+- name: enable-snmpd-service
+  service: name=snmpd enabled=no state=stopped
+  tags: 
+    - snmpd
+
+# check if resource already created
+- name: pcs-resource-show-snmpd
+  command: pcs resource show snmpd-clone
+  register: pcs_resource_show_snmpd_clone
+  run_once: true
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - snmpd
+
+- name: create-pacemaker-resource
+  shell: pcs resource create snmpd systemd:snmpd --clone
+  run_once: true
+  when: pcs_resource_show_snmpd_clone.stderr.startswith("Error")
+  tags:
+    - snmpd
