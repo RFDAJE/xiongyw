@@ -1,4 +1,11 @@
 ---
+
+mirror_ip: 10.2.162.153
+mirror_port: 80
+releasever: 7
+basearch: x86_64
+
+
 # pacemaker cluster name
 CLUSTER_NAME: ctl
 

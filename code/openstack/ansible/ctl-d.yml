@@ -2,5 +2,7 @@
 - hosts: ctl
   gather_facts: no
   roles:
-    - { role: pacemaker, action: delete }
+    - { role: snmpd, action: delete }
+    - { role: ntp, action: delete }
+#    - { role: pacemaker, action: delete }
 
