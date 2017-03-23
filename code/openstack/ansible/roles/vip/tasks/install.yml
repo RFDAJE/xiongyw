@@ -1,0 +1,21 @@
+---
+# check if resource already created
+- name: pcs-resource-show-vip
+  command: pcs resource show {{ CLUSTER_EXT_VIP_NAME }}
+  register: pcs_resource_show_vip
+  run_once: true
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - vip
+
+- name: create-pacemaker-resource
+  shell: |
+    pcs resource create {{ CLUSTER_EXT_VIP_NAME }}  ocf:heartbeat:IPaddr2 ip={{ CLUSTER_EXT_VIP }}  cidr_netmask={{ NODE_EXT_IP_MASK }} op monitor interval=15s
+    pcs resource create {{ CLUSTER_MGMT_VIP_NAME }} ocf:heartbeat:IPaddr2 ip={{ CLUSTER_MGMT_VIP }} cidr_netmask={{ NODE_MGMT_IP_MASK }} op monitor interval=15s
+    pcs constraint colocation add {{ CLUSTER_EXT_VIP_NAME }} with {{ CLUSTER_MGMT_VIP_NAME }}
+    pcs constraint order {{ CLUSTER_MGMT_VIP_NAME }} then {{ CLUSTER_EXT_VIP_NAME }}
+  run_once: true
+  when: pcs_resource_show_vip.stderr.startswith("Error")
+  tags:
+    - vip

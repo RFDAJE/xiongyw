@@ -4,6 +4,7 @@
   roles:
     - { role: common, team: team2 }
     - { role: pacemaker, action: install }
+#    - { role: vip, action: install }
     - { role: ntp, action: install }
     - { role: snmpd, action: install }
 

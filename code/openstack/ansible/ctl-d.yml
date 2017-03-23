@@ -4,5 +4,6 @@
   roles:
     - { role: snmpd, action: delete }
     - { role: ntp, action: delete }
-#    - { role: pacemaker, action: delete }
+    - { role: vip, action: delete }
+    - { role: pacemaker, action: delete }
 

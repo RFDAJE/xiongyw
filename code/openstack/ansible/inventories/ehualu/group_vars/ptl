@@ -25,6 +25,7 @@ NODES_DNS:
   - 219.141.136.10
 
 # VIPs share the same mask/gw info
+# note that the name is also used for pacemaker resource names
 CLUSTER_EXT_VIP: 192.168.8.220
 CLUSTER_EXT_VIP_NAME: ptlvip
 CLUSTER_MGMT_VIP: 192.168.9.220
@@ -84,6 +85,5 @@ NODES_MGMT_NAME_template:
 DASHBOARD_PKG_TARBALL: "openstack-dashboard.tgz"
 DASHBOARD_INSTALL_ROOT: "/usr/share"
 DASHBOARD_PKG_TOP_DIR: "openstack-dashboard"
-
 
 
