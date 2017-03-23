@@ -11,7 +11,7 @@
   tags: 
     - snmpd
 
-- name: enable-snmpd-service
+- name: disable-and-stop-snmpd-service
   service: name=snmpd enabled=no state=stopped
   tags: 
     - snmpd

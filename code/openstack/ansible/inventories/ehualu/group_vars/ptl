@@ -24,6 +24,7 @@ NODE_IPMI_IP_GW: 192.168.8.1
 NODES_DNS:
   - 219.141.136.10
 
+
 # VIPs share the same mask/gw info
 # note that the name is also used for pacemaker resource names
 CLUSTER_EXT_VIP: 192.168.8.220
@@ -54,6 +55,17 @@ MGMT_NAME_SUFFIX: "m"
 IPMI_NAME_IDX_START: 1
 IPMI_NAME_SUFFIX: "i"
 
+#-----------------------------------------------------------------------
+
+
+KEYSTONE_IP: "'192.168.8.210'"
+
+DASHBOARD_PKG_TARBALL: "http://10.2.162.153/oceanray/openstack-dashboard_20170323.tar.gz"
+DASHBOARD_INSTALL_ROOT: "/usr/share"
+DASHBOARD_PKG_TOP_DIR: "openstack-dashboard"
+DASHBOARD_SYSTEMD_FOLDER: "/usr/lib/systemd/system/httpd.service.d"
+DASHBOARD_LISTEN_PORT: "8000"
+
 
 #-----------------------------------------------------------------------
 # http://stackoverflow.com/questions/42811213/ansible-generate-variables-in-loops
@@ -80,10 +92,5 @@ NODES_MGMT_NAME_template:
   "{{ NODENAME_PREFIX }}{{MGMT_NAME_IDX_START|int + item|int }}{{ MGMT_NAME_SUFFIX }}"
 
 
-
-
-DASHBOARD_PKG_TARBALL: "openstack-dashboard.tgz"
-DASHBOARD_INSTALL_ROOT: "/usr/share"
-DASHBOARD_PKG_TOP_DIR: "openstack-dashboard"
 
 

@@ -2,7 +2,9 @@
 - hosts: ptl
   gather_facts: no
   roles:
+    - { role: horizon, action: delete }
     - { role: snmpd, action: delete }
     - { role: ntp, action: delete }
+    - { role: haproxy, action: delete }
     - { role: vip, action: delete }
     - { role: pacemaker, action: delete }

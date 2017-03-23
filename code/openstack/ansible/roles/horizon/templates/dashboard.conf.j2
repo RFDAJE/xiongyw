@@ -1,0 +1,26 @@
+# put this file at /etc/httpd/conf.d/dashboard.conf, and change the IP
+
+Listen {% for item in NODES_FACT if item.ext_ip == inventory_hostname %} {{ item.mgmt_ip }}:{{ DASHBOARD_LISTEN_PORT}} {% endfor %}
+
+<VirtualHost {% for item in NODES_FACT if item.ext_ip == inventory_hostname %} {{ item.mgmt_ip }}:{{ DASHBOARD_LISTEN_PORT}} {% endfor %}>
+
+WSGIDaemonProcess dashboard
+WSGIProcessGroup dashboard
+
+WSGIScriptAlias /dashboard /usr/share/openstack-dashboard/openstack_dashboard/wsgi/django.wsgi
+Alias /dashboard/static /usr/share/openstack-dashboard/static
+
+<Directory /usr/share/openstack-dashboard/openstack_dashboard/wsgi>
+  Options All
+  AllowOverride All
+  Require all granted
+</Directory>
+
+<Directory /usr/share/openstack-dashboard/static>
+  Options All
+  AllowOverride All
+  Require all granted
+</Directory>
+</VirtualHost>
+
+WSGISocketPrefix run/wsgi

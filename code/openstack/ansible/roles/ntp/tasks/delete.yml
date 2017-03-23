@@ -9,7 +9,9 @@
     - ntp-d
   
 - name: delete-pacemaker-resource
-  shell: pcs resource delete chronyd-clone
+  shell: |
+    pcs resource cleanup
+    pcs resource delete chronyd-clone
   run_once: true
   when: not pcs_resource_show_chronyd_clone.stderr
   tags:

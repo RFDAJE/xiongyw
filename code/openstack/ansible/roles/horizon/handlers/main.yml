@@ -1,0 +1,6 @@
+---
+- name: restart-haproxy-resource
+  shell: pcs resource restart haproxy
+  run_once: true
+  tags:
+    - horizon
