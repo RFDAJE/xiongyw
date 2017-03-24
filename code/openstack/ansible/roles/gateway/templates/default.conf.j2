@@ -65,9 +65,11 @@ sync_interval=3600
 db_name=cygw_containers
 
 [keystone]
+version={{ GATEWAY_KEYSTONE_VERSION }}
 user={{ GATEWAY_KEYSTONE_USER }}
 passwd={{ GATEWAY_KEYSTONE_PASS }}
-tenant={{ GATEWAY_KEYSTONE_PROJECT }}
+tenant={{ GATEWAY_KEYSTONE_DOMAIN }}
+project={{ GATEWAY_KEYSTONE_PROJECT }}
 adminurl={{ GATEWAY_KEYSTONE_ADMIN_URL }}
 publicurl={{ GATEWAY_KEYSTONE_PUBLIC_URL }}
 

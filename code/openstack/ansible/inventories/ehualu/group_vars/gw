@@ -54,21 +54,26 @@ IPMI_NAME_IDX_START: 1
 IPMI_NAME_SUFFIX: "i"
 #-----------------------------------------------------------------------
 
-# note that the name "oceanary" needs to be fixed!
-GATEWAY_YUM_PKG_NAME: oceanary-gateway
-GATEWAY_CONFIG_DIR: /etc/oceanary/gateway
+GATEWAY_YUM_PKG_URL: "http://10.2.162.153/oceanray/oceanray-gateway-0.1.8-1.noarch.rpm"
+GATEWAY_YUM_PKG_NAME: oceanray-gateway
+GATEWAY_CONFIG_DIR: /etc/oceanray/gateway
 GATEWAY_WORK_DIR: /var/lib/cygw
+GATEWAY_PKG_TOP_DIR: /usr/lib/python2.7/site-packages/oceanray_gateway
 
 GATEWAY_MARIADB_IP: 192.168.9.210
 GATEWAY_MARIADB_PORT: 3306
 GATEWAY_MARIADB_USER: root
 GATEWAY_MARIADB_PASS: qwerty
 GATEWAY_MONGODB_URL: '"mongodb://192.168.9.211:27017,192.168.9.212:27017,192.168.9.213:27017/?replicaSet=rs0"'
+
+GATEWAY_KEYSTONE_VERSION: v3
 GATEWAY_KEYSTONE_USER: admin
 GATEWAY_KEYSTONE_PASS: qwerty
+GATEWAY_KEYSTONE_DOMAIN: default
 GATEWAY_KEYSTONE_PROJECT: admin
 GATEWAY_KEYSTONE_ADMIN_URL: http://192.168.9.210:35357/v3
 GATEWAY_KEYSTONE_PUBLIC_URL: http://192.168.8.210:5000/v3
+
 GATEWAY_RABBITMQ_TRANSPORT_URL: rabbit://openstack:qwerty@192.168.9.211:5672,openstack:qwerty@192.168.9.212:5672,openstack:qwerty@192.168.9.213:5672/
 GATEWAY_RABBITMQ_QUEUE: testq
 GATEWAY_RABBITMQ_EXCHANGE: tbd

@@ -40,7 +40,7 @@
 
 - name: install-oceanray-rpm-pkg
   yum:
-    name: "http://10.2.162.153/oceanray/oceanary-gateway-0.1.5-1.noarch.rpm"
+    name: "{{ GATEWAY_YUM_PKG_URL }}"
     state: present
   tags:
     - gateway
@@ -55,6 +55,13 @@
 #------------------------------------
 # updating config files
 #------------------------------------
+- name: mkdir-config-dir
+  file:
+    path: "{{ GATEWAY_CONFIG_DIR }}"
+    state: directory
+  tags:
+    - gateway
+
 
 - name: update-default-conf
   template:
@@ -128,6 +135,7 @@
   tags:
     - gateway
 
+# note that the gateway services cannot tested with "httpchk" option.
 - name: update-haproxy-cfg
   blockinfile: 
     backup: yes

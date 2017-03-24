@@ -22,7 +22,7 @@
   tags:
     - gateway-d
 
-# fixme: update haproxy.cfg and restart haproxy resource?
+# fixme: update haproxy.cfg, using blockinfile, state=absent
 
 - name: remove-gateway-pkg
   yum:

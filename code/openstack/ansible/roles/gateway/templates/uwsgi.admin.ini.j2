@@ -2,6 +2,7 @@
 
 [uwsgi]
 http = {{ inventory_hostname }}:{{ GATEWAY_ADMIN_PORT }}
+chdir = {{ GATEWAY_PKG_TOP_DIR }}
 wsgi-file = gateway.py 
 pyargv = --admin
 processes = 5

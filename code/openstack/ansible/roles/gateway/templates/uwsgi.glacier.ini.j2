@@ -2,6 +2,7 @@
 
 [uwsgi]
 http = {{ inventory_hostname }}:{{ GATEWAY_GLACIER_PORT }}
+chdir = {{ GATEWAY_PKG_TOP_DIR }}
 wsgi-file = gateway.py 
 pyargv = --glacier
 processes = 20
