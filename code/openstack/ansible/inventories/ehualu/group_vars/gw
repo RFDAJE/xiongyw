@@ -54,9 +54,10 @@ IPMI_NAME_IDX_START: 1
 IPMI_NAME_SUFFIX: "i"
 #-----------------------------------------------------------------------
 
-GATEWAY_WORK_DIR: /var/lib/cygw
-# note that "oceanary" needs to be fixed!
+# note that the name "oceanary" needs to be fixed!
+GATEWAY_YUM_PKG_NAME: oceanary-gateway
 GATEWAY_CONFIG_DIR: /etc/oceanary/gateway
+GATEWAY_WORK_DIR: /var/lib/cygw
 
 GATEWAY_MARIADB_IP: 192.168.9.210
 GATEWAY_MARIADB_PORT: 3306
