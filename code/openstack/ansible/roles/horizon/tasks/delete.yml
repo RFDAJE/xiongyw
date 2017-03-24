@@ -10,7 +10,7 @@
   
 - name: delete-pacemaker-resource
   shell: |
-    pcs resource cleanup
+    pcs resource cleanup --force
     pcs resource delete httpd-clone
   run_once: true
   when: not pcs_resource_show_httpd_clone.stderr

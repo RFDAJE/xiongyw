@@ -9,7 +9,7 @@
     - pacemaker-d
 
 - name: resource-cleanup
-  shell: pcs resource cleanup
+  shell: pcs resource cleanup --force
   run_once: true
 #  when: PCS_STATUS.startswith("Cluster name:")
   ignore_errors: true
