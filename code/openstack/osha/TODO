@@ -6,6 +6,9 @@
   . haproxy for mq and its web ui: done
   . test crash/reboot cases
   . persistency: cluster status; user/permission; policy persistency
+  . partition: autoheal? http://www.rabbitmq.com/partitions.html
+  . cluster formation: list nodes in config file? http://www.rabbitmq.com/clustering.html
+  - user not persistent: http://stackoverflow.com/questions/26771910/rabbitmq-in-docker-user-creation-not-persisted
 - mongod: web ui; replica set details; mongo shell; access control
 - haproxy on host
 - stonith

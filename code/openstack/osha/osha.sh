@@ -36,8 +36,8 @@ SCRIPTPATH=$(dirname $SCRIPT)
 #settings_wukuang
 #settings_wukuang_qa
 #settings_xiamen
-#settings_ehualu_dev
-settings_ehualu_mini
+settings_ehualu_dev
+#settings_ehualu_mini
 #                                                      #
 #                                                      #
 ########################################################

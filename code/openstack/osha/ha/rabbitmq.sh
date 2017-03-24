@@ -59,6 +59,11 @@ rabbitmq() {
     #ssh ${node} -- echo "NODENAME=rabbit@${node}${MGMT_SUFFIX}" \> ${RABBITMQ_env_conf}
     echo "enabling rabbitmq-management plugin (need start service first)..."
     ssh ${node} -- systemctl start rabbitmq-server
+
+	ssh ${node} -- rabbitmqctl set_policy ha-all '^(?!amq\.).*' '{"ha-mode": "all"}'
+	ssh ${node} -- rabbitmqctl add_user ${RABBITMQ_user} ${RABBITMQ_pass}
+	ssh ${node} -- rabbitmqctl set_permissions ${RABBITMQ_user} ".*" ".*" ".*"
+    
     sleep 5;
     ssh ${node} -- rabbitmq-plugins enable rabbitmq_management
     ssh ${node} -- systemctl stop rabbitmq-server
