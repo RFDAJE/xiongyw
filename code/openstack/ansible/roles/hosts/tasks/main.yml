@@ -1,6 +1,0 @@
----
-# update /etc/hosts
-- name: generate-etc-hosts
-  template: src=hosts.j2 dest=/etc/hosts
-  tags:
-    - hosts

@@ -1,9 +1,0 @@
----
-- hosts: gw
-  gather_facts: no
-  roles:
-    - { role: gateway, action: delete }
-    - { role: snmpd, action: delete }
-    - { role: ntp, action: delete }
-    - { role: vip, action: delete }
-    - { role: pacemaker, action: delete }
